@@ -39,6 +39,14 @@
     border-radius: 4px;
 }
 
+.form-group select {
+    width: 98%;
+    padding: 12px;
+    font-size: 14px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+}
+
 .form-group input:focus {
     outline: none;
     border-color: #007bff;
@@ -52,6 +60,7 @@
 
 .signup-button {
     text-align: center;
+    width: 45%;
     padding: 15px;
     font-size: 16px;
     color: #ffffff;
@@ -64,6 +73,7 @@
 
 .cancle-button {
     text-align: center;
+    width: 45%;
     padding: 15px;
     font-size: 16px;
     color: #ffffff;
@@ -78,3 +88,19 @@
     background-color: #0056b3;
 }
 
+.cancle-button:hover {
+    background-color: #5a6268;
+}
+
+.message {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+    color: red;
+}
+
+.error {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}
