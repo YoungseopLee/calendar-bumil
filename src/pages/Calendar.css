@@ -7,8 +7,8 @@
 
 .calendar {
   width: 90%; /* 약간 더 넓게 설정 */
-  max-width: 300px;
-  min-width: 300px;
+  max-width: 90%;
+  min-width: 90%;
   margin: 20px auto;
   border: 1px solid #ddd;
   border-radius: 10px;

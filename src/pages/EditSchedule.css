@@ -4,7 +4,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
+    height: 100vh; /* 화면 높이 꽉 차게 */
 }
 
 .edit-schedule {
@@ -14,7 +14,6 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 600px;
-    text-align: center;
 }
 
 .edit-schedule__title {
@@ -43,23 +42,17 @@
     margin-bottom: 8px;
 }
 
-.edit-schedule__input {
-    width: 90%;
+/* 모든 input과 select 크기 통일 */
+.edit-schedule__input, 
+.edit-schedule__select {
+    width: 100%; /* 전체 너비 사용 */
     padding: 12px;
     border-radius: 8px;
     border: 1px solid #ddd;
     font-size: 1em;
     background-color: #f9f9f9;
     transition: border-color 0.3s ease;
-}
-.edit-schedule__select {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    font-size: 1em;
-    background-color: #f9f9f9;
-    transition: border-color 0.3s ease;    
+    box-sizing: border-box; /* 패딩 포함한 크기 조정 */
 }
 
 .edit-schedule__input:focus,
@@ -70,15 +63,17 @@
 
 .edit-schedule__button-container {
     display: flex;
+    width: 100%;
     justify-content: space-between;
 }
 
 .edit-schedule__button {
+    width: 48%; /* 버튼 크기 균등 배분 */
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
-    padding: 10px 30px;
+    padding: 10px 20px;
     cursor: pointer;
     font-size: 1em;
     transition: background-color 0.3s ease;
