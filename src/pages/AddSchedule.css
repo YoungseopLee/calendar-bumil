@@ -1,0 +1,223 @@
+.add-schedule-body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.add-schedule {
+    background-color: white;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    width: 100%; /* 기본적으로 100% */
+    max-width: 600px; /* 최대 너비를 600px로 제한 */
+    text-align: center;
+    transition: box-shadow 0.3s ease;
+}
+
+.add-schedule:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.add-schedule__title {
+    font-size: 2em;
+    margin-bottom: 25px;
+    color: #333;
+    font-weight: 600;
+}
+
+.add-schedule__date-label {
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #555;
+    display: block;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.add-schedule__date-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.add-schedule__date-field {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.add-schedule__date-input,
+.add-schedule__select {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 1em;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 180px; /* 기본 너비 */
+}
+
+.add-schedule__date-input:focus,
+.add-schedule__select:focus {
+    border-color: #007BFF;
+    outline: none;
+}
+
+.add-schedule__date-input::-webkit-calendar-picker-indicator {
+    color: #666;
+}
+
+.add-schedule__select {
+    background-image: url('data:image/svg+xml;utf8,<svg fill="#666" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    background-repeat: no-repeat;
+    background-position-x: calc(100% - 10px);
+    background-position-y: center;
+    background-size: 20px;
+    padding-right: 30px;
+    width: 150px;
+}
+
+.add-schedule__todo-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 15px 0;
+}
+
+.add-schedule__todo-item {
+    background-color: #f1f1f1;
+    margin-bottom: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: left;
+    font-size: 1em;
+    color: #555;
+}
+
+.add-schedule__todo-input {
+    width: calc(100% - 24px);
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 1em;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+}
+
+.add-schedule__todo-input::placeholder {
+    color: #aaa;
+}
+
+.add-schedule__todo-input:focus {
+    border-color: #007BFF;
+    outline: none;
+}
+
+.add-schedule__button,
+.add-schedule__button--back {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1em;
+    margin: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.add-schedule__button:hover,
+.add-schedule__button--back:hover {
+    background-color: #0056b3;
+}
+
+.add-schedule__button--back {
+    background-color: #6c757d;
+}
+
+.add-schedule__button--back:hover {
+    background-color: #5a6268;
+}
+
+.add-schedule__status-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.add-schedule__status-label {
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #555;
+    margin-right: auto;
+}
+
+.add-schedule__button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.add-schedule__error-message {
+    color: red;
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.add-schedule__todo-title {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+/* 반응형 디자인 추가: 화면 크기에 맞게 스타일 조정 */
+@media (max-width: 768px) {
+    .add-schedule {
+        padding: 20px;
+        width: 90%; /* 모바일 화면에서는 90% 너비로 설정 */
+    }
+
+    .add-schedule__title {
+        font-size: 1.8em; /* 모바일에서 제목 크기 줄이기 */
+    }
+
+    .add-schedule__date-container {
+        flex-direction: row; /* 한 줄에 배치 */
+        flex-wrap: wrap; /* 줄 바꿈을 허용 */
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .add-schedule__date-field {
+        flex: 1;
+        margin-right: 15px;
+        margin-bottom: 10px;
+    }
+
+    .add-schedule__date-input,
+    .add-schedule__select {
+        width: 80%; /* 모바일에서 100% 너비로 설정 */
+    }
+
+    .add-schedule__todo-input {
+        width: 90%; /* 모바일에서도 할 일 입력 필드가 잘리지 않도록 설정 */
+    }
+
+    .add-schedule__button,
+    .add-schedule__button--back {
+        width: 100%; /* 버튼도 전체 너비로 설정 */
+        margin-top: 10px;
+    }
+}

@@ -1,0 +1,97 @@
+.edit-body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.edit-schedule {
+    background-color: white;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+}
+
+.edit-schedule__title {
+    font-size: 2em;
+    margin-bottom: 25px;
+    color: #333;
+    font-weight: 600;
+}
+
+.edit-schedule__form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.edit-schedule__field {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.edit-schedule__label {
+    font-size: 1.1em;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.edit-schedule__input {
+    width: 90%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 1em;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+}
+.edit-schedule__select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 1em;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;    
+}
+
+.edit-schedule__input:focus,
+.edit-schedule__select:focus {
+    border-color: #007BFF;
+    outline: none;
+}
+
+.edit-schedule__button-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.edit-schedule__button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 30px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.edit-schedule__button:hover {
+    background-color: #0056b3;
+}
+
+.edit-schedule__button--back {
+    background-color: #6c757d;
+}
+
+.edit-schedule__button--back:hover {
+    background-color: #5a6268;
+}

@@ -1,0 +1,352 @@
+/* Calendar.css */
+.calendar-page {
+  display: flex;
+  font-family: 'Noto Sans KR', sans-serif;
+  flex-direction: column; /* 모든 요소가 세로로 배치되도록 변경 */
+}
+
+.calendar {
+  width: 90%; /* 약간 더 넓게 설정 */
+  max-width: 300px;
+  min-width: 300px;
+  margin: 20px auto;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  padding: 20px;
+  position: relative;
+  overflow: auto; /* 일정이 많을 경우 스크롤 처리 */
+  max-height: 100vh; /* 일정 추가 시 스크롤이 생길 수 있도록 높이 제한 */
+}
+
+.calendar-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px; /* 상단 여백을 줄여 상태 변경 UI가 겹치지 않도록 설정 */
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10; /* 네비게이션이 캘린더 위에 고정되도록 설정 */
+}
+
+.calendar-navigation .nav-button {
+  border: none;
+  font-size: 1.0em; /* Increased size for better visibility */
+  cursor: pointer;
+  border-radius: 10%;
+  color: black; /* Changed to black */
+  padding: 5px 10px;
+  transition: color 0.3s ease;
+}
+
+.calendar-navigation .nav-button:hover {
+  color: #ffffff;
+  background-color: #007bff;
+}
+
+.calendar-title {
+  font-size: 1.3em;
+  font-weight: bold;
+  margin: 0;
+  color: #333;
+}
+
+.calendar-days-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-bottom: 10px;
+  margin-top: 20px; /* 캘린더 제목과 상태 변경 UI 사이에 여백 추가 */
+}
+
+.day-header {
+  text-align: center;
+  font-weight: bold;
+  color: #777;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.calendar-day {
+  position: relative;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.calendar-day .status-circle {
+  display: none;
+}
+
+.calendar-day.active {
+  background-color: #ffffff;
+  border: 1px solid #eee;
+}
+
+.calendar-day:hover {
+  background-color: #f0f0f0;
+}
+
+/* 오늘 날짜 스타일 */
+.calendar-day.today {
+  background-color: #28a745; /* 초록색 */
+  color: white; /* 글자색은 흰색 */
+  font-weight: bold;
+}
+
+/* 선택된 날짜 스타일 */
+.calendar-day.selected {
+  background-color: #f0ad4e; /* 오렌지 색으로 선택된 날짜 강조 */
+  color: white;
+  font-weight: bold;
+  border: 2px solid #d9534f; /* 선택된 날짜에 테두리 추가 */
+}
+
+.calendar-day:nth-child(7n) {
+  color: blue;
+}
+
+.calendar-day:nth-child(7n+1) {
+  color: red;
+}
+
+.schedule-area {
+  margin-top: 20px;
+  padding: 15px;
+  border-top: 1px solid #eee;
+}
+
+.selected-date-info {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.selected-date-info h3 {
+  font-size: 1.2em;
+  color: #333;
+  margin-bottom: 0;
+}
+
+.add-schedule-container {
+  display: flex;
+  justify-content: center; /* Centers the button horizontally */
+  margin-bottom: 15px;
+}
+
+.button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+.schedule-section {
+  margin-bottom: 20px;
+}
+
+.schedule-section h4 {
+  font-size: 1.1em;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.schedule-list {
+  padding: 0;
+  list-style: none;
+}
+
+/* 일정 항목 */
+.schedule-item {
+  display: flex;
+  align-items: center; /* 상태 아이콘과 텍스트를 수직 정렬 */
+  background-color: #f0f8ff;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  color: #333;
+  text-align: left; /* 텍스트 왼쪽 정렬 */
+  width: 100%; /* 부모 너비 차지 */
+  white-space: nowrap; /* 텍스트가 한 줄로 유지되도록 */
+}
+
+.schedule-item:hover {
+  background-color: #e0f7fa;
+}
+
+.schedule-item.other-user-schedule {
+  background-color: #fff8e1;
+}
+
+.empty-schedule {
+  color: #999;
+  font-style: italic;
+}
+
+.status-circle {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.schedule-container {
+  display: flex;
+  width: 105%;
+  align-items: center; /* 수직 정렬 */
+  justify-content: space-between; /* 좌우 정렬 */
+}
+
+/* 상태 아이콘 */
+.schedule-item .status-icon {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: gray; /* 기본값은 회색 */
+  margin-right: 10px; /* 상태 아이콘과 텍스트 사이에 공백 추가 */
+  flex-shrink: 0; /* 상태 아이콘이 찌그러지지 않도록 고정 크기 유지 */
+}
+
+/* 일정 텍스트가 남는 공간을 차지하도록 설정 */
+.schedule-item .task-name {
+  flex-grow: 1; /* 텍스트가 남는 공간을 차지하도록 설정 */
+  overflow: hidden; /* 텍스트가 너무 길면 잘림 */
+  text-overflow: ellipsis; /* 텍스트가 잘리면 '...' 으로 표시 */
+  white-space: nowrap; /* 텍스트가 한 줄로 유지되도록 설정 */
+  max-width: calc(20ch); /* 18글자(약 18개 문자의 길이)로 제한 */
+}
+
+.schedule-item .task-name-two {
+  flex-grow: 1; /* 텍스트가 남는 공간을 차지하도록 설정 */
+  overflow: hidden; /* 텍스트가 너무 길면 잘림 */
+  text-overflow: ellipsis; /* 텍스트가 잘리면 '...' 으로 표시 */
+  white-space: nowrap; /* 텍스트가 한 줄로 유지되도록 설정 */
+  max-width: calc(20ch); /* 18글자(약 18개 문자의 길이)로 제한 */
+}
+
+/* 상태별 색상 */
+.schedule-item .status-icon.red {
+  background-color: red; /* 준비 중 */
+}
+
+.schedule-item .status-icon.green {
+  background-color: green; /* 진행 중 */
+}
+
+.schedule-item .status-icon.lightblue {
+  background-color: #30aee0; /* 완료 */
+}
+
+/* 수정 및 삭제 버튼 */
+.button-group {
+  display: flex;
+}
+
+/* 아이콘 버튼 스타일 */
+.icon-button {
+  background: none; /* 배경 제거 */
+  border: none; /* 테두리 제거 */
+  padding: 5px; /* 아이콘 크기에 맞게 패딩 조정 */
+  cursor: pointer;
+  color: #555; /* 기본 아이콘 색상 */
+  transition: color 0.3s ease; /* 부드러운 색상 전환 효과 */
+}
+
+.icon-button:hover {
+  color: #000; /* 마우스 오버 시 아이콘 색상 변경 */
+}
+
+/* 수정 버튼 아이콘 */
+.edit-button {
+  margin-left: 10px; /* 버튼 간 간격 */
+  color: #8fbc8f; /* 연한 초록색 계열 */
+}
+
+.edit-button:hover {
+  color: #239e5b; /* 마우스 오버 시 조금 더 진한 초록색 */
+}
+
+/* 삭제 버튼 아이콘 */
+.delete-button {
+  color: #fa8072; /* 연한 빨간색 계열 */
+}
+
+.delete-button:hover {
+  color: #e75b5b; /* 마우스 오버 시 조금 더 진한 빨간색 */
+}
+
+/* 아이콘 크기 조정 */
+.icon-button svg {
+  font-size: 1.2em; /* 아이콘 크기 조정 */
+}
+
+/* 사용자 상태 변경 UI */
+.user-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #f4f4f4;
+  border-radius: 8px;
+}
+
+.user-info {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.status-container {
+  display: flex;
+  align-items: center;
+}
+
+.status-container label {
+  margin-right: 10px;
+}
+
+.status-container select {
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+}
+
+/* 챗봇 토글 버튼 스타일 */
+.toggle-chatbot-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 999;
+}

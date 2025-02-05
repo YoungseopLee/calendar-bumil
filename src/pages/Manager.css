@@ -1,0 +1,43 @@
+/* Manager.css */
+.manager-page {
+    display: flex;
+  }
+  
+  .manager-content {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  
+  .pending-users-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .pending-users-table th,
+  .pending-users-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .pending-users-table th {
+    background-color: #f2f2f2;
+  }
+  
+  .button {
+    padding: 5px 10px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .approve-button {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .reject-button {
+    background-color: #f44336;
+    color: white;
+  }
