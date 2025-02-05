@@ -18,7 +18,7 @@ const EditSchedule = () => {
     // 날짜에서 하루를 빼는 함수
     const subtractOneDay = (dateString) => {
         const date = new Date(dateString);
-        date.setDate(date.getDate() + 1); // 하루를 빼는 부분
+        date.setDate(date.getDate() - 1); // 하루를 빼는 부분
         return date.toISOString().split('T')[0]; // 날짜 포맷: YYYY-MM-DD
     }; 
 
