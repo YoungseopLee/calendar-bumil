@@ -1,10 +1,13 @@
 .edit-body {
     font-family: 'Noto Sans KR', sans-serif;
-    background-color: #ffffff;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* 화면 높이 꽉 차게 */
+    min-height: 100vh;
+    overflow-y: auto;
 }
 
 .edit-schedule {
@@ -14,6 +17,12 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 600px;
+    text-align: center;
+    transition: box-shadow 0.3s ease;
+}
+
+.edit-schedule:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
 }
 
 .edit-schedule__title {
@@ -23,6 +32,7 @@
     font-weight: 600;
 }
 
+/* 공통 입력 필드 스타일 */
 .edit-schedule__form {
     display: flex;
     flex-direction: column;
@@ -52,7 +62,7 @@
     font-size: 1em;
     background-color: #f9f9f9;
     transition: border-color 0.3s ease;
-    box-sizing: border-box; /* 패딩 포함한 크기 조정 */
+    box-sizing: border-box;
 }
 
 .edit-schedule__input:focus,
@@ -61,14 +71,15 @@
     outline: none;
 }
 
+/* 버튼 스타일 */
 .edit-schedule__button-container {
     display: flex;
-    width: 100%;
     justify-content: space-between;
+    margin-top: 20px;
 }
 
 .edit-schedule__button {
-    width: 48%; /* 버튼 크기 균등 배분 */
+    width: 48%;
     background-color: #007bff;
     color: white;
     border: none;
@@ -89,4 +100,35 @@
 
 .edit-schedule__button--back:hover {
     background-color: #5a6268;
+}
+
+/* 반응형 디자인 추가 */
+@media (max-width: 768px) {
+    .edit-schedule {
+        padding: 20px;
+        width: 85%;
+    }
+
+    .edit-schedule__title {
+        font-size: 1.8em;
+    }
+
+    .edit-schedule__form {
+        gap: 15px;
+    }
+
+    .edit-schedule__input,
+    .edit-schedule__select {
+        font-size: 1.0em;
+    }
+
+    .edit-schedule__button-container {
+        gap: 5%;
+        flex-direction: row;
+    }
+
+    .edit-schedule__button,
+    .edit-schedule__button--back {
+        width: 100%;
+    }
 }

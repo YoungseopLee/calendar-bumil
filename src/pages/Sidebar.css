@@ -1,13 +1,13 @@
 /* 전체 화면 레이아웃 초기화 */
 .app-body {
-  margin: 0;
+  margin: 5%;
   font-family: Arial, sans-serif;
 }
 
 .hamburger-btn {
   position: fixed;
   top: 20px;
-  left: 20px;
+  left: 10px;
   background: none;
   border: none;
   cursor: pointer;

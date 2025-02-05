@@ -6,9 +6,9 @@
 }
 
 .calendar {
-  width: 90%; /* 약간 더 넓게 설정 */
-  max-width: 90%;
-  min-width: 90%;
+  width: 85%; /* 약간 더 넓게 설정 */
+  max-width: 85%;
+  min-width: 85%;
   margin: 20px auto;
   border: 1px solid #ddd;
   border-radius: 10px;

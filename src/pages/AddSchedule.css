@@ -6,7 +6,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh; /* 모바일 브라우저 UI 요소를 고려한 높이 조정 */
+    overflow-y: auto; /* 화면이 작아질 때 스크롤 가능하도록 설정 */
 }
 
 .add-schedule {
@@ -183,6 +184,10 @@
 
 /* 반응형 디자인 추가: 화면 크기에 맞게 스타일 조정 */
 @media (max-width: 768px) {
+    .add-schedule-body {
+        min-height: 100vw; /* 가로 모드일 때 최소 높이 조정 */
+    }
+    
     .add-schedule {
         padding: 20px;
         width: 90%; /* 모바일 화면에서는 90% 너비로 설정 */

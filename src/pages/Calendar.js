@@ -129,7 +129,7 @@ const Calendar = () => {
     const handleStatusChange = async (e) => {
         const newStatus = e.target.value;
         setUserStatus(newStatus);
-
+    
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/update_status`, {
                 method: "PUT",
@@ -139,10 +139,15 @@ const Calendar = () => {
                 },
                 body: JSON.stringify({ status: newStatus }),
             });
-
+    
+            if (response.status === 401) {
+                handleLogout(); // 401 응답 시 자동 로그아웃
+                return;
+            }
+    
             if (response.ok) {
                 alert("상태가 변경되었습니다.");
-                fetchLoggedInUser(); // 변경된 상태를 다시 불러오기
+                fetchLoggedInUser(); // 상태 변경 후 다시 사용자 정보 불러오기
             } else {
                 alert("상태 변경에 실패했습니다.");
             }
@@ -150,6 +155,14 @@ const Calendar = () => {
             console.error("상태 변경 오류:", error);
             alert("상태 변경에 실패했습니다.");
         }
+    };
+    
+    // 자동 로그아웃 함수
+    const handleLogout = () => {
+        alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/login");
     };
     
     // 로그인한 사용자 정보를 다시 가져오는 함수
@@ -162,19 +175,23 @@ const Calendar = () => {
                     "Authorization": `Bearer ${token}`,
                 },
             });
-
+    
+            if (response.status === 401) {
+                handleLogout(); // 401 응답 시 자동 로그아웃 처리
+                return;
+            }
+    
             if (response.ok) {
                 const data = await response.json();
-                setUserStatus(data.user.status); // 최신 상태 업데이트
-                // localStorage의 사용자 정보도 업데이트 (새로운 상태 반영)
-                localStorage.setItem("user", JSON.stringify(data.user));
+                setUserStatus(data.user.status);
+                localStorage.setItem("user", JSON.stringify(data.user)); // 최신 상태 업데이트
             } else {
                 console.error("사용자 정보 불러오기 실패");
             }
         } catch (error) {
             console.error("로그인 사용자 정보 불러오기 실패:", error);
         }
-    }; 
+    };
     
     // 오늘 날짜와 비교하여 색을 구분하기 위한 함수
     const isToday = (day) => {
