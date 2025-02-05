@@ -111,8 +111,7 @@ const AddSchedule = () => {
         <div className='add-schedule-body'>
             <div className="add-schedule-page">
                 <div className="add-schedule">
-                    <h1 className="add-schedule__title">사원 일정 관리 추가</h1>
-
+                    <h1></h1>
                     <div className="add-schedule__date-container">
                         <div className="add-schedule__date-field">
                             <label htmlFor="start-date" className="add-schedule__date-label">시작 날짜</label>
@@ -137,7 +136,7 @@ const AddSchedule = () => {
                     </div>
 
                     <div className="add-schedule__todo-container">
-                        <h2 className="add-schedule__todo-title">계획 입력</h2>
+                        <h2 className="add-schedule__todo-title">일정 입력</h2>
                         <div className="add-schedule__todo-fields">
                             <input
                                 type="text"
@@ -153,8 +152,7 @@ const AddSchedule = () => {
                                     id="status"
                                     value={status}
                                     onChange={(e) => setStatus(e.target.value)}
-                                    className="add-schedule__select"
-                                    style={{ width: '40%' }} 
+                                    className="add-schedule__select" 
                                 >
                                     <option value="준비 중">준비 중</option>
                                     <option value="진행 중">진행 중</option>

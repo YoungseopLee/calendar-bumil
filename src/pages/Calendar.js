@@ -162,7 +162,7 @@ const Calendar = () => {
         alert("세션이 만료되었습니다. 다시 로그인해주세요.");
         localStorage.removeItem("token");
         localStorage.removeItem("user");
-        navigate("/login");
+        navigate("/");
     };
     
     // 로그인한 사용자 정보를 다시 가져오는 함수

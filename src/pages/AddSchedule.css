@@ -6,8 +6,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* 모바일 브라우저 UI 요소를 고려한 높이 조정 */
-    overflow-y: auto; /* 화면이 작아질 때 스크롤 가능하도록 설정 */
+    min-height: 100vh;
+    overflow-y: auto;
 }
 
 .add-schedule {
@@ -15,8 +15,8 @@
     padding: 30px 40px;
     border-radius: 12px;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    width: 100%; /* 기본적으로 100% */
-    max-width: 600px; /* 최대 너비를 600px로 제한 */
+    width: 100%;
+    max-width: 600px;
     text-align: center;
     transition: box-shadow 0.3s ease;
 }
@@ -41,39 +41,41 @@
     text-align: center;
 }
 
+/* 📌 시작 날짜와 종료 날짜 한 줄에 반반 배치 */
 .add-schedule__date-container {
     display: flex;
-    flex-direction: row;
+    width: 100%;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 40px;
+    gap: 10px; /* 두 필드 사이 여백 */
 }
 
 .add-schedule__date-field {
-    flex: 1;
-    margin-right: 20px;
+    flex: 1; /* 두 날짜 필드를 동일한 크기로 설정 */
 }
 
-.add-schedule__date-input,
-.add-schedule__select {
+/* 📌 모든 input과 select의 크기 통일 */
+.add-schedule__input,
+.add-schedule__select,
+.add-schedule__date-input {
+    width: 100%; /* 모든 입력 필드를 동일한 너비로 설정 */
     padding: 12px;
     border-radius: 8px;
     border: 1px solid #ddd;
     font-size: 1em;
     background-color: #f9f9f9;
     transition: border-color 0.3s ease;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    width: 180px; /* 기본 너비 */
+    box-sizing: border-box;
 }
 
-.add-schedule__date-input:focus,
-.add-schedule__select:focus {
+.add-schedule__input:focus,
+.add-schedule__select:focus,
+.add-schedule__date-input:focus {
     border-color: #007BFF;
     outline: none;
 }
 
+/* 📌 날짜 입력 필드의 캘린더 아이콘 스타일 */
 .add-schedule__date-input::-webkit-calendar-picker-indicator {
     color: #666;
 }
@@ -85,47 +87,17 @@
     background-position-y: center;
     background-size: 20px;
     padding-right: 30px;
-    width: 150px;
 }
 
-.add-schedule__todo-list {
-    list-style-type: none;
-    padding: 0;
-    margin: 15px 0;
-}
-
-.add-schedule__todo-item {
-    background-color: #f1f1f1;
-    margin-bottom: 10px;
-    padding: 12px;
-    border-radius: 8px;
-    text-align: left;
-    font-size: 1em;
-    color: #555;
-}
-
-.add-schedule__todo-input {
-    width: calc(100% - 24px);
-    padding: 12px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    font-size: 1em;
-    background-color: #f9f9f9;
-    transition: border-color 0.3s ease;
-}
-
-.add-schedule__todo-input::placeholder {
-    color: #aaa;
-}
-
-.add-schedule__todo-input:focus {
-    border-color: #007BFF;
-    outline: none;
+.add-schedule__button-container {
+    display: flex;
+    justify-content: center;
+    gap: 5%;
 }
 
 .add-schedule__button,
 .add-schedule__button--back {
+    width: 100%;
     background-color: #007bff;
     color: white;
     border: none;
@@ -133,7 +105,6 @@
     padding: 10px 20px;
     cursor: pointer;
     font-size: 1em;
-    margin: 5px;
     transition: background-color 0.3s ease;
 }
 
@@ -150,79 +121,42 @@
     background-color: #5a6268;
 }
 
-.add-schedule__status-container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-    text-align: left;
-}
-
-.add-schedule__status-label {
-    font-size: 1.1em;
-    font-weight: 500;
-    color: #555;
-    margin-right: auto;
-}
-
-.add-schedule__button-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-.add-schedule__error-message {
-    color: red;
-    margin-top: 10px;
-    font-size: 0.9em;
-}
-
-.add-schedule__todo-title {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    font-weight: 700;
-}
-
-/* 반응형 디자인 추가: 화면 크기에 맞게 스타일 조정 */
+/* 📌 반응형 디자인 추가 */
 @media (max-width: 768px) {
-    .add-schedule-body {
-        min-height: 100vw; /* 가로 모드일 때 최소 높이 조정 */
-    }
-    
     .add-schedule {
         padding: 20px;
-        width: 90%; /* 모바일 화면에서는 90% 너비로 설정 */
+        width: 90%;
     }
 
     .add-schedule__title {
-        font-size: 1.8em; /* 모바일에서 제목 크기 줄이기 */
+        font-size: 1.8em;
     }
 
     .add-schedule__date-container {
-        flex-direction: row; /* 한 줄에 배치 */
-        flex-wrap: wrap; /* 줄 바꿈을 허용 */
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-    .add-schedule__date-field {
-        flex: 1;
-        margin-right: 15px;
-        margin-bottom: 10px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
     }
 
     .add-schedule__date-input,
     .add-schedule__select {
-        width: 80%; /* 모바일에서 100% 너비로 설정 */
-    }
-
-    .add-schedule__todo-input {
-        width: 90%; /* 모바일에서도 할 일 입력 필드가 잘리지 않도록 설정 */
+        width: 100%;
     }
 
     .add-schedule__button,
     .add-schedule__button--back {
-        width: 100%; /* 버튼도 전체 너비로 설정 */
+        width: 100%;
         margin-top: 10px;
+    }
+
+    .add-schedule__todo-input {
+    width: calc(100% - 24px);
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 1em;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
     }
 }
