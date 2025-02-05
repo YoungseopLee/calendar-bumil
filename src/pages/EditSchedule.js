@@ -18,20 +18,31 @@ const EditSchedule = () => {
     // 날짜에서 하루를 빼는 함수
     const subtractOneDay = (dateString) => {
         const date = new Date(dateString);
-        date.setDate(date.getDate() - 1); // 하루를 빼는 부분
+        date.setDate(date.getDate() + 1); // 하루를 빼는 부분
         return date.toISOString().split('T')[0]; // 날짜 포맷: YYYY-MM-DD
-    };
+    }; 
 
     useEffect(() => {
-        if (schedule) {
-            setTask(schedule.task);
-            setStartDate(schedule.start_date.split("T")[0]);
-            setEndDate(schedule.end_date.split("T")[0]);
-            setStatus(schedule.status);
-        } else {
-            console.error("일정 데이터가 없습니다!"); // 여기서 문제 발생 시 로그 확인
-            navigate("/calendar"); // 일정이 없다면 캘린더 페이지로 리다이렉션
+        if (!schedule) {
+            console.error("일정 데이터가 없습니다!");
+            navigate("/calendar");
+            return;
         }
+    
+        setTask(schedule.task || "");
+    
+        // 날짜 변환 (하루를 더한 후 YYYY-MM-DD 형식으로 저장)
+        const addOneDay = (dateString) => {
+            if (!dateString) return "";
+            const date = new Date(dateString);
+            date.setDate(date.getDate() + 1);
+            return date.toISOString().split("T")[0]; // YYYY-MM-DD 형식으로 변환
+        };
+    
+        setStartDate(addOneDay(schedule.start_date));
+        setEndDate(addOneDay(schedule.end_date));
+    
+        setStatus(schedule.status || "진행 중");
     }, [schedule, navigate]);
 
     const handleSubmit = async (event) => {
@@ -107,7 +118,7 @@ const EditSchedule = () => {
                             value={status}
                             onChange={(e) => setStatus(e.target.value)}
                         >
-                            <option value="진행 중">준비 중</option>
+                            <option value="준비 중">준비 중</option>
                             <option value="진행 중">진행 중</option>
                             <option value="완료">완료</option>
                         </select>
