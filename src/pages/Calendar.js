@@ -342,24 +342,33 @@ const Calendar = () => {
                         </div>
 
                         <div className="schedule-section">
-                            <h4>다른 사용자 일정</h4>
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                                <h4 style={{ margin: 0 }}>다른 사용자 일정</h4> {/* 제목의 기본 마진을 제거 */}
+                                {/* 부서별 보기 버튼 */}
+                                <button 
+                                className="department-view-button" 
+                                onClick={() => navigate("/department-view")}
+                                >
+                                부서별 보기
+                                </button>
+                            </div>
                             <ul className="schedule-list">
                                 {otherUsersSchedule.length > 0 ? (
-                                    otherUsersSchedule.map((schedule) => (
-                                        <li
-                                            key={schedule.id}
-                                            className="schedule-item other-user-schedule"
-                                            onClick={() => handleScheduleClick(schedule)}
-                                        >
-                                            <span
-                                                className="status-icon"
-                                                style={{ backgroundColor: getStatusClass(schedule.status) }}
-                                            ></span>
-                                            {schedule.name} :&nbsp; <span className="task-name-two">{schedule.task}</span>
-                                        </li>
-                                    ))
+                                otherUsersSchedule.map((schedule) => (
+                                    <li
+                                    key={schedule.id}
+                                    className="schedule-item other-user-schedule"
+                                    onClick={() => handleScheduleClick(schedule)}
+                                    >
+                                    <span
+                                        className="status-icon"
+                                        style={{ backgroundColor: getStatusClass(schedule.status) }}
+                                    ></span>
+                                    {schedule.name} :&nbsp; <span className="task-name-two">{schedule.task}</span>
+                                    </li>
+                                ))
                                 ) : (
-                                    <li className="empty-schedule">이 날짜에 다른 사용자 일정이 없습니다.</li>
+                                <li className="empty-schedule">이 날짜에 다른 사용자 일정이 없습니다.</li>
                                 )}
                             </ul>
                         </div>
