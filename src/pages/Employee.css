@@ -39,7 +39,7 @@
 }
 
 .favorite-item, .employee-item {
-    background-color: #f0f0f0 !important; /* 연한 회색으로 고정 */
+    background-color: #f0f0f0; /* 연한 회색으로 고정 */
     color: #333; /* 기본 텍스트 색상 */
     display: flex;
     align-items: center;
@@ -54,32 +54,6 @@
 .favorite-item:hover, .employee-item:hover {
     transform: scale(1.03);
     background-color: #8f8f8f9a;
-}
-
-/* 상태별 배경색 및 텍스트 색상 */
-.status-work {
-    background-color: rgba(0, 143, 0, 0.829);
-    color: white; /* 어두운 배경 → 흰색 텍스트 */
-}
-
-.status-outside {
-    background-color: rgb(255, 174, 0);
-    color: black; /* 밝은 배경 → 검은색 텍스트 */
-}
-
-.status-vacation {
-    background-color: rgba(255, 0, 0, 0.836);
-    color: white; /* 어두운 배경 → 흰색 텍스트 */
-}
-
-.status-dispatch {
-    background-color: rgba(77, 77, 77, 0.575);
-    color: white; /* 어두운 배경 → 흰색 텍스트 */
-}
-
-.status-default {
-    background-color: gray;
-    color: white; /* 기본 회색 배경 → 흰색 텍스트 */
 }
 
 /* 상태 텍스트 스타일 */

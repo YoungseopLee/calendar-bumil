@@ -58,6 +58,9 @@ const Sidebar = () => {
               <Link to="/employee">Employee</Link>
             </li>
             <li>
+              <Link to="/mypage">MyPage</Link>
+            </li>
+            <li>
               <Link to="/" onClick={handleLogout} className="logout-link">
                 Logout
               </Link>

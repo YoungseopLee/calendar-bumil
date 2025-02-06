@@ -43,65 +43,46 @@ const EmployeeList = () => {
         fetchLoggedInUser();
     }, []);
 
-    const fetchStatus = async (employeeId) => {
-        try {
-            const response = await fetch(`${apiUrl}/get_user_status?user_id=${employeeId}`);
-            if (!response.ok) throw new Error("사용자 상태를 가져오는 데 실패했습니다.");
-
-            const data = await response.json();
-            return data.status || "출근";
-        } catch (err) {
-            console.error("사용자 상태 가져오기 오류:", err);
-            return "출근";
-        }
-    };
-
     const fetchFavorites = async (userId) => {
         try {
             const response = await fetch(`${apiUrl}/get_favorites?user_id=${userId}`, {
                 method: "GET",
-                headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
+                credentials: "include",  // 인증 정보 포함
             });
-
+    
             if (!response.ok) throw new Error("즐겨찾기 목록을 가져오는 데 실패했습니다.");
-
+    
             const data = await response.json();
-            const favoritesWithStatus = await Promise.all(
-                data.favorites.map(async (favorite) => {
-                    const status = await fetchStatus(favorite.id);
-                    return { ...favorite, status };
-                })
-            );
-
-            setFavoriteEmployees(favoritesWithStatus);
+    
+            if (data.favorites.length === 0) {
+                setFavoriteEmployees([]);
+                return;
+            }
+    
+            setFavoriteEmployees(data.favorites);
         } catch (err) {
             setError(err.message);
         }
     };
-
+    
     const fetchEmployees = async () => {
         try {
             const response = await fetch(`${apiUrl}/get_users`);
             if (!response.ok) throw new Error("사용자 데이터를 가져오는 데 실패했습니다.");
-
+    
             const data = await response.json();
-            const employeesWithStatus = await Promise.all(
-                data.users.map(async (employee) => {
-                    const status = await fetchStatus(employee.id);
-                    return { ...employee, status };
-                })
-            );
-
-            setEmployees(employeesWithStatus);
-
-            const uniqueDepartments = [...new Set(data.users.map(emp => emp.department))];
-            setDepartments(uniqueDepartments);
+            setEmployees(data.users);  // 상태 포함
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    };
+    };    
+    
 
     const toggleFavorite = async (employeeId) => {
         try {
@@ -137,7 +118,7 @@ const EmployeeList = () => {
         }
     };
     
-    /* ✅ 상태별 텍스트 색상 변경 */
+    /* 상태별 텍스트 색상 변경 */
     const getStatusTextColor = (status) => {
         switch (status) {
             case "외근": // 밝은 배경
