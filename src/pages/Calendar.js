@@ -303,7 +303,7 @@ const Calendar = () => {
                             <ul className="schedule-list">
                                 {userSchedule.length > 0 ? (
                                     userSchedule.map((schedule) => (
-                                        <div className="schedule-container">
+                                        <div className="schedule-container" key={schedule.id}>
                                             <li
                                                 key={schedule.id}
                                                 className="schedule-item"
