@@ -46,7 +46,7 @@ const MyPage = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    window.location.reload();
+    window.location.href = '/'; // 로그인 페이지로 리디렉션
   };
 
   if (loading) return <div className="mypage-container">로딩 중...</div>;
