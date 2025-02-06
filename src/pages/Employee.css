@@ -39,6 +39,8 @@
 }
 
 .favorite-item, .employee-item {
+    background-color: #f0f0f0 !important; /* 연한 회색으로 고정 */
+    color: #333; /* 기본 텍스트 색상 */
     display: flex;
     align-items: center;
     padding: 10px;
@@ -116,8 +118,11 @@
 .employee-position {
     flex: 1;
     text-align: left;
-    font-size: 0.9em;
+    font-size: 1em; /* 글자 크기 키우기 */
+    color: black; /* 색상을 검정색으로 변경 */
+    font-weight: bold; /* 텍스트를 굵게 만들기 */
 }
+
 
 .employee-status {
     flex: 1;
@@ -234,3 +239,10 @@
     border-color: #007bff;
     outline: none;
 }
+
+/* ✅ 상태별 배경색 적용 (작은 박스만 변경) */
+.employee-status.status-work { background-color: rgba(0, 143, 0, 0.829); color: white; }
+.employee-status.status-outside { background-color: rgb(255, 174, 0); color: black; }
+.employee-status.status-vacation { background-color: rgba(255, 0, 0, 0.836); color: white; }
+.employee-status.status-dispatch { background-color: rgba(77, 77, 77, 0.575); color: white; }
+.employee-status.status-default { background-color: gray; color: white; }
