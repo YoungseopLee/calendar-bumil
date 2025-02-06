@@ -413,6 +413,44 @@ def get_users():
     except Exception as e:
         print(f"사용자 목록 조회 오류: {e}")
         return jsonify({'message': '사용자 목록 조회 오류'}), 500
+    
+# 사용자 상태 변경
+@app.route('/get_user_status', methods=['GET', 'OPTIONS'])
+def get_user_status():
+    if request.method == 'OPTIONS':
+        response = jsonify({'message': 'CORS preflight request success'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        return response
+
+    user_id = request.args.get('user_id')
+
+    if not user_id:
+        return jsonify({'message': 'user_id가 제공되지 않았습니다.'}), 400
+
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+
+        cursor = conn.cursor(dictionary=True)
+
+        # ✅ 사용자의 상태 조회
+        cursor.execute("SELECT status FROM User WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if user and user.get("status"):
+            return jsonify({'status': user['status']}), 200
+        else:
+            return jsonify({'status': '출근'}), 200  # 기본값 "출근"
+
+    except Exception as e:
+        print(f"사용자 상태 조회 오류: {e}")
+        return jsonify({'message': '사용자 상태 조회 오류'}), 500
 
 # 즐겨찾기 추가/삭제 토글
 @app.route('/toggle_favorite', methods=['POST', 'OPTIONS'])
