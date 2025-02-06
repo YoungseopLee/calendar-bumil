@@ -12,13 +12,14 @@ load_dotenv()
 
 app = Flask(__name__)
 
-# CORS 설정: 프론트엔드 오리진과 credentials 허용
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000", "supports_credentials": True}})
+allowed_origins = ["http://localhost:3000", "http://3.38.20.237:5000"]
+CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://3.38.20.237:5000"], "supports_credentials": True}})
 
-# 모든 응답에 CORS 헤더 추가 (와일드카드 대신 프론트엔드 오리진 사용)
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    origin = request.headers.get('Origin')
+    if origin in allowed_origins:
+        response.headers.add('Access-Control-Allow-Origin', origin)
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
@@ -685,12 +686,13 @@ if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
 
 @app.route('/get_all_schedule', methods=['GET', 'OPTIONS']) 
-def get_all_schedule():  # 함수명 수정
+def get_all_schedule():
     if request.method == 'OPTIONS':
         response = jsonify({'message': 'CORS preflight request success'})
-        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')  # 특정 오리진 설정
+        response.headers.add('Access-Control-Allow-Credentials', 'true')  # credentials 허용
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-        response.headers.add('Access-Control-Allow-Methods', 'GET, OPTIONS')  # GET 추가
+        response.headers.add('Access-Control-Allow-Methods', 'GET, OPTIONS')  
         return response
 
     try:
