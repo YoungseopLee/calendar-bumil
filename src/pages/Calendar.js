@@ -21,7 +21,7 @@ const Calendar = () => {
     useEffect(() => {
         if (!user) {
             alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
-            navigate("/login");
+            navigate("/");
         } else {
             fetchLoggedInUser(); // 사용자 정보 API 호출하여 상태 업데이트
         }
