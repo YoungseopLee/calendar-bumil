@@ -7,6 +7,7 @@ import Manager from './pages/Manager';
 import AddSchedule from './pages/AddSchedule';
 import Employee from './pages/Employee';
 import EditSchedule from './pages/EditSchedule';
+import Department_view from './pages/Department_view';
 
 function App() {
   return (
@@ -26,6 +27,8 @@ function App() {
         <Route path="/employee" element={<Employee />} />
         {/* 일정 수정 페이지 */}
         <Route path="/edit-schedule/:scheduleId" element={<EditSchedule />} />
+        {/* 부서별 일정 페이지 */}
+        <Route path="/department-view" element={<Department_view />} />
       </Routes>
     </Router>
   );
