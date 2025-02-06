@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import Sidebar from "./Sidebar";
+import BackButton from "./BackButton";
 import "./MyPage.css";
 
 const MyPage = () => {
@@ -46,7 +48,7 @@ const MyPage = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    window.location.href = '/'; // 로그인 페이지로 리디렉션
+    window.location.href = '/';
   };
 
   if (loading) return <div className="mypage-container">로딩 중...</div>;
@@ -54,6 +56,8 @@ const MyPage = () => {
 
   return (
     <div className="mypage-container">
+      <Sidebar />
+      <BackButton />
       <header className="mypage-header">
         <h1>MyPage</h1>
         <button className="logout-button" onClick={handleLogout}>
