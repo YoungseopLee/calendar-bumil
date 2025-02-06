@@ -21,27 +21,32 @@ const EmployeeList = () => {
             try {
                 const token = localStorage.getItem("token");
                 if (!token) throw new Error("사용자 인증 정보가 없습니다.");
-
+    
                 const response = await fetch(`${apiUrl}/get_logged_in_user`, {
                     method: "GET",
                     headers: { "Authorization": `Bearer ${token}` },
                 });
-
+    
                 if (!response.ok) throw new Error("로그인 사용자 정보를 가져오는 데 실패했습니다.");
-
+    
                 const data = await response.json();
                 setLoggedInUserId(data.user.id);
-                fetchFavorites(data.user.id);
-                fetchEmployees();
             } catch (err) {
                 setError(err.message);
             } finally {
                 setLoading(false);
             }
         };
-
+    
         fetchLoggedInUser();
     }, []);
+    
+    useEffect(() => {
+        if (loggedInUserId) {
+            fetchFavorites(loggedInUserId);
+            fetchEmployees();
+        }
+    }, [loggedInUserId]);    
 
     const fetchFavorites = async (userId) => {
         try {

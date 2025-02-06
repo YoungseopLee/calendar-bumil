@@ -13,16 +13,20 @@ load_dotenv()
 app = Flask(__name__)
 
 allowed_origins = ["http://localhost:3000", "http://3.38.20.237:5000"]
-CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://3.38.20.237:5000"], "supports_credentials": True}})
+CORS(app, supports_credentials=True, origins=allowed_origins)
 
 @app.after_request
 def after_request(response):
     origin = request.headers.get('Origin')
     if origin in allowed_origins:
-        response.headers.add('Access-Control-Allow-Origin', origin)
-    response.headers.add('Access-Control-Allow-Credentials', 'true')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        # 이미 헤더가 설정되어 있지 않은 경우에만 설정
+        if 'Access-Control-Allow-Origin' not in response.headers:
+            response.headers['Access-Control-Allow-Origin'] = origin
+    else:
+        response.headers['Access-Control-Allow-Origin'] = allowed_origins[0]
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
     return response
 
 # DB 설정
@@ -682,19 +686,8 @@ def gemini_chat():
         print(f"Gemini API 호출 오류: {e}")
         return jsonify({"error": "Gemini API 호출 중 오류가 발생했습니다."}), 500
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
-
-@app.route('/get_all_schedule', methods=['GET', 'OPTIONS']) 
+@app.route('/get_all_schedule', methods=['GET']) 
 def get_all_schedule():
-    if request.method == 'OPTIONS':
-        response = jsonify({'message': 'CORS preflight request success'})
-        response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')  # 특정 오리진 설정
-        response.headers.add('Access-Control-Allow-Credentials', 'true')  # credentials 허용
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-        response.headers.add('Access-Control-Allow-Methods', 'GET, OPTIONS')  
-        return response
-
     try:
         conn = get_db_connection()
         if conn is None:
@@ -716,3 +709,7 @@ def get_all_schedule():
     except Exception as e:
         print(f"일정 가져오기 오류: {e}")
         return jsonify({'message': '일정 가져오기 오류'}), 500
+
+
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0')
