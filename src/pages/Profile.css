@@ -1,78 +1,91 @@
-/* 페이지 전체를 중앙 정렬 */
-.profile-page {
+/* 페이지 전체 레이아웃 */
+.mypage-page {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh; /* 뷰포트 전체 높이 */
-    background-color: #f4f4f4;
+    background-color: #f4f4f4; /* 배경색 */
   }
   
-  /* 전체 명함 스타일 */
-  .profile-container {
+  /* 헤더에 사이드바 포함 */
+  .mypage-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  
+  /* 마이페이지 전체 컨테이너 */
+  .mypage-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 320px;
-    height: 500px;
+    height: auto;
     background-color: white;
     border-radius: 15px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    font-family: 'Poppins', sans-serif;
+    font-family: "Poppins", sans-serif;
     border: 3px solid #007BFF;
   }
   
-  /* 위쪽 파란색 영역 */
-  .profile-header {
+  /* 헤더 섹션 */
+  .mypage-header-section {
     background-color: #007BFF;
-    width: 100%;
-    height: 35%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     color: white;
-    padding: 20px 10px;
     text-align: center;
-  }
-  
-  /* 아래쪽 정보 영역 */
-  .profile-content {
+    padding: 20px;
     width: 100%;
-    padding: 30px;
-    text-align: center;
+    border-bottom: 2px solid white;
   }
   
-  /* 이름 및 직책 */
-  .profile-name {
-    font-size: 1.6em;
+  .mypage-header-section h2 {
+    margin: 0;
+    font-size: 1.8em;
     font-weight: bold;
-    color: #007BFF;
   }
   
-  .profile-role {
-    font-size: 1.2em;
-    color: #555;
-    margin-bottom: 20px;
+  /* 내용 섹션 */
+  .mypage-content {
+    padding: 30px;
+    width: 100%;
   }
   
-  /* 상태 및 연락처 정보를 정렬할 div */
-  .profile-details {
+  .mypage-details {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* 왼쪽 정렬 */
+    align-items: flex-start;
     margin-left: auto;
     margin-right: auto;
     width: fit-content; /* 내용 크기에 맞춤 */
   }
   
-  /* 상태 표시 스타일 */
-  .profile-status {
+  .mypage-details p {
     font-size: 1em;
+    margin: 8px 0;
+    color: #333;
     display: flex;
     align-items: center;
-    margin-bottom: 15px;
-    color: #333;
+  }
+  
+  .mypage-details p strong {
+    margin-left: 8px;
+    color: #007BFF;
+  }
+  
+  .icon {
+    margin-right: 8px;
+    color: #007BFF;
+    font-size: 1.2em;
   }
   
   /* 상태 아이콘 */
@@ -91,34 +104,15 @@
     color: #6c757d;
   }
   
-  /* 연락처 정보 스타일 */
-  .profile-info {
-    font-size: 1em;
-    color: #333;
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  
-  .profile-info .icon {
-    margin-right: 8px;
-    color: #007BFF;
-    font-size: 1.2em;
-  }
-  
-  /* 반응형 */
+  /* 반응형 스타일 */
   @media (max-width: 350px) {
-    .profile-container {
+    .mypage-container {
       width: 100%;
       height: auto;
       padding-bottom: 20px;
     }
   
-    .profile-header {
-      height: 30%;
-    }
-  
-    .profile-content {
+    .mypage-content {
       padding: 20px;
     }
   }
