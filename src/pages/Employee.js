@@ -22,7 +22,7 @@ const EmployeeList = () => {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("사용자 인증 정보가 없습니다.");
 
-        const response = await fetch(`${apiUrl}/get_logged_in_user`, {
+        const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -52,7 +52,7 @@ const EmployeeList = () => {
   const fetchFavorites = async (userId) => {
     try {
       const response = await fetch(
-        `${apiUrl}/get_favorites?user_id=${userId}`,
+        `${apiUrl}/favorite/get_favorites?user_id=${userId}`,
         {
           method: "GET",
           headers: {
@@ -67,13 +67,19 @@ const EmployeeList = () => {
         throw new Error("즐겨찾기 목록을 가져오는 데 실패했습니다.");
 
       const data = await response.json();
+      console.log("전체 응답 데이터:", data);
 
-      if (data.favorites.length === 0) {
+      // API 응답 데이터의 키가 "favorite" (단수)인 경우:
+      if (
+        !data.favorite ||
+        !Array.isArray(data.favorite) ||
+        data.favorite.length === 0
+      ) {
         setFavoriteEmployees([]);
         return;
       }
 
-      setFavoriteEmployees(data.favorites);
+      setFavoriteEmployees(data.favorite);
     } catch (err) {
       setError(err.message);
     }
@@ -81,7 +87,7 @@ const EmployeeList = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await fetch(`${apiUrl}/get_users`);
+      const response = await fetch(`${apiUrl}/user/get_users`);
       if (!response.ok)
         throw new Error("사용자 데이터를 가져오는 데 실패했습니다.");
 
@@ -100,8 +106,13 @@ const EmployeeList = () => {
   };
 
   const toggleFavorite = async (employeeId) => {
+    console.log("toggleFavorite 호출 - employeeId:", employeeId);
+    if (!employeeId) {
+      console.error("employeeId가 유효하지 않습니다:", employeeId);
+      return; // 값이 없으면 요청을 보내지 않음
+    }
     try {
-      const response = await fetch(`${apiUrl}/toggle_favorite`, {
+      const response = await fetch(`${apiUrl}/favorite/toggle_favorite`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -163,9 +174,9 @@ const EmployeeList = () => {
         {isFavoritesOpen && (
           <div className="favorite-list">
             {favoriteEmployees.length > 0 ? (
-              favoriteEmployees.map((favorite) => (
+              favoriteEmployees.map((favorite, index) => (
                 <div
-                  key={favorite.id}
+                  key={favorite.id ? favorite.id : `${index}`}
                   className={`favorite-item ${getStatusClass(favorite.status)}`}
                 >
                   <span

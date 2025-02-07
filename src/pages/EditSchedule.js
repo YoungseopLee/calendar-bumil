@@ -54,7 +54,7 @@ const EditSchedule = () => {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/edit-schedule/${scheduleId}`,
+        `${process.env.REACT_APP_API_URL}/schedule/edit-schedule/${scheduleId}`,
         {
           method: "PUT",
           headers: {

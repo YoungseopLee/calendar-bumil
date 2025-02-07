@@ -19,7 +19,7 @@ const MyPage = () => {
         return;
       }
       try {
-        const response = await fetch(`${apiUrl}/get_logged_in_user`, {
+        const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

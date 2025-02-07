@@ -11,7 +11,7 @@ const Manager = () => {
     const fetchPendingUsers = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/get_pending_users`
+          `${process.env.REACT_APP_API_URL}/user/get_pending_users`
         );
         if (response.ok) {
           const data = await response.json();

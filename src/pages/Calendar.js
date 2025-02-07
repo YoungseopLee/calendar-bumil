@@ -74,7 +74,7 @@ const Calendar = () => {
       // 자신의 일정 가져오기
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/get_schedule?user_id=${user.id}&date=${selectedDateString}`
+          `${process.env.REACT_APP_API_URL}/schedule/get_schedule?user_id=${user.id}&date=${selectedDateString}`
         );
         const data = await response.json();
         if (response.ok) {
@@ -90,7 +90,7 @@ const Calendar = () => {
       // 다른 사용자 일정 가져오기
       try {
         const otherUsersResponse = await fetch(
-          `${process.env.REACT_APP_API_URL}/get_other_users_schedule?user_id=${user.id}&date=${selectedDateString}`
+          `${process.env.REACT_APP_API_URL}/schedule/get_other_users_schedule?user_id=${user.id}&date=${selectedDateString}`
         );
         const otherUsersData = await otherUsersResponse.json();
         if (otherUsersResponse.ok) {
@@ -119,7 +119,7 @@ const Calendar = () => {
   const handleDeleteSchedule = async (scheduleId) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/delete-schedule/${scheduleId}`,
+        `${process.env.REACT_APP_API_URL}/schedule/delete-schedule/${scheduleId}`,
         {
           method: "DELETE",
           headers: {
@@ -138,7 +138,7 @@ const Calendar = () => {
   };
 
   const handleAddScheduleClick = () => {
-    navigate("/addschedule", { state: { selectedDate } });
+    navigate("/add-schedule", { state: { selectedDate } });
   };
 
   // 로그인된 사용자 상태 변경
@@ -148,7 +148,7 @@ const Calendar = () => {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/update_status`,
+        `${process.env.REACT_APP_API_URL}/user/update_status`,
         {
           method: "PUT",
           headers: {
@@ -189,7 +189,7 @@ const Calendar = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/get_logged_in_user`,
+        `${process.env.REACT_APP_API_URL}/auth/get_logged_in_user`,
         {
           method: "GET",
           headers: {

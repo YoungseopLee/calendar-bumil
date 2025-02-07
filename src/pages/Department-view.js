@@ -28,7 +28,7 @@ const Department_view = () => {
           fetchAllSchedules(); // 모든 일정 가져오기
         }
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/get_users`
+          `${process.env.REACT_APP_API_URL}/user/get_users`
         );
         if (response.ok) {
           const data = await response.json();
@@ -51,7 +51,7 @@ const Department_view = () => {
   const fetchAllSchedules = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/get_all_schedule`,
+        `${process.env.REACT_APP_API_URL}/schedule/get_all_schedule`,
         {
           method: "GET",
           headers: {
@@ -90,7 +90,7 @@ const Department_view = () => {
 
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/update_status`,
+        `${process.env.REACT_APP_API_URL}/user/update_status`,
         {
           method: "PUT",
           headers: {
@@ -131,7 +131,7 @@ const Department_view = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/get_logged_in_user`,
+        `${process.env.REACT_APP_API_URL}/auth/get_logged_in_user`,
         {
           method: "GET",
           headers: {

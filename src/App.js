@@ -21,7 +21,7 @@ function App() {
         {/* Calendar 페이지(메인) */}
         <Route path="/calendar" element={<Calendar />} />
         {/* 일정 추가 페이지(메인) */}
-        <Route path="/addschedule" element={<AddSchedule />} />
+        <Route path="/add-schedule" element={<AddSchedule />} />
         {/* 사이드바 (메인) */}
         <Route path="/Manager" element={<Manager />} />
         {/* 사원 페이지 */}
