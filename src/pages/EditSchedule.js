@@ -8,8 +8,6 @@ const EditSchedule = () => {
   const location = useLocation();
   const { schedule } = location.state || {}; // state가 없으면 빈 객체로 기본값 설정
 
-  console.log(schedule); // schedule 값이 제대로 전달되었는지 확인
-
   const [task, setTask] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");

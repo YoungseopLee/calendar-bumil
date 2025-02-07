@@ -53,7 +53,7 @@ const Department_view = () => {
       try {
         // 1. 부서 및 사용자 정보 가져오기
         const usersResponse = await fetch(
-          `${process.env.REACT_APP_API_URL}/get_users`
+          `${process.env.REACT_APP_API_URL}/user/get_users`
         );
         if (!usersResponse.ok)
           throw new Error("직원 목록을 불러오지 못했습니다.");
@@ -67,7 +67,7 @@ const Department_view = () => {
 
         // 2. 일정 가져오기
         const scheduleResponse = await fetch(
-          `${process.env.REACT_APP_API_URL}/get_all_schedule`,
+          `${process.env.REACT_APP_API_URL}/schedule/get_all_schedule`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -160,7 +160,7 @@ const Department_view = () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/get_logged_in_user`,
+        `${process.env.REACT_APP_API_URL}/auth/get_logged_in_user`,
         {
           method: "GET",
           headers: {

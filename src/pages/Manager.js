@@ -30,7 +30,7 @@ const Manager = () => {
   const handleApprove = async (userId) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/approve_user`,
+        `${process.env.REACT_APP_API_URL}/user/approve_user`,
         {
           method: "POST",
           headers: {
@@ -55,7 +55,7 @@ const Manager = () => {
   const handleReject = async (userId) => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/reject_user`,
+        `${process.env.REACT_APP_API_URL}/user/reject_user`,
         {
           method: "POST",
           headers: {
@@ -109,12 +109,18 @@ const Manager = () => {
                   <td>{user.email}</td>
                   <td>{user.phone_number}</td>
                   <td>
-                    <button className="button approve-button" onClick={() => handleApprove(user.id)}>
+                    <button
+                      className="button approve-button"
+                      onClick={() => handleApprove(user.id)}
+                    >
                       승인
                     </button>
                   </td>
                   <td>
-                    <button className="button reject-button" onClick={() => handleReject(user.id)}>
+                    <button
+                      className="button reject-button"
+                      onClick={() => handleReject(user.id)}
+                    >
                       거절
                     </button>
                   </td>
