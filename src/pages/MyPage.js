@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../pages/Sidebar";
+import BackButton from "./BackButton";
 import "./MyPage.css";
-import { FaPhone, FaEnvelope, FaCircle, FaUserTie, FaBuilding, FaUserCircle } from "react-icons/fa"; // 아이콘 추가
+import {
+  FaPhone,
+  FaEnvelope,
+  FaCircle,
+  FaUserTie,
+  FaBuilding,
+  FaUserCircle,
+} from "react-icons/fa"; // 아이콘 추가
 
 const MyPage = () => {
   const [user, setUser] = useState(null);
@@ -23,7 +31,7 @@ const MyPage = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
         if (!response.ok) {
@@ -51,6 +59,7 @@ const MyPage = () => {
     <div className="mypage-page">
       <header className="mypage-header">
         <Sidebar />
+        <BackButton />
       </header>
       <div className="mypage-container">
         {/* 프로필 아이콘 추가 */}
