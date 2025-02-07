@@ -1,45 +1,43 @@
-/* MyPage.css */
-
+/* MyPage 전체 레이아웃 */
 .mypage-container {
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-family: Arial, sans-serif;
-  }
-  
-  .mypage-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-  }
-  
-  .mypage-header h1 {
-    font-size: 1.8em;
+    flex-direction: column;
+    min-height: 100vh; /* 화면 전체 높이를 채움 */
+    background-color: #f9f9f9; /* 배경색 */
+    padding: 0; /* 기본 여백 제거 */
     margin: 0;
   }
   
-  .logout-button {
-    background-color: #f44336;
-    border: none;
-    color: #fff;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1em;
+  /* 헤더 (사이드바 메뉴) */
+  .mypage-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: 60px;
+    background-color: #fff; /* 배경색 */
+    padding: 0 10px; /* 좌우 여백 */
+    border-bottom: none; /* 하단 구분선 제거 */
+  }
+  
+  /* 사용자 정보 섹션 */
+  .user-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* 상단 정렬 */
+    align-items: flex-start; /* 좌측 정렬 */
+    padding: 20px; /* 내용 여백 */
+    background-color: #fff; /* 배경색 */
   }
   
   .user-info h2 {
     margin-top: 0;
-    font-size: 1.5em;
+    margin-bottom: 10px;
+    font-size: 1.4em;
   }
   
   .user-info p {
+    margin: 5px 0;
     font-size: 1em;
-    margin: 8px 0;
+    line-height: 1.5;
   }
