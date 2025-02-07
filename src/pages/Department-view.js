@@ -252,13 +252,12 @@ const Department_view = () => {
             <div
               style={{
                 display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                flexDirection: "column",
                 width: "100%",
               }}
             >
               <h4 style={{ margin: 5, whiteSpace: "nowrap" }}>일정 목록</h4>
-              <div>
+              <div style={{ marginTop: "10px", width: "100%" }}>
                 <select
                   className="department-view-dropdown"
                   value={selectedDepartment}
