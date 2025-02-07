@@ -12,7 +12,10 @@ load_dotenv()
 
 app = Flask(__name__)
 
-allowed_origins = ["http://localhost:3000", "http://3.38.20.237", "http://3.38.20.237:5000"]
+serverUrl = os.getenv("REACT_APP_URL")
+apiUrl = os.getenv("REACT_APP_API_URL")
+
+allowed_origins = ["http://localhost:3000", serverUrl, apiUrl]
 CORS(app, supports_credentials=True, origins=allowed_origins)
 
 @app.after_request
@@ -51,7 +54,7 @@ def get_db_connection():
         return None
 
 # Gemini API 설정
-GEMINI_API_KEY = "AIzaSyDrYQj4kvFjR9zqKIowhuTXgeBUoMCQHSY"  # 본인 API 키 입력
+GEMINI_API_KEY = os.getenv("REACT_APP_AI_API_URL")
 genai.configure(api_key=GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-1.5-flash")
 
@@ -570,7 +573,7 @@ def get_favorites():
         cursor = conn.cursor(dictionary=True)
         sql = """
         SELECT u.id, u.name, u.position, u.department, u.email, u.phone_number,
-               COALESCE(u.status, '출근') AS status
+        COALESCE(u.status, '출근') AS status
         FROM Favorite f
         JOIN User u ON f.favorite_user_id = u.id
         WHERE f.user_id = %s

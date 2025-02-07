@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 
 const Sidebar = () => {
@@ -51,7 +51,9 @@ const Sidebar = () => {
             {/* 관리자(어드민)만 Manager 메뉴 보이도록 조건부 렌더링 */}
             {isAdmin && (
               <li>
-                <a href="#" onClick={handleManagerClick}>Manager</a>
+                <a href="#" onClick={handleManagerClick}>
+                  Manager
+                </a>
               </li>
             )}
             <li>

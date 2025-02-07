@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Unauthorized = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    alert('관리자만 접근 가능합니다.');
-    navigate('/', { replace: true });
+    alert("관리자만 접근 가능합니다.");
+    navigate("/", { replace: true });
   }, [navigate]);
 
   return (
