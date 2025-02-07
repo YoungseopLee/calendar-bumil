@@ -6,81 +6,98 @@ import BackButton from "./BackButton";
 import "./Calendar.css";
 
 const Department_view = () => {
+    const [currentDate, setCurrentDate] = useState(new Date());
     const [departments, setDepartments] = useState([]);
     const [selectedDepartment, setSelectedDepartment] = useState("");
-    const [otherUsersSchedule, setOtherUsersSchedule] = useState([]);
+    const [schedules, setSchedules] = useState([]);
+    const [filteredSchedules, setFilteredSchedules] = useState([]); // 필터링된 일정
+    const [users, setUsers] = useState([]); // 직원 목록
     const [userStatus, setUserStatus] = useState("");
-    const [showChatbot, setShowChatbot] = useState(false); // 챗봇 토글 상태
     const navigate = useNavigate();
 
     // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
     const user = JSON.parse(localStorage.getItem('user'));
+    const monthNames = [
+        "1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"
+    ];
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
 
-    // 로그인 상태 확인 및 사용자 정보 불러오기
+    const handlePrevMonth = () => {
+        setCurrentDate(new Date(currentYear, currentMonth - 1));
+    };
+
+    const handleNextMonth = () => {
+        setCurrentDate(new Date(currentYear, currentMonth + 1));
+    };
+
+   // 로그인 및 부서 데이터 가져오기
     useEffect(() => {
-        const fetchDepartments = async () => {
-            try {
-	            if (!user) {
+        const fetchData = async () => {
+            if (!user) {
                 alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
                 navigate("/");
-                } else {
-                    fetchLoggedInUser(); // 사용자 정보 API 호출하여 상태 업데이트
-                    fetchAllSchedules(); // 모든 일정 가져오기
-                }
-                const response = await fetch(`${process.env.REACT_APP_API_URL}/get_users`);
-                if (response.ok) {
-                const data = await response.json();
-                // 사용자 목록에서 부서 값 추출 후 중복 제거
-                const uniqueDepartments = [...new Set(data.users.map(user => user.department))];
-                setDepartments(uniqueDepartments);
-                } else {
-                console.error("부서 목록을 불러오지 못했습니다.");
-                }
-            } catch (error) {
-                console.error("부서 목록 불러오기 오류:", error);
-            }
-        };
-        fetchDepartments();
-    }, []);
-
-    // 일정 가져오기 함수
-    const fetchAllSchedules = async () => {
-        try {
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/get_all_schedule`, {
-                method: "GET",
-                headers: {
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`, // 토큰 추가
-                    "Content-Type": "application/json",
-                },
-            });
-
-            if (response.status === 401) {
-                handleLogout(); // 401 응답 시 자동 로그아웃
                 return;
             }
 
-            if (response.ok) {
-                const data = await response.json();
-                console.log("전체 일정 데이터:", data.schedules);
-                setOtherUsersSchedule(data.schedules); // 상태에 저장
-            } else {
-                console.error("일정 데이터를 가져오지 못했습니다.");
+            try {
+                // 1. 부서 및 사용자 정보 가져오기
+                const usersResponse = await fetch(`${process.env.REACT_APP_API_URL}/get_users`);
+                if (!usersResponse.ok) throw new Error("직원 목록을 불러오지 못했습니다.");
+                const usersData = await usersResponse.json();
+                setUsers(usersData.users);
+
+                const uniqueDepartments = [...new Set(usersData.users.map(user => user.department))];
+                setDepartments(uniqueDepartments);
+
+                // 2. 일정 가져오기
+                const scheduleResponse = await fetch(`${process.env.REACT_APP_API_URL}/get_all_schedule`, {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (scheduleResponse.status === 401) {
+                    handleLogout();
+                    return;
+                }
+
+                if (!scheduleResponse.ok) throw new Error("일정 데이터를 불러오지 못했습니다.");
+                const scheduleData = await scheduleResponse.json();
+                setSchedules(scheduleData.schedules);
+            } catch (error) {
+                console.error("데이터 로딩 오류:", error);
             }
-        } catch (error) {
-            console.error("일정 가져오기 오류:", error);
+        };
+
+        fetchData();
+        fetchLoggedInUser(); // 사용자 상태 업데이트
+    }, []);
+
+    // 선택한 부서의 직원 일정 필터링 및 정렬
+    useEffect(() => {
+        if (!selectedDepartment) {
+            setFilteredSchedules(schedules);
+            return;
         }
-    };
 
-    const handleScheduleClick = (schedule) => {
-        console.log("선택된 일정:", schedule);
-        // 여기에 일정 클릭 시 수행할 동작을 추가
-    };
+        const departmentUserIds = users
+            .filter(user => user.department === selectedDepartment)
+            .map(user => user.id);
 
-    // 로그인된 사용자 상태 변경
+        const filtered = schedules
+            .filter(schedule => departmentUserIds.includes(schedule.user_id))
+            .sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+
+        setFilteredSchedules(filtered);
+    }, [selectedDepartment, schedules, users]);
+    // 상태 변경
+
     const handleStatusChange = async (e) => {
         const newStatus = e.target.value;
         setUserStatus(newStatus);
-    
+
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/update_status`, {
                 method: "PUT",
@@ -90,21 +107,20 @@ const Department_view = () => {
                 },
                 body: JSON.stringify({ status: newStatus }),
             });
-    
+
             if (response.status === 401) {
-                handleLogout(); // 401 응답 시 자동 로그아웃
+                handleLogout();
                 return;
             }
-    
+
             if (response.ok) {
                 alert("상태가 변경되었습니다.");
-                fetchLoggedInUser(); // 상태 변경 후 다시 사용자 정보 불러오기
+                fetchLoggedInUser(); 
             } else {
-                alert("상태 변경에 실패했습니다.");
+                alert("상태 변경 실패");
             }
         } catch (error) {
             console.error("상태 변경 오류:", error);
-            alert("상태 변경에 실패했습니다.");
         }
     };
     
@@ -143,14 +159,6 @@ const Department_view = () => {
             console.error("로그인 사용자 정보 불러오기 실패:", error);
         }
     };
-    
-    // 챗봇 토글 함수
-    const toggleChatbot = () => {
-        setShowChatbot(!showChatbot);
-    };
-    const closeChatbot = () => {
-        setShowChatbot(false);
-    };
 
     // 상태에 맞는 색상 클래스를 반환하는 함수
     const getStatusClass = (status) => {
@@ -165,6 +173,16 @@ const Department_view = () => {
                 return ""; // 기본값
         }
     };
+
+    const groupedSchedules = new Map();
+    filteredSchedules.forEach(schedule => {
+        const date = new Date(schedule.start_date);
+        const yearMonth = `${date.getFullYear()}년 ${monthNames[date.getMonth()]}`;
+        if (!groupedSchedules.has(yearMonth)) {
+            groupedSchedules.set(yearMonth, []);
+        }
+        groupedSchedules.get(yearMonth).push(schedule);
+    });
 
     return (
         <div className="Department_view-page">
@@ -186,16 +204,21 @@ const Department_view = () => {
                         </select>
                     </div>
                 </div>
+                <div className="calendar-navigation">
+                    <button onClick={handlePrevMonth} className="nav-button">{"<"}</button>
+                    <h2 className="calendar-title">
+                        {currentYear}년 {monthNames[currentMonth]}
+                    </h2>
+                    <button onClick={handleNextMonth} className="nav-button">{">"}</button>
+                </div>
                 <div className="schedule-area">
                     <div className="schedule-section">
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                            <h4 style={{ margin: 5 }}>일정 목록</h4> {/* 제목의 기본 마진을 제거 */}
-                            {/* 부서별 보기 버튼 */}
+                            <h4 style={{ margin: 5 , whiteSpace: "nowrap" }}>일정 목록</h4>
                             <select
                                 className="department-dropdown"
                                 value={selectedDepartment}
                                 onChange={(e) => setSelectedDepartment(e.target.value)}
-                                style={{justifyContent: "space-between"}}
                             >
                                 <option value="">전체 부서</option>
                                 {departments.map(dept => (
@@ -204,31 +227,53 @@ const Department_view = () => {
                             </select>
                         </div>
                         <ul className="schedule-list">
-                            {otherUsersSchedule.length > 0 ? (
-                            otherUsersSchedule.map((schedule) => (
-                                <li
-                                key={schedule.id}
-                                className="schedule-item other-user-schedule"
-                                onClick={() => handleScheduleClick(schedule)}
-                                >
-                                <span
-                                    className="status-icon"
-                                    style={{ backgroundColor: getStatusClass(schedule.status) }}
-                                ></span>
-                                {schedule.name} :&nbsp; <span className="task-name-two">{schedule.task}</span>
-                                </li>
-                            ))
-                            ) : (
-                            <li className="empty-schedule">이 날짜에 다른 사용자 일정이 없습니다.</li>
-                            )}
+                            {(() => {
+                                // 1. 선택한 부서 필터링
+                                const departmentUserIds = users
+                                    .filter(user => selectedDepartment === "" || user.department === selectedDepartment)
+                                    .map(user => user.id);
+
+                                // 2. 걸쳐 있는 월의 일정 표시하기 위한 필터
+                                const filtered = schedules
+                                    .filter(schedule => {
+                                        const startDate = new Date(schedule.start_date);
+                                        const endDate = new Date(schedule.end_date);
+
+                                        return (
+                                            departmentUserIds.includes(schedule.user_id) &&
+                                            (
+                                                (startDate.getFullYear() === currentYear && startDate.getMonth() === currentMonth) || 
+                                                (endDate.getFullYear() === currentYear && endDate.getMonth() === currentMonth) || 
+                                                (startDate < new Date(currentYear, currentMonth + 1, 1) && endDate >= new Date(currentYear, currentMonth, 1))
+                                            )
+                                        );
+                                    })
+                                    .sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+
+                                if (filtered.length === 0) {
+                                    return <li className="empty-schedule">선택한 부서에 이번 달 일정이 없습니다.</li>;
+                                }
+
+                                return filtered.map(schedule => {
+                                    const user = users.find(u => u.id === schedule.user_id);
+                                    const userName = user ? user.name : "알 수 없음";
+
+                                    const formatDate = dateString =>
+                                        new Date(dateString).toISOString().slice(2, 10).replace(/-/g, ".");
+
+                                    return (
+                                        <li key={schedule.id} className="schedule-item">
+                                            <span className="status-icon" style={{ backgroundColor: getStatusClass(schedule.status) }}></span>
+                                            {userName} {": \u00A0"}<span className="task-name">{schedule.task}</span> 
+                                            <span> {formatDate(schedule.start_date)}</span>{"\u00A0"} ~ {"\u00A0"}
+                                            <span> {formatDate(schedule.end_date)}</span>
+                                        </li>
+                                    );
+                                });
+                            })()}
                         </ul>
                     </div>
                 </div>
-                <button className="toggle-chatbot-button" onClick={toggleChatbot}>
-                챗봇 열기
-                </button>
-
-                {showChatbot && <Chatbot onClose={closeChatbot} />}
             </div>
         </div>
     );
