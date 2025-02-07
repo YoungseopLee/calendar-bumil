@@ -18,15 +18,29 @@ const Department_view = () => {
 
     // 로그인 상태 확인 및 사용자 정보 불러오기
     useEffect(() => {
-        console.log("useEffect activated");
-        if (!user) {
-            alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
-            navigate("/");
-        } else {
-            fetchLoggedInUser(); // 사용자 정보 API 호출하여 상태 업데이트
-            fetchAllSchedules(); // 모든 일정 가져오기
-        }
-
+        const fetchDepartments = async () => {
+            try {
+	            if (!user) {
+                alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
+                navigate("/");
+                } else {
+                    fetchLoggedInUser(); // 사용자 정보 API 호출하여 상태 업데이트
+                    fetchAllSchedules(); // 모든 일정 가져오기
+                }
+                const response = await fetch(`${process.env.REACT_APP_API_URL}/get_users`);
+                if (response.ok) {
+                const data = await response.json();
+                // 사용자 목록에서 부서 값 추출 후 중복 제거
+                const uniqueDepartments = [...new Set(data.users.map(user => user.department))];
+                setDepartments(uniqueDepartments);
+                } else {
+                console.error("부서 목록을 불러오지 못했습니다.");
+                }
+            } catch (error) {
+                console.error("부서 목록 불러오기 오류:", error);
+            }
+        };
+        fetchDepartments();
     }, []);
 
     // 일정 가져오기 함수
@@ -181,6 +195,7 @@ const Department_view = () => {
                                 className="department-dropdown"
                                 value={selectedDepartment}
                                 onChange={(e) => setSelectedDepartment(e.target.value)}
+                                style={{justifyContent: "space-between"}}
                             >
                                 <option value="">전체 부서</option>
                                 {departments.map(dept => (

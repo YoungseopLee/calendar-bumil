@@ -80,7 +80,10 @@ const EmployeeList = () => {
             if (!response.ok) throw new Error("사용자 데이터를 가져오는 데 실패했습니다.");
     
             const data = await response.json();
-            setEmployees(data.users);  // 상태 포함
+            setEmployees(data.users);
+
+            const uniqueDepartments = Array.from(new Set(data.users.map(emp => emp.department)));
+            setDepartments(uniqueDepartments);
         } catch (err) {
             setError(err.message);
         } finally {

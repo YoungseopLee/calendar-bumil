@@ -12,7 +12,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
-allowed_origins = ["http://localhost:3000", "http://3.38.20.237:5000"]
+allowed_origins = ["http://localhost:3000", "http://3.38.20.237", "http://3.38.20.237:5000"]
 CORS(app, supports_credentials=True, origins=allowed_origins)
 
 @app.after_request
@@ -265,6 +265,101 @@ def add_schedule():
     except Exception as e:
         print(f"일정 추가 중 오류 발생: {e}")
         return jsonify({'message': f'일정 추가 중 오류 발생: {e}'}), 500
+    finally:
+        try:
+            cursor.close()
+            conn.close()
+        except:
+            pass
+
+# 일정 수정 API
+@app.route('/edit-schedule/<int:schedule_id>', methods=['PUT', 'OPTIONS'])
+def edit_schedule(schedule_id):
+    if request.method == 'OPTIONS':
+        response = jsonify({'message': 'CORS preflight request success'})
+        return response
+
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'message': '토큰이 없습니다.'}), 401
+    token = token.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        user_id = payload['user_id']
+        data = request.get_json()
+        start_date = data.get('start_date')
+        end_date = data.get('end_date')
+        task = data.get('task')
+        status = data.get('status')
+
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+
+        cursor = conn.cursor()
+        cursor.execute("SELECT user_id FROM Schedule WHERE id = %s", (schedule_id,))
+        schedule_owner_id = cursor.fetchone()
+        if schedule_owner_id and schedule_owner_id[0] != user_id:
+            return jsonify({'message': '일정을 수정할 권한이 없습니다.'}), 403
+
+        sql = """
+        UPDATE Schedule
+        SET start_date = %s, end_date = %s, task = %s, status = %s
+        WHERE id = %s
+        """
+        values = (start_date, end_date, task, status, schedule_id)
+        cursor.execute(sql, values)
+        conn.commit()
+        return jsonify({'message': '일정이 수정되었습니다.'}), 200
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': '토큰이 만료되었습니다.'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
+    except Exception as e:
+        print(f"일정 수정 오류: {e}")
+        return jsonify({'message': '일정 수정 오류'}), 500
+    finally:
+        try:
+            cursor.close()
+            conn.close()
+        except:
+            pass
+
+# 일정 삭제 API
+@app.route('/delete-schedule/<int:schedule_id>', methods=['DELETE', 'OPTIONS'])
+def delete_schedule(schedule_id):
+    if request.method == 'OPTIONS':
+        response = jsonify({'message': 'CORS preflight request success'})
+        return response
+
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'message': '토큰이 없습니다.'}), 401
+    token = token.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        user_id = payload['user_id']
+
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+
+        cursor = conn.cursor()
+        cursor.execute("SELECT user_id FROM Schedule WHERE id = %s", (schedule_id,))
+        schedule_owner_id = cursor.fetchone()
+        if schedule_owner_id and schedule_owner_id[0] != user_id:
+            return jsonify({'message': '일정을 삭제할 권한이 없습니다.'}), 403
+
+        cursor.execute("DELETE FROM Schedule WHERE id = %s", (schedule_id,))
+        conn.commit()
+        return jsonify({'message': '일정이 삭제되었습니다.'}), 200
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': '토큰이 만료되었습니다.'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
+    except Exception as e:
+        print(f"일정 삭제 오류: {e}")
+        return jsonify({'message': '일정 삭제 오류'}), 500
     finally:
         try:
             cursor.close()
@@ -533,101 +628,6 @@ def get_logged_in_user():
         except:
             pass
 
-# 일정 수정 API
-@app.route('/edit-schedule/<int:schedule_id>', methods=['PUT', 'OPTIONS'])
-def edit_schedule(schedule_id):
-    if request.method == 'OPTIONS':
-        response = jsonify({'message': 'CORS preflight request success'})
-        return response
-
-    token = request.headers.get('Authorization')
-    if not token:
-        return jsonify({'message': '토큰이 없습니다.'}), 401
-    token = token.split(" ")[1]
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-        user_id = payload['user_id']
-        data = request.get_json()
-        start_date = data.get('start_date')
-        end_date = data.get('end_date')
-        task = data.get('task')
-        status = data.get('status')
-
-        conn = get_db_connection()
-        if conn is None:
-            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
-
-        cursor = conn.cursor()
-        cursor.execute("SELECT user_id FROM Schedule WHERE id = %s", (schedule_id,))
-        schedule_owner_id = cursor.fetchone()
-        if schedule_owner_id and schedule_owner_id[0] != user_id:
-            return jsonify({'message': '일정을 수정할 권한이 없습니다.'}), 403
-
-        sql = """
-        UPDATE Schedule
-        SET start_date = %s, end_date = %s, task = %s, status = %s
-        WHERE id = %s
-        """
-        values = (start_date, end_date, task, status, schedule_id)
-        cursor.execute(sql, values)
-        conn.commit()
-        return jsonify({'message': '일정이 수정되었습니다.'}), 200
-    except jwt.ExpiredSignatureError:
-        return jsonify({'message': '토큰이 만료되었습니다.'}), 401
-    except jwt.InvalidTokenError:
-        return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
-    except Exception as e:
-        print(f"일정 수정 오류: {e}")
-        return jsonify({'message': '일정 수정 오류'}), 500
-    finally:
-        try:
-            cursor.close()
-            conn.close()
-        except:
-            pass
-
-# 일정 삭제 API
-@app.route('/delete-schedule/<int:schedule_id>', methods=['DELETE', 'OPTIONS'])
-def delete_schedule(schedule_id):
-    if request.method == 'OPTIONS':
-        response = jsonify({'message': 'CORS preflight request success'})
-        return response
-
-    token = request.headers.get('Authorization')
-    if not token:
-        return jsonify({'message': '토큰이 없습니다.'}), 401
-    token = token.split(" ")[1]
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-        user_id = payload['user_id']
-
-        conn = get_db_connection()
-        if conn is None:
-            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
-
-        cursor = conn.cursor()
-        cursor.execute("SELECT user_id FROM Schedule WHERE id = %s", (schedule_id,))
-        schedule_owner_id = cursor.fetchone()
-        if schedule_owner_id and schedule_owner_id[0] != user_id:
-            return jsonify({'message': '일정을 삭제할 권한이 없습니다.'}), 403
-
-        cursor.execute("DELETE FROM Schedule WHERE id = %s", (schedule_id,))
-        conn.commit()
-        return jsonify({'message': '일정이 삭제되었습니다.'}), 200
-    except jwt.ExpiredSignatureError:
-        return jsonify({'message': '토큰이 만료되었습니다.'}), 401
-    except jwt.InvalidTokenError:
-        return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
-    except Exception as e:
-        print(f"일정 삭제 오류: {e}")
-        return jsonify({'message': '일정 삭제 오류'}), 500
-    finally:
-        try:
-            cursor.close()
-            conn.close()
-        except:
-            pass
-
 # 사용자 상태 업데이트 API
 @app.route('/update_status', methods=['PUT', 'OPTIONS'])
 def update_status():
@@ -686,6 +686,7 @@ def gemini_chat():
         print(f"Gemini API 호출 오류: {e}")
         return jsonify({"error": "Gemini API 호출 중 오류가 발생했습니다."}), 500
 
+# 전체 일정 가져오기
 @app.route('/get_all_schedule', methods=['GET']) 
 def get_all_schedule():
     try:
