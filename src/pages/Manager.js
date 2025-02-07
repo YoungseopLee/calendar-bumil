@@ -1,4 +1,3 @@
-// Manager.js
 import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import "./Manager.css";
@@ -80,52 +79,50 @@ const Manager = () => {
 
   return (
     <div className="manager-page">
-      <Sidebar />
-      <BackButton />
+      <header className="manager-header">
+        <Sidebar />
+      </header>
       <div className="manager-content">
-        <h2>회원가입 승인 관리</h2>
-        <table className="pending-users-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>이름</th>
-              <th>직급</th>
-              <th>부서</th>
-              <th>이메일</th>
-              <th>전화번호</th>
-              <th>승인</th>
-              <th>거절</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pendingUsers.map((user) => (
-              <tr key={user.id}>
-                <td>{user.id}</td>
-                <td>{user.name}</td>
-                <td>{user.position}</td>
-                <td>{user.department}</td>
-                <td>{user.email}</td>
-                <td>{user.phone_number}</td>
-                <td>
-                  <button
-                    className="button approve-button"
-                    onClick={() => handleApprove(user.id)}
-                  >
-                    승인
-                  </button>
-                </td>
-                <td>
-                  <button
-                    className="button reject-button"
-                    onClick={() => handleReject(user.id)}
-                  >
-                    거절
-                  </button>
-                </td>
+        <BackButton />
+        <h1 className="manager-title">회원가입 승인 관리</h1>
+        <section className="pending-users-section">
+          <table className="pending-users-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>이름</th>
+                <th>직급</th>
+                <th>부서</th>
+                <th>이메일</th>
+                <th>전화번호</th>
+                <th>승인</th>
+                <th>거절</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {pendingUsers.map((user) => (
+                <tr key={user.id}>
+                  <td>{user.id}</td>
+                  <td>{user.name}</td>
+                  <td>{user.position}</td>
+                  <td>{user.department}</td>
+                  <td>{user.email}</td>
+                  <td>{user.phone_number}</td>
+                  <td>
+                    <button className="button approve-button" onClick={() => handleApprove(user.id)}>
+                      승인
+                    </button>
+                  </td>
+                  <td>
+                    <button className="button reject-button" onClick={() => handleReject(user.id)}>
+                      거절
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
       </div>
     </div>
   );

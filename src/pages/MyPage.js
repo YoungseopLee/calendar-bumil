@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "./Sidebar";
-import BackButton from "./BackButton";
+import Sidebar from "../pages/Sidebar";
 import "./MyPage.css";
 
 const MyPage = () => {
@@ -23,7 +22,7 @@ const MyPage = () => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            "Authorization": `Bearer ${token}`,
           },
         });
         if (!response.ok) {
@@ -33,11 +32,7 @@ const MyPage = () => {
           );
         }
         const data = await response.json();
-        if (data.user) {
-          setUser(data.user);
-        } else {
-          throw new Error(data.message || "사용자 정보를 불러올 수 없습니다.");
-        }
+        setUser(data.user);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -48,11 +43,6 @@ const MyPage = () => {
     fetchUser();
   }, [apiUrl]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/";
-  };
-
   if (loading) return <div className="mypage-container">로딩 중...</div>;
   if (error) return <div className="mypage-container">{error}</div>;
 
@@ -61,10 +51,7 @@ const MyPage = () => {
       <Sidebar />
       <BackButton />
       <header className="mypage-header">
-        <h1>MyPage</h1>
-        <button className="logout-button" onClick={handleLogout}>
-          로그아웃
-        </button>
+        <Sidebar />
       </header>
       <section className="user-info">
         <h2>{user.name}님의 정보</h2>
