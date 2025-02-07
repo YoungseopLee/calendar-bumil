@@ -1,14 +1,14 @@
-import './App.css';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import SignupPage from './pages/SignupPage';
-import Calendar from './pages/Calendar';
-import Manager from './pages/Manager';
-import AddSchedule from './pages/AddSchedule';
-import Employee from './pages/Employee';
-import EditSchedule from './pages/EditSchedule';
-import MyPage from './pages/MyPage';
-import Department_view from './pages/Department-view';
+import "./App.css";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import Calendar from "./pages/Calendar";
+import Manager from "./pages/Manager";
+import AddSchedule from "./pages/AddSchedule";
+import Employee from "./pages/Employee";
+import EditSchedule from "./pages/EditSchedule";
+import MyPage from "./pages/MyPage";
+import Department_view from "./pages/Department-view";
 
 function App() {
   return (

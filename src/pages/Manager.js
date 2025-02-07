@@ -10,7 +10,9 @@ const Manager = () => {
   useEffect(() => {
     const fetchPendingUsers = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/get_pending_users`);
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/get_pending_users`
+        );
         if (response.ok) {
           const data = await response.json();
           setPendingUsers(data.users);
@@ -28,13 +30,16 @@ const Manager = () => {
 
   const handleApprove = async (userId) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/approve_user`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/approve_user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId }),
+        }
+      );
 
       if (response.ok) {
         setPendingUsers(pendingUsers.filter((user) => user.id !== userId));
@@ -50,13 +55,16 @@ const Manager = () => {
 
   const handleReject = async (userId) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/reject_user`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/reject_user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId }),
+        }
+      );
 
       if (response.ok) {
         setPendingUsers(pendingUsers.filter((user) => user.id !== userId));
@@ -99,12 +107,18 @@ const Manager = () => {
                 <td>{user.email}</td>
                 <td>{user.phone_number}</td>
                 <td>
-                  <button className="button approve-button" onClick={() => handleApprove(user.id)}>
+                  <button
+                    className="button approve-button"
+                    onClick={() => handleApprove(user.id)}
+                  >
                     승인
                   </button>
                 </td>
                 <td>
-                  <button className="button reject-button" onClick={() => handleReject(user.id)}>
+                  <button
+                    className="button reject-button"
+                    onClick={() => handleReject(user.id)}
+                  >
                     거절
                   </button>
                 </td>

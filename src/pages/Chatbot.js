@@ -18,16 +18,13 @@ const Chatbot = ({ onClose }) => {
 
     try {
       // Flask 서버에 API 요청 보내기
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/gemini`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ message: inputMessage }),
-        }
-      );
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/gemini`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: inputMessage }),
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -59,7 +56,9 @@ const Chatbot = ({ onClose }) => {
     <div className="chatbot-container">
       <div className="chatbot-header">
         <h3>AI 챗봇</h3>
-        <button className="close-button" onClick={onClose}>X</button>
+        <button className="close-button" onClick={onClose}>
+          X
+        </button>
       </div>
       <div className="chatbot-messages">
         {messages.map((message, index) => (
