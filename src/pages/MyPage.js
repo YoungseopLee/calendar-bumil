@@ -49,7 +49,7 @@ const MyPage = () => {
   return (
     <div className="mypage-container">
       <Sidebar />
-      <BackButton />
+      {/* <BackButton /> */}
       <header className="mypage-header">
         <Sidebar />
       </header>
