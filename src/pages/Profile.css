@@ -1,14 +1,14 @@
-/* 전체 페이지 */
+/* 페이지 전체 레이아웃 */
 .mypage-page {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh; 
-    background-color: #f4f4f4;
+    height: 100vh; /* 뷰포트 전체 높이 */
+    background-color: #f4f4f4; /* 배경색 */
   }
   
-  /* 헤더 (사이드바 메뉴) */
+  /* 헤더에 사이드바 포함 */
   .mypage-header {
     position: absolute;
     top: 0;
@@ -23,7 +23,7 @@
     z-index: 10;
   }
   
-  /* 프로필 카드 */
+  /* 마이페이지 전체 컨테이너 */
   .mypage-container {
     display: flex;
     flex-direction: column;
@@ -36,36 +36,27 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     font-family: "Poppins", sans-serif;
     border: 3px solid #007BFF;
-    padding: 20px;
-    text-align: center;
   }
   
-  /* 프로필 아이콘 스타일 */
-  .mypage-profile-icon {
-    margin-top: 0px; /* 아이콘을 프로필 카드 위에 위치 */
-    background-color: white;
-    border-radius: 50%;
-    padding: 10px;
-  }
-  
-  .user-icon {
-    font-size: 120px;
-    color: #007BFF;
-  }
-  
-  /* 사용자 이름 스타일 */
+  /* 헤더 섹션 */
   .mypage-header-section {
-    margin-top: 10px;
-    background-color: transparent;
-    color: #007BFF;
+    background-color: #007BFF;
+    color: white;
     text-align: center;
-    font-size: 1.5em;
+    padding: 20px;
+    width: 100%;
+    border-bottom: 2px solid white;
+  }
+  
+  .mypage-header-section h2 {
+    margin: 0;
+    font-size: 1.8em;
     font-weight: bold;
   }
   
-  /* 사용자 정보 */
+  /* 내용 섹션 */
   .mypage-content {
-    padding: 20px;
+    padding: 30px;
     width: 100%;
   }
   
@@ -75,10 +66,9 @@
     align-items: flex-start;
     margin-left: auto;
     margin-right: auto;
-    width: fit-content;
+    width: fit-content; /* 내용 크기에 맞춤 */
   }
   
-  /* 정보 스타일 */
   .mypage-details p {
     font-size: 1em;
     margin: 8px 0;
@@ -104,12 +94,12 @@
     font-size: 1em;
   }
   
-  /* 온라인 상태 */
+  /* 온라인 상태 (녹색) */
   .online {
     color: #28a745;
   }
   
-  /* 오프라인 상태 */
+  /* 오프라인 상태 (회색) */
   .offline {
     color: #6c757d;
   }

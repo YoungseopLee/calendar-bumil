@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../pages/Sidebar";
 import "./MyPage.css";
-import { FaPhone, FaEnvelope, FaCircle, FaUserTie, FaBuilding, FaUserCircle } from "react-icons/fa"; // 아이콘 추가
+import { FaPhone, FaEnvelope, FaCircle } from "react-icons/fa"; // 아이콘 추가
 
 const MyPage = () => {
   const [user, setUser] = useState(null);
@@ -19,7 +19,7 @@ const MyPage = () => {
         return;
       }
       try {
-        const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
+        const response = await fetch(`${apiUrl}/get_logged_in_user`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -53,42 +53,32 @@ const MyPage = () => {
         <Sidebar />
       </header>
       <div className="mypage-container">
-        {/* 프로필 아이콘 추가 */}
-        <div className="mypage-profile-icon">
-          <FaUserCircle className="user-icon" />
-        </div>
-
-        {/* 사용자 이름 */}
         <div className="mypage-header-section">
-          <h2>{user.name}</h2>
+          <h2>{user.name}님의 마이페이지</h2>
         </div>
-
-        {/* 사용자 정보 */}
         <div className="mypage-content">
           <div className="mypage-details">
-            <p>
-              <FaUserTie className="icon" />
-              {user.position}
-            </p>
-            <p>
-              <FaBuilding className="icon" />
-              {user.department}
-            </p>
             <p>
               <FaCircle
                 className={`status-icon ${
                   user.status === "출근" ? "online" : "offline"
                 }`}
               />
-              {user.status}
+              <strong>상태:</strong> {user.status}
             </p>
             <p>
               <FaPhone className="icon" />
-              {user.phone_number}
+              <strong>전화번호:</strong> {user.phone_number}
             </p>
             <p>
               <FaEnvelope className="icon" />
-              {user.email}
+              <strong>이메일:</strong> {user.email}
+            </p>
+            <p>
+              <strong>직급:</strong> {user.position}
+            </p>
+            <p>
+              <strong>부서:</strong> {user.department}
             </p>
           </div>
         </div>
