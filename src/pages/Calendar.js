@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import Chatbot from "./Chatbot"; // Chatbot 컴포넌트 import
 import { FaEdit, FaTrash } from "react-icons/fa";
 import "./Calendar.css";
 
@@ -11,7 +10,6 @@ const Calendar = () => {
   const [userSchedule, setUserSchedule] = useState([]);
   const [otherUsersSchedule, setOtherUsersSchedule] = useState([]);
   const [userStatus, setUserStatus] = useState("");
-  const [showChatbot, setShowChatbot] = useState(false); // 챗봇 토글 상태
   const navigate = useNavigate();
 
   // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
@@ -234,13 +232,6 @@ const Calendar = () => {
       currentYear === selectedDate.getFullYear()
     );
   };
-  // 챗봇 토글 함수
-  const toggleChatbot = () => {
-    setShowChatbot(!showChatbot);
-  };
-  const closeChatbot = () => {
-    setShowChatbot(false);
-  };
 
   // 상태에 맞는 색상 클래스를 반환하는 함수
   const getStatusClass = (status) => {
@@ -433,11 +424,6 @@ const Calendar = () => {
             </div>
           </div>
         )}
-        <button className="toggle-chatbot-button" onClick={toggleChatbot}>
-          챗봇 열기
-        </button>
-
-        {showChatbot && <Chatbot onClose={closeChatbot} />}
       </div>
     </div>
   );
