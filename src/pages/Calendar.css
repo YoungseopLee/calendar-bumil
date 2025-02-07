@@ -1,7 +1,7 @@
 /* Calendar.css */
 .calendar-page {
   display: flex;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
   flex-direction: column; /* 모든 요소가 세로로 배치되도록 변경 */
 }
 
@@ -33,7 +33,7 @@
 
 .calendar-navigation .nav-button {
   border: none;
-  font-size: 1.0em; /* Increased size for better visibility */
+  font-size: 1em; /* Increased size for better visibility */
   cursor: pointer;
   border-radius: 10%;
   color: black; /* Changed to black */
@@ -115,7 +115,7 @@
   color: blue;
 }
 
-.calendar-day:nth-child(7n+1) {
+.calendar-day:nth-child(7n + 1) {
   color: red;
 }
 
@@ -185,7 +185,7 @@
   transition: background-color 0.3s ease;
   color: #333;
   text-align: left; /* 텍스트 왼쪽 정렬 */
-  width: 100%; /* 부모 너비 차지 */
+  width: 98%; /* 부모 너비 차지 */
   white-space: nowrap; /* 텍스트가 한 줄로 유지되도록 */
 }
 
@@ -338,7 +338,7 @@
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   border: none;
   color: white;
   padding: 10px 20px;
@@ -367,4 +367,22 @@
 
 .department-view-button:hover {
   background-color: #0056b3;
+}
+
+.department-view-dropdown {
+  display: block;
+  clear: both;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+  cursor: pointer;
+  background-color: #f8f9fa;
+}
+
+.department-view-dropdown:focus {
+  border-color: #007bff;
+  outline: none;
 }

@@ -40,7 +40,7 @@ const LoginPage = () => {
           console.error("localStorage is not supported in this environment");
         }
 
-        navigate("/calendar"); // 캘린더로 바로 이동 (state 불필요)
+        navigate("/calendar", { replace: true }); // 캘린더로 바로 이동 (state 불필요)
       } else {
         // 로그인 실패 처리
         if (response.status === 403 && data.message === "승인 대기 중입니다!") {

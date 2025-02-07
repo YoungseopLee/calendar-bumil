@@ -258,18 +258,20 @@ const Department_view = () => {
               }}
             >
               <h4 style={{ margin: 5, whiteSpace: "nowrap" }}>일정 목록</h4>
-              <select
-                className="department-dropdown"
-                value={selectedDepartment}
-                onChange={(e) => setSelectedDepartment(e.target.value)}
-              >
-                <option value="">전체 부서</option>
-                {departments.map((dept) => (
-                  <option key={dept} value={dept}>
-                    {dept}
-                  </option>
-                ))}
-              </select>
+              <div>
+                <select
+                  className="department-view-dropdown"
+                  value={selectedDepartment}
+                  onChange={(e) => setSelectedDepartment(e.target.value)}
+                >
+                  <option value="">전체 부서</option>
+                  {departments.map((dept) => (
+                    <option key={dept} value={dept}>
+                      {dept}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             <ul className="schedule-list">
               {(() => {
