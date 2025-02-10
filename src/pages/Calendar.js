@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import Chatbot from "./Chatbot"; // Chatbot 컴포넌트 import
 import { FaEdit, FaTrash } from "react-icons/fa";
 import "./Calendar.css";
 
@@ -10,20 +11,68 @@ const Calendar = () => {
   const [userSchedule, setUserSchedule] = useState([]);
   const [otherUsersSchedule, setOtherUsersSchedule] = useState([]);
   const [userStatus, setUserStatus] = useState("");
+  const [departments, setDepartments] = useState([]);
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [users, setUsers] = useState([]); // 직원 목록
+  const [showChatbot, setShowChatbot] = useState(false); // 챗봇 토글 상태
   const navigate = useNavigate();
 
   // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // 로그인 상태 확인 및 사용자 정보 불러오기
-  useEffect(() => {
-    if (!user) {
-      alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
-      navigate("/", { replace: true });
-    } else {
-      fetchLoggedInUser(); // 사용자 정보 API 호출하여 상태 업데이트
-    }
-  }, []);
+  // 로그인 및 부서 데이터 가져오기
+    useEffect(() => {
+      const fetchData = async () => {
+        if (!user) {
+          alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
+          navigate("/");
+          return;
+        }
+  
+        try {
+          // 1. 부서 및 사용자 정보 가져오기
+          const usersResponse = await fetch(
+            `${process.env.REACT_APP_API_URL}/user/get_users`
+          );
+          if (!usersResponse.ok)
+            throw new Error("직원 목록을 불러오지 못했습니다.");
+          const usersData = await usersResponse.json();
+          setUsers(usersData.users);
+  
+          const uniqueDepartments = [
+            ...new Set(usersData.users.map((user) => user.department)),
+          ];
+          setDepartments(uniqueDepartments);
+  
+          /*// 2. 일정 가져오기 (calendar에서 비활성화)
+          const scheduleResponse = await fetch(
+            `${process.env.REACT_APP_API_URL}/schedule/get_all_schedule`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+  
+          if (scheduleResponse.status === 401) {
+            handleLogout();
+            return;
+          }
+  
+          if (!scheduleResponse.ok)
+            throw new Error("일정 데이터를 불러오지 못했습니다.");
+          const scheduleData = await scheduleResponse.json();
+          setSchedules(scheduleData.schedules);*/
+        
+        } catch (error) {
+          console.error("데이터 로딩 오류:", error);
+        }
+      };
+  
+      fetchData();
+      fetchLoggedInUser(); // 사용자 상태 업데이트
+    }, []);
 
   const monthNames = [
     "1월",
@@ -232,6 +281,13 @@ const Calendar = () => {
       currentYear === selectedDate.getFullYear()
     );
   };
+  // 챗봇 토글 함수
+  const toggleChatbot = () => {
+    setShowChatbot(!showChatbot);
+  };
+  const closeChatbot = () => {
+    setShowChatbot(false);
+  };
 
   // 상태에 맞는 색상 클래스를 반환하는 함수
   const getStatusClass = (status) => {
@@ -338,44 +394,39 @@ const Calendar = () => {
               <ul className="schedule-list">
                 {userSchedule.length > 0 ? (
                   userSchedule.map((schedule) => (
-                    <li
-                      key={schedule.id}
-                      className={`schedule-item ${
-                        /* 원하는 클래스 추가 가능 */ ""
-                      }`}
-                      onClick={() => handleScheduleClick(schedule)}
-                    >
-                      <span
-                        className="status-icon"
-                        style={{
-                          backgroundColor: getStatusClass(schedule.status),
-                        }}
-                      ></span>
-                      <span className="task-name">{schedule.task}</span>
-                      {/* 수정, 삭제 버튼 그룹을 일정 항목 내부에 추가 */}
+                    <div className="schedule-container" key={schedule.id}>
+                      <li
+                        key={schedule.id}
+                        className="schedule-item"
+                        onClick={() => handleScheduleClick(schedule)}
+                      >
+                        <span
+                          className="status-icon"
+                          style={{
+                            backgroundColor: getStatusClass(schedule.status),
+                          }}
+                        ></span>
+                        <span className="task-name">{schedule.task}</span>
+                      </li>
                       <div className="button-group">
+                        {/* 수정 버튼 아이콘 */}
                         <button
                           className="edit-button icon-button"
-                          onClick={(e) => {
-                            e.stopPropagation(); // 버튼 클릭 시 부모 요소의 onClick 이벤트 방지
-                            handleEditSchedule(schedule);
-                          }}
+                          onClick={() => handleEditSchedule(schedule)}
                           title="수정"
                         >
                           <FaEdit />
                         </button>
+                        {/* 삭제 버튼 아이콘 */}
                         <button
                           className="delete-button icon-button"
-                          onClick={(e) => {
-                            e.stopPropagation(); // 버튼 클릭 시 부모 요소의 onClick 이벤트 방지
-                            handleDeleteSchedule(schedule.id);
-                          }}
+                          onClick={() => handleDeleteSchedule(schedule.id)}
                           title="삭제"
                         >
                           <FaTrash />
                         </button>
                       </div>
-                    </li>
+                    </div>
                   ))
                 ) : (
                   <li className="empty-schedule">일정이 없습니다.</li>
@@ -392,43 +443,94 @@ const Calendar = () => {
                   width: "100%",
                 }}
               >
-                <h4 style={{ margin: 0 }}>다른 사용자 일정</h4>{" "}
+                <h4 style={{ margin: 0 }}>전체 일정</h4>{"\u00A0 "}
                 {/* 제목의 기본 마진을 제거 */}
                 {/* 부서별 보기 버튼 */}
-                <button
-                  className="department-view-button"
-                  onClick={() => navigate("/department-view")}
+                <select
+                  className="department-dropdown"
+                  value={selectedDepartment}
+                  onChange={(e) => setSelectedDepartment(e.target.value)}
                 >
-                  부서별 보기
-                </button>
+                  <option value="">전체 부서</option>
+                  {departments.map((dept) => (
+                    <option key={dept} value={dept}>
+                      {dept}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <ul className="schedule-list">
-                {otherUsersSchedule.length > 0 ? (
-                  otherUsersSchedule.map((schedule) => (
-                    <li
-                      key={schedule.id}
-                      className="schedule-item other-user-schedule"
-                      onClick={() => handleScheduleClick(schedule)}
-                    >
-                      <span
-                        className="status-icon"
-                        style={{
-                          backgroundColor: getStatusClass(schedule.status),
-                        }}
-                      ></span>
-                      {schedule.name} :&nbsp;{" "}
-                      <span className="task-name-two">{schedule.task}</span>
-                    </li>
-                  ))
-                ) : (
-                  <li className="empty-schedule">
-                    이 날짜에 다른 사용자 일정이 없습니다.
-                  </li>
-                )}
+                <ul className="schedule-list">
+                {(() => {
+                  // 1. 선택한 부서 필터링
+                  const departmentUserIds = users
+                    .filter(
+                      (user) =>
+                        selectedDepartment === "" ||
+                        user.department === selectedDepartment
+                    )
+                    .map((user) => user.id);
+
+                  // 2. 걸쳐 있는 월의 일정 표시하기 위한 필터
+                  const filtered = otherUsersSchedule
+                    .filter((schedule) => {
+                      console.log("schedule : ", schedule)
+                      const startDate = new Date(schedule.start_date);
+                      const endDate = new Date(schedule.end_date);
+
+                      return (
+                        departmentUserIds.includes(schedule.user_id) &&
+                        (startDate <= new Date(currentYear, currentMonth + 1, 0) && // 해당 월의 마지막 날 이하
+                         endDate >= new Date(currentYear, currentMonth, 1)) // 해당 월의 첫날 이상
+                      );
+                    })
+                    .sort(
+                      (a, b) => new Date(a.start_date) - new Date(b.start_date)
+                    );
+
+                  if (filtered.length === 0) {
+                    return (
+                      <li className="empty-schedule">
+                        선택한 부서에 이 날짜의 일정이 없습니다.
+                      </li>
+                    );
+                  }
+
+                  return filtered.map((schedule) => {
+                    const user = users.find((u) => u.id === schedule.user_id);
+                    const userName = user ? user.name : "알 수 없음";
+
+                    const formatDate = (dateString) =>
+                      new Date(dateString)
+                        .toISOString()
+                        .slice(2, 10)
+                        .replace(/-/g, ".");
+
+                    return (
+                      <li key={schedule.id} className="schedule-item">
+                        <span
+                          className="status-icon"
+                          style={{
+                            backgroundColor: getStatusClass(schedule.status),
+                          }}
+                        ></span>
+                        {userName} {": \u00A0"}
+                        <span className="task-name">{schedule.task}</span>
+                        <span> {formatDate(schedule.start_date)}</span>
+                        {"\u00A0"} ~ {"\u00A0"}
+                        <span> {formatDate(schedule.end_date)}</span>
+                      </li>
+                    );
+                  });
+                })()}
               </ul>
             </div>
           </div>
         )}
+        <button className="toggle-chatbot-button" onClick={toggleChatbot}>
+          챗봇 열기
+        </button>
+
+        {showChatbot && <Chatbot onClose={closeChatbot} />}
       </div>
     </div>
   );
