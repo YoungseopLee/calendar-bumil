@@ -1,14 +1,41 @@
-// LoginPage.js
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false); // 아이디 저장 상태
+  const [autoLogin, setAutoLogin] = useState(false); // 자동 로그인 상태
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // 저장된 이메일과 자동 로그인 상태 가져오기
+    const savedEmail = localStorage.getItem("savedEmail");
+    const savedAutoLogin = localStorage.getItem("autoLogin") === "true";
+
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+
+    if (savedAutoLogin) {
+      const token = localStorage.getItem("token");
+      if (token) {
+        navigate("/calendar", { replace: true }); // 자동으로 캘린더 페이지로 이동
+      }
+      setAutoLogin(true);
+    }
+  }, [navigate]);
+
+  const handleRememberMeChange = (e) => {
+    setRememberMe(e.target.checked);
+  };
+
+  const handleAutoLoginChange = (e) => {
+    setAutoLogin(e.target.checked);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -30,17 +57,24 @@ const LoginPage = () => {
       if (response.ok) {
         // 로그인 성공 처리
         setMessage(data.message);
-        console.log("User info:", data.user);
 
-        // 로컬 스토리지 설정 전에 `localStorage`가 null이 아닌지 확인
-        if (typeof localStorage !== "undefined") {
-          localStorage.setItem("token", data.token); // JWT 토큰 저장
-          localStorage.setItem("user", JSON.stringify(data.user)); // 사용자 정보 저장
+        // 저장 설정
+        localStorage.setItem("token", data.token); // JWT 토큰 저장
+        localStorage.setItem("user", JSON.stringify(data.user)); // 사용자 정보 저장
+
+        if (rememberMe) {
+          localStorage.setItem("savedEmail", email); // 이메일 저장
         } else {
-          console.error("localStorage is not supported in this environment");
+          localStorage.removeItem("savedEmail"); // 체크 해제 시 이메일 제거
         }
 
-        navigate("/calendar", { replace: true }); // 캘린더로 바로 이동 (state 불필요)
+        if (autoLogin) {
+          localStorage.setItem("autoLogin", "true"); // 자동 로그인 활성화
+        } else {
+          localStorage.removeItem("autoLogin"); // 자동 로그인 비활성화
+        }
+
+        navigate("/calendar", { replace: true }); // 캘린더로 이동
       } else {
         // 로그인 실패 처리
         if (response.status === 403 && data.message === "승인 대기 중입니다!") {
@@ -81,6 +115,26 @@ const LoginPage = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+          </div>
+          <div className="checkbox-container">
+            <div className="form-group remember-me">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={rememberMe}
+                onChange={handleRememberMeChange}
+              />
+              <label htmlFor="rememberMe">아이디 저장</label>
+            </div>
+            <div className="form-group auto-login">
+              <input
+                type="checkbox"
+                id="autoLogin"
+                checked={autoLogin}
+                onChange={handleAutoLoginChange}
+              />
+              <label htmlFor="autoLogin">자동 로그인</label>
+            </div>
           </div>
           <button type="submit" className="login-button">
             로그인

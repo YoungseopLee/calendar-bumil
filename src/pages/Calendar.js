@@ -338,39 +338,44 @@ const Calendar = () => {
               <ul className="schedule-list">
                 {userSchedule.length > 0 ? (
                   userSchedule.map((schedule) => (
-                    <div className="schedule-container" key={schedule.id}>
-                      <li
-                        key={schedule.id}
-                        className="schedule-item"
-                        onClick={() => handleScheduleClick(schedule)}
-                      >
-                        <span
-                          className="status-icon"
-                          style={{
-                            backgroundColor: getStatusClass(schedule.status),
-                          }}
-                        ></span>
-                        <span className="task-name">{schedule.task}</span>
-                      </li>
+                    <li
+                      key={schedule.id}
+                      className={`schedule-item ${
+                        /* 원하는 클래스 추가 가능 */ ""
+                      }`}
+                      onClick={() => handleScheduleClick(schedule)}
+                    >
+                      <span
+                        className="status-icon"
+                        style={{
+                          backgroundColor: getStatusClass(schedule.status),
+                        }}
+                      ></span>
+                      <span className="task-name">{schedule.task}</span>
+                      {/* 수정, 삭제 버튼 그룹을 일정 항목 내부에 추가 */}
                       <div className="button-group">
-                        {/* 수정 버튼 아이콘 */}
                         <button
                           className="edit-button icon-button"
-                          onClick={() => handleEditSchedule(schedule)}
+                          onClick={(e) => {
+                            e.stopPropagation(); // 버튼 클릭 시 부모 요소의 onClick 이벤트 방지
+                            handleEditSchedule(schedule);
+                          }}
                           title="수정"
                         >
                           <FaEdit />
                         </button>
-                        {/* 삭제 버튼 아이콘 */}
                         <button
                           className="delete-button icon-button"
-                          onClick={() => handleDeleteSchedule(schedule.id)}
+                          onClick={(e) => {
+                            e.stopPropagation(); // 버튼 클릭 시 부모 요소의 onClick 이벤트 방지
+                            handleDeleteSchedule(schedule.id);
+                          }}
                           title="삭제"
                         >
                           <FaTrash />
                         </button>
                       </div>
-                    </div>
+                    </li>
                   ))
                 ) : (
                   <li className="empty-schedule">일정이 없습니다.</li>

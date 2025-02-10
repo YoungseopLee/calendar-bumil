@@ -127,7 +127,7 @@ const SignupPage = () => {
       <div className="signup-container">
         <h2>회원가입</h2>
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
+          <div className="form-group-signup">
             <label htmlFor="email">이메일 (아이디)</label>
             <input
               type="email"
@@ -138,7 +138,7 @@ const SignupPage = () => {
             />
             {errors.email && <div className="error">{errors.email}</div>}
           </div>
-          <div className="form-group">
+          <div className="form-group-signup">
             <label htmlFor="password">비밀번호</label>
             <input
               type="password"
@@ -149,7 +149,7 @@ const SignupPage = () => {
             />
             {errors.password && <div className="error">{errors.password}</div>}
           </div>
-          <div className="form-group">
+          <div className="form-group-signup">
             <label htmlFor="username">이름</label>
             <input
               type="text"
@@ -159,7 +159,7 @@ const SignupPage = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="form-group-signup">
             <label htmlFor="department">부서</label>
             <select
               id="department"
@@ -176,7 +176,7 @@ const SignupPage = () => {
               ))}
             </select>
           </div>
-          <div className="form-group">
+          <div className="form-group-signup">
             <label htmlFor="rank">직급</label>
             <select
               id="rank"
@@ -193,7 +193,7 @@ const SignupPage = () => {
               ))}
             </select>
           </div>
-          <div className="form-group">
+          <div className="form-group-signup">
             <label htmlFor="phone">전화번호</label>
             <input
               type="tel"
