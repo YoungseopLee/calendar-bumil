@@ -39,31 +39,39 @@ def get_schedule():
 def get_other_users_schedule():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
+    
     user_id = request.args.get('user_id')
     date = request.args.get('date')
+    
     try:
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+        
         cursor = conn.cursor(dictionary=True)
         sql = """
-        SELECT s.id, s.task, s.start_date, s.end_date, s.status, u.name
+        SELECT s.id AS schedule_id, s.task, s.start_date, s.end_date, s.status, 
+        u.id AS user_id, u.name
         FROM Schedule s
         JOIN User u ON s.user_id = u.id
         WHERE DATE(s.start_date) <= %s AND DATE(s.end_date) >= %s AND s.user_id != %s
         """
         cursor.execute(sql, (date, date, user_id))
         other_users_schedules = cursor.fetchall()
+        
         return jsonify({'schedules': other_users_schedules}), 200
+    
     except Exception as e:
         print(f"다른 사용자 일정 가져오기 오류: {e}")
         return jsonify({'message': '다른 사용자 일정 가져오기 오류'}), 500
+    
     finally:
         try:
             cursor.close()
             conn.close()
         except Exception:
             pass
+
 
 @schedule_bp.route('/add-schedule', methods=['POST', 'OPTIONS'])
 def add_schedule():

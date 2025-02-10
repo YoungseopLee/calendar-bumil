@@ -67,7 +67,6 @@ const EmployeeList = () => {
         throw new Error("즐겨찾기 목록을 가져오는 데 실패했습니다.");
 
       const data = await response.json();
-      console.log("전체 응답 데이터:", data);
 
       // API 응답 데이터의 키가 "favorite" (단수)인 경우:
       if (
