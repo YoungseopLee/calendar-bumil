@@ -1,14 +1,18 @@
 # app.py
 from flask import Flask, request, jsonify
+from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from config import ALLOWED_ORIGINS
 from blueprints.auth import auth_bp
 from blueprints.schedule import schedule_bp
 from blueprints.user import user_bp
 from blueprints.favorite import favorite_bp
-from blueprints.gemini import gemini_bp
 
 app = Flask(__name__)
+
+bcrypt = Bcrypt()
+bcrypt.init_app(app)
+
 
 # CORS 설정
 CORS(app, supports_credentials=True, origins=ALLOWED_ORIGINS)
@@ -31,7 +35,6 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(schedule_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(favorite_bp)
-app.register_blueprint(gemini_bp)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

@@ -1,5 +1,6 @@
 # blueprints/auth.py
 from flask import Blueprint, request, jsonify
+from flask_bcrypt import Bcrypt
 from flask_cors import cross_origin
 import jwt
 from datetime import datetime, timedelta, timezone
@@ -7,6 +8,7 @@ from db import get_db_connection
 from config import SECRET_KEY
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
+bcrypt = Bcrypt()
 
 @auth_bp.route('/login', methods=['POST', 'OPTIONS'])
 def login():
@@ -25,7 +27,8 @@ def login():
         cursor.execute("SELECT * FROM User WHERE email = %s", (email,))
         user = cursor.fetchone()
         if user:
-            if password == user['password']:
+            # bcrypt를 사용하여 비밀번호 비교
+            if bcrypt.check_password_hash(user['password'], password):
                 if user['is_approved'] == 1:
                     payload = {
                         'user_id': user['id'],
@@ -87,11 +90,14 @@ def signup():
         if existing_user:
             return jsonify({'message': '이미 사용 중인 이메일입니다.'}), 400
         
+        # bcrypt를 사용하여 비밀번호 해싱 (decode하여 문자열로 변환)
+        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        
         sql = """
         INSERT INTO User (name, position, department, email, phone_number, password)
         VALUES (%s, %s, %s, %s, %s, %s)
         """
-        values = (username, rank, department, email, phone, password)
+        values = (username, rank, department, email, phone, hashed_password)
         cursor.execute(sql, values)
         conn.commit()
         return jsonify({'message': '회원가입 성공!'}), 201

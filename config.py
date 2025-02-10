@@ -20,6 +20,3 @@ db_config = {
 
 # JWT 시크릿키
 SECRET_KEY = os.getenv("REACT_APP_SECRET_KEY")
-
-# Gemini API 키
-GEMINI_API_KEY = os.getenv("REACT_APP_AI_API_URL")
