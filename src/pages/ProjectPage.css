@@ -1,0 +1,39 @@
+/* 전체 레이아웃 */
+.project-page {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+}
+
+/* ✅ 기존 스타일을 유지하면서 Sidebar의 기본 상태에서 여백 조정 */
+.content {
+    width: 100%;
+    max-width: 1000px;
+    padding: 20px;
+    transition: margin-left 0.3s ease-in-out; /* ✅ 사이드바가 열릴 때 애니메이션 */
+}
+
+/* ✅ Sidebar가 열렸을 때 적용될 클래스 */
+.sidebar-open .content {
+    margin-left: 250px; /* ✅ 사이드바 너비만큼 이동 */
+}
+
+/* 🔍 검색 입력창 스타일 */
+.search-input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+/* 검색 결과 없음 메시지 */
+.no-results {
+    text-align: center;
+    color: #888;
+    font-size: 1.1em;
+    margin-top: 10px;
+}
