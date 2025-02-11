@@ -3,6 +3,7 @@ from flask import Blueprint, request, jsonify
 import jwt
 from db import get_db_connection
 from config import SECRET_KEY
+from .auth import decrypt_aes, decrypt_deterministic
 
 user_bp = Blueprint('user', __name__, url_prefix='/user')
 
@@ -17,6 +18,17 @@ def get_pending_users():
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT id, name, position, department, email, phone_number FROM User WHERE is_approved = 0")
         pending_users = cursor.fetchall()
+        # 암호화된 필드 복호화: name, email, phone_number
+        for user in pending_users:
+            try:
+                user['name'] = decrypt_aes(user['name'])
+                user['email'] = decrypt_deterministic(user['email'])
+                user['phone_number'] = decrypt_aes(user['phone_number'])
+            except Exception as decryption_error:
+                print(f"복호화 오류 (pending user id {user['id']}): {decryption_error}")
+                user['name'] = None
+                user['email'] = None
+                user['phone_number'] = None
         return jsonify({'users': pending_users}), 200
     except Exception as e:
         print(f"승인 대기 사용자 목록 가져오기 오류: {e}")
@@ -88,6 +100,17 @@ def get_users():
             FROM User
         """)
         users = cursor.fetchall()
+        # 암호화된 필드 복호화: name, email, phone_number
+        for user in users:
+            try:
+                user['name'] = decrypt_aes(user['name'])
+                user['email'] = decrypt_deterministic(user['email'])
+                user['phone_number'] = decrypt_aes(user['phone_number'])
+            except Exception as decryption_error:
+                print(f"복호화 오류 (user id {user['id']}): {decryption_error}")
+                user['name'] = None
+                user['email'] = None
+                user['phone_number'] = None
         return jsonify({'users': users}), 200
     except Exception as e:
         print(f"사용자 목록 조회 오류: {e}")

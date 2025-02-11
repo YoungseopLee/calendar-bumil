@@ -337,31 +337,36 @@ const Calendar = () => {
           ))}
         </div>
         <div className="calendar-days">
-          {calendarDays.map((day, index) => (
-            <div
-              key={index}
-              className={`calendar-day ${day ? "active" : ""} ${
-                isToday(day) ? "today" : ""
-              } ${isSelected(day) ? "selected" : ""}`}
-              onClick={() => handleDateClick(day)}
-            >
-              {day}
-              {/* 상태 색상 원 */}
-              {day &&
-                userSchedule.some(
-                  (schedule) => new Date(schedule.start_date).getDate() === day
-                ) && (
-                  <div
-                    className={`status-circle ${getStatusClass(
-                      userSchedule.find(
-                        (schedule) =>
-                          new Date(schedule.start_date).getDate() === day
-                      )?.status
-                    )}`}
-                  ></div>
-                )}
-            </div>
-          ))}
+          {calendarDays.map((day, index) => {
+            const key = day
+              ? `${currentYear}-${currentMonth}-${day}`
+              : `empty-${index}`;
+            return (
+              <div
+                key={key}
+                className={`calendar-day ${day ? "active" : ""} ${
+                  isToday(day) ? "today" : ""
+                } ${isSelected(day) ? "selected" : ""}`}
+                onClick={() => handleDateClick(day)}
+              >
+                {day}
+                {day &&
+                  userSchedule.some(
+                    (schedule) =>
+                      new Date(schedule.start_date).getDate() === day
+                  ) && (
+                    <div
+                      className={`status-circle ${getStatusClass(
+                        userSchedule.find(
+                          (schedule) =>
+                            new Date(schedule.start_date).getDate() === day
+                        )?.status
+                      )}`}
+                    ></div>
+                  )}
+              </div>
+            );
+          })}
         </div>
 
         {selectedDate && (
@@ -384,12 +389,12 @@ const Calendar = () => {
               <ul className="schedule-list">
                 {userSchedule.length > 0 ? (
                   userSchedule.map((schedule) => (
-                    <div className="schedule-container" key={schedule.id}>
-                      <li
-                        key={schedule.id}
-                        className="schedule-item"
-                        onClick={() => handleScheduleClick(schedule)}
-                      >
+                    <li
+                      key={schedule.id}
+                      className="schedule-item"
+                      onClick={() => handleScheduleClick(schedule)}
+                    >
+                      <div className="schedule-content">
                         <span
                           className="status-icon"
                           style={{
@@ -397,9 +402,8 @@ const Calendar = () => {
                           }}
                         ></span>
                         <span className="task-name">{schedule.task}</span>
-                      </li>
+                      </div>
                       <div className="button-group">
-                        {/* 수정 버튼 아이콘 */}
                         <button
                           className="edit-button icon-button"
                           onClick={() => handleEditSchedule(schedule)}
@@ -407,7 +411,6 @@ const Calendar = () => {
                         >
                           <FaEdit />
                         </button>
-                        {/* 삭제 버튼 아이콘 */}
                         <button
                           className="delete-button icon-button"
                           onClick={() => handleDeleteSchedule(schedule.id)}
@@ -416,7 +419,7 @@ const Calendar = () => {
                           <FaTrash />
                         </button>
                       </div>
-                    </div>
+                    </li>
                   ))
                 ) : (
                   <li className="empty-schedule">일정이 없습니다.</li>
@@ -490,13 +493,11 @@ const Calendar = () => {
                   return filtered.map((schedule) => {
                     const user = users.find((u) => u.id === schedule.user_id);
                     const userName = user ? user.name : "알 수 없음";
-
                     const formatDate = (dateString) =>
                       new Date(dateString)
                         .toISOString()
                         .slice(2, 10)
                         .replace(/-/g, ".");
-
                     return (
                       <li key={schedule.id} className="schedule-item">
                         <span
