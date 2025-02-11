@@ -10,7 +10,7 @@ import EditSchedule from "./pages/EditSchedule";
 import MyPage from "./pages/MyPage";
 import Department_view from "./pages/Department-view";
 import Profile from "./pages/Profile";
-
+import ProjectDetails from "./pages/ProjectDetails"
 import ProjectPage from "./pages/ProjectPage";  // 추가
 
 function App() {
@@ -39,6 +39,8 @@ function App() {
         <Route path="/department-view" element={<Department_view />} />
         {/* 프로젝트 페이지 */}
         <Route path="/projects" element={<ProjectPage />} />
+        {/* 프로젝트 상세 페이지 */}
+        <Route path="/project-details" element={<ProjectDetails />} />
       </Routes>
     </Router>
   );
