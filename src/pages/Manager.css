@@ -54,10 +54,18 @@
   border: 1px solid #ddd;
   padding: 10px;
   text-align: left;
+  
 }
 
 .pending-users-table th {
   background-color: #f2f2f2;
+}
+
+.pending-users-table td:first-child {
+  max-width: 8ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* 버튼 스타일 */
