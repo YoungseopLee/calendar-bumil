@@ -14,7 +14,7 @@ bcrypt = Bcrypt()
 
 # AES 키 (정확히 32 바이트로 설정)
 AES_KEY = os.environ.get("AES_SECRET_KEY", "Bumil-calendar-1234567890!@#$%^&*").ljust(32)[:32]
-BLOCK_SIZE = AES.block_size # 16
+BLOCK_SIZE = AES.block_size  # 16
 
 def pad(data_bytes: bytes) -> bytes:
     """바이트 데이터를 AES CBC 모드에 맞게 PKCS7 패딩 적용"""
@@ -30,19 +30,19 @@ def encrypt_aes(data: str) -> str:
     """AES 암호화 (CBC 모드, 바이트 단위 패딩 적용)"""
     iv = os.urandom(BLOCK_SIZE)  # 초기화 벡터 생성 (16바이트)
     cipher = AES.new(AES_KEY.encode('utf-8'), AES.MODE_CBC, iv)
-    data_bytes = data.encode('utf-8')       # 문자열 -> 바이트 변환
-    padded_data = pad(data_bytes)           # 바이트 데이터를 패딩
-    encrypted = cipher.encrypt(padded_data) # 암호화
-    return base64.b64encode(iv + encrypted).decode('utf-8')  # IV 포함 후 base64 인코딩
+    data_bytes = data.encode('utf-8')
+    padded_data = pad(data_bytes)
+    encrypted = cipher.encrypt(padded_data)
+    return base64.b64encode(iv + encrypted).decode('utf-8')
 
 def decrypt_aes(encrypted_data: str) -> str:
     """AES 복호화 (CBC 모드, 바이트 단위 언패딩 적용)"""
     raw_data = base64.b64decode(encrypted_data)
-    iv = raw_data[:BLOCK_SIZE]              # IV 추출
+    iv = raw_data[:BLOCK_SIZE]
     cipher = AES.new(AES_KEY.encode('utf-8'), AES.MODE_CBC, iv)
     decrypted_bytes = cipher.decrypt(raw_data[BLOCK_SIZE:])
-    unpadded_bytes = unpad(decrypted_bytes)  # 패딩 제거
-    return unpadded_bytes.decode('utf-8')     # 바이트 -> 문자열 변환
+    unpadded_bytes = unpad(decrypted_bytes)
+    return unpadded_bytes.decode('utf-8')
 
 def encrypt_deterministic(data: str) -> str:
     fixed_iv = b'\x00' * BLOCK_SIZE  # 16바이트의 고정 IV
@@ -52,6 +52,13 @@ def encrypt_deterministic(data: str) -> str:
     encrypted = cipher.encrypt(padded_data)
     return base64.b64encode(encrypted).decode('utf-8')
 
+def decrypt_deterministic(encrypted_data: str) -> str:
+    fixed_iv = b'\x00' * BLOCK_SIZE  # 암호화에 사용된 고정 IV
+    cipher = AES.new(AES_KEY.encode('utf-8'), AES.MODE_CBC, fixed_iv)
+    encrypted_bytes = base64.b64decode(encrypted_data)
+    decrypted_bytes = cipher.decrypt(encrypted_bytes)
+    unpadded_bytes = unpad(decrypted_bytes)
+    return unpadded_bytes.decode('utf-8')
 
 # 회원가입 (AES 암호화 적용)
 @auth_bp.route('/signup', methods=['POST', 'OPTIONS'])
@@ -60,15 +67,16 @@ def signup():
     conn = None
     try:
         data = request.get_json() or {}
-        if not data.get('email') or not data.get('username') or not data.get('rank') or not data.get('department') or not data.get('phone'):
+        print("회원가입 요청 데이터:", data)
+        # 필수 항목 확인
+        if not data.get('email') or not data.get('username') or not data.get('position') or not data.get('department') or not data.get('phone'):
             return jsonify({'message': '필수 항목이 누락되었습니다.'}), 400
 
-        # 이메일은 결정적 암호화(검색용) 적용
+        # 이메일은 결정적 암호화(검색용)
         email = encrypt_deterministic(data.get('email'))
-        # 나머지 필드는 기존 랜덤 IV 방식 적용
         username = encrypt_aes(data.get('username'))
-        rank = encrypt_aes(data.get('rank'))
-        department = encrypt_aes(data.get('department'))
+        position = data.get('position')
+        department = data.get('department')
         phone = encrypt_aes(data.get('phone'))
         password = data.get('password')
 
@@ -86,7 +94,7 @@ def signup():
         INSERT INTO User (name, position, department, email, phone_number, password, is_approved)
         VALUES (%s, %s, %s, %s, %s, %s, 1)
         """
-        values = (username, rank, department, email, phone, hashed_password)
+        values = (username, position, department, email, phone, hashed_password)
         cursor.execute(sql, values)
         conn.commit()
         return jsonify({'message': '회원가입 성공!'}), 201
@@ -112,7 +120,7 @@ def login():
         if not data.get('email') or not data.get('password'):
             return jsonify({'message': '이메일과 비밀번호는 필수입니다.'}), 400
 
-        # 결정적 암호화를 사용하여 이메일 암호문 생성
+        # 이메일은 결정적 암호화를 사용하여 암호문 생성
         encrypted_email = encrypt_deterministic(data.get('email'))
         password = data.get('password')
 
@@ -133,12 +141,10 @@ def login():
         if user.get('is_approved', 0) != 1:
             return jsonify({'message': '승인 대기 중입니다!'}), 403
 
-        # JWT 생성 (페이로드에 저장된 이메일은 복호화 불가능하므로, 원본 이메일은 로그인 시 별도 처리 필요)
+        # JWT 생성
         payload = {
             'user_id': user['id'],
             'name': decrypt_aes(user['name']),
-            # 저장된 이메일은 결정적 암호화되었으므로 복호화 함수(decrypt_aes)는 사용하지 않습니다.
-            # 대신 로그인 요청 시 사용한 이메일(또는 별도로 저장한 원문)을 활용해야 합니다.
             'exp': datetime.now(timezone.utc) + timedelta(hours=1)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
@@ -146,14 +152,12 @@ def login():
         user_data = {
             'id': user['id'],
             'name': decrypt_aes(user['name']),
-            'position': decrypt_aes(user['position']),
-            'department': decrypt_aes(user['department']),
-            # 만약 원본 이메일을 그대로 클라이언트에 전달하고 싶다면, 별도의 컬럼에 저장하거나
-            # 클라이언트가 입력한 이메일을 사용하세요.
-            'email': data.get('email'),
+            'position': user['position'],           
+            'department': user['department'],         
+            'email': decrypt_deterministic(user['email']),
             'phone_number': decrypt_aes(user['phone_number']),
             'is_admin': user.get('is_admin', 0),
-            'is_approved': user.get('is_approved', 0)
+            'is_approved': user.get('is_approved', 1)
         }
 
         return jsonify({'message': '로그인 성공!', 'user': user_data, 'token': token}), 200
@@ -172,10 +176,12 @@ def login():
 def get_logged_in_user():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'}), 200
+
     token = request.headers.get('Authorization')
     if not token:
         return jsonify({'message': '토큰이 없습니다.'}), 401
     token = token.split(" ")[1]
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
         user_id = payload['user_id']
@@ -183,14 +189,25 @@ def get_logged_in_user():
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
-        
+
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM User WHERE id = %s", (user_id,))
         user = cursor.fetchone()
+
         if user:
+            try:
+                user['email'] = decrypt_deterministic(user['email'])
+                user['name'] = decrypt_aes(user['name'])
+                # position과 department는 평문으로 저장되었으므로 별도의 복호화 과정 없이 그대로 사용
+                user['phone_number'] = decrypt_aes(user['phone_number'])
+            except Exception as decryption_error:
+                print(f"복호화 오류: {decryption_error}")
+                return jsonify({'message': '사용자 정보 복호화 실패'}), 500
+
             return jsonify({'user': user}), 200
         else:
             return jsonify({'message': '사용자 정보를 찾을 수 없습니다.'}), 404
+
     except jwt.ExpiredSignatureError:
         return jsonify({'message': '토큰이 만료되었습니다.'}), 401
     except jwt.InvalidTokenError:
