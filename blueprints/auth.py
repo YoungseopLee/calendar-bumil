@@ -1,4 +1,3 @@
-# blueprints/auth.py
 from flask import Blueprint, request, jsonify
 from flask_bcrypt import Bcrypt
 from flask_cors import cross_origin
@@ -6,98 +5,96 @@ import jwt
 from datetime import datetime, timedelta, timezone
 from db import get_db_connection
 from config import SECRET_KEY
+from Cryptodome.Cipher import AES
+import base64
+import os
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 bcrypt = Bcrypt()
 
-@auth_bp.route('/login', methods=['POST', 'OPTIONS'])
-def login():
-    if request.method == 'OPTIONS':
-        return jsonify({'message': 'CORS preflight request success'}), 200
-    try:
-        data = request.get_json()
-        email = data.get('email')
-        password = data.get('password')
-        
-        conn = get_db_connection()
-        if conn is None:
-            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
-        
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM User WHERE email = %s", (email,))
-        user = cursor.fetchone()
-        if user:
-            # bcrypt를 사용하여 비밀번호 비교
-            if bcrypt.check_password_hash(user['password'], password):
-                if user['is_approved'] == 1:
-                    payload = {
-                        'user_id': user['id'],
-                        'name': user['name'],
-                        'email': user['email'],
-                        'exp': datetime.now(timezone.utc) + timedelta(hours=1)
-                    }
-                    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-                    return jsonify({
-                        'message': '로그인 성공!',
-                        'user': {
-                            'id': user['id'],
-                            'name': user['name'],
-                            'position': user['position'],
-                            'department': user['department'],
-                            'email': user['email'],
-                            'phone_number': user['phone_number'],
-                            'is_admin': user['is_admin'],
-                            'is_approved': user['is_approved']
-                        },
-                        'token': token
-                    }), 200
-                else:
-                    return jsonify({'message': '승인 대기 중입니다!'}), 403
-            else:
-                return jsonify({'message': '잘못된 비밀번호!'}), 401
-        else:
-            return jsonify({'message': '사용자를 찾을 수 없습니다!'}), 404
-    except Exception as e:
-        print(f"로그인 중 오류 발생: {e}")
-        return jsonify({'message': '로그인 실패!'}), 500
-    finally:
-        try:
-            cursor.close()
-            conn.close()
-        except Exception:
-            pass
+# AES 키 (정확히 32 바이트로 설정)
+AES_KEY = os.environ.get("AES_SECRET_KEY", "Bumil-calendar-1234567890!@#$%^&*").ljust(32)[:32]
+BLOCK_SIZE = AES.block_size  # 16
 
+def pad(data_bytes: bytes) -> bytes:
+    """바이트 데이터를 AES CBC 모드에 맞게 PKCS7 패딩 적용"""
+    padding_length = BLOCK_SIZE - len(data_bytes) % BLOCK_SIZE
+    return data_bytes + bytes([padding_length]) * padding_length
+
+def unpad(data_bytes: bytes) -> bytes:
+    """PKCS7 패딩 제거"""
+    padding_length = data_bytes[-1]
+    return data_bytes[:-padding_length]
+
+def encrypt_aes(data: str) -> str:
+    """AES 암호화 (CBC 모드, 바이트 단위 패딩 적용)"""
+    iv = os.urandom(BLOCK_SIZE)  # 초기화 벡터 생성 (16바이트)
+    cipher = AES.new(AES_KEY.encode('utf-8'), AES.MODE_CBC, iv)
+    data_bytes = data.encode('utf-8')
+    padded_data = pad(data_bytes)
+    encrypted = cipher.encrypt(padded_data)
+    return base64.b64encode(iv + encrypted).decode('utf-8')
+
+def decrypt_aes(encrypted_data: str) -> str:
+    """AES 복호화 (CBC 모드, 바이트 단위 언패딩 적용)"""
+    raw_data = base64.b64decode(encrypted_data)
+    iv = raw_data[:BLOCK_SIZE]
+    cipher = AES.new(AES_KEY.encode('utf-8'), AES.MODE_CBC, iv)
+    decrypted_bytes = cipher.decrypt(raw_data[BLOCK_SIZE:])
+    unpadded_bytes = unpad(decrypted_bytes)
+    return unpadded_bytes.decode('utf-8')
+
+def encrypt_deterministic(data: str) -> str:
+    fixed_iv = b'\x00' * BLOCK_SIZE  # 16바이트의 고정 IV
+    cipher = AES.new(AES_KEY.encode('utf-8'), AES.MODE_CBC, fixed_iv)
+    data_bytes = data.encode('utf-8')
+    padded_data = pad(data_bytes)
+    encrypted = cipher.encrypt(padded_data)
+    return base64.b64encode(encrypted).decode('utf-8')
+
+def decrypt_deterministic(encrypted_data: str) -> str:
+    fixed_iv = b'\x00' * BLOCK_SIZE  # 암호화에 사용된 고정 IV
+    cipher = AES.new(AES_KEY.encode('utf-8'), AES.MODE_CBC, fixed_iv)
+    encrypted_bytes = base64.b64decode(encrypted_data)
+    decrypted_bytes = cipher.decrypt(encrypted_bytes)
+    unpadded_bytes = unpad(decrypted_bytes)
+    return unpadded_bytes.decode('utf-8')
+
+# 회원가입 (AES 암호화 적용)
 @auth_bp.route('/signup', methods=['POST', 'OPTIONS'])
+@cross_origin(supports_credentials=True)
 def signup():
-    if request.method == 'OPTIONS':
-        return jsonify({'message': 'CORS preflight request success'}), 200
+    conn = None
     try:
-        data = request.get_json()
-        email = data.get('email')
-        password = data.get('password')
-        username = data.get('username')
-        rank = data.get('rank')
+        data = request.get_json() or {}
+        print("회원가입 요청 데이터:", data)
+        # 필수 항목 확인
+        if not data.get('email') or not data.get('username') or not data.get('position') or not data.get('department') or not data.get('phone'):
+            return jsonify({'message': '필수 항목이 누락되었습니다.'}), 400
+
+        # 이메일은 결정적 암호화(검색용)
+        email = encrypt_deterministic(data.get('email'))
+        username = encrypt_aes(data.get('username'))
+        position = data.get('position')
         department = data.get('department')
-        phone = data.get('phone')
-        
+        phone = encrypt_aes(data.get('phone'))
+        password = data.get('password')
+
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
-        
+
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM User WHERE email = %s", (email,))
-        existing_user = cursor.fetchone()
-        if existing_user:
+        if cursor.fetchone():
             return jsonify({'message': '이미 사용 중인 이메일입니다.'}), 400
-        
-        # bcrypt를 사용하여 비밀번호 해싱 (decode하여 문자열로 변환)
+
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        
         sql = """
-        INSERT INTO User (name, position, department, email, phone_number, password)
-        VALUES (%s, %s, %s, %s, %s, %s)
+        INSERT INTO User (name, position, department, email, phone_number, password, is_approved)
+        VALUES (%s, %s, %s, %s, %s, %s, 1)
         """
-        values = (username, rank, department, email, phone, hashed_password)
+        values = (username, position, department, email, phone, hashed_password)
         cursor.execute(sql, values)
         conn.commit()
         return jsonify({'message': '회원가입 성공!'}), 201
@@ -105,21 +102,86 @@ def signup():
         print(f"회원가입 오류: {e}")
         return jsonify({'message': f'오류: {e}'}), 500
     finally:
-        try:
+        if 'cursor' in locals():
             cursor.close()
+        if conn is not None:
             conn.close()
-        except Exception:
-            pass
+
+@auth_bp.route('/login', methods=['POST', 'OPTIONS'])
+@cross_origin(supports_credentials=True)
+def login():
+    conn = None
+    cursor = None
+    try:
+        if request.method == 'OPTIONS':
+            return jsonify({'message': 'CORS preflight request success'}), 200
+
+        data = request.get_json() or {}
+        if not data.get('email') or not data.get('password'):
+            return jsonify({'message': '이메일과 비밀번호는 필수입니다.'}), 400
+
+        # 이메일은 결정적 암호화를 사용하여 암호문 생성
+        encrypted_email = encrypt_deterministic(data.get('email'))
+        password = data.get('password')
+
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM User WHERE email = %s", (encrypted_email,))
+        user = cursor.fetchone()
+
+        if not user:
+            return jsonify({'message': '사용자를 찾을 수 없습니다!'}), 404
+
+        if not bcrypt.check_password_hash(user['password'], password):
+            return jsonify({'message': '잘못된 비밀번호!'}), 401
+
+        if user.get('is_approved', 0) != 1:
+            return jsonify({'message': '승인 대기 중입니다!'}), 403
+
+        # JWT 생성
+        payload = {
+            'user_id': user['id'],
+            'name': decrypt_aes(user['name']),
+            'exp': datetime.now(timezone.utc) + timedelta(hours=1)
+        }
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+
+        user_data = {
+            'id': user['id'],
+            'name': decrypt_aes(user['name']),
+            'position': user['position'],           
+            'department': user['department'],         
+            'email': decrypt_deterministic(user['email']),
+            'phone_number': decrypt_aes(user['phone_number']),
+            'is_admin': user.get('is_admin', 0),
+            'is_approved': user.get('is_approved', 1)
+        }
+
+        return jsonify({'message': '로그인 성공!', 'user': user_data, 'token': token}), 200
+
+    except Exception as e:
+        print(f"로그인 중 오류 발생: {e}")
+        return jsonify({'message': '로그인 실패!'}), 500
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
 
 @auth_bp.route('/get_logged_in_user', methods=['GET', 'OPTIONS'])
 @cross_origin(supports_credentials=True)
 def get_logged_in_user():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'}), 200
+
     token = request.headers.get('Authorization')
     if not token:
         return jsonify({'message': '토큰이 없습니다.'}), 401
     token = token.split(" ")[1]
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
         user_id = payload['user_id']
@@ -127,14 +189,25 @@ def get_logged_in_user():
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
-        
+
         cursor = conn.cursor(dictionary=True)
         cursor.execute("SELECT * FROM User WHERE id = %s", (user_id,))
         user = cursor.fetchone()
+
         if user:
+            try:
+                user['email'] = decrypt_deterministic(user['email'])
+                user['name'] = decrypt_aes(user['name'])
+                # position과 department는 평문으로 저장되었으므로 별도의 복호화 과정 없이 그대로 사용
+                user['phone_number'] = decrypt_aes(user['phone_number'])
+            except Exception as decryption_error:
+                print(f"복호화 오류: {decryption_error}")
+                return jsonify({'message': '사용자 정보 복호화 실패'}), 500
+
             return jsonify({'user': user}), 200
         else:
             return jsonify({'message': '사용자 정보를 찾을 수 없습니다.'}), 404
+
     except jwt.ExpiredSignatureError:
         return jsonify({'message': '토큰이 만료되었습니다.'}), 401
     except jwt.InvalidTokenError:

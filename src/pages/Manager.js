@@ -86,48 +86,24 @@ const Manager = () => {
         <BackButton />
         <h1 className="manager-title">회원가입 승인 관리</h1>
         <section className="pending-users-section">
-          <table className="pending-users-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>이름</th>
-                <th>직급</th>
-                <th>부서</th>
-                <th>이메일</th>
-                <th>전화번호</th>
-                <th>승인</th>
-                <th>거절</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pendingUsers.map((user) => (
-                <tr key={user.id}>
-                  <td>{user.id}</td>
-                  <td>{user.name}</td>
-                  <td>{user.position}</td>
-                  <td>{user.department}</td>
-                  <td>{user.email}</td>
-                  <td>{user.phone_number}</td>
-                  <td>
-                    <button
-                      className="button approve-button"
-                      onClick={() => handleApprove(user.id)}
-                    >
-                      승인
-                    </button>
-                  </td>
-                  <td>
-                    <button
-                      className="button reject-button"
-                      onClick={() => handleReject(user.id)}
-                    >
-                      거절
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {pendingUsers.map((user) => (
+            <div key={user.id} className="user-table-container">
+              <table className="pending-users-table">
+                <tbody>
+                  <tr><td>ID</td><td>{user.id}</td></tr>
+                  <tr><td>이름</td><td>{user.name}</td></tr>
+                  <tr><td>직급</td><td>{user.position}</td></tr>
+                  <tr><td>부서</td><td className="department-cell">{user.department}</td></tr>
+                  <tr><td>이메일</td><td>{user.email}</td></tr>
+                  <tr><td>전화번호</td><td>{user.phone_number}</td></tr>
+                </tbody>
+              </table>
+              <div className="user-actions">
+                <button className="button approve-button" onClick={() => handleApprove(user.id)}>승인</button>
+                <button className="button reject-button" onClick={() => handleReject(user.id)}>거절</button>
+              </div>
+            </div>
+          ))}
         </section>
       </div>
     </div>

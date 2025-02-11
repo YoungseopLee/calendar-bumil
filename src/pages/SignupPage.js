@@ -6,7 +6,7 @@ const SignupPage = () => {
     email: "",
     password: "",
     username: "",
-    rank: "",
+    position: "",
     department: "",
     phone: "",
   });
@@ -24,7 +24,7 @@ const SignupPage = () => {
     "전략사업본부 개발사업부 KERIS팀",
     "전략사업본부 사업지원팀",
   ];
-  const ranks = [
+  const positions = [
     "대표이사",
     "부사장",
     "전무",
@@ -177,16 +177,16 @@ const SignupPage = () => {
             </select>
           </div>
           <div className="form-group-signup">
-            <label htmlFor="rank">직급</label>
+            <label htmlFor="position">직급</label>
             <select
-              id="rank"
-              name="rank"
-              value={formData.rank}
+              id="position"
+              name="position"
+              value={formData.position}
               onChange={handleChange}
               required
             >
               <option value="">직급을 선택하세요</option>
-              {ranks.map((r) => (
+              {positions.map((r) => (
                 <option key={r} value={r}>
                   {r}
                 </option>

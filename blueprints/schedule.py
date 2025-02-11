@@ -1,6 +1,7 @@
 # blueprints/schedule.py
 from flask import Blueprint, request, jsonify
 import jwt
+from .auth import decrypt_aes
 from db import get_db_connection
 from config import SECRET_KEY
 
@@ -59,6 +60,14 @@ def get_other_users_schedule():
         cursor.execute(sql, (date, date, user_id))
         other_users_schedules = cursor.fetchall()
         
+        # 여기서 user.name 복호화
+        for schedule in other_users_schedules:
+            try:
+                schedule['name'] = decrypt_aes(schedule['name'])
+            except Exception as decryption_error:
+                print(f"복호화 오류: {decryption_error}")
+                schedule['name'] = None  # 복호화 실패 시 원하는 처리 방식 적용
+
         return jsonify({'schedules': other_users_schedules}), 200
     
     except Exception as e:
@@ -71,7 +80,6 @@ def get_other_users_schedule():
             conn.close()
         except Exception:
             pass
-
 
 @schedule_bp.route('/add-schedule', methods=['POST', 'OPTIONS'])
 def add_schedule():
