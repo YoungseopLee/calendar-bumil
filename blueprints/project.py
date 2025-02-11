@@ -10,15 +10,14 @@ project_bp = Blueprint('project', __name__, url_prefix='/project')
 def get_all_project():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
-    project_code = request.args.get('Project_Code')
     try:
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
-        sql="SELECT * FROM Project_Details"
-
-        cursor.execute(sql, (project_code))
+        sql="SELECT * FROM Project_Details WHERE is_delete = 0"
+        
+        cursor.execute(sql)
         projects = cursor.fetchall()
         return jsonify({'projects': projects}), 200
     except Exception as e:
@@ -35,26 +34,57 @@ def get_all_project():
 def get_search_project():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
-    
-    user_id = request.args.get('user_id')
-    date = request.args.get('date')
-    
+
+    business_start_date = request.args.get('Business_Start_Date')
+    business_end_date = request.args.get('Business_End_Date')
+    project_pm = request.args.get('Project_PM')
+    sales_representative = request.args.get('Sales_Representative')
+    group_name = request.args.get('Group_Name')
+    project_code = request.args.get('Project_Code')
+    project_name = request.args.get('Project_Name')
+
     try:
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         
         cursor = conn.cursor(dictionary=True)
-        # project 검색 조회 쿼리문 추가 예정
-        # cursor.execute(sql, (date, date, user_id)) (수정 필요)
+        
+        query = "SELECT * FROM Project_Details WHERE 1=1 AND is_delete = 0"
+        params = []
+
+        # 각 검색 조건을 확인하고 쿼리에 추가
+        if business_start_date:
+            query += " AND Business_Start_Date >= %s"
+            params.append(business_start_date)
+        if business_end_date:
+            query += " AND Business_End_Date <= %s"
+            params.append(business_end_date)
+        if project_pm:
+            query += " AND Project_PM LIKE %s"
+            params.append(f"%{project_pm}%")
+        if sales_representative:
+            query += " AND Sales_Representative LIKE %s"
+            params.append(f"%{sales_representative}%")
+        if group_name:
+            query += " AND Group_Name LIKE %s"
+            params.append(f"%{group_name}%")
+        if project_code:
+            query += " AND Project_Code LIKE %s"
+            params.append(f"%{project_code}%")
+        if project_name:
+            query += " AND Project_Name LIKE %s"
+            params.append(f"%{project_name}%")
+        
+        cursor.execute(query, tuple(params))
         search_projects = cursor.fetchall()
         
         return jsonify({'projects': search_projects}), 200
-    
+
     except Exception as e:
         print(f"검색 프로젝트 가져오기 오류: {e}")
         return jsonify({'message': '검색 프로젝트 가져오기 오류'}), 500
-    
+
     finally:
         try:
             cursor.close()
@@ -62,26 +92,75 @@ def get_search_project():
         except Exception:
             pass
 
-
 @project_bp.route('/edit_project', methods=['POST', 'OPTIONS'])
-def add_schedule():
+def edit_project():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     try:
         data = request.get_json()
-        # user_id = data.get('user_id') (데이터 받아와서 저장, 수정 필요)
+
+        project_code = data.get('Project_Code')
+        category = data.get('Category')
+        status = data.get('Status')
+        business_start_date = data.get('Business_Start_Date')
+        business_end_date = data.get('Business_End_Date')
+        project_name = data.get('Project_Name')
+        customer = data.get('Customer')
+        supplier = data.get('Supplier')
+        person_in_charge = data.get('Person_in_Charge')
+        contact_number = data.get('Contact_Number')
+        expected_invoice_date = data.get('Expected_Invoice_Date')
+        expected_payment_date = data.get('Expected_Payment_Date')
+        sales_representative = data.get('Sales_Representative')
+        project_pm = data.get('Project_PM')
+        project_manager = data.get('Project_Manager')
+        project_participant = data.get('Project_Participant')
+        business_details_and_notes = data.get('Business_Details_and_Notes')
+        changes = data.get('Changes')
+
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor()
-        # 프로젝트 수정 쿼리문 추가 예정
-        # values = (user_id, start_date, end_date, task, status) (수정 예정)
-        # cursor.execute(sql, values) (수정 예정)
+
+        sql = """
+        UPDATE Project_Details
+        SET 
+            Category = %s,
+            Status = %s,
+            Business_Start_Date = %s,
+            Business_End_Date = %s,
+            Project_Name = %s,
+            Customer = %s,
+            Supplier = %s,
+            Person_in_Charge = %s,
+            Contact_Number = %s,
+            Expected_Invoice_Date = %s,
+            Expected_Payment_Date = %s,
+            Sales_Representative = %s,
+            Project_PM = %s,
+            Project_Manager = %s,
+            Project_Participant = %s,
+            Business_Details_and_Notes = %s,
+            Changes = %s
+        WHERE Project_Code = %s
+        """
+        values = (
+            category, status, business_start_date, business_end_date,
+            project_name, customer, supplier, person_in_charge, contact_number,
+            expected_invoice_date, expected_payment_date, sales_representative,
+            project_pm, project_manager, project_participant,
+            business_details_and_notes, changes, project_code
+        )
+        
+        cursor.execute(sql, values)
         conn.commit()
         return jsonify({'message': '프로젝트가 수정되었습니다.'}), 200
+
     except Exception as e:
         print(f"프로젝트 수정 오류: {e}")
         return jsonify({'message': f'프로젝트 수정 중 오류 발생: {e}'}), 500
+
     finally:
         try:
             cursor.close()
@@ -90,36 +169,33 @@ def add_schedule():
             pass
 
 @project_bp.route('/delete_project/<int:project_code>', methods=['DELETE', 'OPTIONS'])
-def delete_schedule(schedule_id):
+def delete_project(project_code):
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
-    token = request.headers.get('Authorization')
-    if not token:
-        return jsonify({'message': '토큰이 없습니다.'}), 401
-    token = token.split(" ")[1]
+    
     try:
-        # payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-        # conn = get_db_connection()
-        # if conn is None:
-        #     return jsonify({'message': '데이터베이스 연결 실패!'}), 500
-        # cursor = conn.cursor()
-        # cursor.execute("SELECT user_id FROM Schedule WHERE id = %s", (schedule_id,))
-        # schedule_owner = cursor.fetchone()
-        # if schedule_owner and schedule_owner[0] != user_id:
-        #     return jsonify({'message': '일정을 삭제할 권한이 없습니다.'}), 403
-        # cursor.execute("DELETE FROM Schedule WHERE id = %s", (schedule_id,))
-        # conn.commit()
-        return jsonify({'message': '일정이 삭제되었습니다.'}), 200
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+        cursor = conn.cursor()
+        
+        # 논리 삭제 Is_Delete 칼럼 값을 1로 업데이트
+        sql = "UPDATE Project_Details SET Is_Delete = 1 WHERE Project_Code = %s"
+        cursor.execute(sql, (project_code,))
+        conn.commit()
+        
+        return jsonify({'message': '프로젝트가 삭제되었습니다.'}), 200
+
     except jwt.ExpiredSignatureError:
         return jsonify({'message': '토큰이 만료되었습니다.'}), 401
     except jwt.InvalidTokenError:
         return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
     except Exception as e:
-        print(f"일정 삭제 오류: {e}")
-        return jsonify({'message': '일정 삭제 오류'}), 500
-    # finally:
-    #     try:
-    #         cursor.close()
-    #         conn.close()
-    #     except Exception:
-    #         pass
+        print(f"프로젝트 삭제 오류: {e}")
+        return jsonify({'message': '프로젝트 삭제 오류'}), 500
+    finally:
+        try:
+            cursor.close()
+            conn.close()
+        except Exception:
+            pass
