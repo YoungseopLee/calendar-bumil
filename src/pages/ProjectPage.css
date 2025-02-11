@@ -1,39 +1,126 @@
-/* 전체 레이아웃 */
+/* ✅ 반응형 프로젝트 목록 영역 */
+.content {
+    width: 100%;
+    max-width: 1200px; /* 🔹 최대 너비 유지 */
+    padding: 20px;
+    
+}
+
+.box {
+    background-color: white;
+    padding: 20px; 
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1200px; /* 🔹 최대 크기 유지 */
+    position: relative;
+    box-sizing: border-box;
+}
+
+/* ✅ 반응형 처리 - 화면이 작아지면 크기 조정 */
+@media screen and (max-width: 1024px) {
+    .content,
+    .box {
+        max-width: 90%; /* 🔹 화면이 1024px 이하일 때 90% 크기 유지 */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .content,
+    .box {
+        max-width: 95%; /* 🔹 태블릿에서는 95%로 조정 */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .content,
+    .box {
+        max-width: 100%; /* 🔹 모바일에서는 전체 너비 사용 */
+        padding: 15px; /* 🔹 모바일에서는 패딩 줄이기 */
+    }
+}
+
 .project-page {
     display: flex;
     flex-direction: column;
-    width: 100%;
     align-items: center;
+    min-height: 100vh; /* ✅ 최소 화면 높이를 전체 화면 크기로 설정 */
+    padding-bottom: 10px; /* ✅ 하단 여백 추가 */
 }
 
-/* ✅ 기존 스타일을 유지하면서 Sidebar의 기본 상태에서 여백 조정 */
-.content {
+/* 검색 입력 필드와 날짜 필터 정렬 */
+.search-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     width: 100%;
-    max-width: 1000px;
-    padding: 20px;
-    transition: margin-left 0.3s ease-in-out; /* ✅ 사이드바가 열릴 때 애니메이션 */
+    margin-bottom: 15px;
 }
 
-/* ✅ Sidebar가 열렸을 때 적용될 클래스 */
-.sidebar-open .content {
-    margin-left: 250px; /* ✅ 사이드바 너비만큼 이동 */
-}
-
-/* 🔍 검색 입력창 스타일 */
+/* 기존 검색창 스타일 */
 .search-input {
-    width: 100%;
+    flex: 1;
     padding: 10px;
-    margin-bottom: 20px;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 1em;
     box-sizing: border-box;
 }
 
-/* 검색 결과 없음 메시지 */
-.no-results {
+/* 날짜 필터 스타일 */
+.date-filter {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+/* ✅ 필터 입력 영역 스타일 */
+.filter-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* ✅ 날짜 필터 스타일 */
+.date-filter {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* ✅ 날짜 구분선 (~) */
+.date-separator {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0 5px;
+}
+
+/* ✅ 검색 버튼 스타일 */
+.filter-button {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.filter-button:hover {
+    background-color: #0056b3;
+}
+
+/* ✅ 적용된 필터 정보 표시 */
+.filter-info {
     text-align: center;
-    color: #888;
-    font-size: 1.1em;
-    margin-top: 10px;
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
 }

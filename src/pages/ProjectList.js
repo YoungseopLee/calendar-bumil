@@ -4,7 +4,7 @@ import "./ProjectList.css";
 
 const ProjectList = ({ projects }) => {
   const [displayedProjects, setDisplayedProjects] = useState([]);
-  const [loadedCount, setLoadedCount] = useState(5); // 처음 5개만 로드
+  const [loadedCount, setLoadedCount] = useState(5);
   const observerRef = useRef(null);
   const [loading, setLoading] = useState(false);
 
@@ -18,7 +18,7 @@ const ProjectList = ({ projects }) => {
         if (entries[0].isIntersecting && loadedCount < projects.length) {
           setLoading(true);
           setTimeout(() => {
-            setLoadedCount((prev) => prev + 5); // 5개씩 추가 로드
+            setLoadedCount((prev) => prev + 5);
             setLoading(false);
           }, 1000);
         }
@@ -36,7 +36,7 @@ const ProjectList = ({ projects }) => {
   return (
     <div className="project-list">
       {displayedProjects.map((project) => (
-        <ProjectCard key={project.id} project={project} />
+        <ProjectCard key={project.id} project={project} /> // ✅ 클릭 이벤트는 ProjectCard에서 처리
       ))}
       <div ref={observerRef} className="h-10"></div>
       {loading && <p className="loading-text">로딩 중...</p>}
