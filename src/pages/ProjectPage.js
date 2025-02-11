@@ -3,54 +3,102 @@ import ProjectList from "./ProjectList";
 import Sidebar from "./Sidebar";
 import "./ProjectPage.css";
 
-const generateDummyProjects = (count) => {
-  const statuses = ["진행 중", "완료", "보류"];
-  const owners = ["Admin", "PM", "User"];
-  const membersList = ["User1", "User2", "User3", "User4", "User5"];
-
-  return Array.from({ length: count }, (_, index) => ({
-    id: index + 1,
-    name: `Project ${index + 1}`,
-    owner: owners[Math.floor(Math.random() * owners.length)],
-    members: membersList.sort(() => Math.random() - 0.5).slice(0, Math.floor(Math.random() * 3) + 1),
-    status: statuses[Math.floor(Math.random() * statuses.length)],
-  }));
-};
-
 const ProjectPage = () => {
   const [projects, setProjects] = useState([]);
-  const [searchText, setSearchText] = useState("");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [startFilter, setStartFilter] = useState(""); // 시작하는 기간
+  const [endFilter, setEndFilter] = useState(""); // 끝나는 기간
+  const [appliedStart, setAppliedStart] = useState(""); // 적용된 필터 (검색 버튼 클릭 후)
+  const [appliedEnd, setAppliedEnd] = useState(""); // 적용된 필터 (검색 버튼 클릭 후)
 
   useEffect(() => {
-    const dummyProjects = generateDummyProjects(50);
-    setProjects(dummyProjects);
-  }, []);
+    if (projects.length === 0) {
+      const generateDummyProjects = (count) => {
+        const groups = ["구축 인프라", "구축 SW", "유지보수 인프라", "유지보수 SW", "연구과제"];
+        const statuses = ["제안", "진행 중", "완료"];
+        const salesReps = ["김영수", "박진우", "이민정", "최동영", "서정교"];
+        const pmList = ["주성호", "이현재", "최영철", "이종우", "한지민"];
 
-  // 🔍 검색 필터링 함수
+        return Array.from({ length: count }, (_, index) => {
+          const startDate = new Date(2025, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1);
+          const endDate = new Date(startDate);
+          endDate.setDate(endDate.getDate() + Math.floor(Math.random() * 180) + 1); // 최대 6개월 차이
+
+          return {
+            id: index + 1,
+            code: `2025${String(index + 1).padStart(4, "0")}`,
+            name: `프로젝트 ${index + 1}`,
+            group: groups[Math.floor(Math.random() * groups.length)],
+            owner: salesReps[Math.floor(Math.random() * salesReps.length)],
+            pm: pmList[Math.floor(Math.random() * pmList.length)],
+            status: statuses[Math.floor(Math.random() * statuses.length)],
+            startDate: startDate.toISOString().split("T")[0], // YYYY-MM-DD 형식
+            endDate: endDate.toISOString().split("T")[0], // YYYY-MM-DD 형식
+          };
+        });
+      };
+
+      setProjects(generateDummyProjects(50));
+    }
+  }, [projects]);
+
+  // ✅ 검색 버튼을 눌러야 적용되도록 설정
+  const applyFilters = () => {
+    setAppliedStart(startFilter);
+    setAppliedEnd(endFilter);
+  };
+
+  // 🔍 필터링 로직 (검색 버튼 클릭 시만 적용)
   const filteredProjects = projects.filter((project) => {
-    const searchLower = searchText.toLowerCase();
-    return (
-      project.name.toLowerCase().includes(searchLower) ||  // 프로젝트 이름 검색
-      project.owner.toLowerCase().includes(searchLower) || // 소유자 검색
-      project.status.toLowerCase().includes(searchLower) || // 상태 검색
-      project.members.some(member => member.toLowerCase().includes(searchLower)) // 멤버 검색
-    );
+    const projectStart = new Date(project.startDate);
+    const projectEnd = new Date(project.endDate);
+
+    const filterStart = appliedStart ? new Date(appliedStart) : null;
+    const filterEnd = appliedEnd ? new Date(appliedEnd) : null;
+
+    // ✅ 개선된 필터링 로직 (검색 버튼을 누른 후 적용)
+    return (!filterStart || projectEnd >= filterStart) &&
+           (!filterEnd || projectStart <= filterEnd);
   });
 
   return (
-    <div className={`project-page ${isSidebarOpen ? "sidebar-open" : ""}`}>
+    <div className="project-page">
       <Sidebar />
       <div className="content">
         <div className="box">
           <h1 className="title">프로젝트 목록</h1>
-          <input
-            type="text"
-            className="search-input"
-            placeholder="검색 (이름, 소유자, 상태, 멤버)"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
+
+          {/* ✅ 필터 UI */}
+          <div className="filter-container">
+            {/* <label>시작 날짜:</label> */}
+            <input
+              type="date"
+              className="date-filter"
+              value={startFilter}
+              onChange={(e) => setStartFilter(e.target.value)}
+            />
+
+            <span className="date-separator">~</span>
+
+            {/* <label>종료 날짜:</label> */}
+            <input
+              type="date"
+              className="date-filter"
+              value={endFilter}
+              onChange={(e) => setEndFilter(e.target.value)}
+            />
+
+            <button className="filter-button" onClick={applyFilters}>
+              검색
+            </button>
+          </div>
+
+          {/* ✅ 현재 적용된 필터링 표시 */}
+          {appliedStart && appliedEnd && (
+            <p className="filter-info">
+              적용된 기간: <strong>{appliedStart} ~ {appliedEnd}</strong>
+            </p>
+          )}
+
           {filteredProjects.length > 0 ? (
             <ProjectList projects={filteredProjects} />
           ) : (
