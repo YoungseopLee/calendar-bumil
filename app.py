@@ -21,8 +21,7 @@ CORS(app, supports_credentials=True, origins=ALLOWED_ORIGINS)
 def after_request(response):
     origin = request.headers.get('Origin')
     if origin in ALLOWED_ORIGINS:
-        if 'Access-Control-Allow-Origin' not in response.headers:
-            response.headers['Access-Control-Allow-Origin'] = origin
+        response.headers['Access-Control-Allow-Origin'] = origin
     else:
         response.headers['Access-Control-Allow-Origin'] = ALLOWED_ORIGINS[0]
     response.headers['Access-Control-Allow-Credentials'] = 'true'
