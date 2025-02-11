@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import Chatbot from "./Chatbot"; // Chatbot 컴포넌트 import
 import { FaEdit, FaTrash } from "react-icons/fa";
 import "./Calendar.css";
 
@@ -14,37 +13,36 @@ const Calendar = () => {
   const [departments, setDepartments] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [users, setUsers] = useState([]); // 직원 목록
-  const [showChatbot, setShowChatbot] = useState(false); // 챗봇 토글 상태
   const navigate = useNavigate();
 
   // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
   const user = JSON.parse(localStorage.getItem("user"));
 
   // 로그인 및 부서 데이터 가져오기
-    useEffect(() => {
-      const fetchData = async () => {
-        if (!user) {
-          alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
-          navigate("/");
-          return;
-        }
-  
-        try {
-          // 1. 부서 및 사용자 정보 가져오기
-          const usersResponse = await fetch(
-            `${process.env.REACT_APP_API_URL}/user/get_users`
-          );
-          if (!usersResponse.ok)
-            throw new Error("직원 목록을 불러오지 못했습니다.");
-          const usersData = await usersResponse.json();
-          setUsers(usersData.users);
-  
-          const uniqueDepartments = [
-            ...new Set(usersData.users.map((user) => user.department)),
-          ];
-          setDepartments(uniqueDepartments);
-  
-          /*// 2. 일정 가져오기 (calendar에서 비활성화)
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user) {
+        alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
+        navigate("/");
+        return;
+      }
+
+      try {
+        // 1. 부서 및 사용자 정보 가져오기
+        const usersResponse = await fetch(
+          `${process.env.REACT_APP_API_URL}/user/get_users`
+        );
+        if (!usersResponse.ok)
+          throw new Error("직원 목록을 불러오지 못했습니다.");
+        const usersData = await usersResponse.json();
+        setUsers(usersData.users);
+
+        const uniqueDepartments = [
+          ...new Set(usersData.users.map((user) => user.department)),
+        ];
+        setDepartments(uniqueDepartments);
+
+        /*// 2. 일정 가져오기 (calendar에서 비활성화)
           const scheduleResponse = await fetch(
             `${process.env.REACT_APP_API_URL}/schedule/get_all_schedule`,
             {
@@ -64,15 +62,14 @@ const Calendar = () => {
             throw new Error("일정 데이터를 불러오지 못했습니다.");
           const scheduleData = await scheduleResponse.json();
           setSchedules(scheduleData.schedules);*/
-        
-        } catch (error) {
-          console.error("데이터 로딩 오류:", error);
-        }
-      };
-  
-      fetchData();
-      fetchLoggedInUser(); // 사용자 상태 업데이트
-    }, []);
+      } catch (error) {
+        console.error("데이터 로딩 오류:", error);
+      }
+    };
+
+    fetchData();
+    fetchLoggedInUser(); // 사용자 상태 업데이트
+  }, []);
 
   const monthNames = [
     "1월",
@@ -281,13 +278,6 @@ const Calendar = () => {
       currentYear === selectedDate.getFullYear()
     );
   };
-  // 챗봇 토글 함수
-  const toggleChatbot = () => {
-    setShowChatbot(!showChatbot);
-  };
-  const closeChatbot = () => {
-    setShowChatbot(false);
-  };
 
   // 상태에 맞는 색상 클래스를 반환하는 함수
   const getStatusClass = (status) => {
@@ -443,7 +433,8 @@ const Calendar = () => {
                   width: "100%",
                 }}
               >
-                <h4 style={{ margin: 0 }}>전체 일정</h4>{"\u00A0 "}
+                <h4 style={{ margin: 0 }}>전체 일정</h4>
+                {"\u00A0 "}
                 {/* 제목의 기본 마진을 제거 */}
                 {/* 부서별 보기 버튼 */}
                 <select
@@ -459,7 +450,7 @@ const Calendar = () => {
                   ))}
                 </select>
               </div>
-                <ul className="schedule-list">
+              <ul className="schedule-list">
                 {(() => {
                   // 1. 선택한 부서 필터링
                   const departmentUserIds = users
@@ -473,14 +464,15 @@ const Calendar = () => {
                   // 2. 걸쳐 있는 월의 일정 표시하기 위한 필터
                   const filtered = otherUsersSchedule
                     .filter((schedule) => {
-                      console.log("schedule : ", schedule)
+                      console.log("schedule : ", schedule);
                       const startDate = new Date(schedule.start_date);
                       const endDate = new Date(schedule.end_date);
 
                       return (
                         departmentUserIds.includes(schedule.user_id) &&
-                        (startDate <= new Date(currentYear, currentMonth + 1, 0) && // 해당 월의 마지막 날 이하
-                         endDate >= new Date(currentYear, currentMonth, 1)) // 해당 월의 첫날 이상
+                        startDate <=
+                          new Date(currentYear, currentMonth + 1, 0) && // 해당 월의 마지막 날 이하
+                        endDate >= new Date(currentYear, currentMonth, 1) // 해당 월의 첫날 이상
                       );
                     })
                     .sort(
@@ -526,11 +518,6 @@ const Calendar = () => {
             </div>
           </div>
         )}
-        <button className="toggle-chatbot-button" onClick={toggleChatbot}>
-          챗봇 열기
-        </button>
-
-        {showChatbot && <Chatbot onClose={closeChatbot} />}
       </div>
     </div>
   );

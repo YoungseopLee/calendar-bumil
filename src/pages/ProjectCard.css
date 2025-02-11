@@ -1,0 +1,57 @@
+/* 프로젝트 카드 스타일 */
+.project-card {
+    background-color: #f9fafb; /* 기존보다 연한 배경색 */
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    transition: transform 0.2s ease-in-out;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.project-card:hover {
+    transform: scale(1.02);
+    background-color: #f3f4f6;
+}
+
+/* 프로젝트 제목과 상태 태그 정렬 */
+.project-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+/* 상태 태그 스타일 */
+.project-status {
+    font-size: 0.8em;
+    font-weight: bold;
+    padding: 6px 14px;
+    border-radius: 20px; /* 더 둥글게 조정 */
+    text-align: center;
+    min-width: 80px;
+    display: inline-block;
+    border: 1px solid transparent;
+}
+
+/* ✅ 미니멀한 색상 적용 */
+.status-진행중 {
+    background-color: #eaf5ea; /* 연한 녹색 */
+    color: #2d6a2d; /* 어두운 녹색 */
+    border-color: #8bc34a;
+}
+
+.status-완료 {
+    background-color: #e8f0ff; /* 연한 파란색 */
+    color: #2d5a8e; /* 어두운 파란색 */
+    border-color: #64b5f6;
+}
+
+.status-보류 {
+    background-color: #fbeaea; /* 연한 빨간색 */
+    color: #9e2a2b; /* 어두운 빨간색 */
+    border-color: #e57373;
+}

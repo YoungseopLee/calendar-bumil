@@ -57,6 +57,9 @@ const Sidebar = () => {
               </li>
             )}
             <li>
+              <Link to="/projects">Project</Link>
+            </li>
+            <li>
               <Link to="/employee">Employee</Link>
             </li>
             <li>
