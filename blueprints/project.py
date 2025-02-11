@@ -10,14 +10,15 @@ project_bp = Blueprint('project', __name__, url_prefix='/project')
 def get_all_project():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
+    project_code = request.args.get('Project_Code')
     try:
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
-        sql="SELECT * FROM Project_Details WHERE is_delete = 0"
-        
-        cursor.execute(sql)
+        sql="SELECT * FROM Project_Details"
+
+        cursor.execute(sql, (project_code))
         projects = cursor.fetchall()
         return jsonify({'projects': projects}), 200
     except Exception as e:
@@ -169,33 +170,36 @@ def edit_project():
             pass
 
 @project_bp.route('/delete_project/<int:project_code>', methods=['DELETE', 'OPTIONS'])
-def delete_project(project_code):
+def delete_schedule(schedule_id):
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
-    
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'message': '토큰이 없습니다.'}), 401
+    token = token.split(" ")[1]
     try:
-        conn = get_db_connection()
-        if conn is None:
-            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
-        cursor = conn.cursor()
-        
-        # 논리 삭제 Is_Delete 칼럼 값을 1로 업데이트
-        sql = "UPDATE Project_Details SET Is_Delete = 1 WHERE Project_Code = %s"
-        cursor.execute(sql, (project_code,))
-        conn.commit()
-        
-        return jsonify({'message': '프로젝트가 삭제되었습니다.'}), 200
-
+        # payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        # conn = get_db_connection()
+        # if conn is None:
+        #     return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+        # cursor = conn.cursor()
+        # cursor.execute("SELECT user_id FROM Schedule WHERE id = %s", (schedule_id,))
+        # schedule_owner = cursor.fetchone()
+        # if schedule_owner and schedule_owner[0] != user_id:
+        #     return jsonify({'message': '일정을 삭제할 권한이 없습니다.'}), 403
+        # cursor.execute("DELETE FROM Schedule WHERE id = %s", (schedule_id,))
+        # conn.commit()
+        return jsonify({'message': '일정이 삭제되었습니다.'}), 200
     except jwt.ExpiredSignatureError:
         return jsonify({'message': '토큰이 만료되었습니다.'}), 401
     except jwt.InvalidTokenError:
         return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
     except Exception as e:
-        print(f"프로젝트 삭제 오류: {e}")
-        return jsonify({'message': '프로젝트 삭제 오류'}), 500
-    finally:
-        try:
-            cursor.close()
-            conn.close()
-        except Exception:
-            pass
+        print(f"일정 삭제 오류: {e}")
+        return jsonify({'message': '일정 삭제 오류'}), 500
+    # finally:
+    #     try:
+    #         cursor.close()
+    #         conn.close()
+    #     except Exception:
+    #         pass
