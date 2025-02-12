@@ -20,7 +20,7 @@ const ProjectDetails = () => {
   // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
   const user = JSON.parse(localStorage.getItem("user"));
 
-  //필드 매핑(프로젝트 요소가 추가되면 여기서 매핑해줘야 함)
+  //필드 매핑(프로젝트 요소가 추가되면 여기서 매핑해줘야 함, 그래야 표에 표시됨)
   const fieldMappings = {
     Category: "구분",
     Status: "진행 상황",
@@ -57,11 +57,11 @@ const ProjectDetails = () => {
   // 프로젝트 코드가 변경될 때 마다 fetchData 실행
   useEffect(() => {
     if (projectCode) {
-      fetchData();
+      fetchProjectDetails();
     }
   }, [projectCode]);
 
-  //prject 업데이트 확인
+  //project 업데이트 확인
   useEffect(() => {
     console.log("Project 업데이트됨:", Project);
   }, [Project]); // Project가 변경될 때마다 실행
@@ -80,6 +80,7 @@ const ProjectDetails = () => {
     navigate("/");
   };
 
+  //프로젝트 상세정보 받아오는 API 사용하는 함수
   const fetchProjectDetails = async () => {
     setLoading(true);
     try {
@@ -91,31 +92,12 @@ const ProjectDetails = () => {
       }
       const data = await response.json();
       // 응답이 { project: { ... } } 형태라면:
+      console.log("project response : ", data);
       setProject(data.project);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
-    }
-  };
-  const fetchData = async () => {
-    setLoading(true); // 로딩 시작
-    try {
-      //프로젝트 정보 가져오기
-      const response = await fetch(
-        `${apiUrl}/project/get_project_details?project_code=${projectCode}`
-      );
-      if (!response.ok) {
-        throw new Error("프로젝트 상세정보를 불러오지 못했습니다.");
-      }
-      const data = await response.json();
-
-      setProject(data); //데이터 적용
-    } catch (error) {
-      console.error("데이터 로딩 오류:", error);
-      setError(error.message);
-    } finally {
-      setLoading(false); // 로딩 종료
     }
   };
 
@@ -176,11 +158,11 @@ const ProjectDetails = () => {
     navigate("/project-edit", { state: { projectData: Project } });
   };
 
-  const ProjectTable = ({ data }) => {
+  const ProjectTable = ({ project }) => {
     return (
       <table className="project-table">
         <tbody>
-          {Object.entries(data).map(([key, value]) => (
+          {Object.entries(project).map(([key, value]) => (
             <tr key={key}>
               <th>{fieldMappings[key] || key}</th>
               <td>
@@ -207,7 +189,7 @@ const ProjectDetails = () => {
         </div>
         <h3 className="section-title">🔹 사업개요</h3>
 
-        <ProjectTable data={Project} />
+        {Project ? <ProjectTable project={Project} /> : <p>데이터를 불러오는 중...</p>}
 
         <h3 className="section-title">🔹 인력</h3>
         <table className="project-table">
