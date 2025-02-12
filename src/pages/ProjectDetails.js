@@ -61,7 +61,7 @@ const ProjectDetails = () => {
     }
   }, [projectCode]);
 
-  //prject 업데이트 확인
+  //project 업데이트 확인
   useEffect(() => {
     console.log("Project 업데이트됨:", Project);
   }, [Project]); // Project가 변경될 때마다 실행
@@ -92,6 +92,7 @@ const ProjectDetails = () => {
       }
       const data = await response.json();
       // 응답이 { project: { ... } } 형태라면:
+      console.log("project response : ", data);
       setProject(data.project);
     } catch (err) {
       setError(err.message);
@@ -188,7 +189,7 @@ const ProjectDetails = () => {
         </div>
         <h3 className="section-title">🔹 사업개요</h3>
 
-        <ProjectTable data={Project} />
+        {Project ? <ProjectTable project={Project} /> : <p>데이터를 불러오는 중...</p>}
 
         <h3 className="section-title">🔹 인력</h3>
         <table className="project-table">
