@@ -1,53 +1,55 @@
-/* ✅ 반응형 프로젝트 목록 영역 */
-.content {
-    width: 100%;
-    max-width: 1200px; /* 🔹 최대 너비 유지 */
-    padding: 20px;
-    
-}
-
-.box {
-    background-color: white;
-    padding: 20px; 
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 1200px; /* 🔹 최대 크기 유지 */
-    position: relative;
-    box-sizing: border-box;
-}
-
-/* ✅ 반응형 처리 - 화면이 작아지면 크기 조정 */
-@media screen and (max-width: 1024px) {
-    .content,
-    .box {
-        max-width: 90%; /* 🔹 화면이 1024px 이하일 때 90% 크기 유지 */
-    }
-}
-
-@media screen and (max-width: 768px) {
-    .content,
-    .box {
-        max-width: 95%; /* 🔹 태블릿에서는 95%로 조정 */
-    }
-}
-
-@media screen and (max-width: 480px) {
-    .content,
-    .box {
-        max-width: 100%; /* 🔹 모바일에서는 전체 너비 사용 */
-        padding: 15px; /* 🔹 모바일에서는 패딩 줄이기 */
-    }
-}
-
+/* ✅ 전체 페이지 컨테이너 */
 .project-page {
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 100vh; /* ✅ 최소 화면 높이를 전체 화면 크기로 설정 */
-    padding-bottom: 10px; /* ✅ 하단 여백 추가 */
+    min-height: 100vh;  /* ✅ 화면 높이만큼 유지 */
+    padding-bottom: 20px; /* ✅ 하단 여백 */
 }
 
+/* ✅ 프로젝트 목록 영역 */
+.content {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+}
+
+/* ✅ 프로젝트 카드 컨테이너 */
+.projectPage-box {
+    padding: 20px;
+}
+
+/* .box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1200px;
+    position: relative;
+    box-sizing: border-box;
+} */
+
+/* ✅ 반응형 - 화면 크기에 따라 너비 조정 */
+@media screen and (max-width: 1024px) {
+    .content, .box {
+        max-width: 90%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .content, .box {
+        max-width: 95%;
+        padding: 15px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .content, .box {
+        max-width: 100%;
+        padding: 10px;
+    }
+}
 /* 검색 입력 필드와 날짜 필터 정렬 */
 .search-container {
     display: flex;
@@ -111,16 +113,20 @@
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px; /* ✅ 아이콘 크기 조정 */
+    width: 40px; /* ✅ 버튼 크기 조정 */
+    height: 40px;
 }
 
+/* ✅ 버튼 호버 효과 */
 .filter-button:hover {
     background-color: #0056b3;
 }
 
-/* ✅ 적용된 필터 정보 표시 */
-.filter-info {
-    text-align: center;
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 10px;
+/* ✅ 아이콘 크기 조정 */
+.filter-button svg {
+    font-size: 18px;
 }

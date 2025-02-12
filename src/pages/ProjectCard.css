@@ -7,15 +7,14 @@
     border-radius: 10px;
     margin-bottom: 5px;
     font-weight: bold;
-    transition: transform 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-
+    cursor: pointer;
 }
 
 .project-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* ✅ 호버 시 그림자 강조 */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .project-header {
@@ -25,8 +24,8 @@
     margin-bottom: 8px;
 }
 
-.project-name {
-    font-size: 1.1em;
+.project-title {
+    font-size: 1.2em;
     font-weight: bold;
 }
 
@@ -41,22 +40,18 @@
     border: 1px solid transparent;
 }
 
-.project-code, .project-group, .project-owner, .project-pm, .project-dates {
+/* ✅ 프로젝트 정보 스타일 */
+.project-code, 
+.project-group, 
+.project-owner, 
+.project-pm, 
+.project-period {
     font-size: 0.9em;
     color: #555;
     margin-top: 5px;
 }
 
-/* ✅ 날짜 필터와 카드 간격 늘리기 */
-.filter-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 15px; /* 🔹 기존 10px → 15px */
-    margin-bottom: 25px; /* 🔹 기존 15px → 25px */
-}
-
-/* ✅ 미니멀한 색상 적용 */
+/* ✅ 상태별 색상 적용 */
 .status-진행중 { background-color: #eaf5ea; color: #2d6a2d; border-color: #8bc34a; }
 .status-완료 { background-color: #e8f0ff; color: #2d5a8e; border-color: #64b5f6; }
 .status-보류 { background-color: #fbeaea; color: #9e2a2b; border-color: #e57373; }
