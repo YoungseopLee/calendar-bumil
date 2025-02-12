@@ -249,8 +249,9 @@ const Calendar = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setUserStatus(data.user.status);
-        localStorage.setItem("user", JSON.stringify(data.user)); // 최신 상태 업데이트
+        const status = data.user.status || "";
+        setUserStatus(status);
+        localStorage.setItem("user", JSON.stringify(data.user));
       } else {
         console.error("사용자 정보 불러오기 실패");
       }
@@ -308,7 +309,7 @@ const Calendar = () => {
             <label htmlFor="status">상태 변경:</label>
             <select
               id="status"
-              value={userStatus}
+              value={userStatus || ""}
               onChange={handleStatusChange}
             >
               <option value=""></option>
