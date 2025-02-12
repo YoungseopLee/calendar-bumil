@@ -56,8 +56,10 @@ const ProjectPage = () => {
     const filterStart = appliedStart ? new Date(appliedStart) : null;
     const filterEnd = appliedEnd ? new Date(appliedEnd) : null;
 
-    return (!filterStart || projectEnd >= filterStart) &&
-           (!filterEnd || projectStart <= filterEnd);
+    return (
+      (!filterStart || projectEnd >= filterStart) &&
+      (!filterEnd || projectStart <= filterEnd)
+    );
   });
 
   return (
@@ -92,7 +94,10 @@ const ProjectPage = () => {
           {/* ✅ 현재 적용된 필터 표시 */}
           {appliedStart && appliedEnd && (
             <p className="filter-info">
-              기간 내 진행중인 프로젝트: <strong>{appliedStart} ~ {appliedEnd}</strong>
+              기간 내 진행중인 프로젝트:{" "}
+              <strong>
+                {appliedStart} ~ {appliedEnd}
+              </strong>
             </p>
           )}
 

@@ -198,7 +198,6 @@ def get_logged_in_user():
             try:
                 user['email'] = decrypt_deterministic(user['email'])
                 user['name'] = decrypt_aes(user['name'])
-                # position과 department는 평문으로 저장되었으므로 별도의 복호화 과정 없이 그대로 사용
                 user['phone_number'] = decrypt_aes(user['phone_number'])
             except Exception as decryption_error:
                 print(f"복호화 오류: {decryption_error}")

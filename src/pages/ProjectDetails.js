@@ -40,7 +40,7 @@ const ProjectDetails = () => {
     Project_Manager: "프로젝트 관리자",
     Project_Participant: "프로젝트 참여자",
     Business_Details_and_Notes: "사업 내용 및 특이사항",
-    Changes: "변경사항"
+    Changes: "변경사항",
   };
 
   // 사용자 로그인 확인
@@ -61,12 +61,11 @@ const ProjectDetails = () => {
     }
   }, [projectCode]);
 
-
   //prject 업데이트 확인
   useEffect(() => {
     console.log("Project 업데이트됨:", Project);
   }, [Project]); // Project가 변경될 때마다 실행
-  
+
   //수정 시 프로젝트 인원 상태 표시에 필요한 인원 목록 데이터 불러오기
   useEffect(() => {
     if (loggedInUserId) {
@@ -74,6 +73,31 @@ const ProjectDetails = () => {
     }
   }, [loggedInUserId]);
 
+  const handleLogout = () => {
+    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
+
+  const fetchProjectDetails = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${apiUrl}/project/get_project_details?project_code=${projectCode}`
+      );
+      if (!response.ok) {
+        throw new Error("프로젝트 상세정보를 불러오지 못했습니다.");
+      }
+      const data = await response.json();
+      // 응답이 { project: { ... } } 형태라면:
+      setProject(data.project);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
   const fetchData = async () => {
     setLoading(true); // 로딩 시작
     try {
@@ -87,7 +111,6 @@ const ProjectDetails = () => {
       const data = await response.json();
 
       setProject(data); //데이터 적용
-
     } catch (error) {
       console.error("데이터 로딩 오류:", error);
       setError(error.message);
@@ -100,22 +123,29 @@ const ProjectDetails = () => {
   const fetchLoggedInUser = async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("사용자 인증 정보가 없습니다.");
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/auth/get_logged_in_user`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      if (response.status === 401) {
+        handleLogout(); // 401 응답 시 자동 로그아웃 처리
+        return;
+      }
 
-      if (!response.ok)
-        throw new Error("로그인 사용자 정보를 가져오는 데 실패했습니다.");
-        
-      const data = await response.json();
-      setLoggedInUserId(data.user.id);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("user", JSON.stringify(data.user)); // 최신 상태 업데이트
+      } else {
+        console.error("사용자 정보 불러오기 실패");
+      }
+    } catch (error) {
+      console.error("로그인 사용자 정보 불러오기 실패:", error);
     }
   };
 
@@ -142,9 +172,9 @@ const ProjectDetails = () => {
   if (loading) return <p>데이터를 불러오는 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
 
-  const handleEditClick = () =>{
+  const handleEditClick = () => {
     navigate("/project-edit", { state: { projectData: Project } });
-  }
+  };
 
   const ProjectTable = ({ data }) => {
     return (
@@ -153,7 +183,11 @@ const ProjectDetails = () => {
           {Object.entries(data).map(([key, value]) => (
             <tr key={key}>
               <th>{fieldMappings[key] || key}</th>
-              <td>{value}</td>
+              <td>
+                {typeof value === "object" && value !== null
+                  ? JSON.stringify(value)
+                  : value}
+              </td>
             </tr>
           ))}
         </tbody>
