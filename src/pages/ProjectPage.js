@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa"; 
 import ProjectList from "./ProjectList";
 import Sidebar from "./Sidebar";
+import AddProjectButton from './AddProjectButton';
 import "./ProjectPage.css";
 
 const ProjectPage = () => {
@@ -104,7 +105,7 @@ const ProjectPage = () => {
         : searchCategory === "pm"
         ? project.pm.includes(searchQuery)
         : project.code.includes(searchQuery);
-        
+
 
     const matchesStatus = selectedStatus ? project.status === selectedStatus : true;
 
@@ -119,6 +120,7 @@ const ProjectPage = () => {
   return (
     <div className="project-page">
       <Sidebar />
+      <AddProjectButton />
       <div className="content">
         <div className="projectPage-box">
           <h1 className="title">프로젝트 목록</h1>
