@@ -72,9 +72,9 @@ def signup():
         if not data.get('email') or not data.get('username') or not data.get('position') or not data.get('department') or not data.get('phone'):
             return jsonify({'message': '필수 항목이 누락되었습니다.'}), 400
 
-        # 이메일은 결정적 암호화(검색용)
+        # 이메일은 결정적 암호화 (검색용)
         email = encrypt_deterministic(data.get('email'))
-        username = encrypt_aes(data.get('username'))
+        name = data.get('username')
         position = data.get('position')
         department = data.get('department')
         phone = encrypt_aes(data.get('phone'))
@@ -85,16 +85,22 @@ def signup():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
 
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM User WHERE email = %s", (email,))
+        # 새 DB에서는 테이블명이 tb_user임
+        cursor.execute("SELECT * FROM tb_user WHERE email = %s", (email,))
         if cursor.fetchone():
             return jsonify({'message': '이미 사용 중인 이메일입니다.'}), 400
 
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        # 기본 역할(role_id): 일반 사용자 = 3
+        # 상태는 '출근', 삭제 플래그는 'n', 첫 로그인 여부는 'y'
+        # 생성일, 수정일은 NOW(), 생성자 및 수정자는 생략(또는 'SYSTEM' 대신 null)
         sql = """
-        INSERT INTO User (name, position, department, email, phone_number, password, is_approved)
-        VALUES (%s, %s, %s, %s, %s, %s, 1)
+        INSERT INTO tb_user 
+        (name, position, department, email, phone_number, password, role_id, status, is_delete_yn, first_login_yn, created_at, updated_at)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, '출근', 'n', 'y', NOW(), NOW())
         """
-        values = (username, position, department, email, phone, hashed_password)
+        default_role_id = 3  # 0: admin, 1: project admin, 2: project manager, 3: user
+        values = (name, position, department, email, phone, hashed_password, default_role_id)
         cursor.execute(sql, values)
         conn.commit()
         return jsonify({'message': '회원가입 성공!'}), 201
@@ -129,7 +135,7 @@ def login():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
 
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM User WHERE email = %s", (encrypted_email,))
+        cursor.execute("SELECT * FROM tb_user WHERE email = %s", (encrypted_email,))
         user = cursor.fetchone()
 
         if not user:
@@ -138,26 +144,23 @@ def login():
         if not bcrypt.check_password_hash(user['password'], password):
             return jsonify({'message': '잘못된 비밀번호!'}), 401
 
-        if user.get('is_approved', 0) != 1:
-            return jsonify({'message': '승인 대기 중입니다!'}), 403
-
         # JWT 생성
         payload = {
             'user_id': user['id'],
-            'name': decrypt_aes(user['name']),
+            'name': user['name'],
             'exp': datetime.now(timezone.utc) + timedelta(hours=1)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
         user_data = {
             'id': user['id'],
-            'name': decrypt_aes(user['name']),
-            'position': user['position'],           
-            'department': user['department'],         
+            'name': user['name'],
+            'position': user['position'],
+            'department': user['department'],
             'email': decrypt_deterministic(user['email']),
             'phone_number': decrypt_aes(user['phone_number']),
-            'is_admin': user.get('is_admin', 0),
-            'is_approved': user.get('is_approved', 1)
+            'status': user.get('status', '출근'),
+            'first_login_yn': user.get('first_login_yn', 'y')
         }
 
         return jsonify({'message': '로그인 성공!', 'user': user_data, 'token': token}), 200
@@ -191,13 +194,13 @@ def get_logged_in_user():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
 
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM User WHERE id = %s", (user_id,))
+        cursor.execute("SELECT * FROM tb_user WHERE id = %s", (user_id,))
         user = cursor.fetchone()
 
         if user:
             try:
                 user['email'] = decrypt_deterministic(user['email'])
-                user['name'] = decrypt_aes(user['name'])
+                user['name'] = user['name']
                 user['phone_number'] = decrypt_aes(user['phone_number'])
             except Exception as decryption_error:
                 print(f"복호화 오류: {decryption_error}")
