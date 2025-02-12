@@ -108,7 +108,7 @@ def get_project_details():
         cursor = conn.cursor(dictionary=True)
         sql = "SELECT * FROM Project_Details WHERE Project_Code = %s AND Is_Delete = 0"
         cursor.execute(sql, (project_code,))
-        project = cursor.fetchone()
+        project = cursor.fetchone() 
         if project:
             return jsonify({'project': project}), 200
         else:
