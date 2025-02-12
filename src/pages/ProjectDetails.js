@@ -84,6 +84,7 @@ const ProjectDetails = () => {
   const fetchProjectDetails = async () => {
     setLoading(true);
     try {
+      /*
       const response = await fetch(
         `${apiUrl}/project/get_project_details?project_code=${projectCode}`
       );
@@ -93,7 +94,32 @@ const ProjectDetails = () => {
       const data = await response.json();
       // 응답이 { project: { ... } } 형태라면:
       console.log("project response : ", data);
-      setProject(data.project);
+      setProject(data.project);*/
+
+      //더미데이터 삽입
+      const dummyData = {
+        Category: "유지보수",
+        Status: "수행",
+        Project_Code: "20250122_00004",
+        Business_Start_Date: "2025-01-01",
+        Business_End_Date: "2025-12-31",
+        Group_Name: "그룹명 A",
+        Project_Name: "유지보수 인프라 대진정보통신(주) - 국가정보자원관리원 대구센터",
+        Customer: "대진정보통신(주)",
+        Supplier: "대진정보통신(주)",
+        Person_in_Charge: "최치후 부장",
+        Contact_Number: "054-1234-1234",
+        Expected_Invoice_Date: "2025-01-01",
+        Expected_Payment_Date: "2025-01-01",
+        Sales_Representative: "조우성",
+        Project_PM: "조우성",
+        Project_Manager: "-",
+        Project_Participant: "조우성, 이영섭",
+        Business_Details_and_Notes: "📌 사용인장: 1번 도장",
+        Changes: "변경사항입니다",
+      };
+      setProject(dummyData);
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -155,7 +181,7 @@ const ProjectDetails = () => {
   if (error) return <p>오류 발생: {error}</p>;
 
   const handleEditClick = () => {
-    navigate("/project-edit", { state: { projectData: Project } });
+    navigate(`/project-edit?project_code=${projectCode}`);
   };
 
   const ProjectTable = ({ project }) => {
