@@ -92,6 +92,37 @@ def get_search_project():
         except Exception:
             pass
 
+@project_bp.route('/get_project_details', methods=['GET', 'OPTIONS'])
+def get_project_details():
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'CORS preflight request success'})
+    
+    project_code = request.args.get('project_code')
+    if not project_code:
+        return jsonify({'message': '프로젝트 코드가 제공되지 않았습니다.'}), 400
+    
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+        cursor = conn.cursor(dictionary=True)
+        sql = "SELECT * FROM Project_Details WHERE Project_Code = %s AND Is_Delete = 0"
+        cursor.execute(sql, (project_code,))
+        project = cursor.fetchone()
+        if project:
+            return jsonify({'project': project}), 200
+        else:
+            return jsonify({'message': '해당 프로젝트를 찾을 수 없습니다.'}), 404
+    except Exception as e:
+        print(f"프로젝트 상세정보 조회 오류: {e}")
+        return jsonify({'message': '프로젝트 상세정보 조회 오류'}), 500
+    finally:
+        try:
+            cursor.close()
+            conn.close()
+        except Exception:
+            pass
+
 @project_bp.route('/edit_project', methods=['POST', 'OPTIONS'])
 def edit_project():
     if request.method == 'OPTIONS':

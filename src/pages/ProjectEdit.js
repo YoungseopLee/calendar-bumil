@@ -4,7 +4,7 @@ import Sidebar from "./Sidebar";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import "./ProjectDetails.css";
 
-const ProjectDetails = () => {
+const ProjectEdit = () => {
   const [employees, setEmployees] = useState([]);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [Project, setProject] = useState(null);
@@ -77,7 +77,6 @@ const ProjectDetails = () => {
   const fetchData = async () => {
     setLoading(true); // 로딩 시작
     try {
-      //프로젝트 정보 가져오기
       const response = await fetch(
         `${apiUrl}/project/get_project_details?project_code=${projectCode}`
       );
@@ -86,7 +85,7 @@ const ProjectDetails = () => {
       }
       const data = await response.json();
 
-      setProject(data); //데이터 적용
+      setProject(data);
 
     } catch (error) {
       console.error("데이터 로딩 오류:", error);
@@ -143,7 +142,7 @@ const ProjectDetails = () => {
   if (error) return <p>오류 발생: {error}</p>;
 
   const handleEditClick = () =>{
-    navigate("/project-edit", { state: { projectData: Project } });
+    navigate("/project-edit");
   }
 
   const ProjectTable = ({ data }) => {
@@ -188,4 +187,5 @@ const ProjectDetails = () => {
     </div>
   );
 };
-export default ProjectDetails;
+
+export default ProjectEdit;
