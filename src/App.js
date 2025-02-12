@@ -12,6 +12,7 @@ import Department_view from "./pages/Department-view";
 import Profile from "./pages/Profile";
 import ProjectDetails from "./pages/ProjectDetails"
 import ProjectPage from "./pages/ProjectPage";  // 추가
+import ProjectEdit from "./pages/ProjectEdit";
 
 function App() {
   return (
@@ -41,6 +42,8 @@ function App() {
         <Route path="/projects" element={<ProjectPage />} />
         {/* 프로젝트 상세 페이지 */}
         <Route path="/project-details" element={<ProjectDetails />} />
+        {/* 프로젝트 상세-수정 페이지 */}
+        <Route path="/project-edit" element={<ProjectEdit />} />
       </Routes>
     </Router>
   );

@@ -9,12 +9,34 @@
   }
   
   .project-title {
+    margin-left: 10px;
+    float: left;
     font-size: 18px;
     font-weight: bold;
     color: #333;
     margin-bottom: 10px;
   }
   
+  .EditProjectButton {
+    margin-right: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+  }
+
+  /* 버튼을 감싸는 div 스타일 추가 */
+  .edit-button-container {
+    display: flex;
+    justify-content: space-between; /* 양쪽 끝에 배치 */
+    align-items: center; /* 수직 정렬 */
+    margin-bottom: 10px; /* 아래 여백 추가 */
+  }
+
   .section-title {
     font-size: 16px;
     font-weight: bold;
@@ -46,4 +68,4 @@
   .project-table tr:nth-child(even) td {
     background: #f9f9f9;
   }
-  
+
