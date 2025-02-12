@@ -105,7 +105,8 @@ const ProjectEdit = () => {
         Business_Start_Date: "2025-01-01",
         Business_End_Date: "2025-12-31",
         Group_Name: "그룹명 A",
-        Project_Name: "유지보수 인프라 대진정보통신(주) - 국가정보자원관리원 대구센터",
+        Project_Name:
+          "유지보수 인프라 대진정보통신(주) - 국가정보자원관리원 대구센터",
         Customer: "대진정보통신(주)",
         Supplier: "대진정보통신(주)",
         Person_in_Charge: "최치후 부장",
@@ -120,7 +121,6 @@ const ProjectEdit = () => {
         Changes: "변경사항입니다",
       };
       setProject(dummyData);
-
     } catch (err) {
       setError(err.message);
     } finally {
@@ -192,10 +192,11 @@ const ProjectEdit = () => {
   // 수정된 데이터 저장 API 호출
   const handleSave = async () => {
     try {
-      const response = await fetch(`${apiUrl}/project/update_project`, {
-        method: "PUT",
+      const response = await fetch(`${apiUrl}/project/edit_project`, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(Project),
       });
@@ -232,7 +233,13 @@ const ProjectEdit = () => {
                       value={Project[key]}
                       onChange={(e) => handleChange(key, e.target.value)}
                       rows="4" // 기본 높이 조정
-                      style={{ width: "100%", padding: "8px", fontSize: "1em", border: "1px solid #ccc", borderRadius: "5px" }}
+                      style={{
+                        width: "100%",
+                        padding: "8px",
+                        fontSize: "1em",
+                        border: "1px solid #ccc",
+                        borderRadius: "5px",
+                      }}
                     />
                   </td>
                 </tr>
@@ -254,7 +261,6 @@ const ProjectEdit = () => {
         <button onClick={handleSave} className="save-button">
           저장
         </button>
-
       </div>
     </div>
   );
