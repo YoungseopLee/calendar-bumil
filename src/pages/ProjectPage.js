@@ -95,7 +95,7 @@ const ProjectPage = () => {
           {/* ✅ 현재 적용된 필터링 표시 */}
           {appliedStart && appliedEnd && (
             <p className="filter-info">
-              적용된 기간: <strong>{appliedStart} ~ {appliedEnd}</strong>
+              기간 내 진행중인 프로젝트: <strong>{appliedStart} ~ {appliedEnd}</strong>
             </p>
           )}
 
