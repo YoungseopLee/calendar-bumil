@@ -63,6 +63,9 @@ const Sidebar = () => {
               <Link to="/employee">Employee</Link>
             </li>
             <li>
+              <Link to="/calendar">Calendar</Link>
+            </li>
+            <li>
               <Link to="/mypage">MyPage</Link>
             </li>
             <li>
