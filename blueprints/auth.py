@@ -91,15 +91,15 @@ def signup():
             return jsonify({'message': '이미 사용 중인 이메일입니다.'}), 400
 
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        # 기본 역할(role_id): 일반 사용자 = 3
-        # 상태는 '출근', 삭제 플래그는 'n', 첫 로그인 여부는 'y'
+        # 상태는 '출근', 삭제 플래그 'n', 첫 로그인 여부 'n'
         # 생성일, 수정일은 NOW(), 생성자 및 수정자는 생략(또는 'SYSTEM' 대신 null)
         sql = """
         INSERT INTO tb_user 
         (name, position, department, email, phone_number, password, role_id, status, is_delete_yn, first_login_yn, created_at, updated_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, '출근', 'n', 'y', NOW(), NOW())
+        VALUES (%s, %s, %s, %s, %s, %s, %s, '출근', 'n', 'n', NOW(), NOW())
         """
-        default_role_id = 3  # 0: admin, 1: project admin, 2: project manager, 3: user
+        # 0: admin, 1: pa(project admin), 2: pm(project manager), 3: user
+        default_role_id = 3  
         values = (name, position, department, email, phone, hashed_password, default_role_id)
         cursor.execute(sql, values)
         conn.commit()

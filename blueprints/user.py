@@ -1,4 +1,3 @@
-# blueprints/user.py
 from flask import Blueprint, request, jsonify
 import jwt
 from db import get_db_connection
@@ -7,6 +6,7 @@ from .auth import decrypt_aes, decrypt_deterministic
 
 user_bp = Blueprint('user', __name__, url_prefix='/user')
 
+# 첫 로그인 사용자 목록 조회
 @user_bp.route('/get_pending_users', methods=['GET', 'OPTIONS'])
 def get_pending_users():
     if request.method == 'OPTIONS':
@@ -16,23 +16,16 @@ def get_pending_users():
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT id, name, position, department, email, phone_number FROM User WHERE is_approved = 0")
+        cursor.execute("""
+            SELECT id, name, position, department, email, phone_number 
+            FROM tb_user 
+            WHERE first_login_yn = 'n' AND is_delete_yn = 'n'
+        """)
         pending_users = cursor.fetchall()
-        # 암호화된 필드 복호화: name, email, phone_number
-        for user in pending_users:
-            try:
-                user['name'] = decrypt_aes(user['name'])
-                user['email'] = decrypt_deterministic(user['email'])
-                user['phone_number'] = decrypt_aes(user['phone_number'])
-            except Exception as decryption_error:
-                print(f"복호화 오류 (pending user id {user['id']}): {decryption_error}")
-                user['name'] = None
-                user['email'] = None
-                user['phone_number'] = None
         return jsonify({'users': pending_users}), 200
     except Exception as e:
-        print(f"승인 대기 사용자 목록 가져오기 오류: {e}")
-        return jsonify({'message': '승인 대기 사용자 목록 가져오기 오류'}), 500
+        print(f"미승인 사용자 목록 가져오기 오류: {e}")
+        return jsonify({'message': '미승인 사용자 목록 가져오기 오류'}), 500
     finally:
         try:
             cursor.close()
@@ -40,54 +33,7 @@ def get_pending_users():
         except Exception:
             pass
 
-@user_bp.route('/approve_user', methods=['POST', 'OPTIONS'])
-def approve_user():
-    if request.method == 'OPTIONS':
-        return jsonify({'message': 'CORS preflight request success'}), 200
-    try:
-        data = request.get_json()
-        user_id = data.get('userId')
-        conn = get_db_connection()
-        if conn is None:
-            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
-        cursor = conn.cursor()
-        cursor.execute("UPDATE User SET is_approved = 1 WHERE id = %s", (user_id,))
-        conn.commit()
-        return jsonify({'message': '사용자가 승인되었습니다.'}), 200
-    except Exception as e:
-        print(f"사용자 승인 오류: {e}")
-        return jsonify({'message': '사용자 승인 오류'}), 500
-    finally:
-        try:
-            cursor.close()
-            conn.close()
-        except Exception:
-            pass
-
-@user_bp.route('/reject_user', methods=['POST', 'OPTIONS'])
-def reject_user():
-    if request.method == 'OPTIONS':
-        return jsonify({'message': 'CORS preflight request success'}), 200
-    try:
-        data = request.get_json()
-        user_id = data.get('userId')
-        conn = get_db_connection()
-        if conn is None:
-            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM User WHERE id = %s", (user_id,))
-        conn.commit()
-        return jsonify({'message': '사용자가 거절되었습니다.'}), 200
-    except Exception as e:
-        print(f"사용자 거절 오류: {e}")
-        return jsonify({'message': '사용자 거절 오류'}), 500
-    finally:
-        try:
-            cursor.close()
-            conn.close()
-        except Exception:
-            pass
-
+# 모든 사용자 목록 조회
 @user_bp.route('/get_users', methods=['GET'])
 def get_users():
     try:
@@ -96,21 +42,11 @@ def get_users():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT id, name, position, department, email, phone_number, is_approved, COALESCE(status, '출근') AS status
-            FROM User
+            SELECT id, name, position, department, email, phone_number, status, first_login_yn 
+            FROM tb_user 
+            WHERE is_delete_yn = 'n'
         """)
         users = cursor.fetchall()
-        # 암호화된 필드 복호화: name, email, phone_number
-        for user in users:
-            try:
-                user['name'] = decrypt_aes(user['name'])
-                user['email'] = decrypt_deterministic(user['email'])
-                user['phone_number'] = decrypt_aes(user['phone_number'])
-            except Exception as decryption_error:
-                print(f"복호화 오류 (user id {user['id']}): {decryption_error}")
-                user['name'] = None
-                user['email'] = None
-                user['phone_number'] = None
         return jsonify({'users': users}), 200
     except Exception as e:
         print(f"사용자 목록 조회 오류: {e}")
@@ -122,6 +58,7 @@ def get_users():
         except Exception:
             pass
 
+# 특정 사용자들의 상태 조회
 @user_bp.route('/get_users_status', methods=['POST', 'OPTIONS'])
 def get_users_status():
     if request.method == 'OPTIONS':
@@ -136,7 +73,7 @@ def get_users_status():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
         format_strings = ','.join(['%s'] * len(user_ids))
-        query = f"SELECT id, COALESCE(status, '출근') AS status FROM User WHERE id IN ({format_strings})"
+        query = f"SELECT id, status FROM tb_user WHERE id IN ({format_strings})"
         cursor.execute(query, tuple(user_ids))
         statuses = cursor.fetchall()
         statuses_dict = {user["id"]: user["status"] for user in statuses}
@@ -151,6 +88,7 @@ def get_users_status():
         except Exception:
             pass
 
+# 유저 상태 업데이트
 @user_bp.route('/update_status', methods=['PUT', 'OPTIONS'])
 def update_status():
     if request.method == 'OPTIONS':
@@ -164,14 +102,17 @@ def update_status():
         user_id = payload['user_id']
         data = request.get_json()
         new_status = data.get('status')
-        valid_statuses = ['출근', '외근', '파견', '휴가']
-        if new_status not in valid_statuses:
+        
+        if new_status is None or new_status.strip() == '':
+            new_status = None
+        elif new_status.strip() != "휴가":
             return jsonify({'message': '유효하지 않은 상태 값입니다.'}), 400
+
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor()
-        cursor.execute("UPDATE User SET status = %s WHERE id = %s", (new_status, user_id))
+        cursor.execute("UPDATE tb_user SET status = %s WHERE id = %s", (new_status, user_id))
         conn.commit()
         return jsonify({'message': '상태가 업데이트되었습니다.'}), 200
     except jwt.ExpiredSignatureError:

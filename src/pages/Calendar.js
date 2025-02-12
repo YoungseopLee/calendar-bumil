@@ -311,9 +311,7 @@ const Calendar = () => {
               value={userStatus}
               onChange={handleStatusChange}
             >
-              <option value="출근">출근</option>
-              <option value="외근">외근</option>
-              <option value="파견">파견</option>
+              <option value=""></option>
               <option value="휴가">휴가</option>
             </select>
           </div>

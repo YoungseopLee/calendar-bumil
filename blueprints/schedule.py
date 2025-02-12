@@ -1,7 +1,7 @@
-# blueprints/schedule.py
 from flask import Blueprint, request, jsonify
 import jwt
-from .auth import decrypt_aes
+# 이름 복호화 함수는 더 이상 사용하지 않으므로 import 삭제하거나, 필요없다면 주석 처리합니다.
+# from .auth import decrypt_aes  
 from db import get_db_connection
 from config import SECRET_KEY
 
@@ -20,7 +20,7 @@ def get_schedule():
         cursor = conn.cursor(dictionary=True)
         sql = """
         SELECT id, task, start_date, end_date, status
-        FROM Schedule
+        FROM tb_schedule
         WHERE user_id = %s AND DATE(start_date) <= %s AND DATE(end_date) >= %s
         """
         cursor.execute(sql, (user_id, date, date))
@@ -52,21 +52,13 @@ def get_other_users_schedule():
         cursor = conn.cursor(dictionary=True)
         sql = """
         SELECT s.id AS schedule_id, s.task, s.start_date, s.end_date, s.status, 
-        u.id AS user_id, u.name
-        FROM Schedule s
-        JOIN User u ON s.user_id = u.id
+            u.id AS user_id, u.name
+        FROM tb_schedule s
+        JOIN tb_user u ON s.user_id = u.id
         WHERE DATE(s.start_date) <= %s AND DATE(s.end_date) >= %s AND s.user_id != %s
         """
         cursor.execute(sql, (date, date, user_id))
         other_users_schedules = cursor.fetchall()
-        
-        # 여기서 user.name 복호화
-        for schedule in other_users_schedules:
-            try:
-                schedule['name'] = decrypt_aes(schedule['name'])
-            except Exception as decryption_error:
-                print(f"복호화 오류: {decryption_error}")
-                schedule['name'] = None  # 복호화 실패 시 원하는 처리 방식 적용
 
         return jsonify({'schedules': other_users_schedules}), 200
     
@@ -85,22 +77,40 @@ def get_other_users_schedule():
 def add_schedule():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
+    
+    # 토큰 검증
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'message': '토큰이 없습니다.'}), 401
+    token = token.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        user_id_from_token = payload['user_id']
+        user_name = payload.get('name', 'Unknown')
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': '토큰이 만료되었습니다.'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
+
     try:
         data = request.get_json()
         start_date = data.get('start')
         end_date = data.get('end')
         task = data.get('task')
         status = data.get('status')
-        user_id = data.get('user_id')
+        user_id = user_id_from_token
+
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor()
+        # created_at, updated_at은 NOW(), created_by와 updated_by는 로그인한 사용자의 이름으로 저장
         sql = """
-        INSERT INTO Schedule (user_id, start_date, end_date, task, status)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO tb_schedule 
+        (user_id, start_date, end_date, task, status, created_at, updated_at, created_by, updated_by)
+        VALUES (%s, %s, %s, %s, %s, NOW(), NOW(), %s, %s)
         """
-        values = (user_id, start_date, end_date, task, status)
+        values = (user_id, start_date, end_date, task, status, user_name, user_name)
         cursor.execute(sql, values)
         conn.commit()
         return jsonify({'message': '일정이 추가되었습니다.'}), 200
@@ -114,17 +124,26 @@ def add_schedule():
         except Exception:
             pass
 
+
 @schedule_bp.route('/edit-schedule/<int:schedule_id>', methods=['PUT', 'OPTIONS'])
 def edit_schedule(schedule_id):
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
+    
     token = request.headers.get('Authorization')
     if not token:
         return jsonify({'message': '토큰이 없습니다.'}), 401
     token = token.split(" ")[1]
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-        user_id = payload['user_id']
+        user_id_from_token = payload['user_id']
+        user_name = payload.get('name', 'Unknown')
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': '토큰이 만료되었습니다.'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
+
+    try:
         data = request.get_json()
         start_date = data.get('start_date')
         end_date = data.get('end_date')
@@ -135,16 +154,20 @@ def edit_schedule(schedule_id):
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor()
-        cursor.execute("SELECT user_id FROM Schedule WHERE id = %s", (schedule_id,))
+        
+        # 해당 일정의 소유자 확인 (수정 권한 체크)
+        cursor.execute("SELECT user_id FROM tb_schedule WHERE id = %s", (schedule_id,))
         schedule_owner = cursor.fetchone()
-        if schedule_owner and schedule_owner[0] != user_id:
+        if schedule_owner and schedule_owner[0] != user_id_from_token:
             return jsonify({'message': '일정을 수정할 권한이 없습니다.'}), 403
+        
+        # 수정 시, updated_at은 NOW(), updated_by는 로그인한 사용자의 이름으로 업데이트
         sql = """
-        UPDATE Schedule
-        SET start_date = %s, end_date = %s, task = %s, status = %s
+        UPDATE tb_schedule
+        SET start_date = %s, end_date = %s, task = %s, status = %s, updated_at = NOW(), updated_by = %s
         WHERE id = %s
         """
-        values = (start_date, end_date, task, status, schedule_id)
+        values = (start_date, end_date, task, status, user_name, schedule_id)
         cursor.execute(sql, values)
         conn.commit()
         return jsonify({'message': '일정이 수정되었습니다.'}), 200
@@ -177,11 +200,11 @@ def delete_schedule(schedule_id):
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor()
-        cursor.execute("SELECT user_id FROM Schedule WHERE id = %s", (schedule_id,))
+        cursor.execute("SELECT user_id FROM tb_schedule WHERE id = %s", (schedule_id,))
         schedule_owner = cursor.fetchone()
         if schedule_owner and schedule_owner[0] != user_id:
             return jsonify({'message': '일정을 삭제할 권한이 없습니다.'}), 403
-        cursor.execute("DELETE FROM Schedule WHERE id = %s", (schedule_id,))
+        cursor.execute("DELETE FROM tb_schedule WHERE id = %s", (schedule_id,))
         conn.commit()
         return jsonify({'message': '일정이 삭제되었습니다.'}), 200
     except jwt.ExpiredSignatureError:
@@ -205,7 +228,7 @@ def get_all_schedule():
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
-        sql = "SELECT * FROM Schedule"
+        sql = "SELECT * FROM tb_schedule"
         cursor.execute(sql)
         schedules = cursor.fetchall()
         return jsonify({'schedules': schedules}), 200
