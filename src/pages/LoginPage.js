@@ -141,12 +141,12 @@ const LoginPage = () => {
           </button>
         </form>
         {/* 회원가입 */}
-        {/* {message && <div className="message">{message}</div>}
+        {message && <div className="message">{message}</div>}
         <div className="footer">
           <p>
             Don't have an account? <Link to="/signup">회원가입</Link>
           </p>
-        </div> */}
+        </div>
       </div>
     </div>
   );
