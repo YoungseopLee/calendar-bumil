@@ -74,7 +74,7 @@ const LoginPage = () => {
           localStorage.removeItem("autoLogin"); // 자동 로그인 비활성화
         }
 
-        navigate("/calendar", { replace: true }); // 캘린더로 이동
+        navigate("/projects", { replace: true }); // 캘린더로 이동
       } else {
         // 로그인 실패 처리
         if (response.status === 403 && data.message === "승인 대기 중입니다!") {
@@ -140,12 +140,13 @@ const LoginPage = () => {
             로그인
           </button>
         </form>
-        {message && <div className="message">{message}</div>}
+        {/* 회원가입 */}
+        {/* {message && <div className="message">{message}</div>}
         <div className="footer">
           <p>
             Don't have an account? <Link to="/signup">회원가입</Link>
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );
