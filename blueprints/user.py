@@ -47,6 +47,15 @@ def get_users():
             WHERE is_delete_yn = 'n'
         """)
         users = cursor.fetchall()
+
+        # phone_number 복호화 (암호화된 경우)
+        for user in users:
+            try:
+                user['phone_number'] = decrypt_aes(user['phone_number'])
+            except Exception as e:
+                print(f"전화번호 복호화 오류 (user id {user['id']}): {e}")
+                user['phone_number'] = None
+
         return jsonify({'users': users}), 200
     except Exception as e:
         print(f"사용자 목록 조회 오류: {e}")
@@ -57,7 +66,7 @@ def get_users():
             conn.close()
         except Exception:
             pass
-
+        
 # 특정 사용자들의 상태 조회
 @user_bp.route('/get_users_status', methods=['POST', 'OPTIONS'])
 def get_users_status():
@@ -105,9 +114,9 @@ def update_status():
         
         if new_status is None or new_status.strip() == '':
             new_status = None
-        elif new_status.strip() != "휴가":
+        elif new_status.strip() not in ["휴가", "파견"]:
             return jsonify({'message': '유효하지 않은 상태 값입니다.'}), 400
-
+        
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500

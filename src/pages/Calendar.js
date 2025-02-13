@@ -313,6 +313,7 @@ const Calendar = () => {
               onChange={handleStatusChange}
             >
               <option value=""></option>
+              <option value="파견">파견</option>
               <option value="휴가">휴가</option>
             </select>
           </div>
