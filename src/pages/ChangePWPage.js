@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./ChangePWPage.css";
 
 const ChangePWPage = () => {
@@ -7,9 +8,10 @@ const ChangePWPage = () => {
     new_password: "", //변경할 비밀번호
     confirm_password: "", // 비밀번호 확인용
   });
-
   const [changepwStatus, setchangepwStatus] = useState("");
   const [errors, setErrors] = useState({});
+
+  const navigate = useNavigate();
 
   const validateForm = () => {
     let newErrors = {};
@@ -61,7 +63,7 @@ const ChangePWPage = () => {
       if (response.ok) {
         setchangepwStatus("비밀번호 변경이 완료되었습니다!");
         alert("비밀번호 변경 성공!");
-        navigator("/projects");
+        navigate("/projects");
       } else {
         setchangepwStatus(data.message);
       }
