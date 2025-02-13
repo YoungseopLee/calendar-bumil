@@ -15,35 +15,40 @@ const ProjectPage = () => {
   const [searchQuery, setSearchQuery] = useState(""); // 검색 값
   const [selectedStatus, setSelectedStatus] = useState(""); // ✅ 선택된 상태 저장
 
-  // ✅ API 호출
   const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
+  // ✅ API 호출
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = await fetch(`${apiUrl}/project/get_all_project`);
         if (response.ok) {
           const data = await response.json();
-          console.log("API 응답 데이터:", data); // ✅ 데이터 확인 로그 추가
+          console.log("📌 API 응답 데이터:", data); // ✅ 응답 데이터 확인
+
+          if (!data.projects) {
+            console.error("❌ API 응답에 'projects' 필드가 없습니다.");
+            return;
+          }
 
           const transformedProjects = data.projects.map((proj) => ({
-            id: proj.Project_Code || "",
-            code: proj.Project_Code || "",
-            name: proj.Project_Name || "",
-            group: proj.Group_Name || "",
-            owner: proj.Sales_Representative || "",
-            pm: proj.Project_PM || "",
-            status: proj.Status || "",
-            startDate: proj.Business_Start_Date || "",
-            endDate: proj.Business_End_Date || "",
+            id: proj.project_code || "",  // ✅ 필드명 일치 (snake_case)
+            code: proj.project_code || "",
+            name: proj.project_name || "",
+            group: proj.group_name || "",
+            owner: proj.sales_representative || "",
+            pm: proj.project_pm || "",
+            status: proj.status || "",
+            startDate: proj.business_start_date || "",
+            endDate: proj.business_end_date || "",
           }));
 
           setProjects(transformedProjects);
         } else {
-          console.error("프로젝트 데이터를 불러오지 못했습니다.");
+          console.error("❌ 프로젝트 데이터를 불러오지 못했습니다.");
         }
       } catch (error) {
-        console.error("프로젝트 데이터 로딩 오류:", error);
+        console.error("🚨 프로젝트 데이터 로딩 오류:", error);
       }
     };
 
@@ -58,7 +63,7 @@ const ProjectPage = () => {
 
   // ✅ 상태 필터 버튼 클릭 시 선택 상태 변경
   const handleStatusClick = (status) => {
-    setSelectedStatus(status === selectedStatus ? "" : status); // 동일한 버튼 클릭 시 해제
+    setSelectedStatus(status === selectedStatus ? "" : status);
   };
 
   // ✅ 프로젝트 필터링 로직 (검색 + 상태 필터링 추가)
@@ -68,14 +73,15 @@ const ProjectPage = () => {
     const filterStart = appliedStart ? new Date(appliedStart) : null;
     const filterEnd = appliedEnd ? new Date(appliedEnd) : null;
 
+    // ✅ 검색 필터 - includes() 오류 방지
     const matchesSearch =
       searchCategory === "projectName"
-        ? (project.name || "").includes(searchQuery)
+        ? (project.name || "").toLowerCase().includes(searchQuery.toLowerCase())
         : searchCategory === "owner"
-        ? (project.owner || "").includes(searchQuery)
+        ? (project.owner || "").toLowerCase().includes(searchQuery.toLowerCase())
         : searchCategory === "pm"
-        ? (project.pm || "").includes(searchQuery)
-        : (project.code || "").includes(searchQuery);
+        ? (project.pm || "").toLowerCase().includes(searchQuery.toLowerCase())
+        : (project.code || "").toLowerCase().includes(searchQuery.toLowerCase());
 
     const matchesStatus = selectedStatus
       ? project.status === selectedStatus
@@ -146,9 +152,7 @@ const ProjectPage = () => {
             {["제안", "진행 중", "완료"].map((status) => (
               <button
                 key={status}
-                className={`status-toggle ${
-                  selectedStatus === status ? "active" : ""
-                }`}
+                className={`status-toggle ${selectedStatus === status ? "active" : ""}`}
                 onClick={() => handleStatusClick(status)}
               >
                 {status}
@@ -169,3 +173,4 @@ const ProjectPage = () => {
 };
 
 export default ProjectPage;
+
