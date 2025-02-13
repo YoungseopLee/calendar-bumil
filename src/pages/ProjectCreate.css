@@ -115,3 +115,13 @@
         gap: 5px;
     }
 }
+
+/* ✅ iOS 자동 확대 방지 */
+input, select, textarea {
+    font-size: 17px; /* ✅ 16px 이상 설정하여 자동 확대 방지 */
+}
+
+/* ✅ 날짜 필드도 동일 적용 */
+.date-container input {
+    font-size: 16px;
+}
