@@ -23,37 +23,35 @@ const ProjectEdit = () => {
 
   //필드 매핑(프로젝트 요소가 DB에추가되면 여기서 매핑해줘야 함, 그래야 표에 표시됨)
   const fieldMappings = {
-    Category: "구분",
-    Status: "진행 상황",
-    Project_Code: "프로젝트 코드",
-    Business_Start_Date: "사업 시작일",
-    Business_End_Date: "사업 종료일",
-    Group_Name: "그룹 명",
-    Project_Name: "프로젝트 명",
-    Customer: "매출처",
-    Supplier: "납품처",
-    Person_in_Charge: "담당자",
-    Contact_Number: "연락처",
-    Expected_Invoice_Date: "청구 예정일",
-    Expected_Payment_Date: "수금 예정일",
-    Sales_Representative: "영업대표",
-    Project_PM: "수행 PM",
-    Project_Manager: "프로젝트 관리자",
-    Project_Participant: "프로젝트 참여자",
-    Business_Details_and_Notes: "사업 내용 및 특이사항",
-    Changes: "변경사항",
+    category: "구분",
+    status: "진행 상황",
+    project_code: "프로젝트 코드",
+    business_start_date: "사업 시작일",
+    business_end_date: "사업 종료일",
+    group_name: "그룹 명",
+    project_name: "프로젝트 명",
+    customer: "매출처",
+    supplier: "납품처",
+    person_in_charge: "담당자",
+    contact_number: "연락처",
+    sales_representative: "영업대표",
+    project_pm: "수행 PM",
+    project_manager: "프로젝트 관리자",
+    project_participant: "프로젝트 참여자",
+    business_details_and_notes: "사업 내용 및 특이사항",
+    changes: "변경사항",
   };
 
   // 사용자 로그인 확인
-  // useEffect(() => {
-  //   fetchLoggedInUser();
+  useEffect(() => {
+    fetchLoggedInUser();
 
-  //   if (!user) {
-  //     alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
-  //     navigate("/");
-  //     return;
-  //   }
-  // }, []);
+    if (!user) {
+      alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
+      navigate("/");
+      return;
+    }
+  }, []);
 
   // 프로젝트 코드가 변경될 때 마다 fetchData 실행
   useEffect(() => {
@@ -85,7 +83,6 @@ const ProjectEdit = () => {
   const fetchProjectDetails = async () => {
     setLoading(true);
     try {
-      /*
       const response = await fetch(
         `${apiUrl}/project/get_project_details?project_code=${projectCode}`
       );
@@ -95,30 +92,28 @@ const ProjectEdit = () => {
       const data = await response.json();
       // 응답이 { project: { ... } } 형태라면:
       console.log("project response : ", data);
-      setProject(data.project);*/
+      setProject(data.project);
 
       //더미데이터 삽입
       const dummyData = {
-        Category: "유지보수",
-        Status: "수행",
-        Project_Code: "20250122_00004",
-        Business_Start_Date: "2025-01-01",
-        Business_End_Date: "2025-12-31",
-        Group_Name: "그룹명 A",
-        Project_Name:
+        category: "유지보수",
+        status: "수행",
+        project_code: "20250122_00004",
+        business_start_date: "2025-01-01",
+        business_end_date: "2025-12-31",
+        group_name: "그룹명 A",
+        project_name:
           "유지보수 인프라 대진정보통신(주) - 국가정보자원관리원 대구센터",
-        Customer: "대진정보통신(주)",
-        Supplier: "대진정보통신(주)",
-        Person_in_Charge: "최치후 부장",
-        Contact_Number: "054-1234-1234",
-        Expected_Invoice_Date: "2025-01-01",
-        Expected_Payment_Date: "2025-01-01",
-        Sales_Representative: "조우성",
-        Project_PM: "조우성",
-        Project_Manager: "-",
-        //Project_Participant: "조우성, 이영섭",
-        Business_Details_and_Notes: "📌 사용인장: 1번 도장",
-        Changes: "변경사항입니다",
+        customer: "대진정보통신(주)",
+        supplier: "대진정보통신(주)",
+        person_in_charge: "최치후 부장",
+        contact_number: "054-1234-1234",
+        Sales_representative: "조우성",
+        project_pm: "조우성",
+        project_manager: "-",
+        project_participant: "조우성, 이영섭",
+        business_details_and_notes: "📌 사용인장: 1번 도장",
+        cchanges: "변경사항입니다",
       };
       setProject(dummyData);
     } catch (err) {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { FaSearch } from "react-icons/fa"; 
+import { FaSearch } from "react-icons/fa";
 import ProjectList from "./ProjectList";
 import Sidebar from "./Sidebar";
-import AddProjectButton from './AddProjectButton';
+import AddProjectButton from "./AddProjectButton";
 import "./ProjectPage.css";
 
 const ProjectPage = () => {
@@ -17,19 +17,29 @@ const ProjectPage = () => {
 
   // ✅ 더미 데이터 생성 함수
   const generateDummyProjects = (count) => {
-    const groups = ["구축 인프라", "구축 SW", "유지보수 인프라", "유지보수 SW", "연구과제"];
+    const groups = [
+      "구축 인프라",
+      "구축 SW",
+      "유지보수 인프라",
+      "유지보수 SW",
+      "연구과제",
+    ];
     const statuses = ["제안", "진행 중", "완료"];
     const salesReps = ["김영수", "박진우", "이민정", "최동영", "서정교"];
     const pmList = ["주성호", "이현재", "최영철", "이종우", "한지민"];
 
     return Array.from({ length: count }, (_, index) => {
-      const startDate = new Date(2025, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1);
+      const startDate = new Date(
+        2025,
+        Math.floor(Math.random() * 12),
+        Math.floor(Math.random() * 28) + 1
+      );
       const endDate = new Date(startDate);
       endDate.setDate(endDate.getDate() + Math.floor(Math.random() * 180) + 1);
 
       return {
         id: index + 1,
-        code: `2025${String(index + 1).padStart(4, "0")}`,
+        code: "20250122_00004",
         name: `프로젝트 ${index + 1}`,
         group: groups[Math.floor(Math.random() * groups.length)],
         owner: salesReps[Math.floor(Math.random() * salesReps.length)],
@@ -106,8 +116,9 @@ const ProjectPage = () => {
         ? project.pm.includes(searchQuery)
         : project.code.includes(searchQuery);
 
-
-    const matchesStatus = selectedStatus ? project.status === selectedStatus : true;
+    const matchesStatus = selectedStatus
+      ? project.status === selectedStatus
+      : true;
 
     return (
       (!filterStart || projectEnd >= filterStart) &&
@@ -174,7 +185,9 @@ const ProjectPage = () => {
             {["제안", "진행 중", "완료"].map((status) => (
               <button
                 key={status}
-                className={`status-toggle ${selectedStatus === status ? "active" : ""}`}
+                className={`status-toggle ${
+                  selectedStatus === status ? "active" : ""
+                }`}
                 onClick={() => handleStatusClick(status)}
               >
                 {status}
