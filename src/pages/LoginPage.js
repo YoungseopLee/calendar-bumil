@@ -74,7 +74,15 @@ const LoginPage = () => {
           localStorage.removeItem("autoLogin"); // 자동 로그인 비활성화
         }
 
-        navigate("/projects", { replace: true }); // 캘린더로 이동
+        //최초 로그인 판정 함수
+        if(data.user.first_login_yn == 'y'){
+          navigate("/projects", { replace: true }); // 캘린더로 이동
+        }
+        //최초 로그인이라면, 비밀번호 변경 페이지로 이동하게 하기 
+        else if(data.user.first_login_yn == 'n'){
+          navigate("/change-pw", { replace: true });
+        }
+
       } else {
         // 로그인 실패 처리
         if (response.status === 403 && data.message === "승인 대기 중입니다!") {

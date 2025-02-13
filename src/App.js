@@ -14,6 +14,7 @@ import ProjectDetails from "./pages/ProjectDetails"
 import ProjectPage from "./pages/ProjectPage";  // 추가
 import ProjectEdit from "./pages/ProjectEdit";
 import ProjectCreate from "./pages/ProjectCreate";
+import ChangePWPage from "./pages/ChangePWPage";
 
 function App() {
   return (
@@ -47,6 +48,8 @@ function App() {
         <Route path="/project-edit" element={<ProjectEdit />} />
         {/* 프로젝트 생성 */}
         <Route path="/add-project" element={<ProjectCreate />} />
+        {/* 비밀번호 변경 페이지 */}
+        <Route path="/change-pw" element={<ChangePWPage />} />
       </Routes>
     </Router>
   );
