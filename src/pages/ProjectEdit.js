@@ -224,18 +224,22 @@ const ProjectEdit = () => {
                 <tr key={key}>
                   <th>{label}</th>
                   <td>
-                    <textarea
-                      value={Project[key]}
-                      onChange={(e) => handleChange(key, e.target.value)}
-                      rows="4" // 기본 높이 조정
-                      style={{
-                        width: "100%",
-                        padding: "8px",
-                        fontSize: "1em",
-                        border: "1px solid #ccc",
-                        borderRadius: "5px",
-                      }}
-                    />
+                    {key === "project_code" ? ( // 🔹 project_code는 수정 불가능하게 표시
+                      <span>{Project[key]}</span>
+                    ) : (
+                      <textarea
+                        value={Project[key]}
+                        onChange={(e) => handleChange(key, e.target.value)}
+                        rows="4"
+                        style={{
+                          width: "100%",
+                          padding: "8px",
+                          fontSize: "1em",
+                          border: "1px solid #ccc",
+                          borderRadius: "5px",
+                        }}
+                      />
+                    )}
                   </td>
                 </tr>
               ) : null
@@ -248,7 +252,7 @@ const ProjectEdit = () => {
           <tbody>
             <tr>
               <th>이름</th>
-              <td>{Project?.Project_Participant}</td>
+              <td>{Project?.project_participant}</td>
             </tr>
           </tbody>
         </table>
