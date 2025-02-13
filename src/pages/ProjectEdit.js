@@ -21,7 +21,7 @@ const ProjectEdit = () => {
   // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
   const user = JSON.parse(localStorage.getItem("user"));
 
-  //필드 매핑(프로젝트 요소가 추가되면 여기서 매핑해줘야 함, 그래야 표에 표시됨)
+  //필드 매핑(프로젝트 요소가 DB에추가되면 여기서 매핑해줘야 함, 그래야 표에 표시됨)
   const fieldMappings = {
     Category: "구분",
     Status: "진행 상황",
@@ -45,15 +45,15 @@ const ProjectEdit = () => {
   };
 
   // 사용자 로그인 확인
-  useEffect(() => {
-    fetchLoggedInUser();
+  // useEffect(() => {
+  //   fetchLoggedInUser();
 
-    if (!user) {
-      alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
-      navigate("/");
-      return;
-    }
-  }, []);
+  //   if (!user) {
+  //     alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
+  //     navigate("/");
+  //     return;
+  //   }
+  // }, []);
 
   // 프로젝트 코드가 변경될 때 마다 fetchData 실행
   useEffect(() => {
@@ -116,7 +116,7 @@ const ProjectEdit = () => {
         Sales_Representative: "조우성",
         Project_PM: "조우성",
         Project_Manager: "-",
-        Project_Participant: "조우성, 이영섭",
+        //Project_Participant: "조우성, 이영섭",
         Business_Details_and_Notes: "📌 사용인장: 1번 도장",
         Changes: "변경사항입니다",
       };
