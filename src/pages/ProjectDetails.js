@@ -80,7 +80,7 @@ const ProjectDetails = () => {
   const fetchProjectDetails = async () => {
     setLoading(true);
     try {
-      /*
+      
       const response = await fetch(
         `${apiUrl}/project/get_project_details?project_code=${projectCode}`
       );
@@ -90,9 +90,10 @@ const ProjectDetails = () => {
       const data = await response.json();
       // 응답이 { project: { ... } } 형태라면:
       console.log("project response : ", data);
-      setProject(data.project);*/
+      setProject(data.project);
 
       //더미데이터 삽입
+      /*
       const dummyData = {
         category: "유지보수",
         status: "수행",
@@ -114,6 +115,7 @@ const ProjectDetails = () => {
         changes: "변경사항입니다",
       };
       setProject(dummyData);
+      */
     } catch (err) {
       setError(err.message);
     } finally {

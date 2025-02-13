@@ -94,7 +94,7 @@ const ProjectEdit = () => {
       console.log("project response : ", data);
       setProject(data.project);
 
-      //더미데이터 삽입
+      /*//더미데이터 삽입
       const dummyData = {
         category: "유지보수",
         status: "수행",
@@ -115,7 +115,7 @@ const ProjectEdit = () => {
         business_details_and_notes: "📌 사용인장: 1번 도장",
         cchanges: "변경사항입니다",
       };
-      setProject(dummyData);
+      setProject(dummyData);*/
     } catch (err) {
       setError(err.message);
     } finally {
