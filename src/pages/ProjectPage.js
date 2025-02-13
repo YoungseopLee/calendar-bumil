@@ -58,7 +58,7 @@ const ProjectPage = () => {
   //   }
   // }, [projects]);
 
-  // ✅ API 호출 
+  // ✅ API 호출
   const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
   useEffect(() => {
     const fetchProjects = async () => {
@@ -109,15 +109,15 @@ const ProjectPage = () => {
 
     const matchesSearch =
       searchCategory === "projectName"
-        ? project.name.includes(searchQuery)
+        ? (project.name || "").includes(searchQuery)
         : searchCategory === "owner"
-        ? project.owner.includes(searchQuery)
+        ? (project.owner || "").includes(searchQuery)
         : searchCategory === "pm"
-        ? project.pm.includes(searchQuery)
-        : project.code.includes(searchQuery);
+        ? (project.pm || "").includes(searchQuery)
+        : (project.code || "").includes(searchQuery);
 
     const matchesStatus = selectedStatus
-      ? project.status === selectedStatus
+      ? (project.status || "") === selectedStatus
       : true;
 
     return (
