@@ -15,68 +15,29 @@ const ProjectPage = () => {
   const [searchQuery, setSearchQuery] = useState(""); // 검색 값
   const [selectedStatus, setSelectedStatus] = useState(""); // ✅ 선택된 상태 저장
 
-  // // ✅ 더미 데이터 생성 함수
-  // const generateDummyProjects = (count) => {
-  //   const groups = [
-  //     "구축 인프라",
-  //     "구축 SW",
-  //     "유지보수 인프라",
-  //     "유지보수 SW",
-  //     "연구과제",
-  //   ];
-  //   const statuses = ["제안", "진행 중", "완료"];
-  //   const salesReps = ["김영수", "박진우", "이민정", "최동영", "서정교"];
-  //   const pmList = ["주성호", "이현재", "최영철", "이종우", "한지민"];
-
-  //   return Array.from({ length: count }, (_, index) => {
-  //     const startDate = new Date(
-  //       2025,
-  //       Math.floor(Math.random() * 12),
-  //       Math.floor(Math.random() * 28) + 1
-  //     );
-  //     const endDate = new Date(startDate);
-  //     endDate.setDate(endDate.getDate() + Math.floor(Math.random() * 180) + 1);
-
-  //     return {
-  //       id: index + 1,
-  //       code: "20250122_00004",
-  //       name: `프로젝트 ${index + 1}`,
-  //       group: groups[Math.floor(Math.random() * groups.length)],
-  //       owner: salesReps[Math.floor(Math.random() * salesReps.length)],
-  //       pm: pmList[Math.floor(Math.random() * pmList.length)],
-  //       status: statuses[Math.floor(Math.random() * statuses.length)],
-  //       startDate: startDate.toISOString().split("T")[0],
-  //       endDate: endDate.toISOString().split("T")[0],
-  //     };
-  //   });
-  // };
-
-  // // ✅ 더미 데이터 설정
-  // useEffect(() => {
-  //   if (projects.length === 0) {
-  //     setProjects(generateDummyProjects(150)); // 150개 생성
-  //   }
-  // }, [projects]);
-
   // ✅ API 호출
   const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = await fetch(`${apiUrl}/project/get_all_project`);
         if (response.ok) {
           const data = await response.json();
+          console.log("API 응답 데이터:", data); // ✅ 데이터 확인 로그 추가
+
           const transformedProjects = data.projects.map((proj) => ({
-            id: proj.Project_Code,
-            code: proj.Project_Code,
-            name: proj.Project_Name,
-            group: proj.Group_Name,
-            owner: proj.Sales_Representative,
-            pm: proj.Project_PM,
-            status: proj.Status,
-            startDate: proj.Business_Start_Date,
-            endDate: proj.Business_End_Date,
+            id: proj.Project_Code || "",
+            code: proj.Project_Code || "",
+            name: proj.Project_Name || "",
+            group: proj.Group_Name || "",
+            owner: proj.Sales_Representative || "",
+            pm: proj.Project_PM || "",
+            status: proj.Status || "",
+            startDate: proj.Business_Start_Date || "",
+            endDate: proj.Business_End_Date || "",
           }));
+
           setProjects(transformedProjects);
         } else {
           console.error("프로젝트 데이터를 불러오지 못했습니다.");
@@ -117,7 +78,7 @@ const ProjectPage = () => {
         : (project.code || "").includes(searchQuery);
 
     const matchesStatus = selectedStatus
-      ? (project.status || "") === selectedStatus
+      ? project.status === selectedStatus
       : true;
 
     return (
