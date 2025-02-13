@@ -98,8 +98,8 @@ def signup():
         (name, position, department, email, phone_number, password, role_id, status, is_delete_yn, first_login_yn, created_at, updated_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s, '출근', 'n', 'n', NOW(), NOW())
         """
-        # 0: admin, 1: pa(project admin), 2: pm(project manager), 3: user
-        default_role_id = 3  
+        # AD_ADMIN, PR_ADMIN, PR_MANAGER, USR_GENERAL
+        default_role_id = "USR_GENERAL"
         values = (name, position, department, email, phone, hashed_password, default_role_id)
         cursor.execute(sql, values)
         conn.commit()

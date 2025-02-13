@@ -295,6 +295,7 @@ def edit_project():
     try:
         data = request.get_json()
 
+        # 프로젝트 기본 정보
         new_project_code = data.get('Project_Code')
         category = data.get('Category')
         status = data.get('Status')
@@ -312,11 +313,18 @@ def edit_project():
         changes = data.get('Changes')
         group_name = data.get('Group_Name')
 
+        # 선택적으로, 클라이언트가 할당 사용자 목록을 전달할 수 있음.
+        assigned_user_ids = data.get('Assigned_User_Ids')
+
+        # 현재 프로젝트 여부: 상태가 "진행 중"이면 'Y', 아니면 'N'
+        current_project_yn = 'y' if status == "진행 중" else 'n'
+
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
 
         cursor = conn.cursor(dictionary=True)
+        # 기존 프로젝트가 있는지 확인 (프로젝트 수정 시, project_code가 기존과 동일해야 함)
         cursor.execute("""
             SELECT project_code 
             FROM tb_project 
@@ -326,9 +334,6 @@ def edit_project():
         if not old_project:
             return jsonify({'message': '수정할 프로젝트를 찾을 수 없습니다.'}), 404
         old_project_code = old_project['project_code']
-
-        # 현재 프로젝트 여부: 상태가 "진행 중"이면 'Y', 아니면 'N'
-        current_project_yn = 'y' if status == "진행 중" else 'n'
 
         # tb_project 업데이트
         cursor = conn.cursor()
@@ -358,23 +363,35 @@ def edit_project():
         values_project = (
             category, status, business_start_date, business_end_date,
             project_name, customer, supplier, person_in_charge, contact_number,
-            sales_representative, project_pm, project_manager, business_details_and_notes, changes,
-            group_name, new_project_code, updated_by,
+            sales_representative, project_pm, project_manager,
+            business_details_and_notes, changes, group_name,
+            new_project_code, updated_by,
             old_project_code
         )
         cursor.execute(sql_project, values_project)
 
-        # tb_project_user 업데이트
-        sql_project_user = """
-        UPDATE tb_project_user
-        SET 
-            project_code = %s,
-            current_project_yn = %s,
-            updated_at = NOW(),
-            updated_by = %s
-        WHERE project_code = %s AND is_delete_yn = 'n'
-        """
-        cursor.execute(sql_project_user, (new_project_code, current_project_yn, updated_by, old_project_code))
+        # tb_project_user 업데이트 (옵션)
+        if assigned_user_ids is not None:
+            cursor.execute("DELETE FROM tb_project_user WHERE project_code = %s", (old_project_code,))
+            sql_project_user = """
+            INSERT INTO tb_project_user
+            (
+                project_code,
+                user_id,
+                current_project_yn,
+                is_delete_yn,
+                created_at,
+                updated_at,
+                created_by,
+                updated_by
+            )
+            VALUES
+            (
+                %s, %s, %s, 'n', NOW(), NOW(), %s, %s
+            )
+            """
+            for uid in assigned_user_ids:
+                cursor.execute(sql_project_user, (new_project_code, uid, current_project_yn, updated_by, updated_by))
 
         conn.commit()
         return jsonify({'message': '프로젝트가 수정되었습니다.'}), 200
@@ -403,7 +420,7 @@ def delete_project(project_code):
         cursor = conn.cursor()
         
         # 논리 삭제: is_delete_yn 값을 'Y'로 업데이트
-        sql = "UPDATE tb_project SET is_delete_yn = 'Y' WHERE project_code = %s"
+        sql = "UPDATE tb_project SET is_delete_yn = 'y' WHERE project_code = %s"
         cursor.execute(sql, (project_code,))
         conn.commit()
         
