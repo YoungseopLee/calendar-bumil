@@ -76,7 +76,7 @@ const ProjectCreate = () => {
       }
 
       alert("프로젝트가 성공적으로 생성되었습니다!");
-      navigate("/project"); // ✅ 프로젝트 목록으로 이동
+      navigate("/projects"); // ✅ 프로젝트 목록으로 이동
     } catch (error) {
       setError(error.message);
     }
