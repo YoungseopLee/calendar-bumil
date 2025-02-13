@@ -59,17 +59,15 @@ const ProjectDetails = () => {
     }
   }, [projectCode]);
 
-  //project 업데이트 확인
+  //Employee 업데이트 확인
   useEffect(() => {
-    console.log("Project 업데이트됨:", Project);
-  }, [Project]); // Project가 변경될 때마다 실행
+    console.log("Employees 업데이트됨:", employees);
+  }, [employees]); // Project가 변경될 때마다 실행
 
-  //수정 시 프로젝트 인원 상태 표시에 필요한 인원 목록 데이터 불러오기
+  //프로젝트 인원 상태 표시에 필요한 인원 목록 데이터 불러오기
   useEffect(() => {
-    if (loggedInUserId) {
       fetchEmployees();
-    }
-  }, [loggedInUserId]);
+  }, []);
 
   const handleLogout = () => {
     alert("세션이 만료되었습니다. 다시 로그인해주세요.");
@@ -99,8 +97,8 @@ const ProjectDetails = () => {
         category: "유지보수",
         status: "수행",
         project_code: "20250122_00004",
-        business_start_date: "2025-01-01",
-        business_end_date: "2025-12-31",
+        business_start_date: "Wed, 1 Jan 2025 00:00:00 GMT",
+        business_end_date: "Wed, 31 Dec 2025 00:00:00 GMT",
         group_name: "그룹명 A",
         project_name:
           "유지보수 인프라 대진정보통신(주) - 국가정보자원관리원 대구센터",
@@ -111,6 +109,7 @@ const ProjectDetails = () => {
         sales_representative: "조우성",
         project_pm: "조우성",
         project_manager: "-",
+        project_participant: "조우성, 이영섭",
         business_details_and_notes: "📌 사용인장: 1번 도장",
         changes: "변경사항입니다",
       };
@@ -161,10 +160,7 @@ const ProjectDetails = () => {
 
       const data = await response.json();
       setEmployees(data.users);
-
-      const uniqueDepartments = Array.from(
-        new Set(data.users.map((emp) => emp.department))
-      );
+      console.log("fetchEmployees");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -179,24 +175,67 @@ const ProjectDetails = () => {
     navigate(`/project-edit?project_code=${projectCode}`);
   };
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    if (isNaN(date)) return dateString; // 날짜가 아니면 변환하지 않음
+    return date.toISOString().split("T")[0]; // 'YYYY-MM-DD' 형식으로 변환
+  };
+
   const ProjectTable = ({ project }) => {
     return (
       <table className="project-table">
         <tbody>
-          {Object.entries(project).map(([key, value]) => (
-            <tr key={key}>
-              <th>{fieldMappings[key] || key}</th>
-              <td>
-                {typeof value === "object" && value !== null
-                  ? JSON.stringify(value)
-                  : value}
-              </td>
+          {Object.entries(project)
+            .filter(([key]) => key !== "project_participant") // ❌ Project_Participant 제외
+            .map(([key, value]) => (
+              <tr key={key}>
+                <th>{fieldMappings[key] || key}</th>
+                <td>{key.includes("date") ? formatDate(value) : value}</td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    );
+  };
+
+  const ParticipantsTable = ({ participants, employees }) => {
+    const participantList = participants ? participants.split(",").map(name => name.trim()) : [];
+  
+    // 참여자 목록을 직원 데이터와 매칭
+    const matchedParticipants = participantList.map((participant) => {
+      const employee = employees.find(emp => emp.name === participant);
+      return {
+        name: participant,
+        department: employee ? employee.department : "정보 없음",
+        phone: employee ? employee.phone_number : "정보 없음",
+        status: employee ? employee.status : "정보 없음",
+      };
+    });
+  
+    return (
+      <table className="project-table">
+        <thead>
+          <tr>
+            <th>부서</th>
+            <th>이름</th>
+            <th>전화번호</th>
+            <th>상태</th>
+          </tr>
+        </thead>
+        <tbody>
+          {matchedParticipants.map((participant, index) => (
+            <tr key={index}>
+              <td>{participant.department}</td>
+              <td>{participant.name}</td>
+              <td>{participant.phone}</td>
+              <td>{participant.status}</td>
             </tr>
           ))}
         </tbody>
       </table>
     );
   };
+  
 
   return (
     <div className="app">
@@ -217,14 +256,8 @@ const ProjectDetails = () => {
         )}
 
         <h3 className="section-title">🔹 인력</h3>
-        <table className="project-table">
-          <tbody>
-            <tr>
-              <th>이름</th>
-              <td>{Project?.Project_Participant}</td>
-            </tr>
-          </tbody>
-        </table>
+        <ParticipantsTable participants={Project?.project_participant} employees={employees} />
+      
       </div>
     </div>
   );
