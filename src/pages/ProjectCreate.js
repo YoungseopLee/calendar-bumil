@@ -1,219 +1,168 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import { FaEdit, FaTrash } from "react-icons/fa";
-import "./ProjectDetails.css";
+import "./ProjectCreate.css";
 
-const ProjecCreate = () => {
-  const [employees, setEmployees] = useState([]);
-  const [loggedInUserId, setLoggedInUserId] = useState(null);
-  const [Project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [message, setMessage] = useState(""); // 저장 메시지
-
-  const apiUrl = process.env.REACT_APP_API_URL;
+const ProjectCreate = () => {
   const navigate = useNavigate();
-  const location = useLocation();
+  const apiUrl = process.env.REACT_APP_API_URL || "http://3.38.20.237";
 
-  const projectCode = new URLSearchParams(location.search).get("project_code");
+  // ✅ 프로젝트 입력 상태 관리 (기본값 포함)
+  const [formData, setFormData] = useState({
+    project_code: "",  // 프로젝트 코드
+    project_name: "",  // 프로젝트명
+    category: "",  // 카테고리
+    status: "",  // 상태
+    business_start_date: "",  // 사업 시작일
+    business_end_date: "",  // 사업 종료일
+    customer: "",  // 고객
+    supplier: "",  // 공급처
+    person_in_charge: "",  // 담당자
+    contact_number: "",  // 연락처
+    sales_representative: "",  // 영업대표
+    project_pm: "",  // 프로젝트 PM
+    project_manager: "",  // 프로젝트 관리자
+    business_details_and_notes: "",  // 사업 내용 및 특이사항
+    changes: "",  // 변경사항
+    group_name: "",  // 그룹명
+  });
 
-  // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [error, setError] = useState(null);
 
-  //필드 매핑(프로젝트 요소가 DB에추가되면 여기서 매핑해줘야 함, 그래야 표에 표시됨)
-  const fieldMappings = {
-    Category: "구분",
-    Status: "진행 상황",
-    Project_Code: "프로젝트 코드",
-    Business_Start_Date: "사업 시작일",
-    Business_End_Date: "사업 종료일",
-    Group_Name: "그룹 명",
-    Project_Name: "프로젝트 명",
-    Customer: "매출처",
-    Supplier: "납품처",
-    Person_in_Charge: "담당자",
-    Contact_Number: "연락처",
-    Expected_Invoice_Date: "청구 예정일",
-    Expected_Payment_Date: "수금 예정일",
-    Sales_Representative: "영업대표",
-    Project_PM: "수행 PM",
-    Project_Manager: "프로젝트 관리자",
-    Project_Participant: "프로젝트 참여자",
-    Business_Details_and_Notes: "사업 내용 및 특이사항",
-    Changes: "변경사항",
+  // ✅ 입력값 변경 핸들러
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 사용자 로그인 확인
-  // useEffect(() => {
-  //   fetchLoggedInUser();
+  // ✅ 프로젝트 추가 API 호출
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
 
-  //   if (!user) {
-  //     alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
-  //     navigate("/");
-  //     return;
-  //   }
-  // }, []);
-
-  // 프로젝트 코드가 변경될 때 마다 fetchData 실행
-  useEffect(() => {
-    if (projectCode) {
-      fetchProjectDetails();
+    // ✅ 필수 입력값 검증 (입력되지 않은 값이 있으면 경고)
+    if (!formData.project_code || !formData.category || !formData.status ||
+        !formData.business_start_date || !formData.business_end_date || 
+        !formData.project_name || !formData.project_pm) {
+      setError("⚠️ 필수 입력값을 모두 입력해주세요.");
+      return;
     }
-  }, [projectCode]);
 
-  //project 업데이트 확인
-  useEffect(() => {
-    console.log("Project 업데이트됨:", Project);
-  }, [Project]); // Project가 변경될 때마다 실행
-
-  //수정 시 프로젝트 인원 상태 표시에 필요한 인원 목록 데이터 불러오기
-  useEffect(() => {
-    if (loggedInUserId) {
-      fetchEmployees();
-    }
-  }, [loggedInUserId]);
-
-  const handleLogout = () => {
-    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
-  };
-
-  //로그인 유저 확인 함수
-  const fetchLoggedInUser = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/auth/get_logged_in_user`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.status === 401) {
-        handleLogout(); // 401 응답 시 자동 로그아웃 처리
-        return;
+      if (!token) {
+        throw new Error("로그인이 필요합니다.");
       }
 
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("user", JSON.stringify(data.user)); // 최신 상태 업데이트
-      } else {
-        console.error("사용자 정보 불러오기 실패");
-      }
-    } catch (error) {
-      console.error("로그인 사용자 정보 불러오기 실패:", error);
-    }
-  };
-
-  //사용자 목록 데이터 가져오기(프로젝트 인원 상태 표시에 필요함)
-  const fetchEmployees = async () => {
-    try {
-      const response = await fetch(`${apiUrl}/user/get_users`);
-      if (!response.ok)
-        throw new Error("사용자 데이터를 가져오는 데 실패했습니다.");
-
-      const data = await response.json();
-      setEmployees(data.users);
-
-      const uniqueDepartments = Array.from(
-        new Set(data.users.map((emp) => emp.department))
-      );
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) return <p>데이터를 불러오는 중...</p>;
-  if (error) return <p>오류 발생: {error}</p>;
-
-  // 입력값 변경 시 상태 업데이트
-  const handleChange = (key, value) => {
-    setProject((prevProject) => ({
-      ...prevProject,
-      [key]: value,
-    }));
-  };
-
-  // 수정된 데이터 저장 API 호출
-  const handleSave = async () => {
-    try {
-      const response = await fetch(`${apiUrl}/project/edit_project`, {
+      const response = await fetch(`${apiUrl}/project/add_project`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(Project),
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        throw new Error("프로젝트 업데이트 실패");
+        const errorMessage = await response.json();
+        throw new Error(errorMessage.message || "프로젝트 생성에 실패했습니다.");
       }
 
-      setMessage("프로젝트가 성공적으로 저장되었습니다!");
-    } catch (err) {
-      setMessage("저장 중 오류 발생: " + err.message);
+      alert("프로젝트가 성공적으로 생성되었습니다!");
+      navigate("/project"); // ✅ 프로젝트 목록으로 이동
+    } catch (error) {
+      setError(error.message);
     }
   };
 
   return (
     <div className="app">
       <Sidebar />
-      <div className="project-container">
-        <div className="edit-button-container">
-          <h2 className="project-title">프로젝트 생성</h2>
-        </div>
-        <h3 className="section-title">🔹 사업개요</h3>
+      <div className="project-create-container">
+        <h2 className="title">프로젝트 생성</h2>
+        {error && <p className="error-message">⚠️ {error}</p>}
+        
+        <form onSubmit={handleSubmit} className="project-form">
+          <div className="form-row">
+            <label>프로젝트 코드:</label>
+            <input type="text" name="project_code" value={formData.project_code} onChange={handleChange} required />
+          </div>
 
-        {message && <p className="message">{message}</p>}
+          <div className="form-row">
+            <label>프로젝트명:</label>
+            <input type="text" name="project_name" value={formData.project_name} onChange={handleChange} required />
+          </div>
 
-        <table className="project-table">
-          <tbody>
-            {Object.entries(fieldMappings).map(([key, label]) =>
-              Project && Project[key] !== undefined ? (
-                <tr key={key}>
-                  <th>{label}</th>
-                  <td>
-                    <textarea
-                      value={Project[key]}
-                      onChange={(e) => handleChange(key, e.target.value)}
-                      rows="4" // 기본 높이 조정
-                      style={{
-                        width: "100%",
-                        padding: "8px",
-                        fontSize: "1em",
-                        border: "1px solid #ccc",
-                        borderRadius: "5px",
-                      }}
-                    />
-                  </td>
-                </tr>
-              ) : null
-            )}
-          </tbody>
-        </table>
+          <div className="form-row">
+            <label>카테고리:</label>
+            <select name="category" value={formData.category} onChange={handleChange} required>
+              <option value="">선택하세요</option>
+              <option value="구축 인프라">구축 인프라</option>
+              <option value="구축 SW">구축 SW</option>
+              <option value="유지보수 인프라">유지보수 인프라</option>
+              <option value="유지보수 SW">유지보수 SW</option>
+              <option value="연구과제">연구과제</option>
+            </select>
+          </div>
 
-        <h3 className="section-title">🔹 인력</h3>
-        <table className="project-table">
-          <tbody>
-            <tr>
-              <th>이름</th>
-              <td>{Project?.Project_Participant}</td>
-            </tr>
-          </tbody>
-        </table>
+          <div className="form-row">
+            <label>상태:</label>
+            <select name="status" value={formData.status} onChange={handleChange} required>
+              <option value="">선택하세요</option>
+              <option value="제안">제안</option>
+              <option value="진행 중">진행 중</option>
+              <option value="완료">완료</option>
+            </select>
+          </div>
 
-        <button onClick={handleSave} className="save-button">
-          저장
-        </button>
+          <div className="form-row">
+            <label>사업 기간:</label>
+            <div className="date-container">
+              <input type="date" name="business_start_date" value={formData.business_start_date} onChange={handleChange} required />
+              <span className="date-separator">~</span>
+              <input type="date" name="business_end_date" value={formData.business_end_date} onChange={handleChange} required />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <label>고객:</label>
+            <input type="text" name="customer" value={formData.customer} onChange={handleChange} />
+          </div>
+
+          <div className="form-row">
+            <label>공급처:</label>
+            <input type="text" name="supplier" value={formData.supplier} onChange={handleChange} />
+          </div>
+
+          <div className="form-row">
+            <label>담당자:</label>
+            <input type="text" name="person_in_charge" value={formData.person_in_charge} onChange={handleChange} />
+          </div>
+
+          <div className="form-row">
+            <label>연락처:</label>
+            <input type="text" name="contact_number" value={formData.contact_number} onChange={handleChange} />
+          </div>
+
+          <div className="form-row">
+            <label>영업대표:</label>
+            <input type="text" name="sales_representative" value={formData.sales_representative} onChange={handleChange} />
+          </div>
+
+          <div className="form-row">
+            <label>PM:</label>
+            <input type="text" name="project_pm" value={formData.project_pm} onChange={handleChange} required />
+          </div>
+
+          <div className="form-row">
+            <label>비고:</label>
+            <textarea name="business_details_and_notes" value={formData.business_details_and_notes} onChange={handleChange} />
+          </div>
+
+          <div className="button-container">
+            <button type="submit" className="save-button">프로젝트 생성</button>
+            <button type="button" className="cancel-button" onClick={() => navigate("/project")}>취소</button>
+          </div>
+        </form>
       </div>
     </div>
   );

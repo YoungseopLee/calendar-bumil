@@ -1,0 +1,117 @@
+/* ✅ 프로젝트 생성 페이지 컨테이너 */
+.project-create-container {
+    width: 100%;
+    max-width: 600px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: auto;
+    font-family: Arial, sans-serif;
+}
+
+/* ✅ 제목 스타일 */
+.title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* ✅ 에러 메시지 */
+.error-message {
+    color: red;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* ✅ 입력 폼 스타일 */
+.project-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ✅ 입력 필드와 라벨을 가로로 정렬 */
+.form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.form-row label {
+    width: 120px;
+    font-weight: bold;
+    text-align: left;
+}
+
+/* ✅ 모든 입력 필드 */
+.form-row input,
+.form-row select,
+.form-row textarea {
+    flex: 1;
+    padding: 8px;
+    font-size: 1em;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* ✅ 날짜 입력 필드 정렬 */
+.date-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-separator {
+    font-weight: bold;
+}
+
+/* ✅ 버튼 컨테이너 (가로 정렬 유지) */
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* 버튼 간격 */
+}
+
+/* ✅ 버튼 공통 스타일 */
+.save-button, .cancel-button {
+    flex: 1;  /* ✅ 동일한 너비 유지 */
+    padding: 12px 0;
+    font-size: 1em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+/* ✅ 프로젝트 생성 버튼 (파란색) */
+.save-button {
+    margin-left : 0px;
+    background-color: #007bff;
+    color: white;
+}
+
+.save-button:hover {
+    background-color: #0056b3;
+}
+
+/* ✅ 취소 버튼 (회색) */
+.cancel-button {
+    background-color: #ccc;
+    color: #333;
+}
+
+.cancel-button:hover {
+    background-color: #999;
+}
+
+/* ✅ 반응형 - 모바일 환경에서 버튼이 세로 정렬되도록 */
+@media screen and (max-width: 480px) {
+    .button-container {
+        flex-direction: column; /* ✅ 세로 정렬 */
+        gap: 5px;
+    }
+}

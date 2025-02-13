@@ -13,6 +13,7 @@ import Profile from "./pages/Profile";
 import ProjectDetails from "./pages/ProjectDetails"
 import ProjectPage from "./pages/ProjectPage";  // 추가
 import ProjectEdit from "./pages/ProjectEdit";
+import ProjectCreate from "./pages/ProjectCreate";
 
 function App() {
   return (
@@ -44,6 +45,8 @@ function App() {
         <Route path="/project-details" element={<ProjectDetails />} />
         {/* 프로젝트 상세-수정 페이지 */}
         <Route path="/project-edit" element={<ProjectEdit />} />
+        {/* 프로젝트 생성 */}
+        <Route path="/add-project" element={<ProjectCreate />} />
       </Routes>
     </Router>
   );
