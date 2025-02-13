@@ -108,8 +108,6 @@ const ProjectDetails = () => {
         supplier: "대진정보통신(주)",
         person_in_charge: "최치후 부장",
         contact_number: "054-1234-1234",
-        expected_invoice_date: "2025-01-01",
-        expected_payment_date: "2025-01-01",
         sales_representative: "조우성",
         project_pm: "조우성",
         project_manager: "-",
