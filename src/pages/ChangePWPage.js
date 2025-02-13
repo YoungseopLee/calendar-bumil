@@ -23,7 +23,8 @@ const ChangePWPage = () => {
 
     // 비밀번호 확인 검사
     if (formData.new_password !== formData.confirm_password) {
-      newErrors.confirm_password = "비밀번호와 비밀번호 확인이 일치하지 않습니다.";
+      newErrors.confirm_password =
+        "비밀번호와 비밀번호 확인이 일치하지 않습니다.";
     }
 
     setErrors(newErrors);
@@ -36,7 +37,6 @@ const ChangePWPage = () => {
       ...prevData,
       [name]: value,
     }));
-
   };
 
   const handleSubmit = async (e) => {
@@ -61,7 +61,7 @@ const ChangePWPage = () => {
       if (response.ok) {
         setchangepwStatus("비밀번호 변경이 완료되었습니다!");
         alert("비밀번호 변경 성공!");
-        window.history.back();
+        navigator("/projects");
       } else {
         setchangepwStatus(data.message);
       }
@@ -95,7 +95,9 @@ const ChangePWPage = () => {
               onChange={handleChange}
               required
             />
-            {errors.new_password && <div className="error">{errors.new_password}</div>}
+            {errors.new_password && (
+              <div className="error">{errors.new_password}</div>
+            )}
           </div>
           <div className="form-group-changepw">
             <label htmlFor="confirm_password">변경 비밀번호 확인</label>
@@ -106,7 +108,9 @@ const ChangePWPage = () => {
               onChange={handleChange}
               required
             />
-            {errors.confirm_password && <div className="error">{errors.confirm_password}</div>}
+            {errors.confirm_password && (
+              <div className="error">{errors.confirm_password}</div>
+            )}
           </div>
           <div className="changepw-button-container">
             <button type="submit" className="changepw-button">
