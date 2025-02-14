@@ -27,7 +27,7 @@ const ProjectPage = () => {
           console.error("❌ 로그인 토큰이 없습니다.");
           return;
         }
-
+        
         const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
           method: "GET",
           headers: {
@@ -131,7 +131,7 @@ const ProjectPage = () => {
   return (
     <div className="project-page">
       <Sidebar />
-      {roleId != "USR_GENERAL" && <AddProjectButton />}
+      {roleId == "USR_GENERAL" && <AddProjectButton />}
       <div className="content">
         <div className="projectPage-box">
           <h1 className="title">프로젝트 목록</h1>
