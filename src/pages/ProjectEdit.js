@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import Select from "react-select";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import "./ProjectDetails.css";
 
@@ -11,7 +12,8 @@ const ProjectEdit = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(""); // 저장 메시지
-
+  const [selectedUser, setSelectedUser] = useState(null); // 유저 추가 시 선택된 유저 State
+  const [users, setUsers] = useState([]); // 유저 추가 시 유저 목록을 불러오기 위한 State
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,19 +66,33 @@ const ProjectEdit = () => {
   //Employee 업데이트 확인
   useEffect(() => {
     console.log("Employees 업데이트됨:", employees);
-  }, [employees]); // Project가 변경될 때마다 실행
+  
+    // 이미 할당된 유저 ID 목록을 Set으로 변환 (빠른 조회를 위해)
+    const assignedIds = new Set(
+      Project?.assigned_user_ids?.split(",").map(Number) || []
+    );
+  
+    // employees 목록에서 assigned_user_ids에 없는 유저만 필터링
+    const availableUsers = employees
+      .filter((user) => !assignedIds.has(user.id)) // 이미 참여한 인원 제외
+      .map((user) => ({
+        value: user.id,
+        label: `${user.id} - ${user.name} (${user.department})`,
+      }));
+  
+    setUsers(availableUsers);
+  }, [employees, Project?.assigned_user_ids]); // employees 또는 assigned_user_ids가 변경될 때 실행
+  
+
+  //users 업데이트 확인
+  useEffect(() => {
+    console.log("users 업데이트됨:", user);
+  }, [users]); // users가 변경될 때마다 실행
 
   //프로젝트 인원 표시에 필요한 인원 목록 데이터 불러오기
   useEffect(() => {
       fetchEmployees();
   }, []);
-
-  //수정 시 프로젝트 인원 상태 표시에 필요한 인원 목록 데이터 불러오기
-  useEffect(() => {
-    if (loggedInUserId) {
-      fetchEmployees();
-    }
-  }, [loggedInUserId]);
 
   const handleLogout = () => {
     alert("세션이 만료되었습니다. 다시 로그인해주세요.");
@@ -197,22 +213,35 @@ const ProjectEdit = () => {
     return isNaN(date.getTime()) ? dateString : date.toISOString().split("T")[0];
   };
 
+  const handleRemoveParticipant = (userId) => {
+    setProject((prevProject) => {
+      // 기존 assigned_user_ids에서 해당 ID를 제거
+      const updatedIds = prevProject.assigned_user_ids
+        ? prevProject.assigned_user_ids.split(",").map(Number).filter(id => id !== userId)
+        : [];
+  
+      return {
+        ...prevProject,
+        assigned_user_ids: updatedIds.join(","), // 쉼표로 다시 합쳐서 저장
+      };
+    });
+  };
 
   const ParticipantsTable = ({ assignedUsersIds, employees }) => {
     if (!assignedUsersIds || assignedUsersIds.length === 0) {
       return <p>참여 인원이 없습니다.</p>;
     }
-  // 참여자 ID 목록을 직원 데이터와 매칭
-  const matchedParticipants = assignedUsersIds.map((userId) => {
-    const employee = employees.find((emp) => emp.id === userId);
-    return {
-      id: userId,
-      name: employee ? employee.name : "정보 없음",
-      department: employee ? employee.department : "정보 없음",
-      phone: employee ? employee.phone_number : "정보 없음",
-      status: employee ? employee.status : "정보 없음",
-    };
-  });
+    // 참여자 ID 목록을 직원 데이터와 매칭
+    const matchedParticipants = assignedUsersIds.map((userId) => {
+      const employee = employees.find((emp) => emp.id === userId);
+      return {
+        id: userId,
+        name: employee ? employee.name : "정보 없음",
+        department: employee ? employee.department : "정보 없음",
+        phone: employee ? employee.phone_number : "정보 없음",
+        status: employee ? employee.status : "정보 없음",
+      };
+    });
   
     return (
       <table className="project-table">
@@ -222,6 +251,7 @@ const ProjectEdit = () => {
             <th>이름</th>
             <th>전화번호</th>
             <th>상태</th>
+            <th>삭제</th>
           </tr>
         </thead>
         <tbody>
@@ -231,6 +261,14 @@ const ProjectEdit = () => {
               <td>{participant.name}</td>
               <td>{participant.phone}</td>
               <td>{participant.status}</td>
+              <td>
+                <button 
+                  className="remove-button" 
+                  onClick={() => handleRemoveParticipant(participant.id)}
+                >
+                  ❌
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
@@ -247,7 +285,7 @@ const ProjectEdit = () => {
         business_start_date: formatDate(Project.business_start_date),
         business_end_date: formatDate(Project.business_end_date) 
       };
-
+      console.log("saving project : ", projectToSave);
       const response = await fetch(`${apiUrl}/project/edit_project`, {
         method: "POST",
         headers: {
@@ -267,6 +305,33 @@ const ProjectEdit = () => {
     } catch (err) {
       setMessage("저장 중 오류 발생: " + err.message);
     }
+  };
+
+  const handleAddParticipant = () => {
+    if (!selectedUser) {
+      alert("추가할 참여자를 선택하세요.");
+      return;
+    }
+  
+    setProject((prevProject) => {
+      // 기존 assigned_user_ids를 쉼표로 분리하여 배열로 변환
+      const currentIds = prevProject.assigned_user_ids
+        ? prevProject.assigned_user_ids.split(",").map(Number)
+        : [];
+  
+      // 중복 체크 후 새로운 ID 추가
+      if (!currentIds.includes(selectedUser.value)) {
+        currentIds.push(selectedUser.value);
+      }
+  
+      return {
+        ...prevProject,
+        assigned_user_ids: currentIds.join(","), // 쉼표로 다시 합쳐서 저장
+      };
+    });
+  
+    // 선택한 유저 초기화
+    setSelectedUser(null);
   };
 
   return (
@@ -312,7 +377,28 @@ const ProjectEdit = () => {
 
         <h3 className="section-title">🔹 인력</h3>
         
-        <ParticipantsTable assignedUsersIds={Project?.assigned_user_ids?.split(",").map(Number)} employees={employees} />
+        <ParticipantsTable 
+          assignedUsersIds={Project?.assigned_user_ids?.split(",").map(Number)} 
+          employees={employees} 
+        />
+
+        <div className="form-section">
+          <h3>👥 프로젝트 참여자 추가</h3>
+          <div className="participant-container">
+            <Select
+              className="react-select-container"
+              classNamePrefix="react-select"
+              options={users}
+              value={selectedUser}
+              onChange={setSelectedUser}
+              isSearchable={true}
+              placeholder="참여자 선택"
+            />
+            <button type="button" className="add-button" onClick={handleAddParticipant}>
+              +
+            </button>
+          </div>
+        </div>
 
         {message && <p className="message">{message}</p>}
 
