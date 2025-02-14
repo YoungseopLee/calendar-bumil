@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaPlus, FaTimes } from "react-icons/fa";
+import Select from "react-select";
 import Sidebar from "./Sidebar";
 import "./ProjectCreate.css";
 
@@ -7,31 +9,93 @@ const ProjectCreate = () => {
   const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL || "http://3.38.20.237";
 
-  // ✅ 프로젝트 입력 상태 관리 (기본값 포함)
   const [formData, setFormData] = useState({
-    project_code: "", // 프로젝트 코드
-    project_name: "", // 프로젝트명
-    category: "", // 카테고리
-    status: "", // 상태
-    business_start_date: "", // 사업 시작일
-    business_end_date: "", // 사업 종료일
-    customer: "", // 고객
-    supplier: "", // 공급처
-    person_in_charge: "", // 담당자
-    contact_number: "", // 연락처
-    sales_representative: "", // 영업대표
-    project_pm: "", // 프로젝트 PM
-    project_manager: "", // 프로젝트 관리자
-    business_details_and_notes: "", // 사업 내용 및 특이사항
-    changes: "", // 변경사항
-    group_name: "", // 그룹명
+    project_code: "",
+    project_name: "",
+    category: "",
+    status: "",
+    business_start_date: "",
+    business_end_date: "",
+    customer: "",
+    supplier: "",
+    person_in_charge: "",
+    contact_number: "",
+    sales_representative: "",
+    project_pm: "",
+    project_manager: "",
+    business_details_and_notes: "",
+    changes: "",
+    group_name: "",
+    participants: [],
   });
 
   const [error, setError] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  // ✅ 사용자 불러오기 (참여자 선택용)
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/user/get_users`);
+        if (response.ok) {
+          const data = await response.json();
+          setUsers(
+            data.users.map((user) => ({
+              value: user.id,
+              label: `${user.id} - ${user.name} (${user.department})`,
+            }))
+          );
+        }
+      } catch (error) {
+        console.error("사용자 데이터를 불러오지 못했습니다.", error);
+      }
+    };
+
+    fetchUsers();
+  }, [apiUrl]);
 
   // ✅ 입력값 변경 핸들러
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // ✅ 참여자 추가
+  const handleAddParticipant = () => {
+    if (selectedUser && !formData.participants.some((p) => p.id === selectedUser.value)) {
+      setFormData((prevState) => ({
+        ...prevState,
+        participants: [
+          ...prevState.participants,
+          {
+            id: selectedUser.value,
+            name: selectedUser.label.split(" (")[0],
+            department: selectedUser.label.split(" (")[1].replace(")", ""),
+          },
+        ],
+      }));
+
+      setUsers((prevUsers) => prevUsers.filter((user) => user.value !== selectedUser.value));
+      setSelectedUser(null);
+    }
+  };
+
+  // ✅ 참여자 삭제 (버튼 클릭 시 삭제 + users 리스트에 복원)
+  const handleRemoveParticipant = (userId) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      participants: prevFormData.participants.filter(
+        (participant) => String(participant.id) !== String(userId)
+      ),
+    }));
+
+    const removedUser = formData.participants.find((user) => String(user.id) === String(userId));
+    if (removedUser) {
+      setUsers((prevUsers) => [
+        ...prevUsers,
+        { value: removedUser.id, label: `${removedUser.name} (${removedUser.department})` },
+      ]);
+    }
   };
 
   // ✅ 프로젝트 추가 API 호출
@@ -39,7 +103,6 @@ const ProjectCreate = () => {
     e.preventDefault();
     setError(null);
 
-    // ✅ 필수 입력값 검증 (입력되지 않은 값이 있으면 경고)
     if (
       !formData.project_code ||
       !formData.category ||
@@ -70,13 +133,11 @@ const ProjectCreate = () => {
 
       if (!response.ok) {
         const errorMessage = await response.json();
-        throw new Error(
-          errorMessage.message || "프로젝트 생성에 실패했습니다."
-        );
+        throw new Error(errorMessage.message || "프로젝트 생성에 실패했습니다.");
       }
 
       alert("프로젝트가 성공적으로 생성되었습니다!");
-      navigate("/projects"); // ✅ 프로젝트 목록으로 이동
+      navigate("/projects");
     } catch (error) {
       setError(error.message);
     }
@@ -90,162 +151,94 @@ const ProjectCreate = () => {
         {error && <p className="error-message">⚠️ {error}</p>}
 
         <form onSubmit={handleSubmit} className="project-form">
-          <div className="form-row">
-            <label>프로젝트 코드:</label>
-            <input
-              type="text"
-              name="project_code"
-              value={formData.project_code}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          {/* ✅ 기존 프로젝트 정보 입력 필드 유지 */}
+          {[
+            ["프로젝트 코드", "project_code"],
+            ["프로젝트명", "project_name"],
+            ["고객", "customer"],
+            ["공급처", "supplier"],
+            ["담당자", "person_in_charge"],
+            ["연락처", "contact_number"],
+            ["영업대표", "sales_representative"],
+            ["PM", "project_pm"],
+            ["프로젝트 관리자", "project_manager"],
+            ["변경사항", "changes"],
+            ["그룹명", "group_name"],
+          ].map(([label, name]) => (
+            <div className="form-row" key={name}>
+              <label>{label}:</label>
+              <input type="text" name={name} value={formData[name]} onChange={handleChange} />
+            </div>
+          ))}
 
-          <div className="form-row">
-            <label>프로젝트명:</label>
-            <input
-              type="text"
-              name="project_name"
-              value={formData.project_name}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          {/* ✅ 카테고리 및 상태 */}
+          {[
+            ["카테고리", "category", ["구축 인프라", "구축 SW", "유지보수 인프라", "유지보수 SW", "연구과제"]],
+            ["상태", "status", ["제안", "진행 중", "완료"]],
+          ].map(([label, name, options]) => (
+            <div className="form-row" key={name}>
+              <label>{label}:</label>
+              <select name={name} value={formData[name]} onChange={handleChange}>
+                <option value="">선택하세요</option>
+                {options.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
 
-          <div className="form-row">
-            <label>카테고리:</label>
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              required
-            >
-              <option value="">선택하세요</option>
-              <option value="구축 인프라">구축 인프라</option>
-              <option value="구축 SW">구축 SW</option>
-              <option value="유지보수 인프라">유지보수 인프라</option>
-              <option value="유지보수 SW">유지보수 SW</option>
-              <option value="연구과제">연구과제</option>
-            </select>
-          </div>
-
-          <div className="form-row">
-            <label>상태:</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              required
-            >
-              <option value="">선택하세요</option>
-              <option value="제안">제안</option>
-              <option value="진행 중">진행 중</option>
-              <option value="완료">완료</option>
-            </select>
-          </div>
-
+          {/* ✅ 사업 기간 */}
           <div className="form-row">
             <label>사업 기간:</label>
             <div className="date-container">
-              <input
-                type="date"
-                name="business_start_date"
-                value={formData.business_start_date}
-                onChange={handleChange}
-                required
-              />
+              <input type="date" name="business_start_date" value={formData.business_start_date} onChange={handleChange} required />
               <span className="date-separator">~</span>
-              <input
-                type="date"
-                name="business_end_date"
-                value={formData.business_end_date}
-                onChange={handleChange}
-                required
-              />
+              <input type="date" name="business_end_date" value={formData.business_end_date} onChange={handleChange} required />
             </div>
           </div>
 
+          {/* ✅ 사업 내용 */}
           <div className="form-row">
-            <label>고객:</label>
-            <input
-              type="text"
-              name="customer"
-              value={formData.customer}
-              onChange={handleChange}
-            />
+            <label>사업 내용 및 특이사항:</label>
+            <textarea name="business_details_and_notes" value={formData.business_details_and_notes} onChange={handleChange} />
           </div>
 
-          <div className="form-row">
-            <label>공급처:</label>
-            <input
-              type="text"
-              name="supplier"
-              value={formData.supplier}
-              onChange={handleChange}
-            />
+          {/* ✅ 참여자 선택 */}
+          <div className="form-section">
+            <h3>👥 프로젝트 참여자</h3>
+            <div className="participant-container">
+              <Select
+                className="react-select-container"
+                classNamePrefix="react-select"
+                options={users}
+                value={selectedUser}
+                onChange={setSelectedUser}
+                isSearchable={true}
+                placeholder="참여자 선택"
+              />
+              <button type="button" className="add-button" onClick={handleAddParticipant}>
+                <FaPlus />
+              </button>
+            </div>
+
+            <ul className="participant-list">
+              {formData.participants.map((user) => (
+                <li key={user.id}>
+                  {user.name} ({user.department})
+                  <button type="button" className="remove-button" onClick={() => handleRemoveParticipant(user.id)}>
+                    <FaTimes />
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <div className="form-row">
-            <label>담당자:</label>
-            <input
-              type="text"
-              name="person_in_charge"
-              value={formData.person_in_charge}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="form-row">
-            <label>연락처:</label>
-            <input
-              type="text"
-              name="contact_number"
-              value={formData.contact_number}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="form-row">
-            <label>영업대표:</label>
-            <input
-              type="text"
-              name="sales_representative"
-              value={formData.sales_representative}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="form-row">
-            <label>PM:</label>
-            <input
-              type="text"
-              name="project_pm"
-              value={formData.project_pm}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="form-row">
-            <label>비고:</label>
-            <textarea
-              name="business_details_and_notes"
-              value={formData.business_details_and_notes}
-              onChange={handleChange}
-            />
-          </div>
-
+          {/* ✅ 프로젝트 생성 & 취소 버튼 복원 */}
           <div className="button-container">
-            <button type="submit" className="save-button">
-              프로젝트 생성
-            </button>
-            <button
-              type="button"
-              className="cancel-button"
-              onClick={() => navigate("/projects")}
-            >
-              취소
-            </button>
+            <button type="submit" className="save-button">프로젝트 생성</button>
+            <button type="button" className="cancel-button" onClick={() => navigate("/projects")}>취소</button>
           </div>
         </form>
       </div>
