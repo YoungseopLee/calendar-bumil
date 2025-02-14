@@ -21,25 +21,21 @@ const ProjectEdit = () => {
   // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
   const user = JSON.parse(localStorage.getItem("user"));
 
-  //필드 매핑(프로젝트 요소가 DB에추가되면 여기서 매핑해줘야 함, 그래야 표에 표시됨)
+  //필드 매핑(표시해야 할 프로젝트 요소가 추가되면 여기서 매핑해줘야 함, 그래야 표에 표시됨)
   const fieldMappings = {
-    category: "구분",
-    status: "진행 상황",
     project_code: "프로젝트 코드",
+    project_name: "프로젝트 명",
+    category: "카테고리",
+    status: "상태",
     business_start_date: "사업 시작일",
     business_end_date: "사업 종료일",
-    group_name: "그룹 명",
-    project_name: "프로젝트 명",
-    customer: "매출처",
-    supplier: "납품처",
+    customer: "고객사",
+    supplier: "공급 업체",
     person_in_charge: "담당자",
     contact_number: "연락처",
     sales_representative: "영업대표",
     project_pm: "수행 PM",
-    project_manager: "프로젝트 관리자",
-    project_participant: "프로젝트 참여자",
-    business_details_and_notes: "사업 내용 및 특이사항",
-    changes: "변경사항",
+    changes: "비고",
   };
 
   // 사용자 로그인 확인
@@ -64,6 +60,16 @@ const ProjectEdit = () => {
   useEffect(() => {
     console.log("Project 업데이트됨:", Project);
   }, [Project]); // Project가 변경될 때마다 실행
+
+  //Employee 업데이트 확인
+  useEffect(() => {
+    console.log("Employees 업데이트됨:", employees);
+  }, [employees]); // Project가 변경될 때마다 실행
+
+  //프로젝트 인원 표시에 필요한 인원 목록 데이터 불러오기
+  useEffect(() => {
+      fetchEmployees();
+  }, []);
 
   //수정 시 프로젝트 인원 상태 표시에 필요한 인원 목록 데이터 불러오기
   useEffect(() => {
@@ -184,16 +190,71 @@ const ProjectEdit = () => {
     }));
   };
 
+  // 화면에 표시할 때만 "Thu, 27 Feb 2025 00:00:00 GMT" → "2025-02-27" 변환
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? dateString : date.toISOString().split("T")[0];
+  };
+
+
+  const ParticipantsTable = ({ assignedUsersIds, employees }) => {
+    if (!assignedUsersIds || assignedUsersIds.length === 0) {
+      return <p>참여 인원이 없습니다.</p>;
+    }
+  // 참여자 ID 목록을 직원 데이터와 매칭
+  const matchedParticipants = assignedUsersIds.map((userId) => {
+    const employee = employees.find((emp) => emp.id === userId);
+    return {
+      id: userId,
+      name: employee ? employee.name : "정보 없음",
+      department: employee ? employee.department : "정보 없음",
+      phone: employee ? employee.phone_number : "정보 없음",
+      status: employee ? employee.status : "정보 없음",
+    };
+  });
+  
+    return (
+      <table className="project-table">
+        <thead>
+          <tr>
+            <th>부서</th>
+            <th>이름</th>
+            <th>전화번호</th>
+            <th>상태</th>
+          </tr>
+        </thead>
+        <tbody>
+          {matchedParticipants.map((participant) => (
+            <tr key={participant.id}>
+              <td>{participant.department}</td>
+              <td>{participant.name}</td>
+              <td>{participant.phone}</td>
+              <td>{participant.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
+
   // 수정된 데이터 저장 API 호출
   const handleSave = async () => {
     try {
+      // API에서 YYYY-MM-DD를 받아서 사용하기 때문에 값을 바꿔줌
+      const projectToSave = {
+        ...Project,
+        business_start_date: formatDate(Project.business_start_date),
+        business_end_date: formatDate(Project.business_end_date) 
+      };
+
       const response = await fetch(`${apiUrl}/project/edit_project`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify(Project),
+        body: JSON.stringify(projectToSave),// 수정된 데이터를 서버에 전송
       });
 
       if (!response.ok) {
@@ -201,6 +262,8 @@ const ProjectEdit = () => {
       }
 
       setMessage("프로젝트가 성공적으로 저장되었습니다!");
+      navigate(`/project-details?project_code=${projectCode}`)
+
     } catch (err) {
       setMessage("저장 중 오류 발생: " + err.message);
     }
@@ -215,8 +278,6 @@ const ProjectEdit = () => {
         </div>
         <h3 className="section-title">🔹 사업개요</h3>
 
-        {message && <p className="message">{message}</p>}
-
         <table className="project-table">
           <tbody>
             {Object.entries(fieldMappings).map(([key, label]) =>
@@ -224,20 +285,22 @@ const ProjectEdit = () => {
                 <tr key={key}>
                   <th>{label}</th>
                   <td>
-                    {key === "project_code" ? ( // 🔹 project_code는 수정 불가능하게 표시
+                    {key === "project_code" ? 
+                    ( // 🔹 project_code는 수정 불가능하게 표시 *html변조 공격에 취약할수도
                       <span>{Project[key]}</span>
+                    ) : key === "business_start_date" || key === "business_end_date" ? (
+                      // 🔹 사업 시작일 & 종료일을 달력 입력으로 변경
+                      <input
+                        className="datebox"
+                        type="date"
+                        value={formatDate(Project[key])}
+                        onChange={(e) => handleChange(key, e.target.value)}
+                      />
                     ) : (
                       <textarea
                         value={Project[key]}
                         onChange={(e) => handleChange(key, e.target.value)}
                         rows="4"
-                        style={{
-                          width: "100%",
-                          padding: "8px",
-                          fontSize: "1em",
-                          border: "1px solid #ccc",
-                          borderRadius: "5px",
-                        }}
                       />
                     )}
                   </td>
@@ -248,16 +311,12 @@ const ProjectEdit = () => {
         </table>
 
         <h3 className="section-title">🔹 인력</h3>
-        <table className="project-table">
-          <tbody>
-            <tr>
-              <th>이름</th>
-              <td>{Project?.project_participant}</td>
-            </tr>
-          </tbody>
-        </table>
+        
+        <ParticipantsTable assignedUsersIds={Project?.assigned_user_ids?.split(",").map(Number)} employees={employees} />
 
-        <button onClick={handleSave} className="save-button">
+        {message && <p className="message">{message}</p>}
+
+        <button onClick={handleSave} className="edit-save-button">
           저장
         </button>
       </div>
