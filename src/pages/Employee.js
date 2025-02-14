@@ -47,7 +47,7 @@ const EmployeeList = () => {
       fetchFavorites(loggedInUserId);
       fetchEmployees();
     }
-  }, [loggedInUserId]);
+  }, [loggedInUserId, favoriteEmployees]); // ✅ 즐겨찾기 목록 변경될 때도 갱신
 
   const fetchFavorites = async (userId) => {
     try {
@@ -59,7 +59,7 @@ const EmployeeList = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-          credentials: "include", // 인증 정보 포함
+          credentials: "include",
         }
       );
 
@@ -68,12 +68,7 @@ const EmployeeList = () => {
 
       const data = await response.json();
 
-      // API 응답 데이터의 키가 "favorite" (단수)인 경우:
-      if (
-        !data.favorite ||
-        !Array.isArray(data.favorite) ||
-        data.favorite.length === 0
-      ) {
+      if (!data.favorite || !Array.isArray(data.favorite)) {
         setFavoriteEmployees([]);
         return;
       }
@@ -91,7 +86,13 @@ const EmployeeList = () => {
         throw new Error("사용자 데이터를 가져오는 데 실패했습니다.");
 
       const data = await response.json();
-      setEmployees(data.users);
+
+      // ✅ 즐겨찾기된 직원은 employees 목록에서 제외
+      const filteredEmployees = data.users.filter(
+        (emp) => !favoriteEmployees.some((fav) => fav.id === emp.id)
+      );
+
+      setEmployees(filteredEmployees);
 
       const uniqueDepartments = Array.from(
         new Set(data.users.map((emp) => emp.department))
@@ -108,8 +109,9 @@ const EmployeeList = () => {
     console.log("toggleFavorite 호출 - employeeId:", employeeId);
     if (!employeeId) {
       console.error("employeeId가 유효하지 않습니다:", employeeId);
-      return; // 값이 없으면 요청을 보내지 않음
+      return;
     }
+
     try {
       const response = await fetch(`${apiUrl}/favorite/toggle_favorite`, {
         method: "POST",
@@ -126,7 +128,9 @@ const EmployeeList = () => {
       if (!response.ok)
         throw new Error("즐겨찾기 상태를 업데이트하는 데 실패했습니다.");
 
+      // ✅ 즐겨찾기 목록과 사원 목록 업데이트
       fetchFavorites(loggedInUserId);
+      fetchEmployees();
     } catch (error) {
       setError(error.message);
     }
@@ -147,12 +151,11 @@ const EmployeeList = () => {
     }
   };
 
-  /* 상태별 텍스트 색상 변경 */
   const getStatusTextColor = (status) => {
     switch (status) {
-      case "외근": // 밝은 배경
+      case "외근":
         return "black";
-      default: // 어두운 배경
+      default:
         return "white";
     }
   };
