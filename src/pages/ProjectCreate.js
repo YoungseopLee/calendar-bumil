@@ -98,7 +98,6 @@ const ProjectCreate = () => {
     }
   };
 
-  // ✅ 프로젝트 추가 API 호출
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -122,13 +121,19 @@ const ProjectCreate = () => {
         throw new Error("로그인이 필요합니다.");
       }
 
+      // ✅ 백엔드에 전송할 데이터 구조 변경
+      const payload = {
+        ...formData,
+        participants: formData.participants.map((p) => p.id), // 🔹 ID 값만 포함하도록 변경
+      };
+
       const response = await fetch(`${apiUrl}/project/add_project`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload), // ✅ 변경된 데이터 전송
       });
 
       if (!response.ok) {
@@ -137,6 +142,10 @@ const ProjectCreate = () => {
       }
 
       alert("프로젝트가 성공적으로 생성되었습니다!");
+
+      // ✅ 전송될 json 데이터 확인
+      console.log("📤 전송된 데이터:", payload);
+
       navigate("/projects");
     } catch (error) {
       setError(error.message);
