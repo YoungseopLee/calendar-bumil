@@ -20,25 +20,21 @@ const ProjectDetails = () => {
   // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
   const user = JSON.parse(localStorage.getItem("user"));
 
-  //필드 매핑(프로젝트 요소가 추가되면 여기서 매핑해줘야 함, 그래야 표에 표시됨)
+  //필드 매핑(표시해야 할 프로젝트 요소가 추가되면 여기서 매핑해줘야 함, 그래야 표에 표시됨)
   const fieldMappings = {
-    category: "구분",
-    status: "진행 상황",
     project_code: "프로젝트 코드",
+    project_name: "프로젝트 명",
+    category: "카테고리",
+    status: "상태",
     business_start_date: "사업 시작일",
     business_end_date: "사업 종료일",
-    group_name: "그룹 명",
-    project_name: "프로젝트 명",
-    customer: "매출처",
-    supplier: "납품처",
+    customer: "고객사",
+    supplier: "공급 업체",
     person_in_charge: "담당자",
     contact_number: "연락처",
     sales_representative: "영업대표",
     project_pm: "수행 PM",
-    project_manager: "프로젝트 관리자",
-    project_participant: "프로젝트 참여자",
-    business_details_and_notes: "사업 내용 및 특이사항",
-    changes: "변경사항",
+    changes: "비고",
   };
 
   // 사용자 로그인 확인
@@ -187,32 +183,37 @@ const ProjectDetails = () => {
     return (
       <table className="project-table">
         <tbody>
-          {Object.entries(project)
-            .filter(([key]) => key !== "project_participant") // ❌ Project_Participant 제외
-            .map(([key, value]) => (
-              <tr key={key}>
-                <th>{fieldMappings[key] || key}</th>
-                <td>{key.includes("date") ? formatDate(value) : value}</td>
-              </tr>
-            ))}
+        {Object.entries(fieldMappings) // 필드 매핑 순서대로 반복
+          .filter(([key]) => key in project) // 필드 매핑에 있는 요소만 표시
+          .map(([key, label]) => (
+            <tr key={key}>
+              <th>{label}</th>
+              <td>
+                {["date", "ed_at"].some(substr => key.includes(substr)) ? formatDate(project[key]) : project[key]
+                /*date, at을 포함하면 formatDate를 실행하여 YYYY-MM-DD로 변환함*/}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     );
   };
 
-  const ParticipantsTable = ({ participants, employees }) => {
-    const participantList = participants ? participants.split(",").map(name => name.trim()) : [];
-  
-    // 참여자 목록을 직원 데이터와 매칭
-    const matchedParticipants = participantList.map((participant) => {
-      const employee = employees.find(emp => emp.name === participant);
-      return {
-        name: participant,
-        department: employee ? employee.department : "정보 없음",
-        phone: employee ? employee.phone_number : "정보 없음",
-        status: employee ? employee.status : "정보 없음",
-      };
-    });
+  const ParticipantsTable = ({ assignedUsersIds, employees }) => {
+    if (!assignedUsersIds || assignedUsersIds.length === 0) {
+      return <p>참여 인원이 없습니다.</p>;
+    }
+  // 참여자 ID 목록을 직원 데이터와 매칭
+  const matchedParticipants = assignedUsersIds.map((userId) => {
+    const employee = employees.find((emp) => emp.id === userId);
+    return {
+      id: userId,
+      name: employee ? employee.name : "정보 없음",
+      department: employee ? employee.department : "정보 없음",
+      phone: employee ? employee.phone_number : "정보 없음",
+      status: employee ? employee.status : "정보 없음",
+    };
+  });
   
     return (
       <table className="project-table">
@@ -225,8 +226,8 @@ const ProjectDetails = () => {
           </tr>
         </thead>
         <tbody>
-          {matchedParticipants.map((participant, index) => (
-            <tr key={index}>
+          {matchedParticipants.map((participant) => (
+            <tr key={participant.id}>
               <td>{participant.department}</td>
               <td>{participant.name}</td>
               <td>{participant.phone}</td>
@@ -245,9 +246,10 @@ const ProjectDetails = () => {
       <div className="project-container">
         <div className="edit-button-container">
           <h2 className="project-title">프로젝트 상세정보(품의서)</h2>
+          {user.roleId != "USR_GENERAL" && //로그인 유저의 roleId를 보고 수정 버튼 표시 판정
           <button onClick={handleEditClick} className="EditProjectButton">
             프로젝트 수정
-          </button>
+          </button>}
         </div>
         <h3 className="section-title">🔹 사업개요</h3>
 
@@ -258,7 +260,7 @@ const ProjectDetails = () => {
         )}
 
         <h3 className="section-title">🔹 인력</h3>
-        <ParticipantsTable participants={Project?.project_participant} employees={employees} />
+        <ParticipantsTable assignedUsersIds={Project?.assigned_user_ids?.split(",").map(Number)} employees={employees} />
       
       </div>
     </div>
