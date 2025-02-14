@@ -14,10 +14,43 @@ const ProjectPage = () => {
   const [searchCategory, setSearchCategory] = useState("projectName"); // 검색 기준
   const [searchQuery, setSearchQuery] = useState(""); // 검색 값
   const [selectedStatus, setSelectedStatus] = useState(""); // ✅ 선택된 상태 저장
+  const [roleId, setRoleId] = useState(""); // ✅ 사용자 role_id
 
   const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
-  // ✅ API 호출
+  // ✅ 현재 로그인한 사용자의 role_id 가져오기
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.error("❌ 로그인 토큰이 없습니다.");
+          return;
+        }
+
+        const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("📌 로그인 사용자 정보:", data);
+          setRoleId(data.user?.role_id || ""); // ✅ role_id 설정
+        } else {
+          console.error("❌ 사용자 정보를 불러오지 못했습니다.");
+        }
+      } catch (error) {
+        console.error("🚨 사용자 정보 로딩 오류:", error);
+      }
+    };
+
+    fetchUserRole();
+  }, [apiUrl]);
+
+  // ✅ 프로젝트 불러오기
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -98,7 +131,7 @@ const ProjectPage = () => {
   return (
     <div className="project-page">
       <Sidebar />
-      <AddProjectButton />
+      {roleId != "USR_GENERAL" && <AddProjectButton />}
       <div className="content">
         <div className="projectPage-box">
           <h1 className="title">프로젝트 목록</h1>
