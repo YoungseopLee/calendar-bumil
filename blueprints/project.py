@@ -165,17 +165,17 @@ def add_project():
     try:
         data = request.get_json()
 
-        # ✅ 🔹 빈 문자열을 None으로 변환하는 함수
+        # 빈 문자열을 None으로 변환하는 함수
         def clean_value(value):
             return value if value and value.strip() else None
 
-        # ✅ 🔹 필수 필드 확인
+        # 필수 필드 확인
         required_fields = ["project_code", "category", "status", "business_start_date", "business_end_date", "project_name", "project_pm"]
         missing_fields = [field for field in required_fields if not data.get(field)]
         if missing_fields:
             return jsonify({'message': f'필수 입력 값이 누락되었습니다: {missing_fields}'}), 400
 
-        # ✅ 🔹 필수 필드
+        # 필수 필드
         project_code = data.get('project_code')
         category = data.get('category')
         status = data.get('status')
@@ -184,7 +184,7 @@ def add_project():
         project_name = data.get('project_name')
         project_pm = data.get('project_pm')
 
-        # ✅ 🔹 NULL 허용 필드 (빈 값일 경우 None으로 변환)
+        # NULL 허용 필드 (빈 값은 None으로 변환)
         customer = clean_value(data.get('customer'))
         supplier = clean_value(data.get('supplier'))
         person_in_charge = clean_value(data.get('person_in_charge'))
@@ -195,8 +195,11 @@ def add_project():
         changes = clean_value(data.get('changes'))
         group_name = clean_value(data.get('group_name'))
 
-        # ✅ 🔹 프로젝트 상태가 "진행 중"이면 current_project_yn을 'Y'로 설정
+        # 프로젝트 상태가 "진행 중"이면 current_project_yn은 'y', 아니면 'n'
         current_project_yn = 'y' if status == "진행 중" else 'n'
+
+        # 참여자 목록 (assigned_user_ids)는 선택적 필드; 없으면 None
+        assigned_user_ids = data.get('participants')  # 예: [1, 3, 5]
 
         conn = get_db_connection()
         if conn is None:
@@ -204,17 +207,7 @@ def add_project():
 
         cursor = conn.cursor()
 
-        # ✅ 🔹 SQL 실행 전, 파라미터 개수 확인 로그 추가
-        values_project = (
-            project_code, category, status, business_start_date, business_end_date,
-            project_name, customer, supplier, person_in_charge, contact_number,
-            sales_representative, project_pm, project_manager, business_details_and_notes, changes,
-            group_name, created_by, created_by
-        )
-        
-        print(f"SQL Parameters: {values_project}")  # ✅ SQL 파라미터 로그 추가
-
-        # ✅ 🔹 tb_project INSERT (NULL 허용 필드 처리 추가)
+        # tb_project INSERT
         sql_project = """
         INSERT INTO tb_project
         (
@@ -228,14 +221,15 @@ def add_project():
             %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'n', NOW(), NOW(), %s, %s
         )
         """
-        
-        # ✅ 🔹 SQL 파라미터 개수 검증
-        if len(values_project) != sql_project.count("%s"):
-            return jsonify({'message': 'SQL 파라미터 개수 불일치 오류!'}), 500
-
+        values_project = (
+            project_code, category, status, business_start_date, business_end_date,
+            project_name, customer, supplier, person_in_charge, contact_number,
+            sales_representative, project_pm, project_manager, business_details_and_notes, changes,
+            group_name, created_by, created_by
+        )
         cursor.execute(sql_project, values_project)
 
-        # ✅ 🔹 tb_project_user INSERT
+        # tb_project_user INSERT : 기본적으로 로그인한 사용자를 등록
         sql_project_user = """
         INSERT INTO tb_project_user
         (
@@ -251,13 +245,22 @@ def add_project():
         )
         cursor.execute(sql_project_user, values_project_user)
 
+        # 추가 참여자(있다면) tb_project_user에 추가
+        if assigned_user_ids and isinstance(assigned_user_ids, list):
+            for uid in assigned_user_ids:
+                # uid가 숫자가 아닐 경우 int 변환 (필요하면)
+                try:
+                    uid = int(uid)
+                except ValueError:
+                    continue
+                cursor.execute(sql_project_user, (project_code, uid, current_project_yn, created_by, created_by))
+
         conn.commit()
         return jsonify({'message': '프로젝트가 추가되었습니다.'}), 201
 
     except Exception as e:
-        print(f"프로젝트 추가 오류: {e}") 
-        # 자세한 로그보여주기
-        return jsonify({'message': f'프로젝트 추가 중 오류 발생: {e}'}), 500 
+        print(f"프로젝트 추가 오류: {e}")
+        return jsonify({'message': f'프로젝트 추가 중 오류 발생: {e}'}), 500
 
     finally:
         try:
@@ -309,18 +312,22 @@ def edit_project():
         changes = data.get('changes')
         group_name = data.get('group_name')
 
-        # 선택적으로, 클라이언트가 할당 사용자 목록을 전달할 수 있음.
-        assigned_user_ids = data.get('Assigned_User_Ids')
+        # 클라이언트에서 전달된 참여자 목록 (assigned_user_ids, 예: "1,3,5" 혹은 [1,3,5])
+        assigned_user_ids = data.get('assigned_user_ids')
+        if isinstance(assigned_user_ids, str):
+            assigned_user_ids = [int(uid.strip()) for uid in assigned_user_ids.split(",") if uid.strip()]
+        if not assigned_user_ids:
+            assigned_user_ids = []
 
-        # 현재 프로젝트 여부: 상태가 "진행 중"이면 'Y', 아니면 'N'
+        # 현재 프로젝트 여부: 상태가 "진행 중"이면 'y', 아니면 'n'
         current_project_yn = 'y' if status == "진행 중" else 'n'
 
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
 
+        # 먼저 기존 프로젝트 정보를 조회 (수정 대상)
         cursor = conn.cursor(dictionary=True)
-        # 기존 프로젝트가 있는지 확인 (프로젝트 수정 시, project_code가 기존과 동일해야 함)
         cursor.execute("""
             SELECT project_code 
             FROM tb_project 
@@ -330,6 +337,7 @@ def edit_project():
         if not old_project:
             return jsonify({'message': '수정할 프로젝트를 찾을 수 없습니다.'}), 404
         old_project_code = old_project['project_code']
+        cursor.close()
 
         # tb_project 업데이트
         cursor = conn.cursor()
@@ -365,10 +373,14 @@ def edit_project():
             old_project_code
         )
         cursor.execute(sql_project, values_project)
+        cursor.close()
 
-        # tb_project_user 업데이트 (옵션)
-        if assigned_user_ids is not None:
-            cursor.execute("DELETE FROM tb_project_user WHERE project_code = %s", (old_project_code,))
+        # tb_project_user 업데이트 (참여자 정보 업데이트)
+        cursor = conn.cursor()
+        # 먼저 기존 참여자 레코드를 논리 삭제 처리 (is_delete_yn = 'y')
+        cursor.execute("UPDATE tb_project_user SET is_delete_yn = 'y', updated_at = NOW(), updated_by = %s WHERE project_code = %s", (updated_by, old_project_code))
+        # 새 참여자들 INSERT
+        if assigned_user_ids:
             sql_project_user = """
             INSERT INTO tb_project_user
             (
@@ -388,7 +400,6 @@ def edit_project():
             """
             for uid in assigned_user_ids:
                 cursor.execute(sql_project_user, (new_project_code, uid, current_project_yn, updated_by, updated_by))
-
         conn.commit()
         return jsonify({'message': '프로젝트가 수정되었습니다.'}), 200
 
@@ -408,18 +419,18 @@ def edit_project():
 def delete_project(project_code):
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'}), 200
-    
+
     try:
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+
         cursor = conn.cursor()
-        
-        # 논리 삭제: is_delete_yn 값을 'Y'로 업데이트
-        sql = "UPDATE tb_project SET is_delete_yn = 'y' WHERE project_code = %s"
-        cursor.execute(sql, (project_code,))
+        # 논리 삭제: tb_project의 is_delete_yn 값을 'y'로 업데이트
+        cursor.execute("UPDATE tb_project SET is_delete_yn = 'y', updated_at = NOW() WHERE project_code = %s", (project_code,))
+        # tb_project_user의 해당 프로젝트와 관련된 레코드들도 논리 삭제 처리
+        cursor.execute("UPDATE tb_project_user SET is_delete_yn = 'y', updated_at = NOW() WHERE project_code = %s", (project_code,))
         conn.commit()
-        
         return jsonify({'message': '프로젝트가 삭제되었습니다.'}), 200
 
     except jwt.ExpiredSignatureError:
