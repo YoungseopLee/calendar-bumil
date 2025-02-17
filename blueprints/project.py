@@ -119,7 +119,7 @@ def get_project_details():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
 
-        # 특정 프로젝트의 상세 정보를 조회하면서 할당된 사용자들을 집계
+        # 프로젝트 상세 정보 조회
         sql = """
         SELECT p.*, GROUP_CONCAT(pu.user_id) AS assigned_user_ids
         FROM tb_project p
@@ -130,6 +130,13 @@ def get_project_details():
         cursor.execute(sql, (project_code,))
         project = cursor.fetchone() 
         if project:
+            # assigned_user_ids가 있으면 복호화 처리
+            if project.get("assigned_user_ids"):
+                encrypted_ids = project["assigned_user_ids"].split(",")
+                # 각 암호화된 id를 복호화
+                decrypted_ids = [decrypt_deterministic(eid) for eid in encrypted_ids]
+                # 복호화한 id들을 다시 쉼표로 합침
+                project["assigned_user_ids"] = ",".join(decrypted_ids)
             return jsonify({'project': project}), 200
         else:
             return jsonify({'message': '해당 프로젝트를 찾을 수 없습니다.'}), 404
