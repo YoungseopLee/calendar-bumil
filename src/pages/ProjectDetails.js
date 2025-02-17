@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import { FaEdit, FaTrash } from "react-icons/fa";
 import "./ProjectDetails.css";
 
 const ProjectDetails = () => {
@@ -166,6 +165,7 @@ const ProjectDetails = () => {
     }
   };
 
+  //로딩 중 또는 에러 발생 시 표시
   if (loading) return <p>데이터를 불러오는 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
 
@@ -173,12 +173,15 @@ const ProjectDetails = () => {
     navigate(`/project-edit?project_code=${projectCode}`);
   };
 
+  //날짜 형식 변환 함수 ("Thu, 27 Feb 2025 00:00:00 GMT" → "2025-02-27" 변환)
+  // ProjectEdit.js의 함수와 다름(여기서는 표에 표시만 하기 때문에 날짜가 아니면 변환하지 않음)
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     if (isNaN(date)) return dateString; // 날짜가 아니면 변환하지 않음
     return date.toISOString().split("T")[0]; // 'YYYY-MM-DD' 형식으로 변환
   };
 
+  //프로젝트 정보 표를 표시하는 컴포넌트
   const ProjectTable = ({ project }) => {
     return (
       <table className="project-table">
@@ -203,6 +206,7 @@ const ProjectDetails = () => {
     );
   };
 
+  //참여자 목록 표를 표시하는 컴포넌트
   const ParticipantsTable = ({ assignedUsersIds, employees }) => {
     if (
       !assignedUsersIds ||
