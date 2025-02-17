@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 import jwt
 from db import get_db_connection
 from config import SECRET_KEY
+from .auth import decrypt_deterministic, encrypt_deterministic
 
 project_bp = Blueprint('project', __name__, url_prefix='/project')
 
@@ -248,15 +249,11 @@ def add_project():
         # 추가 참여자(있다면) tb_project_user에 추가
         if assigned_user_ids and isinstance(assigned_user_ids, list):
             for uid in assigned_user_ids:
-                # uid가 숫자가 아닐 경우 int 변환 (필요하면)
-                try:
-                    uid = int(uid)
-                except ValueError:
-                    continue
-                cursor.execute(sql_project_user, (project_code, uid, current_project_yn, created_by, created_by))
-
-        conn.commit()
-        return jsonify({'message': '프로젝트가 추가되었습니다.'}), 201
+                # uid는 평문으로 전달되므로, 암호화된 값으로 변환합니다.
+                encrypted_uid = decrypt_deterministic(uid)
+                cursor.execute(sql_project_user, (project_code, encrypted_uid, current_project_yn, created_by, created_by))
+                conn.commit()
+                return jsonify({'message': '프로젝트가 추가되었습니다.'}), 201
 
     except Exception as e:
         print(f"프로젝트 추가 오류: {e}")
@@ -315,9 +312,10 @@ def edit_project():
         # 클라이언트에서 전달된 참여자 목록 (assigned_user_ids, 예: "1,3,5" 혹은 [1,3,5])
         assigned_user_ids = data.get('assigned_user_ids')
         if isinstance(assigned_user_ids, str):
-            assigned_user_ids = [int(uid.strip()) for uid in assigned_user_ids.split(",") if uid.strip()]
+            assigned_user_ids = [uid.strip() for uid in assigned_user_ids.split(",") if uid.strip()]
         if not assigned_user_ids:
             assigned_user_ids = []
+
 
         # 현재 프로젝트 여부: 상태가 "진행 중"이면 'y', 아니면 'n'
         current_project_yn = 'y' if status == "진행 중" else 'n'
@@ -399,7 +397,8 @@ def edit_project():
             )
             """
             for uid in assigned_user_ids:
-                cursor.execute(sql_project_user, (new_project_code, uid, current_project_yn, updated_by, updated_by))
+                encrypted_uid = encrypt_deterministic(uid)
+                cursor.execute(sql_project_user, (new_project_code, encrypted_uid, current_project_yn, updated_by, updated_by))
         conn.commit()
         return jsonify({'message': '프로젝트가 수정되었습니다.'}), 200
 

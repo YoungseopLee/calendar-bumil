@@ -1,14 +1,10 @@
 from flask import Blueprint, request, jsonify
+import jwt
 from db import get_db_connection
-from Cryptodome.Cipher import AES
-from .auth import decrypt_aes, decrypt_deterministic
-import os
+from config import SECRET_KEY
+from .auth import decrypt_aes, decrypt_deterministic  # 이메일 복호화 함수
 
 favorite_bp = Blueprint('favorite', __name__, url_prefix='/favorite')
-
-# AES 키 (정확히 32 바이트로 설정)
-AES_KEY = os.environ.get("AES_SECRET_KEY", "Bumil-calendar-1234567890!@#$%^&*").ljust(32)[:32]
-BLOCK_SIZE = AES.block_size  # 16
 
 @favorite_bp.route('/toggle_favorite', methods=['POST', 'OPTIONS'])
 def toggle_favorite():
@@ -65,10 +61,11 @@ def get_favorites():
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
-        # tb_favorite와 tb_user를 조인
+        # tb_favorite와 tb_user를 조인하여 필요한 정보를 가져옵니다.
+        # 기존의 u.email 대신 u.id를 사용합니다.
         sql = """
-        SELECT u.id, u.name, u.position, u.department, u.email, u.phone_number,
-              COALESCE(u.status, '출근') AS status
+        SELECT u.id, u.name, u.position, u.department, u.phone_number,
+            COALESCE(u.status, '출근') AS status
         FROM tb_favorite f
         JOIN tb_user u ON f.favorite_user_id = u.id
         WHERE f.user_id = %s
@@ -78,7 +75,8 @@ def get_favorites():
 
         for fav in favorites:
             try:
-                fav['email'] = decrypt_deterministic(fav['email'])
+                # u.id는 암호화된 값이므로 복호화하여 평문 이메일(아이디)으로 변환합니다.
+                fav['id'] = decrypt_deterministic(fav['id'])
                 fav['phone_number'] = decrypt_aes(fav['phone_number'])
             except Exception as decryption_error:
                 print(f"복호화 오류: {decryption_error}")

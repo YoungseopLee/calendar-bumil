@@ -7,9 +7,9 @@ import "./ProjectDetails.css";
 const ProjectDetails = () => {
   const [employees, setEmployees] = useState([]);
   const [loggedInUserId, setLoggedInUserId] = useState(null);
-  const [Project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [Project, setProject] = useState(null); // 이 페이지에 표시할 프로젝트 정보(projectCode로 불러옴)
+  const [loading, setLoading] = useState(true); // 로딩 상태 표시
+  const [error, setError] = useState(null); // 에러 메시지
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
@@ -48,7 +48,7 @@ const ProjectDetails = () => {
     }
   }, []);
 
-  // 프로젝트 코드가 변경될 때 마다 fetchData 실행
+  // 프로젝트 코드가 변경될 때 마다 fetchProjectDetails실행
   useEffect(() => {
     if (projectCode) {
       fetchProjectDetails();
@@ -62,9 +62,10 @@ const ProjectDetails = () => {
 
   //프로젝트 인원 상태 표시에 필요한 인원 목록 데이터 불러오기
   useEffect(() => {
-      fetchEmployees();
+    fetchEmployees();
   }, []);
 
+  //로그아웃 처리 함수
   const handleLogout = () => {
     alert("세션이 만료되었습니다. 다시 로그인해주세요.");
     localStorage.removeItem("token");
@@ -76,7 +77,6 @@ const ProjectDetails = () => {
   const fetchProjectDetails = async () => {
     setLoading(true);
     try {
-      
       const response = await fetch(
         `${apiUrl}/project/get_project_details?project_code=${projectCode}`
       );
@@ -183,38 +183,50 @@ const ProjectDetails = () => {
     return (
       <table className="project-table">
         <tbody>
-        {Object.entries(fieldMappings) // 필드 매핑 순서대로 반복
-          .filter(([key]) => key in project) // 필드 매핑에 있는 요소만 표시
-          .map(([key, label]) => (
-            <tr key={key}>
-              <th>{label}</th>
-              <td>
-                {["date", "ed_at"].some(substr => key.includes(substr)) ? formatDate(project[key]) : project[key]
-                /*date, at을 포함하면 formatDate를 실행하여 YYYY-MM-DD로 변환함*/}
-              </td>
-            </tr>
-          ))}
+          {Object.entries(fieldMappings) // 필드 매핑 순서대로 반복
+            .filter(([key]) => key in project) // 필드 매핑에 있는 요소만 표시
+            .map(([key, label]) => (
+              <tr key={key}>
+                <th>{label}</th>
+                <td>
+                  {
+                    ["date", "ed_at"].some((substr) => key.includes(substr))
+                      ? formatDate(project[key])
+                      : project[key]
+                    /*date, at을 포함하면 formatDate를 실행하여 YYYY-MM-DD로 변환함*/
+                  }
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     );
   };
 
   const ParticipantsTable = ({ assignedUsersIds, employees }) => {
-    if (!assignedUsersIds || assignedUsersIds.length === 0) {
+    if (
+      !assignedUsersIds ||
+      (Array.isArray(assignedUsersIds) && assignedUsersIds.length === 0)
+    ) {
       return <p>참여 인원이 없습니다.</p>;
     }
-  // 참여자 ID 목록을 직원 데이터와 매칭
-  const matchedParticipants = assignedUsersIds.map((userId) => {
-    const employee = employees.find((emp) => emp.id === userId);
-    return {
-      id: userId,
-      name: employee ? employee.name : "정보 없음",
-      department: employee ? employee.department : "정보 없음",
-      phone: employee ? employee.phone_number : "정보 없음",
-      status: employee ? employee.status : "정보 없음",
-    };
-  });
-  
+
+    // assignedUsersIds가 배열이면 그대로 사용, 문자열이면 split 처리
+    const participantIds = Array.isArray(assignedUsersIds)
+      ? assignedUsersIds
+      : assignedUsersIds.split(",").filter((id) => id.trim() !== "");
+
+    const matchedParticipants = participantIds.map((userId) => {
+      const employee = employees.find((emp) => emp.id === userId);
+      return {
+        id: userId,
+        name: employee ? employee.name : "정보 없음",
+        department: employee ? employee.department : "정보 없음",
+        phone: employee ? employee.phone_number : "정보 없음",
+        status: employee ? employee.status : "정보 없음",
+      };
+    });
+
     return (
       <table className="project-table">
         <thead>
@@ -223,6 +235,7 @@ const ProjectDetails = () => {
             <th>이름</th>
             <th>전화번호</th>
             <th>상태</th>
+            <th>삭제</th>
           </tr>
         </thead>
         <tbody>
@@ -238,7 +251,6 @@ const ProjectDetails = () => {
       </table>
     );
   };
-  
 
   return (
     <div className="app">
@@ -246,10 +258,11 @@ const ProjectDetails = () => {
       <div className="project-container">
         <div className="edit-button-container">
           <h2 className="project-title">프로젝트 상세정보(품의서)</h2>
-          {user.roleId != "USR_GENERAL" && //로그인 유저의 roleId를 보고 수정 버튼 표시 판정
-          <button onClick={handleEditClick} className="EditProjectButton">
-            프로젝트 수정
-          </button>}
+          {user.roleId != "USR_GENERAL" && ( //로그인 유저의 roleId를 보고 수정 버튼 표시 판정
+            <button onClick={handleEditClick} className="EditProjectButton">
+              프로젝트 수정
+            </button>
+          )}
         </div>
         <h3 className="section-title">🔹 사업개요</h3>
 
@@ -260,8 +273,12 @@ const ProjectDetails = () => {
         )}
 
         <h3 className="section-title">🔹 인력</h3>
-        <ParticipantsTable assignedUsersIds={Project?.assigned_user_ids?.split(",").map(Number)} employees={employees} />
-      
+        <ParticipantsTable
+          assignedUsersIds={Project?.assigned_user_ids
+            ?.split(",")
+            .filter((id) => id.trim() !== "")}
+          employees={employees}
+        />
       </div>
     </div>
   );

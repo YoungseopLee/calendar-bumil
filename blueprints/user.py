@@ -1,9 +1,8 @@
 from flask import Blueprint, request, jsonify
+import jwt
 from db import get_db_connection
 from config import SECRET_KEY
-from .auth import decrypt_aes
-
-import jwt
+from .auth import decrypt_aes, decrypt_deterministic
 
 user_bp = Blueprint('user', __name__, url_prefix='/user')
 
@@ -18,7 +17,7 @@ def get_pending_users():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT id, name, position, department, email, phone_number 
+            SELECT id, name, position, department, phone_number 
             FROM tb_user 
             WHERE first_login_yn = 'n' AND is_delete_yn = 'n'
         """)
@@ -43,20 +42,19 @@ def get_users():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT id, name, position, department, email, phone_number, status, first_login_yn 
+            SELECT id, name, position, department, phone_number, status, first_login_yn 
             FROM tb_user 
             WHERE is_delete_yn = 'n'
         """)
         users = cursor.fetchall()
-
-        # phone_number 복호화 (암호화된 경우)
         for user in users:
             try:
+                # 사용자 ID도 복호화하여 평문으로 변경
+                user['id'] = decrypt_deterministic(user['id'])
                 user['phone_number'] = decrypt_aes(user['phone_number'])
             except Exception as e:
-                print(f"전화번호 복호화 오류 (user id {user['id']}): {e}")
+                print(f"복호화 오류 (user id {user['id']}): {e}")
                 user['phone_number'] = None
-
         return jsonify({'users': users}), 200
     except Exception as e:
         print(f"사용자 목록 조회 오류: {e}")
@@ -97,7 +95,7 @@ def get_users_status():
             conn.close()
         except Exception:
             pass
-
+        
 # 유저 상태 업데이트
 @user_bp.route('/update_status', methods=['PUT', 'OPTIONS'])
 def update_status():

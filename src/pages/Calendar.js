@@ -134,7 +134,12 @@ const Calendar = () => {
       // 다른 사용자 일정 가져오기
       try {
         const otherUsersResponse = await fetch(
-          `${process.env.REACT_APP_API_URL}/schedule/get_other_users_schedule?user_id=${user.id}&date=${selectedDateString}`
+          `${process.env.REACT_APP_API_URL}/schedule/get_schedule?user_id=${user.id}&date=${selectedDateString}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
         );
         const otherUsersData = await otherUsersResponse.json();
         if (otherUsersResponse.ok) {

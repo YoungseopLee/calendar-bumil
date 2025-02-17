@@ -70,11 +70,11 @@ def signup():
         data = request.get_json() or {}
         print("회원가입 요청 데이터:", data)
         # 필수 항목 확인
-        if not data.get('email') or not data.get('username') or not data.get('position') or not data.get('department') or not data.get('phone'):
+        if not data.get('id') or not data.get('username') or not data.get('position') or not data.get('department') or not data.get('phone'):
             return jsonify({'message': '필수 항목이 누락되었습니다.'}), 400
 
         # 이메일은 결정적 암호화 (검색용)
-        email = encrypt_deterministic(data.get('email'))
+        id = encrypt_deterministic(data.get('id'))
         name = data.get('username')
         position = data.get('position')
         department = data.get('department')
@@ -87,7 +87,7 @@ def signup():
 
         cursor = conn.cursor()
         # 새 DB에서는 테이블명이 tb_user임
-        cursor.execute("SELECT * FROM tb_user WHERE email = %s", (email,))
+        cursor.execute("SELECT * FROM tb_user WHERE id = %s", (id,))
         if cursor.fetchone():
             return jsonify({'message': '이미 사용 중인 이메일입니다.'}), 400
 
@@ -96,12 +96,12 @@ def signup():
         # 생성일, 수정일은 NOW(), 생성자 및 수정자는 생략(또는 'SYSTEM' 대신 null)
         sql = """
         INSERT INTO tb_user 
-        (name, position, department, email, phone_number, password, role_id, is_delete_yn, first_login_yn, created_at, updated_at)
+        (name, position, department, id, phone_number, password, role_id, is_delete_yn, first_login_yn, created_at, updated_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s, 'n', 'n', NOW(), NOW())
         """
         # AD_ADMIN, PR_ADMIN, PR_MANAGER, USR_GENERAL
         default_role_id = "USR_GENERAL"
-        values = (name, position, department, email, phone, hashed_password, default_role_id)
+        values = (name, position, department, id, phone, hashed_password, default_role_id)
         cursor.execute(sql, values)
         conn.commit()
         return jsonify({'message': '회원가입 성공!'}), 201
@@ -124,11 +124,11 @@ def login():
             return jsonify({'message': 'CORS preflight request success'}), 200
 
         data = request.get_json() or {}
-        if not data.get('email') or not data.get('password'):
+        if not data.get('id') or not data.get('password'):
             return jsonify({'message': '이메일과 비밀번호는 필수입니다.'}), 400
 
         # 이메일은 결정적 암호화를 사용하여 암호문 생성
-        encrypted_email = encrypt_deterministic(data.get('email'))
+        encrypted_id = encrypt_deterministic(data.get('id'))
         password = data.get('password')
 
         conn = get_db_connection()
@@ -136,7 +136,7 @@ def login():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
 
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM tb_user WHERE email = %s", (encrypted_email,))
+        cursor.execute("SELECT * FROM tb_user WHERE id = %s", (encrypted_id,))
         user = cursor.fetchone()
 
         if not user:
@@ -158,7 +158,6 @@ def login():
             'name': user['name'],
             'position': user['position'],
             'department': user['department'],
-            'email': decrypt_deterministic(user['email']),
             'phone_number': decrypt_aes(user['phone_number']),
             'status': user.get('status', ''),
             'first_login_yn': user.get('first_login_yn', 'y')
@@ -200,7 +199,7 @@ def get_logged_in_user():
 
         if user:
             try:
-                user['email'] = decrypt_deterministic(user['email'])
+                user['id'] = user['id']
                 user['name'] = user['name']
                 user['phone_number'] = decrypt_aes(user['phone_number'])
             except Exception as decryption_error:
@@ -309,13 +308,13 @@ def create_user():
 
     data = request.get_json() or {}
     # 필수 항목 확인
-    required_fields = ['email', 'username', 'position', 'department', 'phone', 'password', 'role_id']
+    required_fields = ['id', 'username', 'position', 'department', 'phone', 'password', 'role_id']
     for field in required_fields:
         if not data.get(field):
             return jsonify({'message': f'{field} 필드가 누락되었습니다.'}), 400
 
     # 암호화
-    email = encrypt_deterministic(data.get('email'))
+    id = encrypt_deterministic(data.get('id'))
     name = data.get('username')
     position = data.get('position')
     department = data.get('department')
@@ -333,16 +332,16 @@ def create_user():
     cursor = conn.cursor()
     try:
         # 이미 사용중인 이메일 확인
-        cursor.execute("SELECT * FROM tb_user WHERE email = %s", (email,))
+        cursor.execute("SELECT * FROM tb_user WHERE id = %s", (id,))
         if cursor.fetchone():
             return jsonify({'message': '이미 사용 중인 이메일입니다.'}), 400
 
         sql = """
         INSERT INTO tb_user 
-        (name, position, department, email, phone_number, password, role_id, status, first_login_yn, created_at, updated_at, created_by, updated_by)
+        (name, position, department, id, phone_number, password, role_id, status, first_login_yn, created_at, updated_at, created_by, updated_by)
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s)
         """
-        values = (name, position, department, email, phone, hashed_password, role_id, status, first_login_yn, created_by, created_by)
+        values = (name, position, department, id, phone, hashed_password, role_id, status, first_login_yn, created_by, created_by)
         cursor.execute(sql, values)
         conn.commit()
         return jsonify({'message': '유저 생성 성공!'}), 201
@@ -391,9 +390,9 @@ def update_user():
     if 'department' in data:
         fields.append("department = %s")
         values.append(data['department'])
-    if 'email' in data:
-        fields.append("email = %s")
-        values.append(encrypt_deterministic(data['email']))
+    if 'id' in data:
+        fields.append("id = %s")
+        values.append(encrypt_deterministic(data['id']))
     if 'phone' in data:
         fields.append("phone_number = %s")
         values.append(encrypt_aes(data['phone']))

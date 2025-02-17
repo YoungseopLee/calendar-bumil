@@ -3,7 +3,7 @@ import "./SignupPage.css";
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
-    email: "",
+    id: "",
     password: "",
     username: "",
     position: "",
@@ -59,13 +59,13 @@ const SignupPage = () => {
 
   const validateForm = () => {
     let newErrors = {};
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const idRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^010-\d{4}-\d{4}$/; // 010-xxxx-xxxx 형식
     const passwordRegex =
       /^(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
-    if (!emailRegex.test(formData.email)) {
-      newErrors.email = "올바른 이메일 형식이 아닙니다.";
+    if (!idRegex.test(formData.id)) {
+      newErrors.id = "올바른 이메일 형식이 아닙니다.";
     }
 
     if (!phoneRegex.test(formData.phone)) {
@@ -128,15 +128,15 @@ const SignupPage = () => {
         <h2>회원가입</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group-signup">
-            <label htmlFor="email">이메일 (아이디)</label>
+            <label htmlFor="id">이메일 (아이디)</label>
             <input
-              type="email"
-              id="email"
-              name="email"
+              type="id"
+              id="id"
+              name="id"
               onChange={handleChange}
               required
             />
-            {errors.email && <div className="error">{errors.email}</div>}
+            {errors.id && <div className="error">{errors.id}</div>}
           </div>
           <div className="form-group-signup">
             <label htmlFor="password">비밀번호</label>

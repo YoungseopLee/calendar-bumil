@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import "./LoginPage.css";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
+  const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false); // 아이디 저장 상태
   const [autoLogin, setAutoLogin] = useState(false); // 자동 로그인 상태
@@ -12,11 +12,11 @@ const LoginPage = () => {
 
   useEffect(() => {
     // 저장된 이메일과 자동 로그인 상태 가져오기
-    const savedEmail = localStorage.getItem("savedEmail");
+    const savedId = localStorage.getItem("savedId");
     const savedAutoLogin = localStorage.getItem("autoLogin") === "true";
 
-    if (savedEmail) {
-      setEmail(savedEmail);
+    if (savedId) {
+      setId(savedId);
       setRememberMe(true);
     }
 
@@ -49,7 +49,7 @@ const LoginPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ id, password }),
       });
 
       const data = await response.json();
@@ -63,9 +63,9 @@ const LoginPage = () => {
         localStorage.setItem("user", JSON.stringify(data.user)); // 사용자 정보 저장
 
         if (rememberMe) {
-          localStorage.setItem("savedEmail", email); // 이메일 저장
+          localStorage.setItem("savedId", id); // 이메일 저장
         } else {
-          localStorage.removeItem("savedEmail"); // 체크 해제 시 이메일 제거
+          localStorage.removeItem("savedId"); // 체크 해제 시 이메일 제거
         }
 
         if (autoLogin) {
@@ -75,14 +75,13 @@ const LoginPage = () => {
         }
 
         //최초 로그인 판정 함수
-        if(data.user.first_login_yn == 'y'){
+        if (data.user.first_login_yn == "y") {
           navigate("/projects", { replace: true }); // 캘린더로 이동
         }
-        //최초 로그인이라면, 비밀번호 변경 페이지로 이동하게 하기 
-        else if(data.user.first_login_yn == 'n'){
+        //최초 로그인이라면, 비밀번호 변경 페이지로 이동하게 하기
+        else if (data.user.first_login_yn == "n") {
           navigate("/change-pw", { replace: true });
         }
-
       } else {
         // 로그인 실패 처리
         if (response.status === 403 && data.message === "승인 대기 중입니다!") {
@@ -103,13 +102,13 @@ const LoginPage = () => {
         <h2>Login</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">E-mail</label>
+            <label htmlFor="id">E-mail</label>
             <input
               type="text"
-              id="email"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="id"
+              name="id"
+              value={id}
+              onChange={(e) => setId(e.target.value)}
               required
             />
           </div>

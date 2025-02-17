@@ -47,7 +47,7 @@ const EmployeeList = () => {
       fetchFavorites(loggedInUserId);
       fetchEmployees();
     }
-  }, [loggedInUserId, favoriteEmployees]); // ✅ 즐겨찾기 목록 변경될 때도 갱신
+  }, [loggedInUserId]); // ✅ 즐겨찾기 목록 변경될 때도 갱신
 
   const fetchFavorites = async (userId) => {
     try {

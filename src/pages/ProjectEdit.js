@@ -66,12 +66,15 @@ const ProjectEdit = () => {
   //Employee 업데이트 확인
   useEffect(() => {
     console.log("Employees 업데이트됨:", employees);
-  
+
     // 이미 할당된 유저 ID 목록을 Set으로 변환 (빠른 조회를 위해)
     const assignedIds = new Set(
-      Project?.assigned_user_ids?.split(",").map(Number) || []
+      Project?.assigned_user_ids
+        ?.split(",")
+        .map((id) => id.trim())
+        .filter((id) => id !== "") || []
     );
-  
+
     // employees 목록에서 assigned_user_ids에 없는 유저만 필터링
     const availableUsers = employees
       .filter((user) => !assignedIds.has(user.id)) // 이미 참여한 인원 제외
@@ -79,10 +82,9 @@ const ProjectEdit = () => {
         value: user.id,
         label: `${user.id} - ${user.name} (${user.department})`,
       }));
-  
+
     setUsers(availableUsers);
   }, [employees, Project?.assigned_user_ids]); // employees 또는 assigned_user_ids가 변경될 때 실행
-  
 
   //users 업데이트 확인
   useEffect(() => {
@@ -91,7 +93,7 @@ const ProjectEdit = () => {
 
   //프로젝트 인원 표시에 필요한 인원 목록 데이터 불러오기
   useEffect(() => {
-      fetchEmployees();
+    fetchEmployees();
   }, []);
 
   const handleLogout = () => {
@@ -210,19 +212,23 @@ const ProjectEdit = () => {
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    return isNaN(date.getTime()) ? dateString : date.toISOString().split("T")[0];
+    return isNaN(date.getTime())
+      ? dateString
+      : date.toISOString().split("T")[0];
   };
 
   const handleRemoveParticipant = (userId) => {
     setProject((prevProject) => {
-      // 기존 assigned_user_ids에서 해당 ID를 제거
       const updatedIds = prevProject.assigned_user_ids
-        ? prevProject.assigned_user_ids.split(",").map(Number).filter(id => id !== userId)
+        ? prevProject.assigned_user_ids
+            .split(",")
+            .map((id) => id.trim())
+            .filter((id) => id !== "" && id !== userId)
         : [];
-  
+
       return {
         ...prevProject,
-        assigned_user_ids: updatedIds.join(","), // 쉼표로 다시 합쳐서 저장
+        assigned_user_ids: updatedIds.join(","),
       };
     });
   };
@@ -231,8 +237,13 @@ const ProjectEdit = () => {
     if (!assignedUsersIds || assignedUsersIds.length === 0) {
       return <p>참여 인원이 없습니다.</p>;
     }
-    // 참여자 ID 목록을 직원 데이터와 매칭
-    const matchedParticipants = assignedUsersIds.map((userId) => {
+
+    // assignedUsersIds가 배열이면 그대로 사용, 문자열이면 split 처리
+    const participantIds = Array.isArray(assignedUsersIds)
+      ? assignedUsersIds
+      : assignedUsersIds.split(",").filter((id) => id.trim() !== "");
+
+    const matchedParticipants = participantIds.map((userId) => {
       const employee = employees.find((emp) => emp.id === userId);
       return {
         id: userId,
@@ -242,7 +253,7 @@ const ProjectEdit = () => {
         status: employee ? employee.status : "정보 없음",
       };
     });
-  
+
     return (
       <table className="project-table">
         <thead>
@@ -262,8 +273,8 @@ const ProjectEdit = () => {
               <td>{participant.phone}</td>
               <td>{participant.status}</td>
               <td>
-                <button 
-                  className="remove-button" 
+                <button
+                  className="remove-button"
                   onClick={() => handleRemoveParticipant(participant.id)}
                 >
                   ❌
@@ -279,31 +290,36 @@ const ProjectEdit = () => {
   // 수정된 데이터 저장 API 호출
   const handleSave = async () => {
     try {
-      // API에서 YYYY-MM-DD를 받아서 사용하기 때문에 값을 바꿔줌
+      // API에서 YYYY-MM-DD 형식을 받아서 사용하기 때문에 날짜를 변환합니다.
       const projectToSave = {
         ...Project,
         business_start_date: formatDate(Project.business_start_date),
-        business_end_date: formatDate(Project.business_end_date) 
+        business_end_date: formatDate(Project.business_end_date),
       };
-      console.log("saving project : ", projectToSave);
+      // 콘솔에 저장할 데이터 로그 출력
+      console.log("Saving project data:", projectToSave);
+
       const response = await fetch(`${apiUrl}/project/edit_project`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify(projectToSave),// 수정된 데이터를 서버에 전송
+        body: JSON.stringify(projectToSave),
       });
 
       if (!response.ok) {
+        // 응답 데이터를 콘솔에 출력 (오류 디버깅 용)
+        const errorData = await response.json();
+        console.error("Save error response:", errorData);
         throw new Error("프로젝트 업데이트 실패");
       }
 
       setMessage("프로젝트가 성공적으로 저장되었습니다!");
-      navigate(`/project-details?project_code=${projectCode}`)
-
+      navigate(`/project-details?project_code=${projectCode}`);
     } catch (err) {
       setMessage("저장 중 오류 발생: " + err.message);
+      console.error("HandleSave error:", err);
     }
   };
 
@@ -312,25 +328,26 @@ const ProjectEdit = () => {
       alert("추가할 참여자를 선택하세요.");
       return;
     }
-  
+
     setProject((prevProject) => {
-      // 기존 assigned_user_ids를 쉼표로 분리하여 배열로 변환
       const currentIds = prevProject.assigned_user_ids
-        ? prevProject.assigned_user_ids.split(",").map(Number)
+        ? prevProject.assigned_user_ids
+            .split(",")
+            .map((id) => id.trim())
+            .filter((id) => id !== "")
         : [];
-  
-      // 중복 체크 후 새로운 ID 추가
+
+      // 중복 체크 후 새로운 ID 추가 (문자열 비교)
       if (!currentIds.includes(selectedUser.value)) {
         currentIds.push(selectedUser.value);
       }
-  
+
       return {
         ...prevProject,
-        assigned_user_ids: currentIds.join(","), // 쉼표로 다시 합쳐서 저장
+        assigned_user_ids: currentIds.join(","),
       };
     });
-  
-    // 선택한 유저 초기화
+
     setSelectedUser(null);
   };
 
@@ -350,10 +367,11 @@ const ProjectEdit = () => {
                 <tr key={key}>
                   <th>{label}</th>
                   <td>
-                    {key === "project_code" ? 
-                    ( // 🔹 project_code는 수정 불가능하게 표시 *html변조 공격에 취약할수도
+                    {key === "project_code" ? (
+                      // 🔹 project_code는 수정 불가능하게 표시 *html변조 공격에 취약할수도
                       <span>{Project[key]}</span>
-                    ) : key === "business_start_date" || key === "business_end_date" ? (
+                    ) : key === "business_start_date" ||
+                      key === "business_end_date" ? (
                       // 🔹 사업 시작일 & 종료일을 달력 입력으로 변경
                       <input
                         className="datebox"
@@ -376,10 +394,12 @@ const ProjectEdit = () => {
         </table>
 
         <h3 className="section-title">🔹 인력</h3>
-        
-        <ParticipantsTable 
-          assignedUsersIds={Project?.assigned_user_ids?.split(",").map(Number)} 
-          employees={employees} 
+
+        <ParticipantsTable
+          assignedUsersIds={Project?.assigned_user_ids
+            ?.split(",")
+            .filter((id) => id.trim() !== "")}
+          employees={employees}
         />
 
         <div className="form-section">
@@ -394,7 +414,11 @@ const ProjectEdit = () => {
               isSearchable={true}
               placeholder="참여자 선택"
             />
-            <button type="button" className="add-button" onClick={handleAddParticipant}>
+            <button
+              type="button"
+              className="add-button"
+              onClick={handleAddParticipant}
+            >
               +
             </button>
           </div>
