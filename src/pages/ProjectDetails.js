@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import { FaEdit, FaTrash } from "react-icons/fa";
 import "./ProjectDetails.css";
 
 const ProjectDetails = () => {
   const [employees, setEmployees] = useState([]);
-  const [loggedInUserId, setLoggedInUserId] = useState(null);
-  const [Project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  //const [loggedInUserId, setLoggedInUserId] = useState(null);
+  const [Project, setProject] = useState(null); // 이 페이지에 표시할 프로젝트 정보(projectCode로 불러옴)
+  const [loading, setLoading] = useState(true); // 로딩 상태 표시
+  const [error, setError] = useState(null); // 에러 메시지
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
@@ -48,7 +47,7 @@ const ProjectDetails = () => {
     }
   }, []);
 
-  // 프로젝트 코드가 변경될 때 마다 fetchData 실행
+  // 프로젝트 코드가 변경될 때 마다 fetchProjectDetails실행
   useEffect(() => {
     if (projectCode) {
       fetchProjectDetails();
@@ -65,6 +64,7 @@ const ProjectDetails = () => {
       fetchEmployees();
   }, []);
 
+  //로그아웃 처리 함수
   const handleLogout = () => {
     alert("세션이 만료되었습니다. 다시 로그인해주세요.");
     localStorage.removeItem("token");
@@ -166,6 +166,7 @@ const ProjectDetails = () => {
     }
   };
 
+  //로딩 중 또는 에러 발생 시 표시
   if (loading) return <p>데이터를 불러오는 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
 
@@ -173,12 +174,15 @@ const ProjectDetails = () => {
     navigate(`/project-edit?project_code=${projectCode}`);
   };
 
+  //날짜 형식 변환 함수 ("Thu, 27 Feb 2025 00:00:00 GMT" → "2025-02-27" 변환)
+  // ProjectEdit.js의 함수와 다름(여기서는 표에 표시만 하기 때문에 날짜가 아니면 변환하지 않음)
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     if (isNaN(date)) return dateString; // 날짜가 아니면 변환하지 않음
     return date.toISOString().split("T")[0]; // 'YYYY-MM-DD' 형식으로 변환
   };
 
+  //프로젝트 정보 표를 표시하는 컴포넌트
   const ProjectTable = ({ project }) => {
     return (
       <table className="project-table">
@@ -199,6 +203,7 @@ const ProjectDetails = () => {
     );
   };
 
+  //참여자 목록 표를 표시하는 컴포넌트
   const ParticipantsTable = ({ assignedUsersIds, employees }) => {
     if (!assignedUsersIds || assignedUsersIds.length === 0) {
       return <p>참여 인원이 없습니다.</p>;
