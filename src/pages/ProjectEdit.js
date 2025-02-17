@@ -2,18 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Select from "react-select";
-import { FaEdit, FaTrash } from "react-icons/fa";
 import "./ProjectDetails.css";
 
 const ProjectEdit = () => {
   const [employees, setEmployees] = useState([]);
-  const [loggedInUserId, setLoggedInUserId] = useState(null);
-  const [Project, setProject] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  //const [loggedInUserId, setLoggedInUserId] = useState(null);
+  const [Project, setProject] = useState(null); // 이 페이지에 표시할 프로젝트 정보(projectCode로 불러옴)
+  const [loading, setLoading] = useState(true); // 로딩 상태 표시
+  const [error, setError] = useState(null); // 에러 메시지
   const [message, setMessage] = useState(""); // 저장 메시지
   const [selectedUser, setSelectedUser] = useState(null); // 유저 추가 시 선택된 유저 State
   const [users, setUsers] = useState([]); // 유저 추가 시 유저 목록을 불러오기 위한 State
+  
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,7 +51,7 @@ const ProjectEdit = () => {
     }
   }, []);
 
-  // 프로젝트 코드가 변경될 때 마다 fetchData 실행
+  // 프로젝트 코드가 변경될 때 마다 fetchProjectDetails 실행
   useEffect(() => {
     if (projectCode) {
       fetchProjectDetails();
@@ -83,10 +83,9 @@ const ProjectEdit = () => {
     setUsers(availableUsers);
   }, [employees, Project?.assigned_user_ids]); // employees 또는 assigned_user_ids가 변경될 때 실행
   
-
   //users 업데이트 확인
   useEffect(() => {
-    console.log("users 업데이트됨:", user);
+    console.log("users 업데이트됨:", users);
   }, [users]); // users가 변경될 때마다 실행
 
   //프로젝트 인원 표시에 필요한 인원 목록 데이터 불러오기
@@ -94,6 +93,7 @@ const ProjectEdit = () => {
       fetchEmployees();
   }, []);
 
+  //로그아웃 함수
   const handleLogout = () => {
     alert("세션이 만료되었습니다. 다시 로그인해주세요.");
     localStorage.removeItem("token");
@@ -185,9 +185,6 @@ const ProjectEdit = () => {
       const data = await response.json();
       setEmployees(data.users);
 
-      const uniqueDepartments = Array.from(
-        new Set(data.users.map((emp) => emp.department))
-      );
     } catch (err) {
       setError(err.message);
     } finally {
@@ -213,6 +210,7 @@ const ProjectEdit = () => {
     return isNaN(date.getTime()) ? dateString : date.toISOString().split("T")[0];
   };
 
+  // 참여자 삭제 함수
   const handleRemoveParticipant = (userId) => {
     setProject((prevProject) => {
       // 기존 assigned_user_ids에서 해당 ID를 제거
@@ -227,6 +225,7 @@ const ProjectEdit = () => {
     });
   };
 
+  // 참여자 목록 표를 표시하는 컴포넌트
   const ParticipantsTable = ({ assignedUsersIds, employees }) => {
     if (!assignedUsersIds || assignedUsersIds.length === 0) {
       return <p>참여 인원이 없습니다.</p>;
@@ -307,6 +306,7 @@ const ProjectEdit = () => {
     }
   };
 
+  // 참여자 추가 함수
   const handleAddParticipant = () => {
     if (!selectedUser) {
       alert("추가할 참여자를 선택하세요.");
@@ -377,6 +377,7 @@ const ProjectEdit = () => {
 
         <h3 className="section-title">🔹 인력</h3>
         
+        {/* 참여자 목록 표시 */}
         <ParticipantsTable 
           assignedUsersIds={Project?.assigned_user_ids?.split(",").map(Number)} 
           employees={employees} 
