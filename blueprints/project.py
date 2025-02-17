@@ -250,7 +250,7 @@ def add_project():
         if assigned_user_ids and isinstance(assigned_user_ids, list):
             for uid in assigned_user_ids:
                 # uid는 평문으로 전달되므로, 암호화된 값으로 변환합니다.
-                encrypted_uid = decrypt_deterministic(uid)
+                encrypted_uid = encrypt_deterministic(uid)
                 cursor.execute(sql_project_user, (project_code, encrypted_uid, current_project_yn, created_by, created_by))
                 conn.commit()
                 return jsonify({'message': '프로젝트가 추가되었습니다.'}), 201
