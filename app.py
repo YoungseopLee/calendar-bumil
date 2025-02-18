@@ -8,6 +8,7 @@ from blueprints.schedule import schedule_bp
 from blueprints.user import user_bp
 from blueprints.favorite import favorite_bp
 from blueprints.project import project_bp
+from blueprints.status import status_bp
 
 app = Flask(__name__)
 
@@ -36,6 +37,7 @@ app.register_blueprint(schedule_bp)
 app.register_blueprint(user_bp)
 app.register_blueprint(favorite_bp)
 app.register_blueprint(project_bp)
+app.register_blueprint(status_bp)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

@@ -84,26 +84,19 @@ const EmployeeList = () => {
       const response = await fetch(`${apiUrl}/user/get_users`);
       if (!response.ok)
         throw new Error("사용자 데이터를 가져오는 데 실패했습니다.");
-
       const data = await response.json();
-
-      // ✅ 즐겨찾기된 직원은 employees 목록에서 제외
-      const filteredEmployees = data.users.filter(
-        (emp) => !favoriteEmployees.some((fav) => fav.id === emp.id)
-      );
-
-      setEmployees(filteredEmployees);
-
-      const uniqueDepartments = Array.from(
-        new Set(data.users.map((emp) => emp.department))
-      );
-      setDepartments(uniqueDepartments);
+      setEmployees(data.users); // 필터링 없이 전체 사용자 목록 저장
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
+
+  // 렌더링 시에 즐겨찾기 목록 기준 필터링 적용
+  const displayedEmployees = employees.filter(
+    (emp) => !favoriteEmployees.some((fav) => fav.id === emp.id)
+  );
 
   const toggleFavorite = async (employeeId) => {
     console.log("toggleFavorite 호출 - employeeId:", employeeId);
@@ -227,7 +220,7 @@ const EmployeeList = () => {
         />
 
         <ul className="employee-list">
-          {employees
+          {displayedEmployees
             .filter(
               (emp) =>
                 !selectedDepartment || emp.department === selectedDepartment

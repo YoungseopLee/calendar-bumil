@@ -2,7 +2,23 @@ from flask import Blueprint, request, jsonify
 import jwt
 from db import get_db_connection
 from config import SECRET_KEY
-from .auth import decrypt_aes, decrypt_deterministic  # 이메일 복호화 함수
+from .auth import decrypt_aes, decrypt_deterministic, encrypt_deterministic  # 이메일 복호화 함수
+
+favorite_bp = Blueprint('favorite', __name__, url_prefix='/favorite')
+
+from flask import Blueprint, request, jsonify
+import jwt
+from db import get_db_connection
+from config import SECRET_KEY
+from .auth import decrypt_aes, decrypt_deterministic, encrypt_deterministic  # 암호화 함수 추가
+
+favorite_bp = Blueprint('favorite', __name__, url_prefix='/favorite')
+
+from flask import Blueprint, request, jsonify
+import jwt
+from db import get_db_connection
+from config import SECRET_KEY
+from .auth import decrypt_aes, decrypt_deterministic, encrypt_deterministic
 
 favorite_bp = Blueprint('favorite', __name__, url_prefix='/favorite')
 
@@ -12,31 +28,40 @@ def toggle_favorite():
         return jsonify({'message': 'CORS preflight request success'})
     try:
         data = request.get_json()
-        user_id = data.get('user_id')
-        favorite_user_id = data.get('favorite_user_id')
+        # 클라이언트에서 전달받은 값
+        encrypted_user_id = data.get('user_id')
+        # favorite_user_id는 평문으로 전달되므로 암호화
+        favorite_user_id_plain = data.get('favorite_user_id')
+        encrypted_favorite_user_id = encrypt_deterministic(favorite_user_id_plain)
+
+        print("user_id (암호화된 상태 그대로):", encrypted_user_id)
+        print("favorite_user_id (평문):", favorite_user_id_plain)
+        print("favorite_user_id (암호화 후):", encrypted_favorite_user_id)
+
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor()
-        # tb_favorite 테이블에서 즐겨찾기 여부 확인
+
+        # 암호화된 ID를 사용하여 즐겨찾기 여부 확인
         cursor.execute(
             "SELECT * FROM tb_favorite WHERE user_id = %s AND favorite_user_id = %s",
-            (user_id, favorite_user_id)
+            (encrypted_user_id, encrypted_favorite_user_id)
         )
         favorite = cursor.fetchone()
         if favorite:
-            # 이미 즐겨찾기 상태면 삭제 (즐겨찾기 해제)
+            # 이미 즐겨찾기 상태이면 삭제 (즐겨찾기 해제)
             cursor.execute(
                 "DELETE FROM tb_favorite WHERE user_id = %s AND favorite_user_id = %s",
-                (user_id, favorite_user_id)
+                (encrypted_user_id, encrypted_favorite_user_id)
             )
             conn.commit()
             response_message = '즐겨찾기가 삭제되었습니다.'
         else:
-            # 즐겨찾기 상태가 아니면 새로 추가
+            # 즐겨찾기가 없으면 새로 추가
             cursor.execute(
                 "INSERT INTO tb_favorite (user_id, favorite_user_id, is_favorite_yn) VALUES (%s, %s, 'y')",
-                (user_id, favorite_user_id)
+                (encrypted_user_id, encrypted_favorite_user_id)
             )
             conn.commit()
             response_message = '즐겨찾기가 추가되었습니다.'
@@ -75,7 +100,6 @@ def get_favorites():
 
         for fav in favorites:
             try:
-                # u.id는 암호화된 값이므로 복호화하여 평문 이메일(아이디)으로 변환합니다.
                 fav['id'] = decrypt_deterministic(fav['id'])
                 fav['phone_number'] = decrypt_aes(fav['phone_number'])
             except Exception as decryption_error:
