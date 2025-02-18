@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 import jwt
 from db import get_db_connection
 from config import SECRET_KEY
-from .auth import decrypt_deterministic, encrypt_deterministic
+from .auth import decrypt_deterministic, encrypt_deterministic, decrypt_aes
 
 project_bp = Blueprint('project', __name__, url_prefix='/project')
 
@@ -354,7 +354,7 @@ def edit_project():
             encrypted_uid = encrypt_deterministic(uid)
             cursor.execute(sql_project_user, (new_project_code, encrypted_uid, business_start_date, business_end_date, current_project_yn, updated_by, updated_by))
         conn.commit()
-        
+
         return jsonify({'message': '프로젝트가 수정되었습니다.'}), 200
 
     except Exception as e:
@@ -390,6 +390,67 @@ def delete_project(project_code):
     except Exception as e:
         print(f"프로젝트 삭제 오류: {e}")
         return jsonify({'message': '프로젝트 삭제 오류'}), 500
+    finally:
+        try:
+            cursor.close()
+            conn.close()
+        except Exception:
+            pass
+
+# tb_user와 tb_project_user 조회
+@project_bp.route('/get_user_and_projects', methods=['GET', 'OPTIONS'])
+def get_user_and_projects():
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'CORS preflight request success'})
+    
+    # 클라이언트에서 평문 user_id를 쿼리 스트링으로 전달받음 (예: ?user_id=dhwoo@bumil.co.kr)
+    user_id_plain = request.args.get('user_id')
+    if not user_id_plain:
+        return jsonify({'message': 'user_id 파라미터가 제공되지 않았습니다.'}), 400
+
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+        cursor = conn.cursor(dictionary=True)
+
+        # 평문 user_id를 암호화하여 DB 조회 조건으로 사용
+        encrypted_user_id = encrypt_deterministic(user_id_plain)
+
+        # tb_user 테이블에서 필요한 컬럼만 선택 (password, created_at, updated_at, created_by, updated_by 제외)
+        cursor.execute("""
+            SELECT id, name, position, department, phone_number, role_id, status, is_delete_yn, first_login_yn
+            FROM tb_user
+            WHERE id = %s AND is_delete_yn = 'N'
+        """, (encrypted_user_id,))
+        user_info = cursor.fetchone()
+        if not user_info:
+            return jsonify({'message': '사용자 정보를 찾을 수 없습니다.'}), 404
+
+        # 조회된 사용자 정보 복호화
+        user_info['id'] = decrypt_deterministic(user_info['id'])
+        user_info['phone_number'] = decrypt_aes(user_info['phone_number'])
+
+        # tb_project_user 테이블에서 해당 사용자의 프로젝트 참여 정보 조회 (삭제되지 않은 정보만)
+        cursor.execute("""
+            SELECT *
+            FROM tb_project_user
+            WHERE user_id = %s AND is_delete_yn = 'N'
+        """, (encrypted_user_id,))
+        project_users = cursor.fetchall()
+
+        # 각 프로젝트 참여정보의 user_id 복호화 (평문으로 반환)
+        for record in project_users:
+            record['user_id'] = decrypt_deterministic(record['user_id'])
+
+        return jsonify({
+            'user': user_info,
+            'project_users': project_users
+        }), 200
+
+    except Exception as e:
+        print(f"사용자 및 프로젝트 정보 조회 오류: {e}")
+        return jsonify({'message': '사용자 및 프로젝트 정보 조회 오류'}), 500
     finally:
         try:
             cursor.close()
