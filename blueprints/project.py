@@ -155,9 +155,8 @@ def add_project():
 
     try:
         data = request.get_json()
-        def clean_value(value):
-            return value if value and value.strip() else None
-
+        
+        # 필수 값 확인
         required_fields = ["project_code", "category", "status", "business_start_date", "business_end_date", "project_name", "project_pm"]
         missing_fields = [field for field in required_fields if not data.get(field)]
         if missing_fields:
@@ -171,24 +170,32 @@ def add_project():
         project_name = data.get('project_name')
         project_pm = data.get('project_pm')
 
-        customer = clean_value(data.get('customer'))
-        supplier = clean_value(data.get('supplier'))
-        person_in_charge = clean_value(data.get('person_in_charge'))
-        contact_number = clean_value(data.get('contact_number'))
-        sales_representative = clean_value(data.get('sales_representative'))
-        project_manager = clean_value(data.get('project_manager'))
-        business_details_and_notes = clean_value(data.get('business_details_and_notes'))
-        changes = clean_value(data.get('changes'))
-        group_name = clean_value(data.get('group_name'))
+        customer = data.get('customer')
+        supplier = data.get('supplier')
+        person_in_charge = data.get('person_in_charge')
+        contact_number = data.get('contact_number')
+        sales_representative = data.get('sales_representative')
+        project_manager = data.get('project_manager')
+        business_details_and_notes = data.get('business_details_and_notes')
+        changes = data.get('changes')
+        group_name = data.get('group_name')
 
         current_project_yn = 'y' if status == "진행 중" else 'n'
-        assigned_user_ids = data.get('participants')  # 예: [1, 3, 5]
+        
+        assigned_user_ids = data.get('assigned_user_ids', [])
+        if not isinstance(assigned_user_ids, list):
+            return jsonify({'message': '❌ assigned_user_ids 형식 오류! 리스트가 필요합니다.'}), 400
+        
+        participant_dates = data.get('participant_dates', [])
+        if not isinstance(participant_dates, list):
+            return jsonify({'message': '❌ participant_dates 형식 오류! 리스트가 필요합니다.'}), 400
 
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor()
 
+        # 프로젝트 추가
         sql_project = """
         INSERT INTO tb_project
         (project_code, category, status, business_start_date, business_end_date,
@@ -206,24 +213,23 @@ def add_project():
         )
         cursor.execute(sql_project, values_project)
 
-        # tb_project_user INSERT - 이제 start_date와 end_date 필드를 포함시킵니다.
+        # tb_project_user에 기본 로그인 사용자 추가
         sql_project_user = """
         INSERT INTO tb_project_user
         (project_code, user_id, start_date, end_date, current_project_yn, is_delete_yn, created_at, updated_at, created_by, updated_by)
         VALUES
         (%s, %s, %s, %s, %s, 'N', NOW(), NOW(), %s, %s)
         """
-        # 기본적으로 로그인한 사용자를 등록 (시작/종료일은 프로젝트의 사업 시작/종료일로 설정)
-        values_project_user = (
-            project_code, user_id_from_token, business_start_date, business_end_date, current_project_yn, created_by, created_by
-        )
-        cursor.execute(sql_project_user, values_project_user)
+        cursor.execute(sql_project_user, (project_code, user_id_from_token, business_start_date, business_end_date, current_project_yn, created_by, created_by))
 
-        # 추가 참여자 처리 - 여기서는 사용자 ID를 평문 그대로 사용합니다.
-        if assigned_user_ids and isinstance(assigned_user_ids, list):
-            for uid in assigned_user_ids:
-                # uid는 이미 평문이라 암호화하지 않고 그대로 사용
-                cursor.execute(sql_project_user, (project_code, uid, business_start_date, business_end_date, current_project_yn, created_by, created_by))
+        # ✅ 추가 참여자 저장 (ID + 시작일/종료일 포함)
+        if isinstance(participant_dates, list):
+            for participant in participant_dates:
+                user_id = participant.get("user_id")
+                start_date = participant.get("start_date", business_start_date)
+                end_date = participant.get("end_date", business_end_date)
+                cursor.execute(sql_project_user, (project_code, user_id, start_date, end_date, current_project_yn, created_by, created_by))
+
         conn.commit()
         return jsonify({'message': '프로젝트가 추가되었습니다.'}), 201
     except Exception as e:

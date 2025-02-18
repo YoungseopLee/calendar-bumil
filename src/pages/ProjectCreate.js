@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaPlus, FaTimes } from "react-icons/fa";
-import Select from "react-select";
 import Sidebar from "./Sidebar";
 import "./ProjectCreate.css";
+import ParticipantSelection from "./ParticipantSelection"; 
 
 const ProjectCreate = () => {
   const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL || "http://3.38.20.237";
 
+  // ✅ 초기값이 확실하게 배열로 설정되도록 변경
   const [formData, setFormData] = useState({
     project_code: "",
     project_name: "",
@@ -26,76 +26,22 @@ const ProjectCreate = () => {
     business_details_and_notes: "",
     changes: "",
     group_name: "",
-    participants: [],
+    participants: [], 
   });
 
   const [error, setError] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-
-  // ✅ 사용자 불러오기 (참여자 선택용)
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch(`${apiUrl}/user/get_users`);
-        if (response.ok) {
-          const data = await response.json();
-          setUsers(
-            data.users.map((user) => ({
-              value: user.id,
-              label: `${user.id} - ${user.name} (${user.department})`,
-            }))
-          );
-        }
-      } catch (error) {
-        console.error("사용자 데이터를 불러오지 못했습니다.", error);
-      }
-    };
-
-    fetchUsers();
-  }, [apiUrl]);
 
   // ✅ 입력값 변경 핸들러
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ 참여자 추가
-  const handleAddParticipant = () => {
-    if (selectedUser && !formData.participants.some((p) => p.id === selectedUser.value)) {
-      setFormData((prevState) => ({
-        ...prevState,
-        participants: [
-          ...prevState.participants,
-          {
-            id: selectedUser.value,
-            name: selectedUser.label.split(" (")[0],
-            department: selectedUser.label.split(" (")[1].replace(")", ""),
-          },
-        ],
-      }));
-
-      setUsers((prevUsers) => prevUsers.filter((user) => user.value !== selectedUser.value));
-      setSelectedUser(null);
-    }
-  };
-
-  // ✅ 참여자 삭제 (버튼 클릭 시 삭제 + users 리스트에 복원)
-  const handleRemoveParticipant = (userId) => {
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      participants: prevFormData.participants.filter(
-        (participant) => String(participant.id) !== String(userId)
-      ),
+  // ✅ 참여자 추가 및 삭제를 위한 핸들러 (ParticipantSelection에서 사용)
+  const setParticipants = (newParticipants) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      participants: newParticipants,
     }));
-
-    const removedUser = formData.participants.find((user) => String(user.id) === String(userId));
-    if (removedUser) {
-      setUsers((prevUsers) => [
-        ...prevUsers,
-        { value: removedUser.id, label: `${removedUser.name} (${removedUser.department})` },
-      ]);
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -121,11 +67,25 @@ const ProjectCreate = () => {
         throw new Error("로그인이 필요합니다.");
       }
 
-      // ✅ 백엔드에 전송할 데이터 구조 변경
+      // ✅ 참여자 데이터를 백엔드가 원하는 형식으로 변환
+      const assigned_user_ids = formData.participants.map(p => p.id);
+      console.log("✅ assigned_user_ids:", assigned_user_ids);  // 디버깅
+
+      const participant_dates = formData.participants.map(p => ({
+        user_id: p.id,
+        start_date: p.participant_start_date || formData.business_start_date,
+        end_date: p.participant_end_date || formData.business_end_date
+      }));
+      console.log("✅ participant_dates:", participant_dates);  // 디버깅
+
+      // ✅ 백엔드에 전송할 데이터 구조
       const payload = {
         ...formData,
-        participants: formData.participants.map((p) => p.id), // 🔹 ID 값만 포함하도록 변경
+        assigned_user_ids,  
+        participant_dates   
       };
+
+      console.log("📤 전송된 데이터:", JSON.stringify(payload, null, 2)); // 최종 디버깅
 
       const response = await fetch(`${apiUrl}/project/add_project`, {
         method: "POST",
@@ -133,7 +93,7 @@ const ProjectCreate = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(payload), // ✅ 변경된 데이터 전송
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -142,15 +102,12 @@ const ProjectCreate = () => {
       }
 
       alert("프로젝트가 성공적으로 생성되었습니다!");
-
-      // ✅ 전송될 json 데이터 확인
-      console.log("📤 전송된 데이터:", payload);
-
       navigate("/projects");
     } catch (error) {
       setError(error.message);
     }
-  };
+};
+
 
   return (
     <div className="app">
@@ -213,36 +170,14 @@ const ProjectCreate = () => {
             <label>사업 내용 및 특이사항:</label>
             <textarea name="business_details_and_notes" value={formData.business_details_and_notes} onChange={handleChange} />
           </div>
-
-          {/* ✅ 참여자 선택 */}
-          <div className="form-section">
-            <h3>👥 프로젝트 참여자</h3>
-            <div className="participant-container">
-              <Select
-                className="react-select-container"
-                classNamePrefix="react-select"
-                options={users}
-                value={selectedUser}
-                onChange={setSelectedUser}
-                isSearchable={true}
-                placeholder="참여자 선택"
-              />
-              <button type="button" className="add-button" onClick={handleAddParticipant}>
-                <FaPlus />
-              </button>
-            </div>
-
-            <ul className="participant-list">
-              {formData.participants.map((user) => (
-                <li key={user.id}>
-                  {user.name} ({user.department})
-                  <button type="button" className="remove-button" onClick={() => handleRemoveParticipant(user.id)}>
-                    <FaTimes />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
+          
+          {/* ✅ 참여자 선택 컴포넌트 */}
+          <ParticipantSelection
+            participants={formData.participants}  // ✅ formData.participants를 직접 전달
+            setParticipants={setParticipants}
+            projectStartDate={formData.business_start_date}
+            projectEndDate={formData.business_end_date}
+          />
 
           {/* ✅ 프로젝트 생성 & 취소 버튼 복원 */}
           <div className="button-container">
