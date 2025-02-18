@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 import jwt
 from db import get_db_connection
 from config import SECRET_KEY
-from .auth import decrypt_deterministic
+from .auth import decrypt_deterministic, encrypt_deterministic
 
 project_bp = Blueprint('project', __name__, url_prefix='/project')
 
@@ -182,13 +182,10 @@ def add_project():
 
         current_project_yn = 'y' if status == "진행 중" else 'n'
         
-        assigned_user_ids = data.get('assigned_user_ids', [])
-        if not isinstance(assigned_user_ids, list):
-            return jsonify({'message': '❌ assigned_user_ids 형식 오류! 리스트가 필요합니다.'}), 400
-        
-        participant_dates = data.get('participant_dates', [])
-        if not isinstance(participant_dates, list):
-            return jsonify({'message': '❌ participant_dates 형식 오류! 리스트가 필요합니다.'}), 400
+        # participants(추가 참여자) 배열을 받음 (기본 로그인 사용자는 제외됨)
+        participants = data.get('participants', [])
+        if not isinstance(participants, list):
+            return jsonify({'message': '❌ participants 형식 오류! 리스트가 필요합니다.'}), 400
 
         conn = get_db_connection()
         if conn is None:
@@ -213,22 +210,21 @@ def add_project():
         )
         cursor.execute(sql_project, values_project)
 
-        # tb_project_user에 기본 로그인 사용자 추가
+        # **기본 로그인 사용자 추가 부분 제거됨**
+        # 이제 추가 참여자만 tb_project_user에 삽입합니다.
         sql_project_user = """
         INSERT INTO tb_project_user
         (project_code, user_id, start_date, end_date, current_project_yn, is_delete_yn, created_at, updated_at, created_by, updated_by)
         VALUES
         (%s, %s, %s, %s, %s, 'N', NOW(), NOW(), %s, %s)
         """
-        cursor.execute(sql_project_user, (project_code, user_id_from_token, business_start_date, business_end_date, current_project_yn, created_by, created_by))
-
-        # ✅ 추가 참여자 저장 (ID + 시작일/종료일 포함)
-        if isinstance(participant_dates, list):
-            for participant in participant_dates:
-                user_id = participant.get("user_id")
-                start_date = participant.get("start_date", business_start_date)
-                end_date = participant.get("end_date", business_end_date)
-                cursor.execute(sql_project_user, (project_code, user_id, start_date, end_date, current_project_yn, created_by, created_by))
+        for participant in participants:
+            participant_id_plain = participant.get("id")
+            start_date = participant.get("start_date", business_start_date)
+            end_date = participant.get("end_date", business_end_date)
+            # 평문 ID를 암호화하여 저장
+            encrypted_participant_id = encrypt_deterministic(participant_id_plain)
+            cursor.execute(sql_project_user, (project_code, encrypted_participant_id, start_date, end_date, current_project_yn, created_by, created_by))
 
         conn.commit()
         return jsonify({'message': '프로젝트가 추가되었습니다.'}), 201
@@ -354,9 +350,11 @@ def edit_project():
         (%s, %s, %s, %s, %s, 'N', NOW(), NOW(), %s, %s)
         """
         for uid in assigned_user_ids:
-            # 여기서는 uid는 평문이므로 그대로 사용합니다.
-            cursor.execute(sql_project_user, (new_project_code, uid, business_start_date, business_end_date, current_project_yn, updated_by, updated_by))
+            # 평문 uid를 암호화하여 사용
+            encrypted_uid = encrypt_deterministic(uid)
+            cursor.execute(sql_project_user, (new_project_code, encrypted_uid, business_start_date, business_end_date, current_project_yn, updated_by, updated_by))
         conn.commit()
+        
         return jsonify({'message': '프로젝트가 수정되었습니다.'}), 200
 
     except Exception as e:
