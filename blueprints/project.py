@@ -115,12 +115,16 @@ def get_project_details():
         cursor.execute(sql, (project_code,))
         project = cursor.fetchone() 
         if project:
-            # assigned_user_ids가 있으면 복호화 처리 (필요하다면)
             if project.get("assigned_user_ids"):
-                # 만약 tb_project_user에 저장된 user_id가 암호화된 상태라면 복호화 후 반환
+                # 콤마로 구분된 문자열을 분리 후 복호화하여 배열로 저장
                 encrypted_ids = project["assigned_user_ids"].split(",")
-                decrypted_ids = [decrypt_deterministic(eid) for eid in encrypted_ids]
-                project["assigned_user_ids"] = ",".join(decrypted_ids)
+                participants = [decrypt_deterministic(eid.strip()) for eid in encrypted_ids if eid.strip() != ""]
+                project["participants"] = participants
+            else:
+                project["participants"] = []
+            # 필요하면 기존 필드는 제거
+            if "assigned_user_ids" in project:
+                del project["assigned_user_ids"]
             return jsonify({'project': project}), 200
         else:
             return jsonify({'message': '해당 프로젝트를 찾을 수 없습니다.'}), 404
