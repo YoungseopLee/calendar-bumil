@@ -165,7 +165,7 @@ const EmployeeList = () => {
       <Sidebar />
       <BackButton />
       <div className="box">
-        <h2 className="title">내 즐겨찾기 목록</h2>
+        {/* <h2 className="title">내 즐겨찾기 목록</h2>
         {isFavoritesOpen && (
           <div className="favorite-list">
             {favoriteEmployees.length > 0 ? (
@@ -196,10 +196,10 @@ const EmployeeList = () => {
               <p className="no-favorites">즐겨찾기가 없습니다.</p>
             )}
           </div>
-        )}
+        )} */}
 
         <h2 className="title">사원 목록</h2>
-        <select
+        {/* <select
           className="department-dropdown"
           value={selectedDepartment}
           onChange={(e) => setSelectedDepartment(e.target.value)}
@@ -210,7 +210,7 @@ const EmployeeList = () => {
               {dept}
             </option>
           ))}
-        </select>
+        </select> */}
 
         <input
           type="text"
@@ -223,22 +223,18 @@ const EmployeeList = () => {
           {displayedEmployees
             .filter(
               (emp) =>
-                !selectedDepartment || emp.department === selectedDepartment
+                !selectedDepartment ||
+                emp.department.includes(selectedDepartment)
             )
             .filter((emp) => emp.name.toLowerCase().includes(searchText))
             .map((employee) => (
               <li
                 key={employee.id}
                 className={`employee-item ${getStatusClass(employee.status)}`}
+                onClick={() =>
+                  console.log(`선택한 사원: `,employee)
+                }
               >
-                <span
-                  className="favorite-icon"
-                  onClick={() => toggleFavorite(employee.id)}
-                >
-                  {favoriteEmployees.some((fav) => fav.id === employee.id)
-                    ? "★"
-                    : "☆"}
-                </span>
                 <span className="employee-name">{employee.name}</span>
                 <span className="employee-position">{employee.position}</span>
                 <span

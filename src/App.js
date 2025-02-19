@@ -51,7 +51,7 @@ function App() {
         <Route path="/add-project" element={<ProjectCreate />} />
         {/* 비밀번호 변경 페이지 */}
         <Route path="/change-pw" element={<ChangePWPage />} />
-        {/* 비밀번호 변경 페이지 */}
+        {/* 사원원 상세 페이지 */}
         <Route path="/user-details" element={<UserDetails />} />
       </Routes>
     </Router>
