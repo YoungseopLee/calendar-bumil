@@ -42,7 +42,7 @@ def get_users():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT id, name, position, department, phone_number, status, first_login_yn 
+            SELECT id, name, position, department, phone_number, role_id, status, first_login_yn 
             FROM tb_user 
             WHERE is_delete_yn = 'n'
         """)
