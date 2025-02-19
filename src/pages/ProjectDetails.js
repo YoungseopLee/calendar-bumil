@@ -207,18 +207,18 @@ const ProjectDetails = () => {
   };
 
   //참여자 목록 표를 표시하는 컴포넌트
-  const ParticipantsTable = ({ assignedUsersIds, employees }) => {
+  const ParticipantsTable = ({ participants, employees }) => {
     if (
-      !assignedUsersIds ||
-      (Array.isArray(assignedUsersIds) && assignedUsersIds.length === 0)
+      !participants ||
+      (Array.isArray(participants) && participants.length === 0)
     ) {
       return <p>참여 인원이 없습니다.</p>;
     }
 
-    // assignedUsersIds가 배열이면 그대로 사용, 문자열이면 split 처리
-    const participantIds = Array.isArray(assignedUsersIds)
-      ? assignedUsersIds
-      : assignedUsersIds.split(",").filter((id) => id.trim() !== "");
+    // participants가 배열이면 그대로 사용, 문자열이면 split 처리
+    const participantIds = Array.isArray(participants)
+      ? participants
+      : participants.split(",").filter((id) => id.trim() !== "");
 
     const matchedParticipants = participantIds.map((userId) => {
       const employee = employees.find((emp) => emp.id === userId);
@@ -239,7 +239,6 @@ const ProjectDetails = () => {
             <th>이름</th>
             <th>전화번호</th>
             <th>상태</th>
-            <th>삭제</th>
           </tr>
         </thead>
         <tbody>
@@ -278,9 +277,7 @@ const ProjectDetails = () => {
 
         <h3 className="section-title">🔹 인력</h3>
         <ParticipantsTable
-          assignedUsersIds={Project?.assigned_user_ids
-            ?.split(",")
-            .filter((id) => id.trim() !== "")}
+          participants={Project?.participants}
           employees={employees}
         />
       </div>
