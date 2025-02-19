@@ -95,39 +95,48 @@ def get_search_project():
 def get_project_details():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
-    
+
     project_code = request.args.get('project_code')
     if not project_code:
         return jsonify({'message': '프로젝트 코드가 제공되지 않았습니다.'}), 400
-    
+
     try:
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+
         cursor = conn.cursor(dictionary=True)
-        sql = """
-        SELECT p.*, GROUP_CONCAT(pu.user_id) AS assigned_user_ids
-        FROM tb_project p
-        LEFT JOIN tb_project_user pu ON p.project_code = pu.project_code AND pu.is_delete_yn = 'N'
-        WHERE p.project_code = %s AND p.is_delete_yn = 'N'
-        GROUP BY p.project_code
+        # tb_project에서 프로젝트 정보 조회
+        sql_project = """
+            SELECT *
+            FROM tb_project
+            WHERE project_code = %s AND is_delete_yn = 'N'
         """
-        cursor.execute(sql, (project_code,))
-        project = cursor.fetchone() 
-        if project:
-            if project.get("assigned_user_ids"):
-                # 콤마로 구분된 문자열을 분리 후 복호화하여 배열로 저장
-                encrypted_ids = project["assigned_user_ids"].split(",")
-                participants = [decrypt_deterministic(eid.strip()) for eid in encrypted_ids if eid.strip() != ""]
-                project["participants"] = participants
-            else:
-                project["participants"] = []
-            # 필요하면 기존 필드는 제거
-            if "assigned_user_ids" in project:
-                del project["assigned_user_ids"]
-            return jsonify({'project': project}), 200
-        else:
+        cursor.execute(sql_project, (project_code,))
+        project = cursor.fetchone()
+
+        if not project:
             return jsonify({'message': '해당 프로젝트를 찾을 수 없습니다.'}), 404
+
+        # tb_project_user에서 해당 프로젝트의 참여자(인력) 정보 조회
+        sql_project_users = """
+            SELECT *
+            FROM tb_project_user
+            WHERE project_code = %s AND is_delete_yn = 'N'
+        """
+        cursor.execute(sql_project_users, (project_code,))
+        project_users = cursor.fetchall()
+
+        # 만약 tb_project_user의 user_id가 암호화되어 있다면 복호화 처리
+        for record in project_users:
+            # 복호화 후 평문 user_id로 변경 (필요에 따라 다른 컬럼도 복호화)
+            record['user_id'] = decrypt_deterministic(record['user_id'])
+
+        # 프로젝트 정보에 참여자 정보를 추가 (원하는 키 이름으로 지정 가능: participants 또는 project_users)
+        project['project_users'] = project_users
+
+        return jsonify({'project': project}), 200
+
     except Exception as e:
         print(f"프로젝트 상세정보 조회 오류: {e}")
         return jsonify({'message': '프로젝트 상세정보 조회 오류'}), 500
@@ -406,7 +415,7 @@ def delete_project(project_code):
 def get_user_and_projects():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
-    
+
     # 클라이언트에서 평문 user_id를 쿼리 스트링으로 전달받음 (예: ?user_id=dhwoo@bumil.co.kr)
     user_id_plain = request.args.get('user_id')
     if not user_id_plain:
@@ -435,11 +444,12 @@ def get_user_and_projects():
         user_info['id'] = decrypt_deterministic(user_info['id'])
         user_info['phone_number'] = decrypt_aes(user_info['phone_number'])
 
-        # tb_project_user 테이블에서 해당 사용자의 프로젝트 참여 정보 조회 (삭제되지 않은 정보만)
+        # tb_project_user와 tb_project 테이블을 조인하여 해당 사용자의 프로젝트 참여 정보 조회
         cursor.execute("""
-            SELECT *
-            FROM tb_project_user
-            WHERE user_id = %s AND is_delete_yn = 'N'
+            SELECT tpu.*, p.project_name
+            FROM tb_project_user tpu
+            JOIN tb_project p ON tpu.project_code = p.project_code
+            WHERE tpu.user_id = %s
         """, (encrypted_user_id,))
         project_users = cursor.fetchall()
 
