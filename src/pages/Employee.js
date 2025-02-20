@@ -4,19 +4,18 @@ import Sidebar from "./Sidebar";
 import BackButton from "./BackButton";
 import { useNavigate } from "react-router-dom";
 
-
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [favoriteEmployees, setFavoriteEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchText, setSearchText] = useState("");
-  const [searchField, setSearchField] = useState("name"); 
+  const [searchField, setSearchField] = useState("name");
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [showFavorites, setShowFavorites] = useState(false);
   const [statusList, setStatusList] = useState([]);
   const [userRole, setUserRole] = useState(null); // AD_ADMIN, USR_GENERAL
-
+  const navigate = useNavigate();
 
   const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -38,18 +37,18 @@ const EmployeeList = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("사용자 인증 정보가 없습니다.");
-    
+
         const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         });
-    
+
         if (!response.ok)
           throw new Error("로그인 사용자 정보를 가져오는 데 실패했습니다.");
-    
+
         const data = await response.json();
         setLoggedInUserId(data.user.id);
-        setUserRole(data.user.role_id); 
+        setUserRole(data.user.role_id);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -94,7 +93,7 @@ const EmployeeList = () => {
 
   const toggleFavorite = async (employeeId) => {
     if (!loggedInUserId) return;
-  
+
     try {
       const response = await fetch(`${apiUrl}/favorite/toggle_favorite`, {
         method: "POST",
@@ -103,13 +102,13 @@ const EmployeeList = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
-          user_id: loggedInUserId, 
-          favorite_user_id: employeeId, 
+          user_id: loggedInUserId,
+          favorite_user_id: employeeId,
         }),
       });
-  
+
       if (!response.ok) throw new Error("즐겨찾기 상태 업데이트 실패");
-  
+
       fetchFavorites(loggedInUserId);
     } catch (error) {
       setError(error.message);
@@ -149,7 +148,6 @@ const EmployeeList = () => {
   if (loading) return <p>데이터를 불러오는 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
 
-
   const handleStatusChange = async (employeeId, newStatus) => {
     try {
       const response = await fetch(`${apiUrl}/status/update_status`, {
@@ -159,13 +157,13 @@ const EmployeeList = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
-          user_id: employeeId, 
-          status: newStatus, 
+          user_id: employeeId,
+          status: newStatus,
         }),
       });
-  
+
       if (!response.ok) throw new Error("상태 변경 실패!");
-  
+
       alert("상태가 성공적으로 변경되었습니다! ✅");
       fetchEmployees();
     } catch (error) {
@@ -180,21 +178,28 @@ const EmployeeList = () => {
       <BackButton />
       <div className="box">
         <h2 className="title">사원 목록</h2>
-  
+
         <div className="toggle-container">
-          <button className="toggle-button" onClick={() => setShowFavorites(!showFavorites)}>
+          <button
+            className="toggle-button"
+            onClick={() => setShowFavorites(!showFavorites)}
+          >
             {showFavorites ? "전체 사원 보기" : "즐겨찾기 보기"}
           </button>
         </div>
-  
+
         <div className="search-container">
-          <select className="search-dropdown" value={searchField} onChange={handleSearchFieldChange}>
+          <select
+            className="search-dropdown"
+            value={searchField}
+            onChange={handleSearchFieldChange}
+          >
             <option value="name">이름</option>
             <option value="position">직급</option>
             <option value="department">부서</option>
             <option value="status">상태</option>
           </select>
-  
+
           <input
             type="text"
             className="search-input"
@@ -210,9 +215,14 @@ const EmployeeList = () => {
               <li
                 key={employee.id}
                 className={`employee-item`}
+                onClick={() => navigate(`/user-details?user_id=${employee.id}`)}
               >
                 <span
-                  className={`favorite-icon ${favoriteEmployees.some((fav) => fav.id === employee.id) ? "" : "not-favorite"}`}
+                  className={`favorite-icon ${
+                    favoriteEmployees.some((fav) => fav.id === employee.id)
+                      ? ""
+                      : "not-favorite"
+                  }`}
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleFavorite(employee.id);
@@ -227,8 +237,11 @@ const EmployeeList = () => {
                 {userRole === "AD_ADMIN" ? (
                   <select
                     className="status-dropdown"
-                    value={employee.status} 
-                    onChange={(e) => handleStatusChange(employee.id, e.target.value)}
+                    value={employee.status}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) =>
+                      handleStatusChange(employee.id, e.target.value)
+                    }
                   >
                     {statusList.map((status) => (
                       <option key={status.id} value={status.id}>
@@ -237,17 +250,14 @@ const EmployeeList = () => {
                     ))}
                   </select>
                 ) : (
-                  <span>{employee.status}</span> 
+                  <span>{employee.status}</span>
                 )}
               </li>
             ))}
-        </ul>  
-
+        </ul>
       </div>
     </div>
   );
-
 };
 
 export default EmployeeList;
-
