@@ -6,6 +6,7 @@
   align-items: center;
   height: 100vh;
   padding: 20px;
+  margin-top: 20px; /*사이드바를 위한 상단 여백*/
 }
 
 /* 프로필 카드 */
@@ -22,7 +23,7 @@
   /*box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);*/
   font-family: "Poppins", sans-serif;
   /*border: 3px solid #007bff;*/
-  padding: 0px;
+  padding: 8px;
   text-align: center;
   align-items: flex-start;
 }
