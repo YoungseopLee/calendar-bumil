@@ -107,14 +107,13 @@ const ProjectPage = () => {
     const filterEnd = appliedEnd ? new Date(appliedEnd) : null;
 
     // ✅ 검색 필터 - includes() 오류 방지
+    // 프로젝트 코드, 프로젝트 명, 이름(영업대표 또는 PM)으로 검색 
     const matchesSearch =
       searchCategory === "projectName"
-        ? (project.name || "").toLowerCase().includes(searchQuery.toLowerCase())
-        : searchCategory === "owner"
-        ? (project.owner || "").toLowerCase().includes(searchQuery.toLowerCase())
-        : searchCategory === "pm"
-        ? (project.pm || "").toLowerCase().includes(searchQuery.toLowerCase())
-        : (project.code || "").toLowerCase().includes(searchQuery.toLowerCase());
+        ? project.name.includes(searchQuery)
+        : searchCategory === "code"
+        ? project.code.includes(searchQuery)
+        : project.owner.includes(searchQuery) || project.pm.includes(searchQuery);
 
     const matchesStatus = selectedStatus
       ? project.status === selectedStatus
@@ -146,8 +145,7 @@ const ProjectPage = () => {
             >
               <option value="code">프로젝트 코드</option>
               <option value="projectName">프로젝트 명</option>
-              <option value="owner">영업대표</option>
-              <option value="pm">PM</option>
+              <option value="name">참여인력</option>
             </select>
             <input
               type="text"
