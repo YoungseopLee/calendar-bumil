@@ -40,6 +40,17 @@
   font-size: 1em;
   transition: background-color 0.3s ease;
 }
+.edit-delete-button {
+  margin: 10px;
+  background-color: #ff5a5a;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
 
 /* 버튼을 감싸는 div 스타일 추가 */
 .edit-button-container {

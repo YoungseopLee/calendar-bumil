@@ -224,15 +224,12 @@ const ProjectEdit = () => {
         ...prevProject,
         project_users: updatedParticipants,
       };
-
-      console.log("🔹 삭제 후 project_users:", updatedProject.project_users);
       return updatedProject;
     });
   };
 
   //참여자 목록 표를 표시하는 컴포넌트
   const Projectuserstable = ({ project_users, employees }) => {
-    console.log("project_users : ", project_users);
     if (!project_users || project_users.length === 0) {
       return <p>참여 인원이 없습니다.</p>;
     }
@@ -242,7 +239,6 @@ const ProjectEdit = () => {
       ? project_users
       : project_users.split(",").map((id) => ({ id: id.trim() })); // 문자열이면 쉼표 기준으로 나눔
 
-    console.log("participants : ", participants);
 
     // employees 데이터에서 user 정보 찾아 매칭
     const matchedParticipants = participants.map((participant) => {
@@ -301,11 +297,9 @@ const ProjectEdit = () => {
         ...Project,
         business_start_date: formatDate(Project.business_start_date),
         business_end_date: formatDate(Project.business_end_date),
-        assigned_user_ids: Project.project_users.map(user => user.user_id), 
+        assigned_user_ids: Project.project_users.map((user) => user.user_id),
       };
-      
-      // 콘솔에 저장할 데이터 로그 출력
-      console.log("Saving project data:", JSON.stringify(projectToSave, null, 2));
+
 
       const response = await fetch(`${apiUrl}/project/edit_project`, {
         method: "POST",
@@ -348,7 +342,6 @@ const ProjectEdit = () => {
       const newParticipant = employees.find(
         (emp) => emp.id === selectedUser.value
       );
-      console.log("testemp:", newParticipant);
       if (!newParticipant) {
         alert("선택한 사용자를 찾을 수 없습니다.");
         return prevProject;
@@ -375,8 +368,45 @@ const ProjectEdit = () => {
     });
 
     setSelectedUser(null);
-};
+  };
 
+  const deleteProject = async (project_code) => {
+    // 삭제 여부 확인
+    const confirmDelete = window.confirm('정말로 이 프로젝트를 삭제하시겠습니까?');
+  
+    if (!confirmDelete) {
+      return; // 사용자가 취소를 클릭하면 함수 종료
+    }
+  
+    try {
+      // 서버의 프로젝트 삭제 API로 DELETE 요청
+      const response = await fetch(`${apiUrl}/project/delete_project/${project_code}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token")}`,  // JWT 토큰을 Authorization 헤더에 추가
+          'Content-Type': 'application/json',
+        }
+      });
+  
+      // 응답 상태가 OK가 아닌 경우 오류 처리
+      if (!response.ok) {
+        throw new Error('프로젝트 삭제 실패');
+      }
+  
+      // 성공적으로 삭제되었을 경우
+      const data = await response.json();
+      console.log(data.message);  // 서버에서 전달된 메시지 출력
+  
+      // 추가적인 UI 처리 (예: 프로젝트 목록 갱신 등)
+      alert(data.message);  // 프로젝트 삭제 성공 메시지 알림
+      navigate("/projects");
+    } catch (err) {
+      console.error('Error:', err);
+      alert('프로젝트 삭제에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+  
+  
 
   return (
     <div className="app">
@@ -454,6 +484,13 @@ const ProjectEdit = () => {
         <button onClick={handleSave} className="edit-save-button">
           저장
         </button>
+        <button className="edit-delete-button"
+          onClick={() => deleteProject(Project.project_code)}
+          disabled={loading}
+        >
+          {loading ? "삭제 중..." : "프로젝트 삭제"}
+        </button>
+        {error && <p style={{ color: "red" }}>{error}</p>}
       </div>
     </div>
   );
