@@ -252,7 +252,10 @@ const ProjectDetails = () => {
       <div className="project-container">
         <div className="edit-button-container">
           <h2 className="project-title">프로젝트 상세정보(품의서)</h2>
-          <button onClick={() => navigate("/projects")} className="project-list-button">
+          <button
+            onClick={() => navigate("/projects")}
+            className="project-list-button"
+          >
             목록
           </button>
         </div>
@@ -271,7 +274,7 @@ const ProjectDetails = () => {
           <p>데이터를 불러오는 중...</p>
         )}
 
-        <h3 className="section-title">🔹 인력</h3>
+        <h3 className="section-title">🔹 인력&nbsp;&nbsp;&nbsp;</h3>
         <Projectuserstable
           project_users={Project?.project_users}
           employees={employees}

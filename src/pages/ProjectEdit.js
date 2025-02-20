@@ -239,7 +239,6 @@ const ProjectEdit = () => {
       ? project_users
       : project_users.split(",").map((id) => ({ id: id.trim() })); // 문자열이면 쉼표 기준으로 나눔
 
-
     // employees 데이터에서 user 정보 찾아 매칭
     const matchedParticipants = participants.map((participant) => {
       const employee = employees.find(
@@ -299,7 +298,6 @@ const ProjectEdit = () => {
         business_end_date: formatDate(Project.business_end_date),
         assigned_user_ids: Project.project_users.map((user) => user.user_id),
       };
-
 
       const response = await fetch(`${apiUrl}/project/edit_project`, {
         method: "POST",
@@ -372,49 +370,55 @@ const ProjectEdit = () => {
 
   const deleteProject = async (project_code) => {
     // 삭제 여부 확인
-    const confirmDelete = window.confirm('정말로 이 프로젝트를 삭제하시겠습니까?');
-  
+    const confirmDelete = window.confirm(
+      "정말로 이 프로젝트를 삭제하시겠습니까?"
+    );
+
     if (!confirmDelete) {
       return; // 사용자가 취소를 클릭하면 함수 종료
     }
-  
+
     try {
       // 서버의 프로젝트 삭제 API로 DELETE 요청
-      const response = await fetch(`${apiUrl}/project/delete_project/${project_code}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem("token")}`,  // JWT 토큰을 Authorization 헤더에 추가
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        `${apiUrl}/project/delete_project/${project_code}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // JWT 토큰을 Authorization 헤더에 추가
+            "Content-Type": "application/json",
+          },
         }
-      });
-  
+      );
+
       // 응답 상태가 OK가 아닌 경우 오류 처리
       if (!response.ok) {
-        throw new Error('프로젝트 삭제 실패');
+        throw new Error("프로젝트 삭제 실패");
       }
-  
+
       // 성공적으로 삭제되었을 경우
       const data = await response.json();
-      console.log(data.message);  // 서버에서 전달된 메시지 출력
-  
+      console.log(data.message); // 서버에서 전달된 메시지 출력
+
       // 추가적인 UI 처리 (예: 프로젝트 목록 갱신 등)
-      alert(data.message);  // 프로젝트 삭제 성공 메시지 알림
+      alert(data.message); // 프로젝트 삭제 성공 메시지 알림
       navigate("/projects");
     } catch (err) {
-      console.error('Error:', err);
-      alert('프로젝트 삭제에 실패했습니다. 다시 시도해주세요.');
+      console.error("Error:", err);
+      alert("프로젝트 삭제에 실패했습니다. 다시 시도해주세요.");
     }
   };
-  
-  
 
   return (
     <div className="app">
       <Sidebar />
       <div className="project-container">
-      <div className="edit-button-container">
+        <div className="edit-button-container">
           <h2 className="project-title">프로젝트 상세정보(품의서)</h2>
-          <button onClick={() => navigate("/projects")} className="project-list-button">
+          <button
+            onClick={() => navigate("/projects")}
+            className="project-list-button"
+          >
             목록
           </button>
         </div>
@@ -455,7 +459,7 @@ const ProjectEdit = () => {
           </tbody>
         </table>
 
-        <h3 className="section-title">🔹 인력</h3>
+        <h3 className="section-title">🔹 인력&nbsp;&nbsp;&nbsp;</h3>
 
         <Projectuserstable
           project_users={Project?.project_users}
@@ -489,7 +493,17 @@ const ProjectEdit = () => {
         <button onClick={handleSave} className="edit-save-button">
           저장
         </button>
-        <button className="edit-delete-button"
+        <button
+          type="button"
+          className="edit-cancel-button"
+          onClick={() =>
+            navigate(`/project-details?project_code=${Project.project_code}`)
+          }
+        >
+          취소
+        </button>
+        <button
+          className="edit-delete-button"
           onClick={() => deleteProject(Project.project_code)}
           disabled={loading}
         >
