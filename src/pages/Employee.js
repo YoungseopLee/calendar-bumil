@@ -11,15 +11,14 @@ const EmployeeList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchText, setSearchText] = useState("");
-  const [searchField, setSearchField] = useState("name"); // ✅ 기본 검색 필드를 '이름'으로 설정
+  const [searchField, setSearchField] = useState("name"); 
   const [loggedInUserId, setLoggedInUserId] = useState(null);
   const [showFavorites, setShowFavorites] = useState(false);
   const [statusList, setStatusList] = useState([]);
-  const [userRole, setUserRole] = useState(null); // ✅ 사용자 역할 상태 추가
+  const [userRole, setUserRole] = useState(null); // AD_ADMIN, USR_GENERAL
 
 
   const apiUrl = process.env.REACT_APP_API_URL;
-  const navigate = useNavigate();
 
   const fetchStatusList = async () => {
     try {
@@ -28,7 +27,7 @@ const EmployeeList = () => {
       );
       if (!response.ok) throw new Error("상태 목록을 불러오지 못했습니다.");
       const data = await response.json();
-      setStatusList(data.statuses); // 예: [{ id: "파견", comment: "파견" }, ...]
+      setStatusList(data.statuses);
     } catch (error) {
       console.error("상태 목록 로딩 오류:", error);
     }
@@ -50,7 +49,7 @@ const EmployeeList = () => {
     
         const data = await response.json();
         setLoggedInUserId(data.user.id);
-        setUserRole(data.user.role_id); // ✅ 역할 저장 (admin 체크 가능)
+        setUserRole(data.user.role_id); 
       } catch (err) {
         setError(err.message);
       } finally {
@@ -104,14 +103,13 @@ const EmployeeList = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
-          user_id: loggedInUserId, // 로그인된 사용자 ID
-          favorite_user_id: employeeId, // 즐겨찾기 대상 사용자 ID
+          user_id: loggedInUserId, 
+          favorite_user_id: employeeId, 
         }),
       });
   
       if (!response.ok) throw new Error("즐겨찾기 상태 업데이트 실패");
   
-      // ✅ 즐겨찾기 목록 다시 불러오기 (업데이트 반영)
       fetchFavorites(loggedInUserId);
     } catch (error) {
       setError(error.message);
@@ -139,7 +137,7 @@ const EmployeeList = () => {
 
   const handleSearchFieldChange = (event) => {
     setSearchField(event.target.value);
-    setSearchText(""); // 필드 변경 시 검색어 초기화
+    setSearchText("");
   };
 
   const filterEmployees = (emp) => {
@@ -155,20 +153,20 @@ const EmployeeList = () => {
   const handleStatusChange = async (employeeId, newStatus) => {
     try {
       const response = await fetch(`${apiUrl}/status/update_status`, {  // ✅ API 경로 수정
-        method: "PUT",  // ✅ API에 맞게 PUT 요청 사용
+        method: "PUT", 
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,  // ✅ JWT 토큰 포함
         },
         body: JSON.stringify({
-          user_id: employeeId,  // ✅ user_id 포함 (백엔드에서 필요)
-          status: newStatus, // ✅ 변경할 상태
+          user_id: employeeId, 
+          status: newStatus, 
         }),
       });
   
       if (!response.ok) throw new Error("상태 변경 실패 + " + response.status);
   
-      fetchEmployees(); // ✅ 상태 변경 후 목록 다시 불러오기
+      fetchEmployees(); 
     } catch (error) {
       setError(error.message);
     }
@@ -209,7 +207,7 @@ const EmployeeList = () => {
             .map((employee) => (
               <li
                 key={employee.id}
-                className={`employee-item`} // ✅ getStatusClass 제거 가능
+                className={`employee-item`}
               >
                 <span
                   className={`favorite-icon ${favoriteEmployees.some((fav) => fav.id === employee.id) ? "" : "not-favorite"}`}
@@ -223,11 +221,11 @@ const EmployeeList = () => {
                 <span className="employee-name">{employee.name}</span>
                 <span className="employee-position">{employee.position}</span>
 
-                {/* ✅ 관리자(admin)와 일반 사용자(USR_GENERAL)만 상태 변경 가능 */}
-                {userRole === "AD_ADMIN" || userRole === "USR_GENERAL" ? (
+                {/* ✅ 관리자(admin)만 상태 변경 가능 */}
+                {userRole === "AD_ADMIN" ? (
                   <select
                     className="status-dropdown"
-                    value={employee.status} // ✅ 각 직원의 현재 상태를 표시하도록 수정
+                    value={employee.status} 
                     onChange={(e) => handleStatusChange(employee.id, e.target.value)}
                   >
                     {statusList.map((status) => (
@@ -237,7 +235,7 @@ const EmployeeList = () => {
                     ))}
                   </select>
                 ) : (
-                  <span>{employee.status}</span> // ✅ 일반 사용자는 상태를 변경하지 못하고 볼 수만 있음
+                  <span>{employee.status}</span> 
                 )}
               </li>
             ))}
