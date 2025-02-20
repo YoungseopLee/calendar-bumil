@@ -152,11 +152,11 @@ const EmployeeList = () => {
 
   const handleStatusChange = async (employeeId, newStatus) => {
     try {
-      const response = await fetch(`${apiUrl}/status/update_status`, {  // ✅ API 경로 수정
-        method: "PUT", 
+      const response = await fetch(`${apiUrl}/status/update_status`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,  // ✅ JWT 토큰 포함
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
           user_id: employeeId, 
@@ -164,10 +164,12 @@ const EmployeeList = () => {
         }),
       });
   
-      if (!response.ok) throw new Error("상태 변경 실패 + " + response.status);
+      if (!response.ok) throw new Error("상태 변경 실패!");
   
-      fetchEmployees(); 
+      alert("상태가 성공적으로 변경되었습니다! ✅");
+      fetchEmployees();
     } catch (error) {
+      alert("❌ 상태 변경에 실패했습니다!");
       setError(error.message);
     }
   };
