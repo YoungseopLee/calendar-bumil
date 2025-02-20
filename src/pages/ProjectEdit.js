@@ -213,42 +213,50 @@ const ProjectEdit = () => {
       : date.toISOString().split("T")[0];
   };
 
-  // 참여자 삭제 함수
   const handleRemoveParticipant = (userId) => {
     setProject((prevProject) => {
-      const updatedIds = prevProject.assigned_user_ids
-        ? prevProject.assigned_user_ids
-            .split(",")
-            .map((id) => id.trim())
-            .filter((id) => id !== "" && id !== userId)
-        : [];
+      // 기존 project_users에서 user_id가 일치하지 않는 요소만 남김
+      const updatedParticipants = prevProject.project_users.filter(
+        (participant) => participant.id !== userId
+      );
 
-      return {
+      const updatedProject = {
         ...prevProject,
-        assigned_user_ids: updatedIds.join(","),
+        project_users: updatedParticipants,
       };
+
+      console.log("🔹 삭제 후 project_users:", updatedProject.project_users);
+      return updatedProject;
     });
   };
 
-  // 참여자 목록 표를 표시하는 컴포넌트
-  const ParticipantsTable = ({ assignedUsersIds, employees }) => {
-    if (!assignedUsersIds || assignedUsersIds.length === 0) {
+  //참여자 목록 표를 표시하는 컴포넌트
+  const Projectuserstable = ({ project_users, employees }) => {
+    console.log("project_users : ", project_users);
+    if (!project_users || project_users.length === 0) {
       return <p>참여 인원이 없습니다.</p>;
     }
 
-    // assignedUsersIds가 배열이면 그대로 사용, 문자열이면 split 처리
-    const participantIds = Array.isArray(assignedUsersIds)
-      ? assignedUsersIds
-      : assignedUsersIds.split(",").filter((id) => id.trim() !== "");
+    // project_users가 객체 배열인지, 문자열인지 판별 후 가공
+    const participants = Array.isArray(project_users) // 배열 형태인지 확인
+      ? project_users
+      : project_users.split(",").map((id) => ({ id: id.trim() })); // 문자열이면 쉼표 기준으로 나눔
 
-    const matchedParticipants = participantIds.map((userId) => {
-      const employee = employees.find((emp) => emp.id === userId);
+    console.log("participants : ", participants);
+
+    // employees 데이터에서 user 정보 찾아 매칭
+    const matchedParticipants = participants.map((participant) => {
+      const employee = employees.find(
+        (emp) => emp.id.toString() === participant.user_id.toString()
+      );
       return {
-        id: userId,
+        id: participant.id,
         name: employee ? employee.name : "정보 없음",
         department: employee ? employee.department : "정보 없음",
         phone: employee ? employee.phone_number : "정보 없음",
         status: employee ? employee.status : "정보 없음",
+        start_date: formatDate(participant.start_date),
+        end_date: formatDate(participant.end_date),
       };
     });
 
@@ -256,9 +264,9 @@ const ProjectEdit = () => {
       <table className="project-table">
         <thead>
           <tr>
-            <th>부서</th>
             <th>이름</th>
-            <th>전화번호</th>
+            <th>참여 시작일</th>
+            <th>참여 종료일</th>
             <th>상태</th>
             <th>삭제</th>
           </tr>
@@ -266,9 +274,9 @@ const ProjectEdit = () => {
         <tbody>
           {matchedParticipants.map((participant) => (
             <tr key={participant.id}>
-              <td>{participant.department}</td>
               <td>{participant.name}</td>
-              <td>{participant.phone}</td>
+              <td>{participant.start_date}</td>
+              <td>{participant.end_date}</td>
               <td>{participant.status}</td>
               <td>
                 <button
@@ -293,9 +301,11 @@ const ProjectEdit = () => {
         ...Project,
         business_start_date: formatDate(Project.business_start_date),
         business_end_date: formatDate(Project.business_end_date),
+        assigned_user_ids: Project.project_users.map(user => user.user_id), 
       };
+      
       // 콘솔에 저장할 데이터 로그 출력
-      console.log("Saving project data:", projectToSave);
+      console.log("Saving project data:", JSON.stringify(projectToSave, null, 2));
 
       const response = await fetch(`${apiUrl}/project/edit_project`, {
         method: "POST",
@@ -321,7 +331,6 @@ const ProjectEdit = () => {
     }
   };
 
-  // 참여자 추가 함수
   const handleAddParticipant = () => {
     if (!selectedUser) {
       alert("추가할 참여자를 선택하세요.");
@@ -329,26 +338,45 @@ const ProjectEdit = () => {
     }
 
     setProject((prevProject) => {
-      const currentIds = prevProject.assigned_user_ids
-        ? prevProject.assigned_user_ids
-            .split(",")
-            .map((id) => id.trim())
-            .filter((id) => id !== "")
-        : [];
+      const currentDate = new Date();
+      const currentDateStr = currentDate.toUTCString(); // "Thu, 27 Feb 2025 00:00:00 GMT"
 
-      // 중복 체크 후 새로운 ID 추가 (문자열 비교)
-      if (!currentIds.includes(selectedUser.value)) {
-        currentIds.push(selectedUser.value);
+      // 기존 `project_users` 배열 복사
+      const updatedParticipants = [...prevProject.project_users];
+
+      // `employees`에서 `selectedUser`에 해당하는 객체 찾기
+      const newParticipant = employees.find(
+        (emp) => emp.id === selectedUser.value
+      );
+      console.log("testemp:", newParticipant);
+      if (!newParticipant) {
+        alert("선택한 사용자를 찾을 수 없습니다.");
+        return prevProject;
+      }
+
+      // 중복 체크 후 추가
+      if (
+        !updatedParticipants.some((user) => user.user_id === newParticipant.id)
+      ) {
+        updatedParticipants.push({
+          ...newParticipant,
+          user_id: newParticipant.id, // `user_id`로 변경
+          start_date: currentDateStr, // 현재 날짜를 start_date로 추가
+          end_date: currentDateStr, // 현재 날짜를 end_date로 추가
+        });
+      } else {
+        alert("이미 추가되어있습니다.");
       }
 
       return {
         ...prevProject,
-        assigned_user_ids: currentIds.join(","),
+        project_users: updatedParticipants, // 기존 `project`에서 `project_users`만 업데이트
       };
     });
 
     setSelectedUser(null);
-  };
+};
+
 
   return (
     <div className="app">
@@ -394,10 +422,8 @@ const ProjectEdit = () => {
 
         <h3 className="section-title">🔹 인력</h3>
 
-        <ParticipantsTable
-          assignedUsersIds={Project?.assigned_user_ids
-            ?.split(",")
-            .filter((id) => id.trim() !== "")}
+        <Projectuserstable
+          project_users={Project?.project_users}
           employees={employees}
         />
 
