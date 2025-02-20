@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Employee.css";
 import Sidebar from "./Sidebar";
 import BackButton from "./BackButton";
+import { useNavigate } from "react-router-dom";
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
@@ -15,6 +16,7 @@ const EmployeeList = () => {
   const [isFavoritesOpen] = useState(true);
 
   const apiUrl = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchLoggedInUser = async () => {
@@ -231,9 +233,10 @@ const EmployeeList = () => {
               <li
                 key={employee.id}
                 className={`employee-item ${getStatusClass(employee.status)}`}
-                onClick={() =>
-                  console.log(`선택한 사원: `,employee)
-                }
+                onClick={() => {
+                  console.log(`선택한 사원: `, employee);
+                  navigate(`/user-details?user_id=${employee.id}`); //클릭하면 사용자 상세 페이지로 이동
+                }}
               >
                 <span className="employee-name">{employee.name}</span>
                 <span className="employee-position">{employee.position}</span>
