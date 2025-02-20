@@ -29,9 +29,46 @@
   transition: background-color 0.3s ease;
 }
 
+.project-list-button{
+  margin-right: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 0.8em;
+  transition: background-color 0.3s ease;
+}
+
 .edit-save-button {
   margin: 10px;
   background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
+
+.edit-cancel-button{
+  margin: 10px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: background-color 0.3s ease;
+}
+
+.edit-delete-button {
+  margin: 10px;
+  margin-left: 10px;
+  background-color: #ff5a5a;
   color: white;
   border: none;
   border-radius: 5px;
@@ -50,6 +87,7 @@
 }
 
 .section-title {
+  float: left;
   font-size: 16px;
   font-weight: bold;
   color: #007acc;
@@ -106,4 +144,8 @@
   border-color: #007bff;
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
   outline: none;
+}
+
+.form-section{
+  margin-left:10px
 }

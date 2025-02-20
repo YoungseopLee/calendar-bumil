@@ -10,7 +10,7 @@ project_bp = Blueprint('project', __name__, url_prefix='/project')
 @project_bp.route('/get_all_project', methods=['GET', 'OPTIONS'])
 def get_all_project():
     if request.method == 'OPTIONS':
-        return jsonify({'message': 'CORS preflight request success'})
+        return jsonify({'message': 'CORS preflight request success'}), 200
     try:
         conn = get_db_connection()
         if conn is None:
@@ -25,6 +25,18 @@ def get_all_project():
         """
         cursor.execute(sql)
         projects = cursor.fetchall()
+        
+        for project in projects:
+            if project.get("assigned_user_ids"):
+                encrypted_ids = project["assigned_user_ids"].split(",")
+                decrypted_ids = [
+                    decrypt_deterministic(eid.strip())
+                    for eid in encrypted_ids if eid.strip() != ""
+                ]
+                project["assigned_user_ids"] = decrypted_ids  # 배열 형태로 저장
+            else:
+                project["assigned_user_ids"] = []
+        
         return jsonify({'projects': projects}), 200
     except Exception as e:
         print(f"프로젝트 가져오기 오류: {e}")

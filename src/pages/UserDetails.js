@@ -222,14 +222,16 @@ const UserDetails = () => {
         <BackButton />
       </header>
       <div className="userdetail-container">
-        {/* 프로필 아이콘 추가 */}
-        <div className="userdetail-profile-icon">
-          <FaUserCircle className="user-icon" />
-        </div>
+        <div className="userdetail-icon-name-section">
+          {/* 프로필 아이콘 추가 */}
+          <div className="userdetail-icon-section">
+            <FaUserCircle className="user-icon" />
+          </div>
 
-        {/* 사용자 이름 */}
-        <div className="userdetail-header-section">
-          <h2>{user.name}</h2>
+          {/* 사용자 이름 */}
+          <div className="userdetail-name-section">
+            <h2>{user.name}</h2>
+          </div>
         </div>
 
         {/* 사용자 정보 */}

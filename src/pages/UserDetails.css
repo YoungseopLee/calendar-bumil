@@ -6,6 +6,7 @@
   align-items: center;
   height: 100vh;
   padding: 20px;
+  margin-top: 20px; /*사이드바를 위한 상단 여백*/
 }
 
 /* 프로필 카드 */
@@ -19,28 +20,34 @@
   background-color: white;
   border-radius: 15px;
   /*overflow: hidden;*/
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  /*box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);*/
   font-family: "Poppins", sans-serif;
-  border: 3px solid #007bff;
-  padding: 20px;
+  /*border: 3px solid #007bff;*/
+  padding: 8px;
   text-align: center;
+  align-items: flex-start;
+}
+.userdetail-icon-name-section {
+  display: flex;
+  align-items: center; /* 세로 정렬 */
+  justify-content: flex-start; /* 왼쪽 정렬 */
+  gap: 10px; /* 아이콘과 이름 사이의 간격 */
 }
 
 /* 프로필 아이콘 스타일 */
-.userdetail-profile-icon {
-  margin-top: 0px; /* 아이콘을 프로필 카드 위에 위치 */
+.userdetail-icon-section {
   background-color: white;
   border-radius: 50%;
   padding: 10px;
 }
 
 .user-icon {
-  font-size: 120px;
+  font-size: 40px;
   color: #007bff;
 }
 
 /* 사용자 정보 스타일 */
-.userdetail-header-section {
+.userdetail-name-section {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -49,17 +56,20 @@
 
 /* 사용자 정보 */
 .userdetail-content {
-  padding: 20px;
+  padding: 0px;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* 왼쪽 정렬 */
 }
 
 .userdetail-details {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  margin-left: auto;
-  margin-right: auto;
-  width: fit-content;
+  margin-left: 0; /* 왼쪽 정렬 */
+  margin-right: 0; /* 오른쪽 여백 제거 */
+  width: 100%; /* 너비를 100%로 설정 */
 }
 
 /* 정보 스타일 */
@@ -102,20 +112,23 @@
 .userdetail-projects {
   flex-grow: 1;
   width: 100%; /* 부모 요소의 너비를 채우도록 설정 */
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 /* 프로젝트 테이블 스타일 */
 .project-table {
+  table-layout: fixed; /* 각 열의 너비를 고정 */
   width: 100%; /* 테이블 너비를 100%로 설정 */
   border-collapse: collapse; /* 테이블 경계선 겹침 방지 */
   margin-top: 20px; /* 테이블 상단 여백 */
 }
 
 .project-table th, .project-table td {
+  width: 8.33%; /* 12개월 기준으로 균등 분배 */
+  overflow: hidden; /* 넘치는 내용 그냥 가려지도록 설정 */
+  white-space: nowrap; /* 한 줄로 표시 */
   border: 1px solid #ddd; /* 테이블 셀 경계선 */
   padding: 12px; /* 테이블 셀 패딩 */
-  text-align: left; /* 텍스트 정렬 */
   width: 8.33%; /* 열 너비를 고정 */
 }
 
@@ -158,10 +171,11 @@
   font-weight: bold;
   color: #333;
 }
-
 .project-cell {
-  text-align: center; /* 프로젝트명 가운데 정렬 */
+  text-align: center !important; /* 강제 적용 */
+  vertical-align: middle; /* 세로 중앙 정렬 */
 }
+
 
 /* 반응형 스타일 */
 @media (max-width: 768px) {
