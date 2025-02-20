@@ -2,36 +2,54 @@ import React, { useState, useEffect } from "react";
 import "./Employee.css";
 import Sidebar from "./Sidebar";
 import BackButton from "./BackButton";
+import { useNavigate } from "react-router-dom";
+
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [favoriteEmployees, setFavoriteEmployees] = useState([]);
-  const [departments, setDepartments] = useState([]);
-  const [selectedDepartment, setSelectedDepartment] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchText, setSearchText] = useState("");
+  const [searchField, setSearchField] = useState("name"); 
   const [loggedInUserId, setLoggedInUserId] = useState(null);
-  const [isFavoritesOpen] = useState(true);
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [statusList, setStatusList] = useState([]);
+  const [userRole, setUserRole] = useState(null); // AD_ADMIN, USR_GENERAL
+
 
   const apiUrl = process.env.REACT_APP_API_URL;
+
+  const fetchStatusList = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/status/get_status_list`
+      );
+      if (!response.ok) throw new Error("상태 목록을 불러오지 못했습니다.");
+      const data = await response.json();
+      setStatusList(data.statuses);
+    } catch (error) {
+      console.error("상태 목록 로딩 오류:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchLoggedInUser = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("사용자 인증 정보가 없습니다.");
-
+    
         const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         });
-
+    
         if (!response.ok)
           throw new Error("로그인 사용자 정보를 가져오는 데 실패했습니다.");
-
+    
         const data = await response.json();
         setLoggedInUserId(data.user.id);
+        setUserRole(data.user.role_id); 
       } catch (err) {
         setError(err.message);
       } finally {
@@ -40,6 +58,7 @@ const EmployeeList = () => {
     };
 
     fetchLoggedInUser();
+    fetchStatusList();
   }, []);
 
   useEffect(() => {
@@ -47,7 +66,7 @@ const EmployeeList = () => {
       fetchFavorites(loggedInUserId);
       fetchEmployees();
     }
-  }, [loggedInUserId]); // ✅ 즐겨찾기 목록 변경될 때도 갱신
+  }, [loggedInUserId]);
 
   const fetchFavorites = async (userId) => {
     try {
@@ -67,44 +86,15 @@ const EmployeeList = () => {
         throw new Error("즐겨찾기 목록을 가져오는 데 실패했습니다.");
 
       const data = await response.json();
-
-      if (!data.favorite || !Array.isArray(data.favorite)) {
-        setFavoriteEmployees([]);
-        return;
-      }
-
-      setFavoriteEmployees(data.favorite);
+      setFavoriteEmployees(data.favorite || []);
     } catch (err) {
       setError(err.message);
     }
   };
-
-  const fetchEmployees = async () => {
-    try {
-      const response = await fetch(`${apiUrl}/user/get_users`);
-      if (!response.ok)
-        throw new Error("사용자 데이터를 가져오는 데 실패했습니다.");
-      const data = await response.json();
-      setEmployees(data.users); // 필터링 없이 전체 사용자 목록 저장
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 렌더링 시에 즐겨찾기 목록 기준 필터링 적용
-  const displayedEmployees = employees.filter(
-    (emp) => !favoriteEmployees.some((fav) => fav.id === emp.id)
-  );
 
   const toggleFavorite = async (employeeId) => {
-    console.log("toggleFavorite 호출 - employeeId:", employeeId);
-    if (!employeeId) {
-      console.error("employeeId가 유효하지 않습니다:", employeeId);
-      return;
-    }
-
+    if (!loggedInUserId) return;
+  
     try {
       const response = await fetch(`${apiUrl}/favorite/toggle_favorite`, {
         method: "POST",
@@ -113,43 +103,31 @@ const EmployeeList = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
-          user_id: loggedInUserId,
-          favorite_user_id: employeeId,
+          user_id: loggedInUserId, 
+          favorite_user_id: employeeId, 
         }),
       });
-
-      if (!response.ok)
-        throw new Error("즐겨찾기 상태를 업데이트하는 데 실패했습니다.");
-
-      // ✅ 즐겨찾기 목록과 사원 목록 업데이트
+  
+      if (!response.ok) throw new Error("즐겨찾기 상태 업데이트 실패");
+  
       fetchFavorites(loggedInUserId);
-      fetchEmployees();
     } catch (error) {
       setError(error.message);
     }
   };
 
-  const getStatusClass = (status) => {
-    switch (status) {
-      case "출근":
-        return "status-work";
-      case "외근":
-        return "status-outside";
-      case "휴가":
-        return "status-vacation";
-      case "파견":
-        return "status-dispatch";
-      default:
-        return "status-default";
-    }
-  };
+  const fetchEmployees = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/user/get_users`);
+      if (!response.ok)
+        throw new Error("사용자 데이터를 가져오는 데 실패했습니다.");
 
-  const getStatusTextColor = (status) => {
-    switch (status) {
-      case "외근":
-        return "black";
-      default:
-        return "white";
+      const data = await response.json();
+      setEmployees(data.users);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -157,100 +135,117 @@ const EmployeeList = () => {
     setSearchText(event.target.value.trim().toLowerCase());
   };
 
+  const handleSearchFieldChange = (event) => {
+    setSearchField(event.target.value);
+    setSearchText("");
+  };
+
+  const filterEmployees = (emp) => {
+    if (!searchText) return true;
+    const value = emp[searchField]?.toLowerCase() || "";
+    return value.includes(searchText);
+  };
+
   if (loading) return <p>데이터를 불러오는 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
+
+
+  const handleStatusChange = async (employeeId, newStatus) => {
+    try {
+      const response = await fetch(`${apiUrl}/status/update_status`, {  // ✅ API 경로 수정
+        method: "PUT", 
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,  // ✅ JWT 토큰 포함
+        },
+        body: JSON.stringify({
+          user_id: employeeId, 
+          status: newStatus, 
+        }),
+      });
+  
+      if (!response.ok) throw new Error("상태 변경 실패 + " + response.status);
+  
+      fetchEmployees(); 
+    } catch (error) {
+      setError(error.message);
+    }
+  };
 
   return (
     <div className="app">
       <Sidebar />
       <BackButton />
       <div className="box">
-        {/* <h2 className="title">내 즐겨찾기 목록</h2>
-        {isFavoritesOpen && (
-          <div className="favorite-list">
-            {favoriteEmployees.length > 0 ? (
-              favoriteEmployees.map((favorite, index) => (
-                <div
-                  key={favorite.id ? favorite.id : `${index}`}
-                  className={`favorite-item ${getStatusClass(favorite.status)}`}
-                >
-                  <span
-                    className="favorite-icon"
-                    onClick={() => toggleFavorite(favorite.id)}
-                  >
-                    ★
-                  </span>
-                  <span className="employee-name">{favorite.name}</span>
-                  <span className="employee-position">{favorite.position}</span>
-                  <span
-                    className={`employee-status ${getStatusClass(
-                      favorite.status
-                    )}`}
-                    style={{ color: getStatusTextColor(favorite.status) }}
-                  >
-                    {favorite.status}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p className="no-favorites">즐겨찾기가 없습니다.</p>
-            )}
-          </div>
-        )} */}
-
         <h2 className="title">사원 목록</h2>
-        {/* <select
-          className="department-dropdown"
-          value={selectedDepartment}
-          onChange={(e) => setSelectedDepartment(e.target.value)}
-        >
-          <option value="">전체 부서</option>
-          {departments.map((dept) => (
-            <option key={dept} value={dept}>
-              {dept}
-            </option>
-          ))}
-        </select> */}
-
-        <input
-          type="text"
-          className="search-input"
-          placeholder="사원 이름으로 검색..."
-          onChange={handleSearch}
-        />
-
+  
+        <div className="toggle-container">
+          <button className="toggle-button" onClick={() => setShowFavorites(!showFavorites)}>
+            {showFavorites ? "전체 사원 보기" : "즐겨찾기 보기"}
+          </button>
+        </div>
+  
+        <div className="search-container">
+          <select className="search-dropdown" value={searchField} onChange={handleSearchFieldChange}>
+            <option value="name">이름</option>
+            <option value="position">직급</option>
+            <option value="department">부서</option>
+            <option value="status">상태</option>
+          </select>
+  
+          <input
+            type="text"
+            className="search-input"
+            placeholder={`검색할 ${searchField} 입력...`}
+            onChange={handleSearch}
+            value={searchText}
+          />
+        </div>
         <ul className="employee-list">
-          {displayedEmployees
-            .filter(
-              (emp) =>
-                !selectedDepartment ||
-                emp.department.includes(selectedDepartment)
-            )
-            .filter((emp) => emp.name.toLowerCase().includes(searchText))
+          {(showFavorites ? favoriteEmployees : employees)
+            .filter(filterEmployees)
             .map((employee) => (
               <li
                 key={employee.id}
-                className={`employee-item ${getStatusClass(employee.status)}`}
-                onClick={() =>
-                  console.log(`선택한 사원: `,employee)
-                }
+                className={`employee-item`}
               >
+                <span
+                  className={`favorite-icon ${favoriteEmployees.some((fav) => fav.id === employee.id) ? "" : "not-favorite"}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(employee.id);
+                  }}
+                >
+                  ★
+                </span>
                 <span className="employee-name">{employee.name}</span>
                 <span className="employee-position">{employee.position}</span>
-                <span
-                  className={`employee-status ${getStatusClass(
-                    employee.status
-                  )}`}
-                  style={{ color: getStatusTextColor(employee.status) }}
-                >
-                  {employee.status}
-                </span>
+
+                {/* ✅ 관리자(admin)만 상태 변경 가능 */}
+                {userRole === "AD_ADMIN" ? (
+                  <select
+                    className="status-dropdown"
+                    value={employee.status} 
+                    onChange={(e) => handleStatusChange(employee.id, e.target.value)}
+                  >
+                    {statusList.map((status) => (
+                      <option key={status.id} value={status.id}>
+                        {status.comment}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <span>{employee.status}</span> 
+                )}
               </li>
             ))}
-        </ul>
+        </ul>  
+
       </div>
     </div>
   );
+
 };
 
 export default EmployeeList;
+

@@ -200,7 +200,7 @@ const ProjectDetails = () => {
     const matchedParticipants = participants.map((participant) => {
       const employee = employees.find((emp) => emp.id.toString() === participant.user_id.toString());
       return {
-        //id: participant.id,
+        id: employee ? employee.id : "정보 없음",
         name: employee ? employee.name : "정보 없음",
         department: employee ? employee.department : "정보 없음",
         phone: employee ? employee.phone_number : "정보 없음",
@@ -224,7 +224,14 @@ const ProjectDetails = () => {
         <tbody>
           {matchedParticipants.map((participant) => (
             <tr key={participant.id}>
-              <td>{participant.name}</td>
+              <td>
+              {/* 이름을 클릭하면 사용자 상세 페이지로 이동 */}
+              <span
+                onClick={() => navigate(`/user-details?user_id=${participant.id}`)}
+              >
+                {participant.name}
+              </span>
+            </td>
               <td>{participant.start_date}</td>
               <td>{participant.end_date}</td>
               <td>{participant.status}</td>

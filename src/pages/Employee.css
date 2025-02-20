@@ -158,11 +158,42 @@
     padding: 5px 10px;
     border-radius: 5px;
     cursor: pointer;
-    margin-left: 10px;
 }
 
 .toggle-button:hover {
     background-color: #0056b3;
+}
+
+/* ✅ 즐겨찾기 보기 버튼을 검색창 위로 이동 */
+.toggle-container {
+    display: flex;
+    justify-content: flex-start; /* 왼쪽 정렬 */
+    width: 100%;
+    margin-bottom: 10px; /* 버튼과 검색창 간격 조정 */
+}
+
+/* ✅ 검색 컨테이너 (드롭다운 + 검색창) */
+.search-container {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+/* ✅ 검색 드롭다운 스타일 */
+.search-dropdown {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    width: 120px;
+}
+
+/* ✅ 검색 입력창 스타일 */
+.search-input {
+    flex-grow: 1;
 }
 
 .department-tabs {
@@ -210,6 +241,17 @@
 .department-dropdown:focus {
     border-color: #007bff;
     outline: none;
+}
+
+/* ✅ 상태 변경 드롭다운 스타일 */
+.status-dropdown {
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    background-color: white;
+    margin-left: 10px;
 }
 
 /* ✅ 상태별 배경색 적용 (작은 박스만 변경) */

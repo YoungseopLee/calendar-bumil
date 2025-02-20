@@ -149,6 +149,7 @@ def login():
         payload = {
             'user_id': user['id'],
             'name': user['name'],
+            'role_id': user['role_id'],
             'exp': datetime.now(timezone.utc) + timedelta(hours=1)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
