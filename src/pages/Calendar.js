@@ -13,6 +13,7 @@ const Calendar = () => {
   const [departments, setDepartments] = useState([]);
   const [selectedDepartment, setSelectedDepartment] = useState("");
   const [users, setUsers] = useState([]); // 직원 목록
+  const [statusList, setStatusList] = useState([]); // 상태 목록 (백엔드 CRUD 결과)
   const navigate = useNavigate();
 
   // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
@@ -69,7 +70,21 @@ const Calendar = () => {
 
     fetchData();
     fetchLoggedInUser(); // 사용자 상태 업데이트
+    fetchStatusList(); // 상태 목록 가져오기
   }, []);
+
+  const fetchStatusList = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/status/get_status_list`
+      );
+      if (!response.ok) throw new Error("상태 목록을 불러오지 못했습니다.");
+      const data = await response.json();
+      setStatusList(data.statuses); // 예: [{ id: "파견", comment: "파견" }, ...]
+    } catch (error) {
+      console.error("상태 목록 로딩 오류:", error);
+    }
+  };
 
   const monthNames = [
     "1월",
@@ -85,7 +100,6 @@ const Calendar = () => {
     "11월",
     "12월",
   ];
-
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth();
 
@@ -194,10 +208,9 @@ const Calendar = () => {
   const handleStatusChange = async (e) => {
     const newStatus = e.target.value;
     setUserStatus(newStatus);
-
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/user/update_status`,
+        `${process.env.REACT_APP_API_URL}/status/update_status`,
         {
           method: "PUT",
           headers: {
@@ -207,15 +220,13 @@ const Calendar = () => {
           body: JSON.stringify({ status: newStatus }),
         }
       );
-
       if (response.status === 401) {
-        handleLogout(); // 401 응답 시 자동 로그아웃
+        handleLogout();
         return;
       }
-
       if (response.ok) {
         alert("상태가 변경되었습니다.");
-        fetchLoggedInUser(); // 상태 변경 후 다시 사용자 정보 불러오기
+        fetchLoggedInUser();
       } else {
         alert("상태 변경에 실패했습니다.");
       }
@@ -225,7 +236,6 @@ const Calendar = () => {
     }
   };
 
-  // 자동 로그아웃 함수
   const handleLogout = () => {
     alert("세션이 만료되었습니다. 다시 로그인해주세요.");
     localStorage.removeItem("token");
@@ -246,12 +256,10 @@ const Calendar = () => {
           },
         }
       );
-
       if (response.status === 401) {
-        handleLogout(); // 401 응답 시 자동 로그아웃 처리
+        handleLogout();
         return;
       }
-
       if (response.ok) {
         const data = await response.json();
         const status = data.user.status || "";
@@ -317,9 +325,11 @@ const Calendar = () => {
               value={userStatus || ""}
               onChange={handleStatusChange}
             >
-              <option value=""></option>
-              <option value="파견">파견</option>
-              <option value="휴가">휴가</option>
+              {statusList.map((status) => (
+                <option key={status.id} value={status.id}>
+                  {status.comment}
+                </option>
+              ))}
             </select>
           </div>
         </div>

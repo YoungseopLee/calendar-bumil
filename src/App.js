@@ -4,14 +4,15 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import Calendar from "./pages/Calendar";
 import Manager from "./pages/Manager";
+import StatusManagement from "./pages/StatusManagement";
 import AddSchedule from "./pages/AddSchedule";
 import Employee from "./pages/Employee";
 import EditSchedule from "./pages/EditSchedule";
 import MyPage from "./pages/MyPage";
 import Department_view from "./pages/Department-view";
 import Profile from "./pages/Profile";
-import ProjectDetails from "./pages/ProjectDetails"
-import ProjectPage from "./pages/ProjectPage";  // 추가
+import ProjectDetails from "./pages/ProjectDetails";
+import ProjectPage from "./pages/ProjectPage"; // 추가
 import ProjectEdit from "./pages/ProjectEdit";
 import ProjectCreate from "./pages/ProjectCreate";
 import ChangePWPage from "./pages/ChangePWPage";
@@ -25,12 +26,14 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         {/* 회원가입 페이지 */}
         <Route path="/signup" element={<SignupPage />} />
-        {/* Calendar 페이지(메인) */}
+        {/* Calendar 페이지 */}
         <Route path="/calendar" element={<Calendar />} />
-        {/* 일정 추가 페이지(메인) */}
+        {/* 일정 추가 페이지 */}
         <Route path="/add-schedule" element={<AddSchedule />} />
-        {/* 사이드바 (메인) */}
-        <Route path="/Manager" element={<Manager />} />
+        {/* 어드민 페이지 */}
+        <Route path="/manager" element={<Manager />} />
+        {/* 상태 CRUD 페이지 */}
+        <Route path="/status-management" element={<StatusManagement />} />
         {/* 사원 페이지 */}
         <Route path="/employee" element={<Employee />} />
         {/* 일정 수정 페이지 */}
