@@ -6,6 +6,7 @@ from .auth import decrypt_aes, decrypt_deterministic, encrypt_deterministic
 
 user_bp = Blueprint('user', __name__, url_prefix='/user')
 
+
 # 첫 로그인 사용자 목록 조회
 @user_bp.route('/get_pending_users', methods=['GET', 'OPTIONS'])
 def get_pending_users():

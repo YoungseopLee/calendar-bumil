@@ -6,22 +6,6 @@ from .auth import decrypt_aes, decrypt_deterministic, encrypt_deterministic  # �
 
 favorite_bp = Blueprint('favorite', __name__, url_prefix='/favorite')
 
-from flask import Blueprint, request, jsonify
-import jwt
-from db import get_db_connection
-from config import SECRET_KEY
-from .auth import decrypt_aes, decrypt_deterministic, encrypt_deterministic  # 암호화 함수 추가
-
-favorite_bp = Blueprint('favorite', __name__, url_prefix='/favorite')
-
-from flask import Blueprint, request, jsonify
-import jwt
-from db import get_db_connection
-from config import SECRET_KEY
-from .auth import decrypt_aes, decrypt_deterministic, encrypt_deterministic
-
-favorite_bp = Blueprint('favorite', __name__, url_prefix='/favorite')
-
 @favorite_bp.route('/toggle_favorite', methods=['POST', 'OPTIONS'])
 def toggle_favorite():
     if request.method == 'OPTIONS':
