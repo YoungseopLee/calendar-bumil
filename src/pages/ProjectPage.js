@@ -131,7 +131,8 @@ const ProjectPage = () => {
   return (
     <div className="project-page">
       <Sidebar />
-      {roleId == "USR_GENERAL" && <AddProjectButton />}
+      {/*roleId 가 AD_ADMIN 또는 USR_GENERAR 또는 PR_ADMIN 일 때 생성버튼 활성화 */}
+      {roleId === "AD_ADMIN" || roleId === "USR_GENERAL" || roleId === "PR_ADMIN" ? <AddProjectButton /> : null}
       <div className="content">
         <div className="projectPage-box">
           <h1 className="title">프로젝트 목록</h1>
