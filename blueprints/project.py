@@ -316,7 +316,7 @@ def edit_project():
             return jsonify({'message': '수정할 프로젝트를 찾을 수 없습니다.'}), 404
         old_project_code = old_project['project_code']
         cursor.close()
-
+        
         # tb_project 업데이트
         cursor = conn.cursor()
         sql_project = """
