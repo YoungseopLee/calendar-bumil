@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 import jwt
 from db import get_db_connection
+from .auth import encrypt_deterministic
 from config import SECRET_KEY
 
 status_bp = Blueprint('status', __name__, url_prefix='/status')
@@ -171,11 +172,13 @@ def update_status():
         if new_status is None or new_status.strip() == '':
             new_status = None
 
+        encrypted_target_user_id = encrypt_deterministic(target_user_id)
+
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor()
-        cursor.execute("UPDATE tb_user SET status = %s WHERE id = %s", (new_status, target_user_id))
+        cursor.execute("UPDATE tb_user SET status = %s WHERE id = %s", (new_status, encrypted_target_user_id))
         conn.commit()
         return jsonify({'message': '상태가 업데이트되었습니다.'}), 200
 
