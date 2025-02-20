@@ -83,34 +83,9 @@ const ProjectDetails = () => {
         throw new Error("프로젝트 상세정보를 불러오지 못했습니다.");
       }
       const data = await response.json();
-      // 응답이 { project: { ... } } 형태라면:
       console.log("project response : ", data);
       setProject(data.project);
 
-      //더미데이터 삽입
-      /*
-      const dummyData = {
-        category: "유지보수",
-        status: "수행",
-        project_code: "20250122_00004",
-        business_start_date: "Wed, 1 Jan 2025 00:00:00 GMT",
-        business_end_date: "Wed, 31 Dec 2025 00:00:00 GMT",
-        group_name: "그룹명 A",
-        project_name:
-          "유지보수 인프라 대진정보통신(주) - 국가정보자원관리원 대구센터",
-        customer: "대진정보통신(주)",
-        supplier: "대진정보통신(주)",
-        person_in_charge: "최치후 부장",
-        contact_number: "054-1234-1234",
-        sales_representative: "조우성",
-        project_pm: "조우성",
-        project_manager: "-",
-        project_participant: "조우성, 이영섭",
-        business_details_and_notes: "📌 사용인장: 1번 도장",
-        changes: "변경사항입니다",
-      };
-      setProject(dummyData);
-      */
     } catch (err) {
       setError(err.message);
     } finally {
@@ -207,46 +182,51 @@ const ProjectDetails = () => {
   };
 
   //참여자 목록 표를 표시하는 컴포넌트
-  const ParticipantsTable = ({ participants, employees }) => {
-    if (
-      !participants ||
-      (Array.isArray(participants) && participants.length === 0)
-    ) {
+  const Projectuserstable = ({ project_users, employees }) => {
+    console.log("project_users : ", project_users);
+    if (!project_users || project_users.length === 0) {
       return <p>참여 인원이 없습니다.</p>;
     }
-
-    // participants가 배열이면 그대로 사용, 문자열이면 split 처리
-    const participantIds = Array.isArray(participants)
-      ? participants
-      : participants.split(",").filter((id) => id.trim() !== "");
-
-    const matchedParticipants = participantIds.map((userId) => {
-      const employee = employees.find((emp) => emp.id === userId);
+  
+    // project_users가 객체 배열인지, 문자열인지 판별 후 가공
+    const participants =
+      Array.isArray(project_users) // 배열 형태인지 확인
+        ? project_users
+        : project_users.split(",").map((id) => ({ id: id.trim() })); // 문자열이면 쉼표 기준으로 나눔
+  
+    console.log("participants : ", participants);
+  
+    // employees 데이터에서 user 정보 찾아 매칭
+    const matchedParticipants = participants.map((participant) => {
+      const employee = employees.find((emp) => emp.id.toString() === participant.user_id.toString());
       return {
-        id: userId,
+        //id: participant.id,
         name: employee ? employee.name : "정보 없음",
         department: employee ? employee.department : "정보 없음",
         phone: employee ? employee.phone_number : "정보 없음",
         status: employee ? employee.status : "정보 없음",
+        start_date: formatDate(participant.start_date),
+        end_date: formatDate(participant.end_date),
       };
+
     });
 
     return (
       <table className="project-table">
         <thead>
           <tr>
-            <th>부서</th>
             <th>이름</th>
-            <th>전화번호</th>
+            <th>참여 시작일</th>
+            <th>참여 종료일</th>
             <th>상태</th>
           </tr>
         </thead>
         <tbody>
           {matchedParticipants.map((participant) => (
             <tr key={participant.id}>
-              <td>{participant.department}</td>
               <td>{participant.name}</td>
-              <td>{participant.phone}</td>
+              <td>{participant.start_date}</td>
+              <td>{participant.end_date}</td>
               <td>{participant.status}</td>
             </tr>
           ))}
@@ -276,8 +256,8 @@ const ProjectDetails = () => {
         )}
 
         <h3 className="section-title">🔹 인력</h3>
-        <ParticipantsTable
-          participants={Project?.participants}
+        <Projectuserstable
+          project_users={Project?.project_users}
           employees={employees}
         />
       </div>
