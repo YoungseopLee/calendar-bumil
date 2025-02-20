@@ -85,7 +85,6 @@ const ProjectDetails = () => {
       const data = await response.json();
       console.log("project response : ", data);
       setProject(data.project);
-
     } catch (err) {
       setError(err.message);
     } finally {
@@ -187,18 +186,19 @@ const ProjectDetails = () => {
     if (!project_users || project_users.length === 0) {
       return <p>참여 인원이 없습니다.</p>;
     }
-  
+
     // project_users가 객체 배열인지, 문자열인지 판별 후 가공
-    const participants =
-      Array.isArray(project_users) // 배열 형태인지 확인
-        ? project_users
-        : project_users.split(",").map((id) => ({ id: id.trim() })); // 문자열이면 쉼표 기준으로 나눔
-  
+    const participants = Array.isArray(project_users) // 배열 형태인지 확인
+      ? project_users
+      : project_users.split(",").map((id) => ({ id: id.trim() })); // 문자열이면 쉼표 기준으로 나눔
+
     console.log("participants : ", participants);
-  
+
     // employees 데이터에서 user 정보 찾아 매칭
     const matchedParticipants = participants.map((participant) => {
-      const employee = employees.find((emp) => emp.id.toString() === participant.user_id.toString());
+      const employee = employees.find(
+        (emp) => emp.id.toString() === participant.user_id.toString()
+      );
       return {
         id: employee ? employee.id : "정보 없음",
         name: employee ? employee.name : "정보 없음",
@@ -208,7 +208,6 @@ const ProjectDetails = () => {
         start_date: formatDate(participant.start_date),
         end_date: formatDate(participant.end_date),
       };
-
     });
 
     return (
@@ -225,13 +224,15 @@ const ProjectDetails = () => {
           {matchedParticipants.map((participant) => (
             <tr key={participant.id}>
               <td>
-              {/* 이름을 클릭하면 사용자 상세 페이지로 이동 */}
-              <span
-                onClick={() => navigate(`/user-details?user_id=${participant.id}`)}
-              >
-                {participant.name}
-              </span>
-            </td>
+                {/* 이름을 클릭하면 사용자 상세 페이지로 이동 */}
+                <span
+                  onClick={() =>
+                    navigate(`/user-details?user_id=${participant.id}`)
+                  }
+                >
+                  {participant.name}
+                </span>
+              </td>
               <td>{participant.start_date}</td>
               <td>{participant.end_date}</td>
               <td>{participant.status}</td>
@@ -244,17 +245,25 @@ const ProjectDetails = () => {
 
   return (
     <div className="app">
+      {/* <button>
+        뒤로가기
+      </button> */}
       <Sidebar />
       <div className="project-container">
         <div className="edit-button-container">
           <h2 className="project-title">프로젝트 상세정보(품의서)</h2>
+          <button onClick={() => navigate("/projects")} className="project-list-button">
+            목록
+          </button>
+        </div>
+        <div className="edit-button-container">
+          <h3 className="section-title">🔹 사업개요</h3>
           {user.roleId != "USR_GENERAL" && ( //로그인 유저의 roleId를 보고 수정 버튼 표시 판정
             <button onClick={handleEditClick} className="EditProjectButton">
               프로젝트 수정
             </button>
           )}
         </div>
-        <h3 className="section-title">🔹 사업개요</h3>
 
         {Project ? (
           <ProjectTable project={Project} />

@@ -412,10 +412,15 @@ const ProjectEdit = () => {
     <div className="app">
       <Sidebar />
       <div className="project-container">
-        <div className="edit-button-container">
-          <h2 className="project-title">프로젝트 수정</h2>
+      <div className="edit-button-container">
+          <h2 className="project-title">프로젝트 상세정보(품의서)</h2>
+          <button onClick={() => navigate("/projects")} className="project-list-button">
+            목록
+          </button>
         </div>
-        <h3 className="section-title">🔹 사업개요</h3>
+        <div className="edit-button-container">
+          <h3 className="section-title">🔹 사업개요</h3>
+        </div>
 
         <table className="project-table">
           <tbody>
