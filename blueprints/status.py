@@ -136,16 +136,36 @@ def delete_status(status):
 def update_status():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'}), 200
+
     token = request.headers.get('Authorization')
     if not token:
         return jsonify({'message': '토큰이 없습니다.'}), 401
-    # 토큰 문자열에서 "Bearer " 제거
     token = token.split(" ")[1]
+
     try:
+        # 토큰 디코딩: payload에 user_id와 role_id가 포함되어 있다고 가정
         payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-        user_id = payload['user_id']
+        requester_user_id = payload['user_id']
+        requester_role = payload.get('role_id')
+        
+        # payload에 role_id가 없으면 DB에서 조회
+        if not requester_role:
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT role_id FROM tb_user WHERE id = %s", (requester_user_id,))
+            result = cursor.fetchone()
+            requester_role = result.get('role_id') if result else None
+            cursor.close()
+            conn.close()
+        
         data = request.get_json()
         new_status = data.get('status')
+
+        # 변경 대상 사용자 ID (관리자는 요청 본문에 user_id를 보낼 수 있음)
+        # 일반 사용자는 자신의 상태만 변경할 수 있음.
+        target_user_id = data.get('user_id', requester_user_id)
+        if requester_role != "AD_ADMIN" and target_user_id != requester_user_id:
+            return jsonify({'message': '자신의 상태만 업데이트할 수 있습니다.'}), 403
 
         # 빈 문자열이면 None으로 처리 (상태 삭제)
         if new_status is None or new_status.strip() == '':
@@ -155,9 +175,10 @@ def update_status():
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor()
-        cursor.execute("UPDATE tb_user SET status = %s WHERE id = %s", (new_status, user_id))
+        cursor.execute("UPDATE tb_user SET status = %s WHERE id = %s", (new_status, target_user_id))
         conn.commit()
         return jsonify({'message': '상태가 업데이트되었습니다.'}), 200
+
     except jwt.ExpiredSignatureError:
         return jsonify({'message': '토큰이 만료되었습니다.'}), 401
     except jwt.InvalidTokenError:
