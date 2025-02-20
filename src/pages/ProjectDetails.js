@@ -227,7 +227,6 @@ const ProjectDetails = () => {
               <td>
               {/* 이름을 클릭하면 사용자 상세 페이지로 이동 */}
               <span
-                style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
                 onClick={() => navigate(`/user-details?user_id=${participant.id}`)}
               >
                 {participant.name}
