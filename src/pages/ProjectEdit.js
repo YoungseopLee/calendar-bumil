@@ -61,6 +61,7 @@ const ProjectEdit = () => {
       navigate("/");
       return;
     }
+
   }, []);
 
   // 프로젝트 코드가 변경되면 상세정보 불러오기
@@ -248,6 +249,7 @@ const ProjectEdit = () => {
                   className="datebox"
                   type="date"
                   value={formatDate(participant.start_date)}
+                  onMouseDown={(e) => e.stopPropagation()} // 포커스 유지
                   onChange={(e) =>
                     handleParticipantDateChange(
                       participant.id,
@@ -262,6 +264,7 @@ const ProjectEdit = () => {
                   className="datebox"
                   type="date"
                   value={formatDate(participant.end_date)}
+                  onMouseDown={(e) => e.stopPropagation()} // 포커스 유지
                   onChange={(e) =>
                     handleParticipantDateChange(
                       participant.id,

@@ -14,7 +14,7 @@ const UserRolesManagement = () => {
   // 로그인한 사용자 정보 (localStorage에 저장된 최신 정보)
   const user = JSON.parse(localStorage.getItem("user"));
   const apiUrl = process.env.REACT_APP_API_URL;
-  
+
   // 로그인한 사용자 정보 최신화 및 어드민 여부 체크
   useEffect(() => {
     fetchLoggedInUser();
@@ -29,7 +29,7 @@ const UserRolesManagement = () => {
       navigate("/");
       return;
     }
-    
+
   }, []);
 
   // 로그인한 사용자 정보 API 호출
@@ -65,6 +65,7 @@ const UserRolesManagement = () => {
     navigate("/");
   };
 
+
   // ✅ 사용자 데이터 가져오기
   useEffect(() => {
     fetchEmployees();
@@ -96,13 +97,13 @@ const UserRolesManagement = () => {
           role_id: newRoleId,
         }),
       });
-  
+
       if (!response.ok) throw new Error("역할 변경 실패");
-  
+
       console.log("역할 변경 성공:", employeeId, newRoleId);
       alert("✅ 역할이 성공적으로 변경되었습니다!");
 
-  
+
       // 🔥 즉시 상태 반영
       setEmployees((prevEmployees) =>
         prevEmployees.map((emp) =>
@@ -113,7 +114,7 @@ const UserRolesManagement = () => {
       console.error("역할 변경 오류:", error);
       console.log("Token:", localStorage.getItem("token"));
       console.log("Sending request with ID:", employeeId, "New Role:", newRoleId);
-  
+
       alert("❌ 역할 변경에 실패했습니다. 다시 시도해주세요.");
     }
   };
@@ -189,7 +190,7 @@ const UserRolesManagement = () => {
               <select
                 className="role-dropdown"
                 value={employee.role_id}
-                
+
                 onChange={(e) => handleRoleChange(employee.id, e.target.value)}
               >
                 <option value="AD_ADMIN">어드민</option>
