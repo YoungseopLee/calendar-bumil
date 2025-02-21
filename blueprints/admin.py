@@ -195,3 +195,63 @@ def delete_user(user_id):
     finally:
         cursor.close()
         conn.close()
+
+# 유저 권한 수정
+@admin_bp.route('/update_role_id', methods=['PUT', 'OPTIONS'])
+def update_role_id():
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'CORS preflight request success'}), 200
+
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'message': '토큰이 없습니다.'}), 401
+    token = token.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        updated_by = payload.get('name', 'SYSTEM')
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': '토큰이 만료되었습니다.'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
+    except Exception as e:
+        return jsonify({'message': '토큰 검증 오류'}), 401
+
+    data = request.get_json() or {}
+    if not data.get('id'):
+        return jsonify({'message': '유저 id가 제공되지 않았습니다.'}), 400
+    user_id = data.get('id')
+
+    fields = []
+    values = []
+
+    if 'id' in data:
+        fields.append("id = %s")
+        values.append(encrypt_deterministic(data['id']))
+    if 'role_id' in data:
+        fields.append("role_id = %s")
+        values.append(data['role_id'])
+    if not fields:
+        return jsonify({'message': '수정할 필드가 제공되지 않았습니다.'}), 400
+
+    fields.append("updated_by = %s")
+    values.append(updated_by)
+    values.append(user_id)
+
+    set_clause = ", ".join(fields)
+
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+    cursor = conn.cursor()
+    try:
+        sql = f"UPDATE tb_user SET {set_clause} WHERE id = %s AND is_delete_yn = 'N'"
+        cursor.execute(sql, tuple(values))
+        conn.commit()
+        return jsonify({'message': '유저 정보가 업데이트되었습니다.'}), 200
+    except Exception as e:
+        conn.rollback()
+        print(f"유저 정보 업데이트 오류: {e}")
+        return jsonify({'message': f'유저 정보 업데이트 오류: {e}'}), 500
+    finally:
+        cursor.close()
+        conn.close()
