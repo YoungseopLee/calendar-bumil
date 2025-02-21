@@ -200,7 +200,7 @@ def delete_user(user_id):
 @admin_bp.route('/update_role_id', methods=['PUT', 'OPTIONS'])
 def update_role_id():
     if request.method == 'OPTIONS':
-        return jsonify({'message': 'CORS preflight request success'}), 200
+        return jsonify({'message': 'CORS preflight reques t success'}), 200
 
     token = request.headers.get('Authorization')
     if not token:

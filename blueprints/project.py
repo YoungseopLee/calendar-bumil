@@ -188,7 +188,6 @@ def add_project():
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
         created_by = payload.get('name', 'SYSTEM')
-        user_id_from_token = payload.get('user_id')
     except jwt.ExpiredSignatureError:
         return jsonify({'message': '토큰이 만료되었습니다.'}), 401
     except jwt.InvalidTokenError:
@@ -196,8 +195,7 @@ def add_project():
 
     try:
         data = request.get_json()
-        
-        # 필수 값 확인
+
         required_fields = ["project_code", "category", "status", "business_start_date", "business_end_date", "project_name", "project_pm"]
         missing_fields = [field for field in required_fields if not data.get(field)]
         if missing_fields:
@@ -222,8 +220,7 @@ def add_project():
         group_name = data.get('group_name')
 
         current_project_yn = 'y' if status == "진행 중" else 'n'
-        
-        # participants(추가 참여자) 배열을 받음 (기본 로그인 사용자는 제외됨)
+
         participants = data.get('participants', [])
         if not isinstance(participants, list):
             return jsonify({'message': '❌ participants 형식 오류! 리스트가 필요합니다.'}), 400
@@ -233,7 +230,6 @@ def add_project():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor()
 
-        # 프로젝트 추가
         sql_project = """
         INSERT INTO tb_project
         (project_code, category, status, business_start_date, business_end_date,
@@ -251,8 +247,6 @@ def add_project():
         )
         cursor.execute(sql_project, values_project)
 
-        # **기본 로그인 사용자 추가 부분 제거됨**
-        # 이제 추가 참여자만 tb_project_user에 삽입합니다.
         sql_project_user = """
         INSERT INTO tb_project_user
         (project_code, user_id, start_date, end_date, current_project_yn, is_delete_yn, created_at, updated_at, created_by, updated_by)
@@ -260,11 +254,14 @@ def add_project():
         (%s, %s, %s, %s, %s, 'N', NOW(), NOW(), %s, %s)
         """
         for participant in participants:
-            participant_id_plain = participant.get("id")
+            participant_id = participant.get("id")
             start_date = participant.get("start_date", business_start_date)
             end_date = participant.get("end_date", business_end_date)
-            # 평문 ID를 암호화하여 저장
-            encrypted_participant_id = encrypt_deterministic(participant_id_plain)
+
+            if not participant_id:
+                return jsonify({'message': '참여자 ID가 누락되었습니다.'}), 400
+
+            encrypted_participant_id = encrypt_deterministic(participant_id)
             cursor.execute(sql_project_user, (project_code, encrypted_participant_id, start_date, end_date, current_project_yn, created_by, created_by))
 
         conn.commit()
