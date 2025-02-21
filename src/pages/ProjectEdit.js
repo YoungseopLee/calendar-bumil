@@ -352,8 +352,8 @@ const ProjectEdit = () => {
         updatedParticipants.push({
           ...newParticipant,
           user_id: newParticipant.id,
-          start_date: currentDateStr,
-          end_date: currentDateStr,
+          start_date: Project.business_start_date,
+          end_date: Project.business_end_date,
         });
       } else {
         alert("이미 추가되어있습니다.");
