@@ -49,7 +49,8 @@
 /* 사용자 정보 스타일 */
 .userdetail-name-section {
   display: flex;
-  flex-direction: column;
+  flex-direction: row; /* 가로 정렬 */
+  gap: 10px; /* 요소 간 간격 추가 (선택 사항) */
   align-items: center;
   /* margin-bottom: 20px; */
 }
@@ -174,6 +175,46 @@
 .project-cell {
   text-align: center !important; /* 강제 적용 */
   vertical-align: middle; /* 세로 중앙 정렬 */
+}
+
+.project-chart {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.project-chart-row {
+  margin-bottom: 10px; /* 프로젝트 간의 간격 */
+}
+
+.project-chart-title {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.project-chart-months {
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid #ddd; /* 상단 경계선 */
+  border-bottom: 1px solid #ddd; /* 하단 경계선 */
+}
+
+.project-month {
+  flex: 1; /* 각 월이 고르게 차지하도록 설정 */
+  text-align: center;
+  line-height: 30px;
+  font-size: 1em;
+  border-left: 1px solid #ddd; /* 각 월을 구분하는 선 */
+}
+
+.project-month:first-child {
+  border-left: none; /* 첫 번째 월은 왼쪽 경계선 없애기 */
+}
+
+.highlighted {
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
 }
 
 
