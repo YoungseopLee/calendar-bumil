@@ -55,34 +55,45 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // 로그인 성공 처리
         setMessage(data.message);
-
-        // 저장 설정
-        localStorage.setItem("token", data.token); // JWT 토큰 저장
-        localStorage.setItem("user", JSON.stringify(data.user)); // 사용자 정보 저장
-
+      
+        // ✅ 토큰 저장
+        localStorage.setItem("token", data.token);
+      
+        // ✅ 전체 사용자 정보 다시 요청
+        const userResponse = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${data.token}`,
+          },
+        });
+      
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          localStorage.setItem("user", JSON.stringify(userData.user)); // ✅ 최신 사용자 정보 저장
+        }
+      
+        // ✅ 로그인 옵션 설정
         if (rememberMe) {
-          localStorage.setItem("savedId", id); // 이메일 저장
+          localStorage.setItem("savedId", id);
         } else {
-          localStorage.removeItem("savedId"); // 체크 해제 시 이메일 제거
+          localStorage.removeItem("savedId");
         }
-
+      
         if (autoLogin) {
-          localStorage.setItem("autoLogin", "true"); // 자동 로그인 활성화
+          localStorage.setItem("autoLogin", "true");
         } else {
-          localStorage.removeItem("autoLogin"); // 자동 로그인 비활성화
+          localStorage.removeItem("autoLogin");
         }
-
-        //최초 로그인 판정 함수
-        if (data.user.first_login_yn == "y") {
-          navigate("/projects", { replace: true }); // 캘린더로 이동
-        }
-        //최초 로그인이라면, 비밀번호 변경 페이지로 이동하게 하기
-        else if (data.user.first_login_yn == "n") {
+      
+        // ✅ 최초 로그인 여부에 따라 라우팅
+        if (data.user.first_login_yn === "y") {
+          navigate("/projects", { replace: true });
+        } else if (data.user.first_login_yn === "n") {
           navigate("/change-pw", { replace: true });
         }
-      } else {
+      }
+      else {
         // 로그인 실패 처리
         if (response.status === 403 && data.message === "승인 대기 중입니다!") {
           alert("승인 대기 중입니다. 관리자의 승인을 기다려주세요.");

@@ -43,26 +43,6 @@ const Calendar = () => {
         ];
         setDepartments(uniqueDepartments);
 
-        /*// 2. 일정 가져오기 (calendar에서 비활성화)
-          const scheduleResponse = await fetch(
-            `${process.env.REACT_APP_API_URL}/schedule/get_all_schedule`,
-            {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`,
-                "Content-Type": "application/json",
-              },
-            }
-          );
-  
-          if (scheduleResponse.status === 401) {
-            handleLogout();
-            return;
-          }
-  
-          if (!scheduleResponse.ok)
-            throw new Error("일정 데이터를 불러오지 못했습니다.");
-          const scheduleData = await scheduleResponse.json();
-          setSchedules(scheduleData.schedules);*/
       } catch (error) {
         console.error("데이터 로딩 오류:", error);
       }
