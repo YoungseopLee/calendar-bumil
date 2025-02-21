@@ -1,90 +1,102 @@
-/* 전체 페이지 스타일 */
+/* app-body */
+.app-body{
+  margin: 0%;
+}
+
+/* 전체 페이지 레이아웃 */
 .manager-page {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f9f9f9;
-}
-
-/* 헤더 스타일 */
-.manager-header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  height: 60px;
-  background-color: #fff;
-  padding: 0 10px;
-  z-index: 10;
+  background-color: #f4f6f8;
 }
 
 /* 콘텐츠 영역 */
 .manager-content {
   flex-grow: 1;
-  width: 100%;
   padding: 20px;
-  background-color: #fff;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
 }
 
-/* 제목 스타일 */
+/* 중앙 정렬된 타이틀 */
 .manager-title {
-  font-size: 1.8em;
+  font-size: 2.2em;
   font-weight: bold;
-  margin-bottom: 20px;
-  text-align: left;
+  margin-bottom: 40px;
+  text-align: center;
   color: #333;
 }
 
-/* 테이블 섹션 */
-.pending-users-section {
+/* 카드 컨테이너: 세로 중앙 정렬 */
+.card-container {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  gap: 20px;
   width: 100%;
+  max-width: 500px; /* 최대 너비 설정 */
+  align-items: center;
 }
 
-/* 테이블 스타일 */
-.pending-users-table {
-  width: 90%;
-  border-collapse: collapse;
-  margin-top: 10px;
+/* 관리자 카드 스타일 */
+.manager-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  width: 100%;
+  text-align: center;
+  transition: transform 0.2s ease-in-out, box-shadow 0.3s ease;
+  cursor: pointer;
 }
 
-.pending-users-table th,
-.pending-users-table td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: left;
-  
+.manager-card h2 {
+  font-size: 1.5em;
+  color: #333;
 }
 
-.pending-users-table th {
-  background-color: #f2f2f2;
+.manager-card p {
+  font-size: 1em;
+  color: #555;
+  margin: 10px 0 20px;
 }
 
-.pending-users-table td:first-child {
-  max-width: 8ch;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.manager-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* 버튼 스타일 */
-.button {
-  padding: 6px 12px;
-  margin-top: 10px;
-  margin-right: 5px;
+.manage-button {
+  background-color: #007bff;
+  color: white;
   border: none;
-  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 1em;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 0.9em;
+  transition: background-color 0.3s ease;
 }
 
-.approve-button {
-  background-color: #4caf50;
-  color: white;
+.manage-button:hover {
+  background-color: #0056b3;
 }
 
-.reject-button {
-  background-color: #f44336;
-  color: white;
+/* 반응형 스타일 */
+@media (max-width: 600px) {
+  .manager-title {
+    font-size: 1.8em;
+  }
+
+  .manager-card {
+    padding: 20px;
+  }
+
+  .manage-button {
+    padding: 8px 16px;
+  }
 }
