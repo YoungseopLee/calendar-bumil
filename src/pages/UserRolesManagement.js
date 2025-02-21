@@ -44,7 +44,9 @@ const UserRolesManagement = () => {
   
       if (!response.ok) throw new Error("역할 변경 실패");
   
+      console.log("역할 변경 성공:", employeeId, newRoleId);
       alert("✅ 역할이 성공적으로 변경되었습니다!");
+
   
       // 🔥 즉시 상태 반영
       setEmployees((prevEmployees) =>
@@ -60,7 +62,7 @@ const UserRolesManagement = () => {
       alert("❌ 역할 변경에 실패했습니다. 다시 시도해주세요.");
     }
   };
-  
+
   // ✅ 역할 필터링 로직
   const handleRoleFilter = (roleId) => {
     setActiveRoleFilter((prev) => (prev === roleId ? null : roleId)); // ✅ 동일 역할 클릭 시 전체 보기
