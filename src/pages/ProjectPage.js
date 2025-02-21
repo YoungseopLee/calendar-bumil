@@ -151,7 +151,7 @@ const ProjectPage = () => {
   return (
     <div className="project-page">
       <Sidebar />
-      {roleId && ["AD_ADMIN", "USR_GENERAL", "PR_ADMIN"].includes(roleId) && <AddProjectButton />}
+      {roleId && ["AD_ADMIN", "PR_ADMIN"].includes(roleId) && <AddProjectButton />}
       <div className="content">
         <div className="projectPage-box">
           <h1 className="title">프로젝트 목록</h1>

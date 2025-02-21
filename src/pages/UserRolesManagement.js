@@ -27,30 +27,40 @@ const UserRolesManagement = () => {
     }
   };
 
-  // ✅ 역할 드롭다운 변경 핸들러
+  // ✅ 역할 변경 API 호출
   const handleRoleChange = async (employeeId, newRoleId) => {
     try {
-      const response = await fetch(`${apiUrl}/user/update_role`, {
+      const response = await fetch(`${apiUrl}/admin/update_user`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
-          user_id: employeeId,
+          id: employeeId,
           role_id: newRoleId,
         }),
       });
-
+  
       if (!response.ok) throw new Error("역할 변경 실패");
-
+  
       alert("✅ 역할이 성공적으로 변경되었습니다!");
-      fetchEmployees();
+  
+      // 🔥 즉시 상태 반영
+      setEmployees((prevEmployees) =>
+        prevEmployees.map((emp) =>
+          emp.id === employeeId ? { ...emp, role_id: newRoleId } : emp
+        )
+      );
     } catch (error) {
       console.error("역할 변경 오류:", error);
+      console.log("Token:", localStorage.getItem("token"));
+      console.log("Sending request with ID:", employeeId, "New Role:", newRoleId);
+  
+      alert("❌ 역할 변경에 실패했습니다. 다시 시도해주세요.");
     }
   };
-
+  
   // ✅ 역할 필터링 로직
   const handleRoleFilter = (roleId) => {
     setActiveRoleFilter((prev) => (prev === roleId ? null : roleId)); // ✅ 동일 역할 클릭 시 전체 보기
@@ -122,6 +132,7 @@ const UserRolesManagement = () => {
               <select
                 className="role-dropdown"
                 value={employee.role_id}
+                
                 onChange={(e) => handleRoleChange(employee.id, e.target.value)}
               >
                 <option value="AD_ADMIN">어드민</option>

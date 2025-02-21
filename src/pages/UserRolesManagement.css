@@ -58,7 +58,7 @@
   
   /* ✅ 비활성화 상태 버튼 (흰색 계열) */
   .role-toggle-button {
-    background-color: #f0f0f0; /* 연한 회색 → 비활성화 상태 */
+    background-color: #ffffff; /* 연한 회색 → 비활성화 상태 */
     color: #333;
     padding: 10px 20px;
     border-radius: 6px;
@@ -71,7 +71,7 @@
   
   /* ✅ 호버 상태 */
   .role-toggle-button:hover {
-    background-color: #e6e6e6; /* 호버 시 약간 어두운 회색 */
+    background-color: #fffdfd; /* 호버 시 약간 어두운 회색 */
   }
   
   /* ✅ 활성화 상태 버튼 (기존 활성화 색상 유지) */
