@@ -2,10 +2,26 @@ from flask import Blueprint, request, jsonify
 import jwt
 from db import get_db_connection
 from config import SECRET_KEY
+from datetime import datetime
 from .auth import decrypt_deterministic, encrypt_deterministic, decrypt_aes
 
 project_bp = Blueprint('project', __name__, url_prefix='/project')
 
+def parse_date(date_str: str) -> str:
+    try:
+        if not date_str or date_str == "None":
+            return None  # 빈 문자열 또는 "None" 문자열이면 None 반환
+
+        if isinstance(date_str, str) and "," in date_str:
+            return datetime.strptime(date_str, '%a, %d %b %Y %H:%M:%S %Z').strftime('%Y-%m-%d')
+        elif isinstance(date_str, str):
+            # 이미 "YYYY-MM-DD" 형식일 경우
+            return date_str
+        else:
+            raise ValueError("Invalid date format")
+    except Exception as e:
+        raise ValueError(f"날짜 형식 오류: {date_str} - {e}")
+    
 # 모든 프로젝트 조회 (tb_project와 tb_project_user를 조인)
 @project_bp.route('/get_all_project', methods=['GET', 'OPTIONS'])
 def get_all_project():
@@ -290,8 +306,10 @@ def edit_project():
         new_project_code = data.get('project_code')
         category = data.get('category')
         status = data.get('status')
-        business_start_date = data.get('business_start_date')
-        business_end_date = data.get('business_end_date')
+        # 날짜 문자열 변환: parse_date 함수를 사용하여 ISO 형식("YYYY-MM-DD")로 통일
+        business_start_date = parse_date(data.get('business_start_date'))
+        business_end_date = parse_date(data.get('business_end_date'))
+        
         project_name = data.get('project_name')
         customer = data.get('customer')
         supplier = data.get('supplier')
@@ -304,12 +322,11 @@ def edit_project():
         changes = data.get('changes')
         group_name = data.get('group_name')
 
-        # 클라이언트에서 전달된 참여자 목록 (assigned_user_ids) - 평문 ID로 전달됨
-        assigned_user_ids = data.get('assigned_user_ids')
-        if isinstance(assigned_user_ids, str):
-            assigned_user_ids = [uid.strip() for uid in assigned_user_ids.split(",") if uid.strip()]
-        if not assigned_user_ids:
-            assigned_user_ids = []
+        # 클라이언트에서 전달된 참여자 정보 배열 (participants)
+        # 각 항목은 user_id, start_date, end_date를 포함한다고 가정
+        participants = data.get('participants')
+        if not isinstance(participants, list):
+            return jsonify({'message': '프로젝트 참여자 정보 형식 오류! 배열이 필요합니다.'}), 400
 
         current_project_yn = 'y' if status == "진행 중" else 'n'
 
@@ -374,10 +391,27 @@ def edit_project():
         VALUES
         (%s, %s, %s, %s, %s, 'N', NOW(), NOW(), %s, %s)
         """
-        for uid in assigned_user_ids:
-            # 평문 uid를 암호화하여 사용
-            encrypted_uid = encrypt_deterministic(uid)
-            cursor.execute(sql_project_user, (new_project_code, encrypted_uid, business_start_date, business_end_date, current_project_yn, updated_by, updated_by))
+        
+        for participant in participants:
+            participant_user_id = participant.get("user_id") or participant.get("id")
+            participant_start_date = parse_date(participant.get("start_date"))
+            participant_end_date = parse_date(participant.get("end_date"))
+            
+            if not participant_user_id:
+                return jsonify({'message': '참여자 ID가 누락되었습니다.'}), 400
+
+            # 날짜가 누락된 경우 기본값 설정 (예: 오늘 날짜)
+            if not participant_start_date:
+                participant_start_date = datetime.now().strftime('%Y-%m-%d')
+            if not participant_end_date:
+                participant_end_date = participant_start_date  # 종료일 없으면 시작일과 동일하게
+
+            encrypted_uid = encrypt_deterministic(participant_user_id)
+
+            cursor.execute(sql_project_user, (
+                new_project_code, encrypted_uid, participant_start_date, participant_end_date,
+                current_project_yn, updated_by, updated_by
+            ))
         conn.commit()
 
         return jsonify({'message': '프로젝트가 수정되었습니다.'}), 200
@@ -463,15 +497,15 @@ def get_user_and_projects():
             JOIN tb_project p ON tpu.project_code = p.project_code
             WHERE tpu.user_id = %s
         """, (encrypted_user_id,))
-        project_users = cursor.fetchall()
+        participants = cursor.fetchall()
 
         # 각 프로젝트 참여정보의 user_id 복호화 (평문으로 반환)
-        for record in project_users:
+        for record in participants:
             record['user_id'] = decrypt_deterministic(record['user_id'])
 
         return jsonify({
             'user': user_info,
-            'project_users': project_users
+            'participants': participants
         }), 200
 
     except Exception as e:
