@@ -36,7 +36,8 @@ const EmployeeList = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (!response.ok) throw new Error("로그인 사용자 정보를 가져오는 데 실패했습니다.");
+        if (!response.ok)
+          throw new Error("로그인 사용자 정보를 가져오는 데 실패했습니다.");
         const data = await response.json();
 
         setLoggedInUserId(data.user.id); // 사용자 ID 저장
@@ -87,7 +88,8 @@ const EmployeeList = () => {
         }
       );
 
-      if (!response.ok) throw new Error("즐겨찾기 목록을 가져오는 데 실패했습니다.");
+      if (!response.ok)
+        throw new Error("즐겨찾기 목록을 가져오는 데 실패했습니다.");
 
       const data = await response.json();
       setFavoriteEmployees(data.favorite || []);
@@ -101,7 +103,8 @@ const EmployeeList = () => {
   const fetchEmployees = async () => {
     try {
       const response = await fetch(`${apiUrl}/user/get_users`);
-      if (!response.ok) throw new Error("사원 데이터를 가져오는 데 실패했습니다.");
+      if (!response.ok)
+        throw new Error("사원 데이터를 가져오는 데 실패했습니다.");
 
       const data = await response.json();
       setEmployees(data.users);
@@ -151,14 +154,14 @@ const EmployeeList = () => {
           status: newStatus,
         }),
       });
-  
+
       if (!response.ok) throw new Error("상태 변경 실패!");
-  
+
       alert("상태가 성공적으로 변경되었습니다! ✅");
-  
+
       // ✅ 전체 사원 목록 새로고침
       fetchEmployees();
-  
+
       // ✅ 즐겨찾기 목록도 새로고침
       if (showFavorites) {
         fetchFavorites(loggedInUserId);
@@ -191,21 +194,34 @@ const EmployeeList = () => {
 
         {/* 🔄 즐겨찾기 토글 */}
         <div className="toggle-container">
-          <button className="toggle-button" onClick={() => setShowFavorites(!showFavorites)}>
+          <button
+            className="toggle-button"
+            onClick={() => setShowFavorites(!showFavorites)}
+          >
             {showFavorites ? "전체 사원 보기" : "즐겨찾기 보기"}
           </button>
         </div>
 
         {/* 🔍 검색 UI */}
         <div className="search-container">
-          <select className="search-dropdown" value={searchField} onChange={(e) => setSearchField(e.target.value)}>
+          <select
+            className="search-dropdown"
+            value={searchField}
+            onChange={(e) => setSearchField(e.target.value)}
+          >
             <option value="name">이름</option>
             <option value="position">직급</option>
             <option value="department">부서</option>
             <option value="status">상태</option>
           </select>
 
-          <input type="text" className="search-input" placeholder={`검색할 ${searchField} 입력...`} onChange={(e) => setSearchText(e.target.value.trim().toLowerCase())} value={searchText} />
+          <input
+            type="text"
+            className="search-input"
+            placeholder={`검색할 ${searchField} 입력...`}
+            onChange={(e) => setSearchText(e.target.value.trim().toLowerCase())}
+            value={searchText}
+          />
         </div>
 
         {/* 👥 사원 목록 렌더링 */}
@@ -213,9 +229,23 @@ const EmployeeList = () => {
           {(showFavorites ? favoriteEmployees : employees)
             .filter(filterEmployees)
             .map((employee) => (
-              <li key={employee.id} className="employee-item" onClick={() => navigate(`/user-details?user_id=${employee.id}`)}>
+              <li
+                key={employee.id}
+                className="employee-item"
+                onClick={() => navigate(`/user-details?user_id=${employee.id}`)}
+              >
                 {/* ⭐ 즐겨찾기 토글 */}
-                <span className={`favorite-icon ${favoriteEmployees.some((fav) => fav.id === employee.id) ? "" : "not-favorite"}`} onClick={(e) => { e.stopPropagation(); toggleFavorite(employee.id); }}>
+                <span
+                  className={`favorite-icon ${
+                    favoriteEmployees.some((fav) => fav.id === employee.id)
+                      ? ""
+                      : "not-favorite"
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleFavorite(employee.id);
+                  }}
+                >
                   ★
                 </span>
 
@@ -225,10 +255,17 @@ const EmployeeList = () => {
 
                 {/* 🔄 관리자 전용 상태 변경 드롭다운 */}
                 {userRole === "AD_ADMIN" ? (
-                  <select className="status-dropdown" value={employee.status} onClick={(e) => e.stopPropagation()} onChange={(e) => handleStatusChange(employee.id, e.target.value)}>
+                  <select
+                    className="status-dropdown"
+                    value={employee.status}
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) =>
+                      handleStatusChange(employee.id, e.target.value)
+                    }
+                  >
                     {statusList.map((status) => (
                       <option key={status.id} value={status.id}>
-                        {status.comment}
+                        {status.id}
                       </option>
                     ))}
                   </select>

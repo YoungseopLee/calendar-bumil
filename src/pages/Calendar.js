@@ -327,7 +327,7 @@ const Calendar = () => {
             >
               {statusList.map((status) => (
                 <option key={status.id} value={status.id}>
-                  {status.comment}
+                  {status.id}
                 </option>
               ))}
             </select>
