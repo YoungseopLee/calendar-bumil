@@ -6,6 +6,14 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+textarea{
+  font-family: "Pretendard-Regular" !important;
+    word-break: keep-all;
+}
+input{
+  font-family: "Pretendard-Regular" !important;
+    word-break: keep-all;
+}
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
