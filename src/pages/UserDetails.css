@@ -117,14 +117,14 @@
 }
 
 /* 프로젝트 테이블 스타일 */
-.project-table {
+.project-user-table {
   table-layout: fixed; /* 각 열의 너비를 고정 */
   width: 100%; /* 테이블 너비를 100%로 설정 */
   border-collapse: collapse; /* 테이블 경계선 겹침 방지 */
   margin-top: 20px; /* 테이블 상단 여백 */
 }
 
-.project-table th, .project-table td {
+.project-user-table th, .project-user-table td {
   width: 8.33%; /* 12개월 기준으로 균등 분배 */
   overflow: hidden; /* 넘치는 내용 그냥 가려지도록 설정 */
   white-space: nowrap; /* 한 줄로 표시 */
@@ -133,12 +133,12 @@
   width: 8.33%; /* 열 너비를 고정 */
 }
 
-.project-table th {
+.project-user-table th {
   background-color: #f2f2f2; /* 테이블 헤더 배경색 */
   color: #333; /* 테이블 헤더 텍스트 색상 */
 }
 
-.project-table td {
+.project-user-table td {
   background-color: #fff; /* 테이블 셀 배경색 */
   color: #333; /* 테이블 셀 텍스트 색상 */
 }
@@ -220,10 +220,10 @@
 
 /* 반응형 스타일 */
 @media (max-width: 768px) {
-  .project-table {
+  .project-user-table {
     width: 100%; /* 작은 화면에서 테이블 너비를 100%로 설정 */
   }
-  .project-table th, .project-table td {
+  .project-user-table th, .project-user-table td {
     padding: 8px; /* 작은 화면에서 셀 패딩 조정 */
   }
 }

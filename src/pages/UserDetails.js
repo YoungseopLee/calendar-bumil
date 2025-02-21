@@ -183,7 +183,7 @@ const UserDetails = () => {
     const navigate = useNavigate(); // ✅ 네비게이션 훅 사용
   
     return (
-      <table className="project-table">
+      <table className="project-user-table">
         <thead>
           <tr>
             <th>프로젝트명</th>
