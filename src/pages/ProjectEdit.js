@@ -54,6 +54,13 @@ const ProjectEdit = () => {
       navigate("/");
       return;
     }
+
+    // 권한 체크
+    if (user.role_id !== "AD_ADMIN" && user.role_id !== "PR_ADMIN") {
+      alert("관리자 권한이 없습니다.");
+      navigate("/");
+      return;
+    }
   }, []);
 
   // 프로젝트 코드가 변경되면 상세정보 불러오기
