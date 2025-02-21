@@ -72,14 +72,14 @@ const StatusManagement = () => {
   return (
     <div className="status-management">
       <Sidebar />
-      <h2>상태 관리</h2>
+      <h2 className="status-title">상태 관리</h2>
       <div className="status-list">
         {statuses.map((s) => (
           <div key={s.id} className="status-item">
             <span>
               {s.id} ({s.comment})
             </span>
-            <button onClick={() => handleDeleteStatus(s.id)}>삭제</button>
+            <button onClick={() => handleDeleteStatus(s.id)} className="reject-button">삭제</button>
           </div>
         ))}
       </div>
@@ -96,7 +96,7 @@ const StatusManagement = () => {
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
         />
-        <button onClick={handleAddStatus}>상태 추가</button>
+        <button onClick={handleAddStatus} className="approve-button">상태 추가</button>
       </div>
     </div>
   );
