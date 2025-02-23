@@ -46,6 +46,7 @@ def get_users():
             SELECT id, name, position, department, phone_number, role_id, status, first_login_yn 
             FROM tb_user 
             WHERE is_delete_yn = 'n'
+            ORDER BY name ASC
         """)
         users = cursor.fetchall()
         for user in users:
