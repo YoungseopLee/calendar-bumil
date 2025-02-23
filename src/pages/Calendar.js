@@ -7,7 +7,7 @@ import "./Calendar.css";
 const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
-  const [userSchedule, setUserSchedule] = useState([]);
+
   const [otherUsersSchedule, setOtherUsersSchedule] = useState([]);
   const [userStatus, setUserStatus] = useState("");
   const [departments, setDepartments] = useState([]);
@@ -42,7 +42,6 @@ const Calendar = () => {
           ...new Set(usersData.users.map((user) => user.department)),
         ];
         setDepartments(uniqueDepartments);
-
       } catch (error) {
         console.error("데이터 로딩 오류:", error);
       }
@@ -101,29 +100,69 @@ const Calendar = () => {
   for (let i = 1; i <= daysInMonth; i++) {
     calendarDays.push(i);
   }
+  const userScheduletest = [
+    {
+      id: 1,
+      start_date: "Sun, 16 Feb 2025 00:00:00 GMT",
+      end_date: "Sun, 16 Feb 2025 00:00:00 GMT",
+      status: "준비 중",
+      task: "test1",
+    },
+    {
+      id: 2,
+      start_date: "Mon, 17 Feb 2025 14:00:00 GMT",
+      end_date: "Mon, 17 Feb 2025 16:00:00 GMT",
+      status: "진행 중",
+      task: "회의",
+    },
+    {
+      id: 3,
+      start_date: "Wed, 19 Feb 2025 09:30:00 GMT",
+      end_date: "Wed, 19 Feb 2025 11:00:00 GMT",
+      status: "완료",
+      task: "프로젝트 완료",
+    },
+    {
+      id: 4,
+      start_date: "Fri, 21 Feb 2025 18:00:00 GMT",
+      end_date: "Fri, 21 Feb 2025 20:00:00 GMT",
+      status: "대기 중",
+      task: "클라이언트 미팅",
+    },
+    {
+      id: 5,
+      start_date: "Sun, 23 Feb 2025 12:00:00 GMT",
+      end_date: "Sun, 23 Feb 2025 14:00:00 GMT",
+      status: "준비 중",
+      task: "팀 점검",
+    },
+  ];
+  const [userSchedule, setUserSchedule] = useState(userScheduletest);
+  console.log("유저스케쥴테스트: ", userSchedule);
 
   const handleDateClick = async (day) => {
     if (day) {
       const selectedDate = new Date(currentYear, currentMonth, day);
-      setSelectedDate(selectedDate);
 
+      setSelectedDate(selectedDate);
       const selectedDateString = selectedDate.toISOString().split("T")[0];
 
-      // 자신의 일정 가져오기
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/schedule/get_schedule?user_id=${user.id}&date=${selectedDateString}`
-        );
-        const data = await response.json();
-        if (response.ok) {
-          setUserSchedule(data.schedules || []);
-        } else {
-          alert("자신의 일정 로드에 실패했습니다.");
-        }
-      } catch (error) {
-        console.error("자신의 일정 로드 실패:", error);
-        alert("자신의 일정 로드에 실패했습니다.");
-      }
+      // // 자신의 일정 가져오기
+      // try {
+      //   const response = await fetch(
+      //     `${process.env.REACT_APP_API_URL}/schedule/get_schedule?user_id=${user.id}&date=${selectedDateString}`
+      //   );
+      //   const data = await response.json();
+      //   console.log("스케쥴확인:", data);
+      //   if (response.ok) {
+      //     setUserSchedule(data.schedules || []);
+      //   } else {
+      //     alert("자신의 일정 로드에 실패했습니다.");
+      //   }
+      // } catch (error) {
+      //   console.error("자신의 일정 로드 실패:", error);
+      //   alert("자신의 일정 로드에 실패했습니다.");
+      // }
 
       // 다른 사용자 일정 가져오기
       try {
@@ -336,16 +375,26 @@ const Calendar = () => {
             const key = day
               ? `${currentYear}-${currentMonth}-${day}`
               : `empty-${index}`;
+
+            // 일정이 있는 날짜인지 확인
+            const hasSchedule =
+              day &&
+              userSchedule.some(
+                (schedule) => new Date(schedule.start_date).getDate() === day
+              );
+
             return (
               <div
                 key={key}
-                className={`calendar-day ${day ? "active" : ""} ${
-                  isToday(day) ? "today" : ""
-                } ${isSelected(day) ? "selected" : ""}`}
+                className={`calendar-day ${day ? "active" : ""} 
+          ${isToday(day) ? "today" : ""} 
+          ${isSelected(day) ? "selected" : ""} 
+          ${hasSchedule ? "has-schedule" : ""}`}
                 onClick={() => handleDateClick(day)}
               >
                 {day}
-                {day &&
+
+                {/* {day &&
                   userSchedule.some(
                     (schedule) =>
                       new Date(schedule.start_date).getDate() === day
@@ -358,7 +407,7 @@ const Calendar = () => {
                         )?.status
                       )}`}
                     ></div>
-                  )}
+                  )} */}
               </div>
             );
           })}
@@ -382,8 +431,16 @@ const Calendar = () => {
             <div className="schedule-section">
               <h4>내 일정</h4>
               <ul className="schedule-list">
-                {userSchedule.length > 0 ? (
-                  userSchedule.map((schedule) => (
+                {userSchedule
+                  .filter((schedule) => {
+                    // 선택된 날짜가 없거나, start_date의 날짜가 selectedDate와 같은 경우만 표시
+                    if (!selectedDate) return false;
+                    const scheduleDate = new Date(
+                      schedule.start_date
+                    ).toDateString();
+                    return scheduleDate === selectedDate.toDateString();
+                  })
+                  .map((schedule) => (
                     <li
                       key={schedule.id}
                       className="schedule-item"
@@ -415,8 +472,15 @@ const Calendar = () => {
                         </button>
                       </div>
                     </li>
-                  ))
-                ) : (
+                  ))}
+                {/* 일정이 없을 경우 표시 */}
+                {userSchedule.filter((schedule) => {
+                  if (!selectedDate) return false;
+                  const scheduleDate = new Date(
+                    schedule.start_date
+                  ).toDateString();
+                  return scheduleDate === selectedDate.toDateString();
+                }).length === 0 && (
                   <li className="empty-schedule">일정이 없습니다.</li>
                 )}
               </ul>
