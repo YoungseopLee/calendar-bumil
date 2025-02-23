@@ -38,6 +38,7 @@ def get_all_project():
         LEFT JOIN tb_project_user pu ON p.project_code = pu.project_code AND pu.is_delete_yn = 'N'
         WHERE p.is_delete_yn = 'N'
         GROUP BY p.project_code
+        ORDER BY p.created_at DESC
         """
         cursor.execute(sql)
         projects = cursor.fetchall()
