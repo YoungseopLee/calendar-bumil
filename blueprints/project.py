@@ -156,11 +156,6 @@ def get_project_details():
         cursor.execute(sql_project_users, (project_code,))
         project_users = cursor.fetchall()
 
-        # 만약 tb_project_user의 user_id가 암호화되어 있다면 복호화 처리
-        for record in project_users:
-            # 복호화 후 평문 user_id로 변경 (필요에 따라 다른 컬럼도 복호화)
-            record['user_id'] = decrypt_deterministic(record['user_id'])
-
         # 프로젝트 정보에 참여자 정보를 추가 (원하는 키 이름으로 지정 가능: participants 또는 project_users)
         project['project_users'] = project_users
 
@@ -461,8 +456,8 @@ def get_user_and_projects():
         return jsonify({'message': 'CORS preflight request success'})
 
     # 클라이언트에서 평문 user_id를 쿼리 스트링으로 전달받음 (예: ?user_id=dhwoo@bumil.co.kr)
-    user_id_plain = request.args.get('user_id')
-    if not user_id_plain:
+    user_id = request.args.get('user_id')
+    if not user_id:
         return jsonify({'message': 'user_id 파라미터가 제공되지 않았습니다.'}), 400
 
     try:
@@ -471,22 +466,22 @@ def get_user_and_projects():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
 
-        # 평문 user_id를 암호화하여 DB 조회 조건으로 사용
-        encrypted_user_id = encrypt_deterministic(user_id_plain)
-
-        # tb_user 테이블에서 필요한 컬럼만 선택 (password, created_at, updated_at, created_by, updated_by 제외)
+        # tb_user 테이블에서 필요한 컬럼 조회
         cursor.execute("""
             SELECT id, name, position, department, phone_number, role_id, status, is_delete_yn, first_login_yn
             FROM tb_user
             WHERE id = %s AND is_delete_yn = 'N'
-        """, (encrypted_user_id,))
+        """, (user_id,))
         user_info = cursor.fetchone()
         if not user_info:
             return jsonify({'message': '사용자 정보를 찾을 수 없습니다.'}), 404
 
-        # 조회된 사용자 정보 복호화
-        user_info['id'] = decrypt_deterministic(user_info['id'])
-        user_info['phone_number'] = decrypt_aes(user_info['phone_number'])
+        # ✅ 복호화 시도
+        try:
+            user_info['phone_number'] = decrypt_aes(user_info['phone_number'])
+        except Exception as decrypt_error:
+            print(f"📛 Phone number 복호화 오류: {decrypt_error}")
+            user_info['phone_number'] = "복호화 실패"
 
         # tb_project_user와 tb_project 테이블을 조인하여 해당 사용자의 프로젝트 참여 정보 조회
         cursor.execute("""
@@ -494,12 +489,8 @@ def get_user_and_projects():
             FROM tb_project_user tpu
             JOIN tb_project p ON tpu.project_code = p.project_code
             WHERE tpu.user_id = %s
-        """, (encrypted_user_id,))
+        """, (user_id,))
         participants = cursor.fetchall()
-
-        # 각 프로젝트 참여정보의 user_id 복호화 (평문으로 반환)
-        for record in participants:
-            record['user_id'] = decrypt_deterministic(record['user_id'])
 
         return jsonify({
             'user': user_info,

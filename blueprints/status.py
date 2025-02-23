@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
 import jwt
 from db import get_db_connection
-from .auth import encrypt_deterministic
 from config import SECRET_KEY
 
 status_bp = Blueprint('status', __name__, url_prefix='/status')
@@ -156,27 +155,27 @@ def update_status_admin():
 
         # role_id가 없으면 DB에서 조회
         if not requester_role:
-            encrypted_user_id = encrypt_deterministic(requester_user_id)
-            cursor.execute("SELECT role_id FROM tb_user WHERE id = %s", (encrypted_user_id,))
+            user_id = requester_user_id
+            cursor.execute("SELECT role_id FROM tb_user WHERE id = %s", (user_id,))
             result = cursor.fetchone()
             requester_role = result.get('role_id') if result else None
 
         data = request.get_json()
         new_status = data.get('status')
-        target_user_email = data.get('user_id')  # 이메일 주소가 user_id로 전달됨
+        target_user_email = data.get('user_id')
 
         # ✅ 이메일을 암호화하여 DB에서 조회
-        encrypted_target_user_id = encrypt_deterministic(target_user_email)
+        target_user_id = target_user_email
 
         print(f"✅ 요청자 ID: {requester_user_id}")
-        print(f"✅ 암호화된 대상 사용자 ID: {encrypted_target_user_id}")
+        print(f"✅ 암호화된 대상 사용자 ID: {target_user_id}")
 
         # 관리자가 아니라면 본인 상태만 변경 가능
-        if requester_role != "AD_ADMIN" and encrypted_target_user_id != encrypted_user_id:
+        if requester_role != "AD_ADMIN" and target_user_id != user_id:
             return jsonify({'message': '자신의 상태만 업데이트할 수 있습니다.'}), 403
 
         # 암호화된 ID로 사용자 검색
-        cursor.execute("SELECT status FROM tb_user WHERE id = %s", (encrypted_target_user_id,))
+        cursor.execute("SELECT status FROM tb_user WHERE id = %s", (target_user_id,))
         user_info = cursor.fetchone()
         if not user_info:
             return jsonify({'message': '사용자를 찾을 수 없습니다.'}), 404
@@ -186,13 +185,13 @@ def update_status_admin():
             return jsonify({'message': '상태가 변경되지 않았습니다.'}), 200
 
         # 상태 업데이트
-        cursor.execute("UPDATE tb_user SET status = %s WHERE id = %s", (new_status, encrypted_target_user_id))
+        cursor.execute("UPDATE tb_user SET status = %s WHERE id = %s", (new_status, target_user_id))
 
         # 변경 이력 기록
         cursor.execute("""
             INSERT INTO tb_user_status_log (recorded_at, status_id, user_id, created_by)
             VALUES (NOW(3), %s, %s, %s)
-        """, (new_status, encrypted_target_user_id, requester_user_id))
+        """, (new_status, target_user_id, requester_user_id))
 
         conn.commit()
         return jsonify({'message': '상태가 업데이트되었습니다.'}), 200
@@ -235,8 +234,8 @@ def update_status():
 
         # role_id가 없으면 DB에서 조회
         if not requester_role:
-            encrypted_user_id = encrypt_deterministic(requester_user_id)
-            cursor.execute("SELECT role_id FROM tb_user WHERE id = %s", (encrypted_user_id,))
+            user_id = requester_user_id
+            cursor.execute("SELECT role_id FROM tb_user WHERE id = %s", (user_id,))
             result = cursor.fetchone()
             requester_role = result.get('role_id') if result else None
 

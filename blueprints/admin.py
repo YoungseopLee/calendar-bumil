@@ -36,7 +36,7 @@ def create_user():
             return jsonify({'message': f'{field} 필드가 누락되었습니다.'}), 400
 
     # 암호화
-    id = encrypt_deterministic(data.get('id'))
+    id = data.get('id')
     name = data.get('username')
     position = data.get('position')
     department = data.get('department')
@@ -114,7 +114,7 @@ def update_user():
         values.append(data['department'])
     if 'id' in data:
         fields.append("id = %s")
-        values.append(encrypt_deterministic(data['id']))
+        values.append(data['id'])
     if 'phone' in data:
         fields.append("phone_number = %s")
         values.append(encrypt_aes(data['phone']))
@@ -226,7 +226,7 @@ def update_role_id():
 
     if 'id' in data:
         fields.append("id = %s")
-        values.append(encrypt_deterministic(data['id']))
+        values.append(data['id'])
     if 'role_id' in data:
         fields.append("role_id = %s")
         values.append(data['role_id'])

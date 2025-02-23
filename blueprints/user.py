@@ -51,8 +51,6 @@ def get_users():
         users = cursor.fetchall()
         for user in users:
             try:
-                # 사용자 ID도 복호화하여 평문으로 변경
-                user['id'] = decrypt_deterministic(user['id'])
                 user['phone_number'] = decrypt_aes(user['phone_number'])
             except Exception as e:
                 print(f"복호화 오류 (user id {user['id']}): {e}")
@@ -74,9 +72,8 @@ def get_user():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # 쿼리 스트링에서 평문 user_id를 전달받음
-    user_id_plain = request.args.get('user_id')
-    if not user_id_plain:
+    user_id = request.args.get('user_id')
+    if not user_id:
         return jsonify({'message': 'user_id 파라미터가 제공되지 않았습니다.'}), 400
 
     try:
@@ -85,23 +82,23 @@ def get_user():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
         
-        # 평문 user_id를 암호화하여 DB 조회 조건으로 사용
-        encrypted_user_id = encrypt_deterministic(user_id_plain)
-        
         sql = """
             SELECT id, name, position, department, phone_number, role_id, status, is_delete_yn, first_login_yn
             FROM tb_user
             WHERE id = %s AND is_delete_yn = 'N'
         """
-        cursor.execute(sql, (encrypted_user_id,))
+        cursor.execute(sql, (user_id,))
         user_info = cursor.fetchone()
+
         if not user_info:
             return jsonify({'message': '사용자 정보를 찾을 수 없습니다.'}), 404
 
-        # 복호화 처리
-        user_info['id'] = decrypt_deterministic(user_info['id'])
-        user_info['phone_number'] = decrypt_aes(user_info['phone_number'])
-        
+        try:
+            user_info['phone_number'] = decrypt_aes(user_info['phone_number'])
+        except Exception as decryption_error:
+            print(f"📛 전화번호 복호화 오류: {decryption_error}")
+            user_info['phone_number'] = "복호화 실패"
+
         return jsonify({'user': user_info}), 200
 
     except Exception as e:

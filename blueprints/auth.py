@@ -74,7 +74,7 @@ def signup():
             return jsonify({'message': '필수 항목이 누락되었습니다.'}), 400
 
         # 이메일은 결정적 암호화 (검색용)
-        id = encrypt_deterministic(data.get('id'))
+        id = data.get('id')
         name = data.get('username')
         position = data.get('position')
         department = data.get('department')
@@ -127,8 +127,7 @@ def login():
         if not data.get('id') or not data.get('password'):
             return jsonify({'message': '이메일과 비밀번호는 필수입니다.'}), 400
 
-        # 이메일은 결정적 암호화를 사용하여 암호문 생성
-        encrypted_id = encrypt_deterministic(data.get('id'))
+        id = data.get('id')
         password = data.get('password')
 
         conn = get_db_connection()
@@ -136,7 +135,7 @@ def login():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
 
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM tb_user WHERE id = %s", (encrypted_id,))
+        cursor.execute("SELECT * FROM tb_user WHERE id = %s", (id,))
         user = cursor.fetchone()
 
         if not user:
