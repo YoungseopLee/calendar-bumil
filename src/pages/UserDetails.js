@@ -90,7 +90,7 @@ const UserDetails = () => {
         }
 
         const userprojectData = await userResponse.json();
-        setUserProjects(userprojectData.project_users);
+        setUserProjects(userprojectData.participants);
         console.log("userprojectData : ", userprojectData);
 
       } catch (err) {
@@ -128,65 +128,62 @@ const UserDetails = () => {
   if (loading || !user) return <div className="userdetail-container">로딩 중...</div>;
   //유저가 로딩되지 않을 때 로딩 중 표시 로직이 꼬이는 경우가 있어 !user 추가함
   if (error) return <div className="userdetail-container">{error}</div>;
-
   const ChartView = ({ filteredProjects }) => {
-    const navigate = useNavigate(); // ✅ 네비게이션 훅 사용
-  
     return (
-      <table className="project-table">
-        <thead>
-          <tr>
-            {Array.from({ length: 12 }, (_, index) => (
-              <th key={index + 1}>{index + 1}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {filteredProjects.map((project) => {
-            const projectStart = new Date(project.start_date);
-            const projectEnd = new Date(project.end_date);
+      <div className="project-chart">
+        {filteredProjects.map((project) => {
+          const startDate = new Date(project.start_date);
+          const endDate = new Date(project.end_date);
   
-            const startMonth =
-              projectStart.getFullYear() < year ? 1 : projectStart.getMonth() + 1;
-            const endMonth =
-              projectEnd.getFullYear() > year ? 12 : projectEnd.getMonth() + 1;
+          if (isNaN(startDate) || isNaN(endDate)) {
+            return null;
+          }
   
-            const colSpan = endMonth - startMonth + 1;
+          const startYear = startDate.getFullYear();
+          const endYear = endDate.getFullYear();
+          const months = [];
   
-            return (
-              <tr key={project.id}>
+          // 월 데이터를 저장하기 위한 로직 수정
+          for (let year = startYear; year <= endYear; year++) {
+            let start = year === startYear ? startDate.getMonth() : 0; // 시작 연도의 시작 월
+            let end = year === endYear ? endDate.getMonth() : 11; // 종료 연도의 종료 월
+  
+            for (let month = start; month <= end; month++) {
+              months.push(year * 100 + month); // 월을 '연도월' 형식으로 저장
+            }
+          }
+  
+          return (
+            <div key={project.id} className="project-chart-row">
+              <div
+                className="project-chart-title"
+                onClick={() => navigate(`/project-details?project_code=${project.project_code}`)}
+              >
+                {project.project_name}
+              </div>
+              <div className="project-chart-months">
                 {Array.from({ length: 12 }, (_, idx) => {
-                  if (idx + 1 === startMonth) {
-                    return (
-                      <td
-                        key={idx}
-                        colSpan={colSpan}
-                        className="project-cell"
-                        onClick={() => navigate(`/project-details?project_code=${project.project_code}`)} // ✅ 클릭 시 이동
-                        style={{ cursor: "pointer" }} // ✅ 마우스 커서 변경 (클릭 가능한 요소임을 강조)
-                      >
-                        {project.project_name}
-                      </td>
-                    );
-                  } else if (idx + 1 > startMonth && idx + 1 <= endMonth) {
-                    return null;
-                  } else {
-                    return <td key={idx}></td>;
-                  }
+                  // 선택한 연도의 idx월이 months 배열에 있는지 확인
+                  const isHighlighted = months.includes(year * 100 + idx); // 선택한 연도의 월을 체크
+                  return (
+                    <span key={idx} className={`project-month ${isHighlighted ? 'highlighted' : ''}`}>
+                      {idx + 1}
+                    </span>
+                  );
                 })}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     );
   };
-  
+
   const TableView = ({ filteredProjects }) => {
     const navigate = useNavigate(); // ✅ 네비게이션 훅 사용
   
     return (
-      <table className="project-table">
+      <table className="project-user-table">
         <thead>
           <tr>
             <th>프로젝트명</th>
@@ -238,18 +235,18 @@ const UserDetails = () => {
         <div className="userdetail-content">
           <div className="userdetail-details">
             <p>
+              <FaCircle
+                className={`status-icon ${user.status === "본사" ? "online" : "offline"}`}
+              />
+              {user.status}
+            </p>
+            <p>
               <FaUserTie className="icon" />
               {user.position}
             </p>
             <p>
               <FaBuilding className="icon" />
               {user.department}
-            </p>
-            <p>
-              <FaCircle
-                className={`status-icon ${user.status === "출근" ? "online" : "offline"}`}
-              />
-              {user.status}
             </p>
             <p>
               <FaPhone className="icon" />

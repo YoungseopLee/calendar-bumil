@@ -13,14 +13,8 @@ def toggle_favorite():
     try:
         data = request.get_json()
         # 클라이언트에서 전달받은 값
-        encrypted_user_id = data.get('user_id')
-        # favorite_user_id는 평문으로 전달되므로 암호화
-        favorite_user_id_plain = data.get('favorite_user_id')
-        encrypted_favorite_user_id = encrypt_deterministic(favorite_user_id_plain)
-
-        print("user_id (암호화된 상태 그대로):", encrypted_user_id)
-        print("favorite_user_id (평문):", favorite_user_id_plain)
-        print("favorite_user_id (암호화 후):", encrypted_favorite_user_id)
+        user_id = data.get('user_id')
+        favorite_user_id = data.get('favorite_user_id')
 
         conn = get_db_connection()
         if conn is None:
@@ -30,14 +24,14 @@ def toggle_favorite():
         # 암호화된 ID를 사용하여 즐겨찾기 여부 확인
         cursor.execute(
             "SELECT * FROM tb_favorite WHERE user_id = %s AND favorite_user_id = %s",
-            (encrypted_user_id, encrypted_favorite_user_id)
+            (user_id, favorite_user_id)
         )
         favorite = cursor.fetchone()
         if favorite:
             # 이미 즐겨찾기 상태이면 삭제 (즐겨찾기 해제)
             cursor.execute(
                 "DELETE FROM tb_favorite WHERE user_id = %s AND favorite_user_id = %s",
-                (encrypted_user_id, encrypted_favorite_user_id)
+                (user_id, favorite_user_id)
             )
             conn.commit()
             response_message = '즐겨찾기가 삭제되었습니다.'
@@ -45,7 +39,7 @@ def toggle_favorite():
             # 즐겨찾기가 없으면 새로 추가
             cursor.execute(
                 "INSERT INTO tb_favorite (user_id, favorite_user_id, is_favorite_yn) VALUES (%s, %s, 'y')",
-                (encrypted_user_id, encrypted_favorite_user_id)
+                (user_id, favorite_user_id)
             )
             conn.commit()
             response_message = '즐겨찾기가 추가되었습니다.'

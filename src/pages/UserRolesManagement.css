@@ -1,0 +1,114 @@
+/* 전체 페이지 스타일 */
+.user-roles-page {
+    margin-top: 20%;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f4f6f8;
+  }
+  
+  /* 콘텐츠 박스 스타일 */
+  .box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1000px;
+    margin: 0px auto;
+  }
+  
+  /* 타이틀 */
+  .title {
+    font-size: 1.8em;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  /* 검색창 */
+  .search-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .search-dropdown {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    width: 140px;
+  }
+  
+  .search-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+/* ✅ 권한 필터 토글 버튼 컨테이너 */
+.role-toggle-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  /* ✅ 비활성화 상태 버튼 (흰색 계열) */
+  .role-toggle-button {
+    background-color: #ffffff; /* 연한 회색 → 비활성화 상태 */
+    color: #333;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    flex: 1;
+    margin: 0 5px;
+    border: 1px solid #ccc; /* 경계선 추가 */
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  /* ✅ 호버 상태 */
+  .role-toggle-button:hover {
+    background-color: #fffdfd; /* 호버 시 약간 어두운 회색 */
+  }
+  
+  /* ✅ 활성화 상태 버튼 (기존 활성화 색상 유지) */
+  .role-toggle-button.active {
+    background-color: #007bff; /* 파란색 → 활성화 상태 */
+    color: white;
+    font-weight: bold;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); /* 활성화 상태 그림자 */
+  }
+  
+  /* 사용자 목록 스타일 */
+  .employee-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .employee-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .employee-item:hover {
+    transform: scale(1.03);
+  }
+  
+  /* 역할 드롭다운 */
+  .role-dropdown {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: white;
+    cursor: pointer;
+  }

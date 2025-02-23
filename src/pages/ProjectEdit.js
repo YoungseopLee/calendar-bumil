@@ -4,15 +4,21 @@ import Sidebar from "./Sidebar";
 import Select from "react-select";
 import "./ProjectDetails.css";
 
+// date 문자열을 "YYYY-MM-DD" 형식으로 변환하는 함수
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return isNaN(date.getTime()) ? dateString : date.toISOString().split("T")[0];
+};
+
 const ProjectEdit = () => {
   const [employees, setEmployees] = useState([]);
-  //const [loggedInUserId, setLoggedInUserId] = useState(null);
-  const [Project, setProject] = useState(null); // 이 페이지에 표시할 프로젝트 정보(projectCode로 불러옴)
-  const [loading, setLoading] = useState(true); // 로딩 상태 표시
-  const [error, setError] = useState(null); // 에러 메시지
+  const [Project, setProject] = useState(null); // 프로젝트 정보 (project_code로 불러옴)
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [message, setMessage] = useState(""); // 저장 메시지
-  const [selectedUser, setSelectedUser] = useState(null); // 유저 추가 시 선택된 유저 State
-  const [users, setUsers] = useState([]); // 유저 추가 시 유저 목록을 불러오기 위한 State
+  const [selectedUser, setSelectedUser] = useState(null); // 추가할 유저 선택
+  const [users, setUsers] = useState([]); // 참여 가능한 유저 목록
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
@@ -20,10 +26,10 @@ const ProjectEdit = () => {
 
   const projectCode = new URLSearchParams(location.search).get("project_code");
 
-  // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
+  // 로그인한 사용자 정보 (localStorage에 저장된 최신 정보)
   const user = JSON.parse(localStorage.getItem("user"));
 
-  //필드 매핑(표시해야 할 프로젝트 요소가 추가되면 여기서 매핑해줘야 함, 그래야 표에 표시됨)
+  // 화면에 표시할 프로젝트 필드 매핑
   const fieldMappings = {
     project_code: "프로젝트 코드",
     project_name: "프로젝트 명",
@@ -40,62 +46,62 @@ const ProjectEdit = () => {
     changes: "비고",
   };
 
-  // 사용자 로그인 확인
+  // 로그인한 사용자 정보 최신화 및 체크
   useEffect(() => {
     fetchLoggedInUser();
-
     if (!user) {
       alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
       navigate("/");
       return;
     }
+
+    // 권한 체크
+    if (user.role_id !== "AD_ADMIN" && user.role_id !== "PR_ADMIN") {
+      alert("관리자 권한이 없습니다.");
+      navigate("/");
+      return;
+    }
+
   }, []);
 
-  // 프로젝트 코드가 변경될 때 마다 fetchProjectDetails 실행
+  // 프로젝트 코드가 변경되면 상세정보 불러오기
   useEffect(() => {
     if (projectCode) {
       fetchProjectDetails();
     }
   }, [projectCode]);
 
-  //project 업데이트 확인
-  useEffect(() => {
-    console.log("Project 업데이트됨:", Project);
-  }, [Project]); // Project가 변경될 때마다 실행
-
-  //Employee 업데이트 확인
+  // employees 업데이트 확인 및 참여 가능한 유저 목록 업데이트
   useEffect(() => {
     console.log("Employees 업데이트됨:", employees);
-
-    // 이미 할당된 유저 ID 목록을 Set으로 변환 (빠른 조회를 위해)
+    // 이미 할당된 유저 ID 목록(Set으로 변환)
     const assignedIds = new Set(
       Project?.assigned_user_ids
         ?.split(",")
         .map((id) => id.trim())
         .filter((id) => id !== "") || []
     );
-
-    // employees 목록에서 assigned_user_ids에 없는 유저만 필터링
+    // employees 목록에서 이미 참여한 인원 제외
     const availableUsers = employees
-      .filter((user) => !assignedIds.has(user.id)) // 이미 참여한 인원 제외
-      .map((user) => ({
-        value: user.id,
-        label: `${user.id} - ${user.name} (${user.department})`,
+      .filter((emp) => !assignedIds.has(emp.id))
+      .map((emp) => ({
+        value: emp.id,
+        label: `${emp.id} - ${emp.name} (${emp.department})`,
       }));
-
     setUsers(availableUsers);
-  }, [employees, Project?.assigned_user_ids]); // employees 또는 assigned_user_ids가 변경될 때 실행
-  //users 업데이트 확인
+  }, [employees, Project?.assigned_user_ids]);
+
+  // employees가 변경되면 로그 출력
   useEffect(() => {
     console.log("users 업데이트됨:", users);
-  }, [users]); // users가 변경될 때마다 실행
+  }, [users]);
 
-  //프로젝트 인원 표시에 필요한 인원 목록 데이터 불러오기
+  // 프로젝트 인원 표시에 필요한 employees 목록 불러오기
   useEffect(() => {
     fetchEmployees();
   }, []);
 
-  //로그아웃 함수
+  // 로그아웃 함수
   const handleLogout = () => {
     alert("세션이 만료되었습니다. 다시 로그인해주세요.");
     localStorage.removeItem("token");
@@ -103,7 +109,7 @@ const ProjectEdit = () => {
     navigate("/");
   };
 
-  //프로젝트 상세정보 받아오는 API 사용하는 함수
+  // 프로젝트 상세정보 API 호출
   const fetchProjectDetails = async () => {
     setLoading(true);
     try {
@@ -114,32 +120,8 @@ const ProjectEdit = () => {
         throw new Error("프로젝트 상세정보를 불러오지 못했습니다.");
       }
       const data = await response.json();
-      // 응답이 { project: { ... } } 형태라면:
       console.log("project response : ", data);
       setProject(data.project);
-
-      /*//더미데이터 삽입
-      const dummyData = {
-        category: "유지보수",
-        status: "수행",
-        project_code: "20250122_00004",
-        business_start_date: "2025-01-01",
-        business_end_date: "2025-12-31",
-        group_name: "그룹명 A",
-        project_name:
-          "유지보수 인프라 대진정보통신(주) - 국가정보자원관리원 대구센터",
-        customer: "대진정보통신(주)",
-        supplier: "대진정보통신(주)",
-        person_in_charge: "최치후 부장",
-        contact_number: "054-1234-1234",
-        Sales_representative: "조우성",
-        project_pm: "조우성",
-        project_manager: "-",
-        project_participant: "조우성, 이영섭",
-        business_details_and_notes: "📌 사용인장: 1번 도장",
-        cchanges: "변경사항입니다",
-      };
-      setProject(dummyData);*/
     } catch (err) {
       setError(err.message);
     } finally {
@@ -147,28 +129,23 @@ const ProjectEdit = () => {
     }
   };
 
-  //로그인 유저 확인 함수
+  // 로그인한 사용자 정보 API 호출
   const fetchLoggedInUser = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/auth/get_logged_in_user`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (response.status === 401) {
-        handleLogout(); // 401 응답 시 자동 로그아웃 처리
+        handleLogout();
         return;
       }
-
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem("user", JSON.stringify(data.user)); // 최신 상태 업데이트
+        localStorage.setItem("user", JSON.stringify(data.user));
       } else {
         console.error("사용자 정보 불러오기 실패");
       }
@@ -177,13 +154,12 @@ const ProjectEdit = () => {
     }
   };
 
-  //사용자 목록 데이터 가져오기(프로젝트 인원 상태 표시에 필요함)
+  // employees 목록 API 호출
   const fetchEmployees = async () => {
     try {
       const response = await fetch(`${apiUrl}/user/get_users`);
       if (!response.ok)
         throw new Error("사용자 데이터를 가져오는 데 실패했습니다.");
-
       const data = await response.json();
       setEmployees(data.users);
     } catch (err) {
@@ -196,7 +172,7 @@ const ProjectEdit = () => {
   if (loading) return <p>데이터를 불러오는 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
 
-  // 입력값 변경 시 상태 업데이트
+  // 상위 필드 변경 핸들러 (프로젝트의 top-level 필드 업데이트)
   const handleChange = (key, value) => {
     setProject((prevProject) => ({
       ...prevProject,
@@ -204,54 +180,52 @@ const ProjectEdit = () => {
     }));
   };
 
-  // 화면에 표시할 때만 "Thu, 27 Feb 2025 00:00:00 GMT" → "2025-02-27" 변환
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return isNaN(date.getTime())
-      ? dateString
-      : date.toISOString().split("T")[0];
+  // 참여자 날짜 업데이트 함수
+  const handleParticipantDateChange = (participantId, field, value) => {
+    setProject((prevProject) => ({
+      ...prevProject,
+      project_users: prevProject.project_users.map((participant) =>
+        // participant.id를 기준으로 업데이트 (각 참여자마다 고유 ID 존재)
+        participant.id === participantId
+          ? { ...participant, [field]: value }
+          : participant
+      ),
+    }));
   };
 
-  const handleRemoveParticipant = (userId) => {
+  // 참여자 제거 핸들러
+  const handleRemoveParticipant = (participantId) => {
     setProject((prevProject) => {
-      // 기존 project_users에서 user_id가 일치하지 않는 요소만 남김
       const updatedParticipants = prevProject.project_users.filter(
-        (participant) => participant.id !== userId
+        (participant) => participant.id !== participantId
       );
-
-      const updatedProject = {
+      return {
         ...prevProject,
         project_users: updatedParticipants,
       };
-      return updatedProject;
     });
   };
 
-  //참여자 목록 표를 표시하는 컴포넌트
+  // 참여자 목록 표 컴포넌트
   const Projectuserstable = ({ project_users, employees }) => {
     if (!project_users || project_users.length === 0) {
       return <p>참여 인원이 없습니다.</p>;
     }
 
-    // project_users가 객체 배열인지, 문자열인지 판별 후 가공
-    const participants = Array.isArray(project_users) // 배열 형태인지 확인
-      ? project_users
-      : project_users.split(",").map((id) => ({ id: id.trim() })); // 문자열이면 쉼표 기준으로 나눔
-
-    // employees 데이터에서 user 정보 찾아 매칭
-    const matchedParticipants = participants.map((participant) => {
+    // 참여자 정보 매칭
+    const matchedParticipants = project_users.map((participant) => {
       const employee = employees.find(
         (emp) => emp.id.toString() === participant.user_id.toString()
       );
       return {
         id: participant.id,
+        user_id: participant.user_id,
         name: employee ? employee.name : "정보 없음",
         department: employee ? employee.department : "정보 없음",
         phone: employee ? employee.phone_number : "정보 없음",
         status: employee ? employee.status : "정보 없음",
-        start_date: formatDate(participant.start_date),
-        end_date: formatDate(participant.end_date),
+        start_date: participant.start_date,
+        end_date: participant.end_date,
       };
     });
 
@@ -270,8 +244,36 @@ const ProjectEdit = () => {
           {matchedParticipants.map((participant) => (
             <tr key={participant.id}>
               <td>{participant.name}</td>
-              <td>{participant.start_date}</td>
-              <td>{participant.end_date}</td>
+              <td>
+                <input
+                  className="datebox"
+                  type="date"
+                  value={formatDate(participant.start_date)}
+                  onMouseDown={(e) => e.stopPropagation()} // 포커스 유지
+                  onChange={(e) =>
+                    handleParticipantDateChange(
+                      participant.id,
+                      "start_date",
+                      e.target.value
+                    )
+                  }
+                />
+              </td>
+              <td>
+                <input
+                  className="datebox"
+                  type="date"
+                  value={formatDate(participant.end_date)}
+                  onMouseDown={(e) => e.stopPropagation()} // 포커스 유지
+                  onChange={(e) =>
+                    handleParticipantDateChange(
+                      participant.id,
+                      "end_date",
+                      e.target.value
+                    )
+                  }
+                />
+              </td>
               <td>{participant.status}</td>
               <td>
                 <button
@@ -291,13 +293,21 @@ const ProjectEdit = () => {
   // 수정된 데이터 저장 API 호출
   const handleSave = async () => {
     try {
-      // API에서 YYYY-MM-DD 형식을 받아서 사용하기 때문에 날짜를 변환합니다.
+      // 상위 프로젝트 필드의 날짜 값은 "YYYY-MM-DD" 형식으로 변환
       const projectToSave = {
         ...Project,
         business_start_date: formatDate(Project.business_start_date),
         business_end_date: formatDate(Project.business_end_date),
         assigned_user_ids: Project.project_users.map((user) => user.user_id),
+        // ✅ 'participants' 필드로 전송 (백엔드 요구사항)
+        participants: Project.project_users.map((user) => ({
+          user_id: user.user_id,
+          start_date: user.start_date ? formatDate(user.start_date) : null,
+          end_date: user.end_date ? formatDate(user.end_date) : null,
+        })),
       };
+
+      console.log("저장할 데이터:", JSON.stringify(projectToSave, null, 2));
 
       const response = await fetch(`${apiUrl}/project/edit_project`, {
         method: "POST",
@@ -309,7 +319,6 @@ const ProjectEdit = () => {
       });
 
       if (!response.ok) {
-        // 응답 데이터를 콘솔에 출력 (오류 디버깅 용)
         const errorData = await response.json();
         console.error("Save error response:", errorData);
         throw new Error("프로젝트 업데이트 실패");
@@ -323,6 +332,7 @@ const ProjectEdit = () => {
     }
   };
 
+  // 참여자 추가 핸들러
   const handleAddParticipant = () => {
     if (!selectedUser) {
       alert("추가할 참여자를 선택하세요.");
@@ -331,12 +341,12 @@ const ProjectEdit = () => {
 
     setProject((prevProject) => {
       const currentDate = new Date();
-      const currentDateStr = currentDate.toUTCString(); // "Thu, 27 Feb 2025 00:00:00 GMT"
+      const currentDateStr = currentDate.toISOString().split("T")[0];
 
-      // 기존 `project_users` 배열 복사
+      // 기존 project_users 배열 복사
       const updatedParticipants = [...prevProject.project_users];
 
-      // `employees`에서 `selectedUser`에 해당하는 객체 찾기
+      // 선택한 사용자 정보 찾기
       const newParticipant = employees.find(
         (emp) => emp.id === selectedUser.value
       );
@@ -351,9 +361,9 @@ const ProjectEdit = () => {
       ) {
         updatedParticipants.push({
           ...newParticipant,
-          user_id: newParticipant.id, // `user_id`로 변경
-          start_date: currentDateStr, // 현재 날짜를 start_date로 추가
-          end_date: currentDateStr, // 현재 날짜를 end_date로 추가
+          user_id: newParticipant.id,
+          start_date: Project.business_start_date,
+          end_date: Project.business_end_date,
         });
       } else {
         alert("이미 추가되어있습니다.");
@@ -361,47 +371,39 @@ const ProjectEdit = () => {
 
       return {
         ...prevProject,
-        project_users: updatedParticipants, // 기존 `project`에서 `project_users`만 업데이트
+        project_users: updatedParticipants,
       };
     });
 
     setSelectedUser(null);
   };
 
+  // 프로젝트 삭제 핸들러
   const deleteProject = async (project_code) => {
-    // 삭제 여부 확인
     const confirmDelete = window.confirm(
       "정말로 이 프로젝트를 삭제하시겠습니까?"
     );
-
-    if (!confirmDelete) {
-      return; // 사용자가 취소를 클릭하면 함수 종료
-    }
+    if (!confirmDelete) return;
 
     try {
-      // 서버의 프로젝트 삭제 API로 DELETE 요청
       const response = await fetch(
         `${apiUrl}/project/delete_project/${project_code}`,
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // JWT 토큰을 Authorization 헤더에 추가
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
             "Content-Type": "application/json",
           },
         }
       );
 
-      // 응답 상태가 OK가 아닌 경우 오류 처리
       if (!response.ok) {
         throw new Error("프로젝트 삭제 실패");
       }
 
-      // 성공적으로 삭제되었을 경우
       const data = await response.json();
-      console.log(data.message); // 서버에서 전달된 메시지 출력
-
-      // 추가적인 UI 처리 (예: 프로젝트 목록 갱신 등)
-      alert(data.message); // 프로젝트 삭제 성공 메시지 알림
+      console.log(data.message);
+      alert(data.message);
       navigate("/projects");
     } catch (err) {
       console.error("Error:", err);
@@ -434,11 +436,9 @@ const ProjectEdit = () => {
                   <th>{label}</th>
                   <td>
                     {key === "project_code" ? (
-                      // 🔹 project_code는 수정 불가능하게 표시 *html변조 공격에 취약할수도
                       <span>{Project[key]}</span>
                     ) : key === "business_start_date" ||
                       key === "business_end_date" ? (
-                      // 🔹 사업 시작일 & 종료일을 달력 입력으로 변경
                       <input
                         className="datebox"
                         type="date"
@@ -460,7 +460,6 @@ const ProjectEdit = () => {
         </table>
 
         <h3 className="section-title">🔹 인력&nbsp;&nbsp;&nbsp;</h3>
-
         <Projectuserstable
           project_users={Project?.project_users}
           employees={employees}

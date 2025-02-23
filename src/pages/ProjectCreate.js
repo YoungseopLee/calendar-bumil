@@ -2,13 +2,68 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import "./ProjectCreate.css";
-import ParticipantSelection from "./ParticipantSelection"; 
+import ParticipantSelection from "./ParticipantSelection";
 
 const ProjectCreate = () => {
   const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL || "http://3.38.20.237";
 
-  // ✅ 초기값이 확실하게 배열로 설정되도록 변경
+  // 로그인한 사용자 정보 (localStorage에 저장된 최신 정보)
+  const user = JSON.parse(localStorage.getItem("user"));
+  
+  // 로그인한 사용자 정보 최신화 및 어드민 여부 체크
+  useEffect(() => {
+    fetchLoggedInUser();
+    if (!user) {
+      alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
+      navigate("/");
+      return;
+    }
+
+    // 권한 체크
+    if (user.role_id !== "AD_ADMIN" && user.role_id !== "PR_ADMIN") {
+      alert("관리자 권한이 없습니다.");
+      navigate("/");
+      return;
+    }
+    
+  }, []);
+
+  // 로그인한 사용자 정보 API 호출
+  const fetchLoggedInUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.status === 401) {
+        handleLogout();
+        return;
+      }
+      if (response.ok) {
+        const data = await response.json();
+        localStorage.setItem("user", JSON.stringify(data.user));
+      } else {
+        console.error("사용자 정보 불러오기 실패");
+      }
+    } catch (error) {
+      console.error("로그인 사용자 정보 불러오기 실패:", error);
+    }
+  };
+
+  // 로그아웃 함수
+  const handleLogout = () => {
+    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
+
+
+// ✅ 초기값이 확실하게 배열로 설정되도록 변경
   const [formData, setFormData] = useState({
     project_code: "",
     project_name: "",
@@ -47,7 +102,7 @@ const ProjectCreate = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-
+  
     if (
       !formData.project_code ||
       !formData.category ||
@@ -60,33 +115,28 @@ const ProjectCreate = () => {
       setError("⚠️ 필수 입력값을 모두 입력해주세요.");
       return;
     }
-
+  
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("로그인이 필요합니다.");
       }
-
-      // ✅ 참여자 데이터를 백엔드가 원하는 형식으로 변환
-      const assigned_user_ids = formData.participants.map(p => p.id);
-      console.log("✅ assigned_user_ids:", assigned_user_ids);  // 디버깅
-
-      const participant_dates = formData.participants.map(p => ({
-        user_id: p.id,
+  
+      // ✅ 참여자 데이터를 백엔드가 요구하는 형식으로 변환
+      const participants = formData.participants.map((p) => ({
+        id: p.id,
         start_date: p.participant_start_date || formData.business_start_date,
         end_date: p.participant_end_date || formData.business_end_date
       }));
-      console.log("✅ participant_dates:", participant_dates);  // 디버깅
-
-      // ✅ 백엔드에 전송할 데이터 구조
+  
+      // ✅ 전송할 데이터 구조
       const payload = {
         ...formData,
-        assigned_user_ids,  
-        participant_dates   
+        participants,  // 전체 참여자 정보 포함
       };
-
-      console.log("📤 전송된 데이터:", JSON.stringify(payload, null, 2)); // 최종 디버깅
-
+  
+      console.log("📤 전송된 데이터:", JSON.stringify(payload, null, 2)); // 디버깅용 출력
+  
       const response = await fetch(`${apiUrl}/project/add_project`, {
         method: "POST",
         headers: {
@@ -95,19 +145,18 @@ const ProjectCreate = () => {
         },
         body: JSON.stringify(payload),
       });
-
+  
       if (!response.ok) {
         const errorMessage = await response.json();
         throw new Error(errorMessage.message || "프로젝트 생성에 실패했습니다.");
       }
-
-      alert("프로젝트가 성공적으로 생성되었습니다!");
+  
+      alert("✅ 프로젝트가 성공적으로 생성되었습니다!");
       navigate("/projects");
     } catch (error) {
       setError(error.message);
     }
-};
-
+  };
 
   return (
     <div className="app">
