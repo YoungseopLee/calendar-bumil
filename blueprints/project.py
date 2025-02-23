@@ -45,12 +45,9 @@ def get_all_project():
         
         for project in projects:
             if project.get("assigned_user_ids"):
-                encrypted_ids = project["assigned_user_ids"].split(",")
-                decrypted_ids = [
-                    decrypt_deterministic(eid.strip())
-                    for eid in encrypted_ids if eid.strip() != ""
-                ]
-                project["assigned_user_ids"] = decrypted_ids  # 배열 형태로 저장
+                # 암호화가 제거되었으므로 그대로 리스트로 변환
+                assigned_ids = [eid.strip() for eid in project["assigned_user_ids"].split(",") if eid.strip() != ""]
+                project["assigned_user_ids"] = assigned_ids  # 평문으로 저장
             else:
                 project["assigned_user_ids"] = []
         
@@ -257,8 +254,7 @@ def add_project():
             if not participant_id:
                 return jsonify({'message': '참여자 ID가 누락되었습니다.'}), 400
 
-            encrypted_participant_id = encrypt_deterministic(participant_id)
-            cursor.execute(sql_project_user, (project_code, encrypted_participant_id, start_date, end_date, current_project_yn, created_by, created_by))
+            cursor.execute(sql_project_user, (project_code, participant_id, start_date, end_date, current_project_yn, created_by, created_by))
 
         conn.commit()
         return jsonify({'message': '프로젝트가 추가되었습니다.'}), 201
@@ -399,10 +395,8 @@ def edit_project():
             if not participant_end_date:
                 participant_end_date = participant_start_date  # 종료일 없으면 시작일과 동일하게
 
-            encrypted_uid = encrypt_deterministic(participant_user_id)
-
             cursor.execute(sql_project_user, (
-                new_project_code, encrypted_uid, participant_start_date, participant_end_date,
+                new_project_code, participant_user_id, participant_start_date, participant_end_date,
                 current_project_yn, updated_by, updated_by
             ))
         conn.commit()
