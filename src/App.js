@@ -18,6 +18,7 @@ import ProjectCreate from "./pages/ProjectCreate";
 import ChangePWPage from "./pages/ChangePWPage";
 import UserDetails from "./pages/UserDetails";
 import UserRolesManagement from "./pages/UserRolesManagement";
+import SituationControl from "./pages/SituationControl";
 
 function App() {
   return (
@@ -59,6 +60,8 @@ function App() {
         <Route path="/change-pw" element={<ChangePWPage />} />
         {/* 사원원 상세 페이지 */}
         <Route path="/user-details" element={<UserDetails />} />
+        {/* 현황 관리 페이지 */}
+        <Route path="/SituationControl" element={<SituationControl />} />
       </Routes>
     </Router>
   );
