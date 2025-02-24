@@ -143,7 +143,7 @@ const EmployeeList = () => {
   // 🔄 **사원 상태 변경 (관리자만 가능)**
   const handleStatusChange = async (employeeId, newStatus) => {
     try {
-      const response = await fetch(`${apiUrl}/status/update_status`, {
+      const response = await fetch(`${apiUrl}/status/update_status_admin`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -218,10 +218,19 @@ const EmployeeList = () => {
           <input
             type="text"
             className="search-input"
-            placeholder={`검색할 ${searchField} 입력...`}
+            placeholder={`검색어를 입력해주세요...`}
             onChange={(e) => setSearchText(e.target.value.trim().toLowerCase())}
             value={searchText}
           />
+        </div>
+
+
+        {/* 🏷️ 인덱스 바 */}
+        <div className="employee-index-bar">
+          <span className="index-item">즐겨찾기</span>
+          <span className="index-item">이름</span>
+          <span className="index-item">직급</span>
+          <span className="index-item">상태</span>
         </div>
 
         {/* 👥 사원 목록 렌더링 */}
@@ -264,8 +273,8 @@ const EmployeeList = () => {
                     }
                   >
                     {statusList.map((status) => (
-                      <option key={status.id} value={status.id}>
-                        {status.id}
+                      <option key={status.comment} value={status.comment}>
+                        {status.comment}
                       </option>
                     ))}
                   </select>

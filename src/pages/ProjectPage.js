@@ -12,7 +12,7 @@ const ProjectPage = () => {
   const [roleId, setRoleId] = useState("");
   const [searchCategory, setSearchCategory] = useState("projectName");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState([]);
   const [startFilter, setStartFilter] = useState("");
   const [endFilter, setEndFilter] = useState("");
   const [appliedStart, setAppliedStart] = useState("");
@@ -112,7 +112,13 @@ const ProjectPage = () => {
   };
 
   const handleStatusClick = (status) => {
-    setSelectedStatus(status === selectedStatus ? "" : status);
+    if (selectedStatus.includes(status)) {
+      // 이미 선택된 상태일 경우 제거
+      setSelectedStatus(selectedStatus.filter((s) => s !== status));
+    } else {
+      // 선택되지 않은 상태일 경우 추가
+      setSelectedStatus([...selectedStatus, status]);
+    }
   };
 
   const filteredProjects = projects.filter((project) => {
@@ -120,7 +126,7 @@ const ProjectPage = () => {
     const projectEnd = new Date(project.endDate);
     const filterStart = appliedStart ? new Date(appliedStart) : null;
     const filterEnd = appliedEnd ? new Date(appliedEnd) : null;
-
+  
     const matchesSearch =
       searchCategory === "projectName"
         ? project.name.includes(searchQuery)
@@ -137,9 +143,10 @@ const ProjectPage = () => {
         : searchCategory === "participants"
         ? project.participantNames.some((name) => name.includes(searchQuery))
         : false;
-
-    const matchesStatus = selectedStatus ? project.status === selectedStatus : true;
-
+  
+    const matchesStatus =
+      selectedStatus.length === 0 || selectedStatus.includes(project.status);
+  
     return (
       (!filterStart || projectEnd >= filterStart) &&
       (!filterEnd || projectStart <= filterEnd) &&
@@ -203,7 +210,7 @@ const ProjectPage = () => {
             {["제안", "진행 중", "완료"].map((status) => (
               <button
                 key={status}
-                className={`status-toggle ${selectedStatus === status ? "active" : ""}`}
+                className={`status-toggle ${selectedStatus.includes(status) ? "active" : ""}`}
                 onClick={() => handleStatusClick(status)}
               >
                 {status}
