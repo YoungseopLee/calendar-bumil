@@ -126,27 +126,27 @@ const ProjectPage = () => {
     const projectEnd = new Date(project.endDate);
     const filterStart = appliedStart ? new Date(appliedStart) : null;
     const filterEnd = appliedEnd ? new Date(appliedEnd) : null;
-  
+
     const matchesSearch =
       searchCategory === "projectName"
         ? project.name.includes(searchQuery)
         : searchCategory === "code"
-        ? project.code.includes(searchQuery)
-        : searchCategory === "allParticipants"
-        ? project.owner.includes(searchQuery) ||
-          project.pm.includes(searchQuery) ||
-          project.participantNames.some((name) => name.includes(searchQuery))
-        : searchCategory === "salesRep"
-        ? project.owner.includes(searchQuery)
-        : searchCategory === "projectPM"
-        ? project.pm.includes(searchQuery)
-        : searchCategory === "participants"
-        ? project.participantNames.some((name) => name.includes(searchQuery))
-        : false;
-  
+          ? project.code.includes(searchQuery)
+          : searchCategory === "allParticipants"
+            ? project.owner.includes(searchQuery) ||
+            project.pm.includes(searchQuery) ||
+            project.participantNames.some((name) => name.includes(searchQuery))
+            : searchCategory === "salesRep"
+              ? project.owner.includes(searchQuery)
+              : searchCategory === "projectPM"
+                ? project.pm.includes(searchQuery)
+                : searchCategory === "participants"
+                  ? project.participantNames.some((name) => name.includes(searchQuery))
+                  : false;
+
     const matchesStatus =
       selectedStatus.length === 0 || selectedStatus.includes(project.status);
-  
+
     return (
       (!filterStart || projectEnd >= filterStart) &&
       (!filterEnd || projectStart <= filterEnd) &&
@@ -156,76 +156,85 @@ const ProjectPage = () => {
   });
 
   return (
-    <div className="project-page">
-      <Sidebar />
-      {roleId && ["AD_ADMIN", "PR_ADMIN"].includes(roleId) && <AddProjectButton />}
-      <div className="content">
-        <div className="projectPage-box">
-          <h1 className="title">프로젝트 목록</h1>
-          <div className="search-container">
-            <select
-              className="search-category"
-              value={searchCategory}
-              onChange={(e) => setSearchCategory(e.target.value)}
+<div className="project-page">
+  <Sidebar />
+  {roleId && ["AD_ADMIN", "PR_ADMIN"].includes(roleId) && <AddProjectButton />}
+  <div className="content">
+    <div className="projectPage-box">
+      {/* ✅ 타이틀과 필터를 함께 고정 */}
+      <div className="fixed-header">
+        <h1 className="title">프로젝트 목록</h1>
+
+        {/* ✅ 검색 필터 */}
+        <div className="search-container">
+          <select
+            className="search-category"
+            value={searchCategory}
+            onChange={(e) => setSearchCategory(e.target.value)}
+          >
+            <option value="code">프로젝트 코드</option>
+            <option value="projectName">프로젝트 명</option>
+            <option value="allParticipants">참여인력 (전체)</option>
+            <option value="salesRep">영업대표</option>
+            <option value="projectPM">프로젝트 PM</option>
+            <option value="participants">프로젝트 참여자</option>
+          </select>
+          <input
+            type="text"
+            className="search-input"
+            placeholder="검색어 입력"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <button className="filter-button" onClick={applyFilters}>
+            <FaSearch />
+          </button>
+        </div>
+
+        {/* ✅ 날짜 필터 */}
+        <div className="filter-container">
+          <input
+            type="date"
+            className="date-filter"
+            value={startFilter}
+            onChange={(e) => setStartFilter(e.target.value)}
+          />
+          <span className="date-separator">~</span>
+          <input
+            type="date"
+            className="date-filter"
+            value={endFilter}
+            onChange={(e) => setEndFilter(e.target.value)}
+          />
+          <button className="filter-button" onClick={applyFilters}>
+            <FaSearch />
+          </button>
+        </div>
+
+        {/* ✅ 상태 토글 필터 */}
+        <div className="status-toggle-container">
+          {["제안", "진행 중", "완료"].map((status) => (
+            <button
+              key={status}
+              className={`status-toggle ${selectedStatus.includes(status) ? "active" : ""}`}
+              onClick={() => handleStatusClick(status)}
             >
-              <option value="code">프로젝트 코드</option>
-              <option value="projectName">프로젝트 명</option>
-              <option value="allParticipants">참여인력 (전체)</option>
-              <option value="salesRep">영업대표</option>
-              <option value="projectPM">프로젝트 PM</option>
-              <option value="participants">프로젝트 참여자</option>
-            </select>
-            <input
-              type="text"
-              className="search-input"
-              placeholder="검색어 입력"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button className="filter-button" onClick={applyFilters}>
-              <FaSearch />
+              {status}
             </button>
-          </div>
-
-          <div className="filter-container">
-            <input
-              type="date"
-              className="date-filter"
-              value={startFilter}
-              onChange={(e) => setStartFilter(e.target.value)}
-            />
-            <span className="date-separator">~</span>
-            <input
-              type="date"
-              className="date-filter"
-              value={endFilter}
-              onChange={(e) => setEndFilter(e.target.value)}
-            />
-            <button className="filter-button" onClick={applyFilters}>
-              <FaSearch />
-            </button>
-          </div>
-
-          <div className="status-toggle-container">
-            {["제안", "진행 중", "완료"].map((status) => (
-              <button
-                key={status}
-                className={`status-toggle ${selectedStatus.includes(status) ? "active" : ""}`}
-                onClick={() => handleStatusClick(status)}
-              >
-                {status}
-              </button>
-            ))}
-          </div>
-
-          {filteredProjects.length > 0 ? (
-            <ProjectList projects={filteredProjects} />
-          ) : (
-            <p className="no-results">검색 결과가 없습니다.</p>
-          )}
+          ))}
         </div>
       </div>
+
+      {/* ✅ 필터된 프로젝트 목록 */}
+      {filteredProjects.length > 0 ? (
+        <ProjectList projects={filteredProjects} />
+      ) : (
+        <p className="no-results">검색 결과가 없습니다.</p>
+      )}
     </div>
+  </div>
+</div>
+
   );
 };
 

@@ -4,7 +4,7 @@
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
-    padding-bottom: 20px;
+    padding-bottom: 10px;
     background-color: #f8f9fa;
 }
 
@@ -12,8 +12,8 @@
 .content {
     width: 100%;
     max-width: 1200px;
-    padding: 20px;
-    padding-left: 20px;
+    /* padding: 20px; */
+    /* padding-left: 20px; */
 }
 
 /* ✅ 프로젝트 카드 컨테이너 */
@@ -202,3 +202,40 @@
         min-width: 100px;
     }
 }
+
+/* ✅ 고정 헤더 스타일 */
+.fixed-header {
+    position: sticky;
+    top: 0;
+    background-color: white;  /* 배경색 */
+    z-index: 1100;  /* 사이드바보다 높은 값으로 설정 */
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);  /* 그림자 효과 */
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+  
+  /* ✅ 타이틀 스타일 */
+  .fixed-header .title {
+    margin: 0;
+    padding: 10px 0;
+    font-size: 20px;
+    text-align: center;
+  }
+  
+  /* ✅ 검색 필터 컨테이너 (간격 축소) */
+  .search-container,
+  .filter-container,
+  .status-toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 5px;  /* ✅ 간격 축소 */
+    padding: 5px 0;      /* ✅ 패딩 축소 */
+  }
+  
+  /* ✅ 사이드바가 열릴 때 고정된 헤더 가리지 않도록 */
+  .sidebar {
+    z-index: 1200;  /* 고정된 헤더보다 위에 표시 */
+  }

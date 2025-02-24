@@ -72,6 +72,7 @@
 /* ✅ 로그아웃 섹션 스타일 */
 .logout-section {
   margin-top: auto;  /* 자동으로 아래쪽에 배치 */
+  margin-bottom: 40px;
   padding-top: 20px;
   border-top: 1px solid #ddd;
 }
