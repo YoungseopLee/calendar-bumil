@@ -44,7 +44,7 @@ const AddSchedule = () => {
   // 날짜를 YYYY-MM-DD 형식으로 변환하고 하루를 뺍니다.
   const adjustDate = (dateString) => {
     const date = new Date(dateString);
-    date.setDate(date.getDate() - 1); // 데이터베이스에 저장하기 전에 하루를 뺍니다.
+    date.setDate(date.getDate()); // 데이터베이스에 저장하기 전에 하루를 뺍니다.
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");

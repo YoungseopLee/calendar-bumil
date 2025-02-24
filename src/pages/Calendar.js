@@ -116,54 +116,27 @@ const Calendar = () => {
   for (let i = 1; i <= daysInMonth; i++) {
     calendarDays.push(i);
   }
-  // const userScheduletest = [
-  //   {
-  //     id: 1,
-  //     start_date: "Sun, 16 Feb 2025 00:00:00 GMT",
-  //     end_date: "Sun, 16 Feb 2025 00:00:00 GMT",
-  //     status: "준비 중",
-  //     task: "test1",
-  //   },
-  //   {
-  //     id: 2,
-  //     start_date: "Mon, 17 Feb 2025 14:00:00 GMT",
-  //     end_date: "Mon, 17 Feb 2025 16:00:00 GMT",
-  //     status: "진행 중",
-  //     task: "회의",
-  //   },
-  //   {
-  //     id: 3,
-  //     start_date: "Wed, 19 Feb 2025 09:30:00 GMT",
-  //     end_date: "Wed, 19 Feb 2025 11:00:00 GMT",
-  //     status: "완료",
-  //     task: "프로젝트 완료",
-  //   },
-  //   {
-  //     id: 4,
-  //     start_date: "Fri, 21 Feb 2025 18:00:00 GMT",
-  //     end_date: "Fri, 21 Feb 2025 20:00:00 GMT",
-  //     status: "대기 중",
-  //     task: "클라이언트 미팅",
-  //   },
-  //   {
-  //     id: 5,
-  //     start_date: "Sun, 23 Feb 2025 12:00:00 GMT",
-  //     end_date: "Sun, 23 Feb 2025 14:00:00 GMT",
-  //     status: "준비 중",
-  //     task: "팀 점검",
-  //   },
-  // ];
-  // const [userSchedule, setUserSchedule] = useState(userScheduletest);
-  // console.log("유저스케쥴테스트: ", userSchedule);
 
   const handleDateClick = async (day) => {
     if (day) {
       const selectedDate = new Date(currentYear, currentMonth, day);
-      console.log("selectedDate:",selectedDate);
       setSelectedDate(selectedDate);
-      const selectedDateString = selectedDate.toISOString().split("T")[0];
-
+      // 선택한 날짜를 한국 시간대로 변환
+      const offset = 9 * 60; // 한국 시간 (KST)은 UTC보다 9시간 빠릅니다.
+      selectedDate.setMinutes(
+        selectedDate.getMinutes() + selectedDate.getTimezoneOffset() + offset
+      );
       // 자신의 일정 가져오기
+      // 한국 시간대로 날짜 문자열을 생성
+      const selectedDateString = `${selectedDate.getFullYear()}-${(
+        selectedDate.getMonth() + 1
+      )
+        .toString()
+        .padStart(2, "0")}-${selectedDate
+        .getDate()
+        .toString()
+        .padStart(2, "0")}`;
+
       try {
         const response = await fetch(
           `${process.env.REACT_APP_API_URL}/schedule/get_schedule?user_id=${user.id}&date=${selectedDateString}`
@@ -201,6 +174,7 @@ const Calendar = () => {
         alert("다른 사용자 일정 로드에 실패했습니다.");
       }
     }
+    fetchUserSchedule();
   };
 
   const handleScheduleClick = (schedule) => {
@@ -394,20 +368,21 @@ const Calendar = () => {
 
             // 일정이 있는 날짜인지 확인
             const hasSchedule =
-            day &&
-            allSchedule.some((schedule) => {
-              const startDate = new Date(schedule.start_date);
-              const endDate = new Date(schedule.end_date);
-              const currentDate = new Date(Date.UTC(currentYear, currentMonth, day));
-          
-              // 시간 차이로 인한 오류 방지
-              startDate.setUTCHours(0, 0, 0, 0);
-              endDate.setUTCHours(0, 0, 0, 0);
-              currentDate.setUTCHours(0, 0, 0, 0);
-          
-              return currentDate >= startDate && currentDate <= endDate;
-            });
-          
+              day &&
+              allSchedule.some((schedule) => {
+                const startDate = new Date(schedule.start_date);
+                const endDate = new Date(schedule.end_date);
+                const currentDate = new Date(
+                  Date.UTC(currentYear, currentMonth, day)
+                );
+
+                // 시간 차이로 인한 오류 방지
+                startDate.setUTCHours(0, 0, 0, 0);
+                endDate.setUTCHours(0, 0, 0, 0);
+                currentDate.setUTCHours(0, 0, 0, 0);
+
+                return currentDate >= startDate && currentDate <= endDate;
+              });
 
             return (
               <div
@@ -457,16 +432,10 @@ const Calendar = () => {
             <div className="schedule-section">
               <h4>내 일정</h4>
               <ul className="schedule-list">
-                {userSchedule
-                  .filter((schedule) => {
-                    // 선택된 날짜가 없거나, start_date의 날짜가 selectedDate와 같은 경우만 표시
-                    if (!selectedDate) return false;
-                    const scheduleDate = new Date(
-                      schedule.start_date
-                    ).toDateString();
-                    return scheduleDate === selectedDate.toDateString();
-                  })
-                  .map((schedule) => (
+                {userSchedule.length === 0 ? (
+                  <li className="empty-schedule">일정이 없습니다.</li>
+                ) : (
+                  userSchedule.map((schedule) => (
                     <li
                       key={schedule.id}
                       className="schedule-item"
@@ -498,16 +467,7 @@ const Calendar = () => {
                         </button>
                       </div>
                     </li>
-                  ))}
-                {/* 일정이 없을 경우 표시 */}
-                {userSchedule.filter((schedule) => {
-                  if (!selectedDate) return false;
-                  const scheduleDate = new Date(
-                    schedule.start_date
-                  ).toDateString();
-                  return scheduleDate === selectedDate.toDateString();
-                }).length === 0 && (
-                  <li className="empty-schedule">일정이 없습니다.</li>
+                  ))
                 )}
               </ul>
             </div>
@@ -552,7 +512,6 @@ const Calendar = () => {
                   // 2. 걸쳐 있는 월의 일정 표시하기 위한 필터
                   const filtered = otherUsersSchedule
                     .filter((schedule) => {
-                      console.log("schedule : ", schedule);
                       const startDate = new Date(schedule.start_date);
                       const endDate = new Date(schedule.end_date);
 
@@ -567,6 +526,7 @@ const Calendar = () => {
                       (a, b) => new Date(a.start_date) - new Date(b.start_date)
                     );
 
+                  console.log("filteredAllschedule : ", filtered);
                   if (filtered.length === 0) {
                     return (
                       <li className="empty-schedule">
