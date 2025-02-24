@@ -309,6 +309,8 @@ const UserDetails = () => {
         </div>
       </div>
 
+      <div className="divider"></div>
+
       <div className="userdetail-projects">
         <div className="project-header">
           <h3>참여한 프로젝트</h3>
