@@ -97,7 +97,7 @@ def signup():
         sql = """
         INSERT INTO tb_user 
         (name, position, department, id, phone_number, password, role_id, is_delete_yn, first_login_yn, created_at, updated_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, 'n', 'n', NOW(), NOW())
+        VALUES (%s, %s, %s, %s, %s, %s, %s, 'N', 'N', NOW(), NOW())
         """
         # AD_ADMIN, PR_ADMIN, PR_MANAGER, USR_GENERAL
         default_role_id = "USR_GENERAL"
@@ -160,7 +160,7 @@ def login():
             'department': user['department'],
             'phone_number': decrypt_aes(user['phone_number']),
             'status': user.get('status', ''),
-            'first_login_yn': user.get('first_login_yn', 'y')
+            'first_login_yn': user.get('first_login_yn', 'Y')
         }
 
         return jsonify({'message': '로그인 성공!', 'user': user_data, 'token': token}), 200
@@ -273,7 +273,7 @@ def change_password():
 
         # 비밀번호를 업데이트하고 first_login_yn을 'y'로 변경 (비밀번호 변경 완료)
         cursor.execute(
-            "UPDATE tb_user SET password = %s, first_login_yn = 'y', updated_at = NOW(), updated_by = %s WHERE id = %s",
+            "UPDATE tb_user SET password = %s, first_login_yn = 'Y', updated_at = NOW(), updated_by = %s WHERE id = %s",
             (new_hashed, payload.get('name', 'SYSTEM'), user_id)
         )
         conn.commit()

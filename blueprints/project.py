@@ -45,9 +45,8 @@ def get_all_project():
         
         for project in projects:
             if project.get("assigned_user_ids"):
-                # 암호화가 제거되었으므로 그대로 리스트로 변환
                 assigned_ids = [eid.strip() for eid in project["assigned_user_ids"].split(",") if eid.strip() != ""]
-                project["assigned_user_ids"] = assigned_ids  # 평문으로 저장
+                project["assigned_user_ids"] = assigned_ids
             else:
                 project["assigned_user_ids"] = []
         

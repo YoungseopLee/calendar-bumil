@@ -25,3 +25,6 @@ yarn-error.log*
 __pycache__/
 .env
 *.zip
+
+encrypt_password.py
+encrypt_phone_number.py
