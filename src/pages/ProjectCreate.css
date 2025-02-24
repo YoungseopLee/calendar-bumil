@@ -55,23 +55,54 @@
     border-radius: 5px;
 }
 
-/* ✅ 사업 기간 입력 바 컨테이너 */
+/* ✅ 사업 기간 입력 바 전체를 한 줄에 배치 */
+.form-row.date-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+/* ✅ 라벨 스타일 (다른 입력 필드와 동일) */
+.form-row.date-row label {
+    width: 160px;
+    font-weight: bold;
+    text-align: left;
+    flex-shrink: 0;
+}
+
+/* ✅ 날짜 입력 필드와 구분 기호 컨테이너 */
 .date-container {
     display: flex;
     align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
+    gap: 10px;
+    flex: 1;                  /* 다른 입력 필드와 동일한 너비 */
+    box-sizing: border-box;
 }
 
-/* ✅ 사업 기간 입력 필드 */
+/* ✅ 시작일과 종료일 입력 필드 */
 .date-container input {
-    flex: 1;
-    min-width: 120px;
-    padding: 8px;
-    font-size: 14px;
+    flex: 1;                  /* 같은 크기로 배치 */
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    min-width: 0;             /* 최소 너비 제한 해제 */
     text-align: center;
 }
+
+/* ✅ 날짜 구분 기호 (~) */
+.date-separator {
+    padding: 0 10px;
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+}
+
 
 /* ✅ 버튼 컨테이너 */
 .button-container {
@@ -126,9 +157,24 @@
     .form-row label {
         width: 140px;
     }
+    
+    .form-row.date-row {
+        flex-direction: row;  /* 한 줄 유지 */
+        align-items: center;
+    }
+
+    .date-container {
+        flex-direction: row;
+        gap: 5px;
+    }
 
     .date-container input {
-        width: 100%;
+        width: auto;
+        flex: 1;
+    }
+
+    .date-separator {
+        display: block;
     }
 }
 
