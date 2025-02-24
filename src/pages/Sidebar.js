@@ -48,25 +48,25 @@ const Sidebar = () => {
             {isAdmin && (
               <li>
                 <a href="#" onClick={handleManagerClick}>
-                  Manager
+                  관리자
                 </a>
               </li>
             )}
             <li>
-              <Link to="/projects">Project</Link>
+              <Link to="/projects">프로젝트</Link>
             </li>
             <li>
-              <Link to="/employee">Employee</Link>
+              <Link to="/employee">직원</Link>
             </li>
             <li>
-              <Link to="/calendar">Calendar</Link>
+              <Link to="/calendar">달력</Link>
             </li>
             <li>
-              <Link to="/mypage">MyPage</Link>
+              <Link to="/mypage">내 정보</Link>
             </li>
             <li>
               <Link to="/" onClick={handleLogout} className="logout-link">
-                Logout
+                로그아웃
               </Link>
             </li>
           </ul>
