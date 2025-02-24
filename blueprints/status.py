@@ -37,7 +37,7 @@ def get_status_list():
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT id, comment FROM tb_status")
+        cursor.execute("SELECT id, comment FROM tb_status ORDER BY comment")
         statuses = cursor.fetchall()
         return jsonify({'statuses': statuses}), 200
     except Exception as e:
