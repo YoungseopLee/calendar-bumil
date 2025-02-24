@@ -179,6 +179,14 @@ const UserRolesManagement = () => {
           ))}
         </div>
 
+        {/* ✅ 인덱스 헤더 바 추가 */}
+        <div className="employee-index-bar">
+          <span className="index-item">이름</span>
+          <span className="index-item">직급</span>
+          <span className="index-item">권한</span>
+        </div>
+
+
         {/* ✅ 사용자 목록 */}
         <ul className="employee-list">
           {employees.filter(filterEmployees).map((employee) => (
