@@ -6,7 +6,16 @@
   align-items: center;
   height: 100vh;
   padding: 20px;
-  margin-top: 20px; /*사이드바를 위한 상단 여백*/
+  margin-top: 50px; /*사이드바를 위한 상단 여백*/
+}
+
+/* 구분선 스타일 */
+.divider {
+  width: 100%;
+  height: 2px;  /* 선의 두께 */
+  background-color: #ddd;  /* 선의 색상 */
+  margin: 20px 0;  /* 위아래 여백 */
+  border-radius: 2px;  /* 둥근 모서리 */
 }
 
 /* 프로필 카드 */
