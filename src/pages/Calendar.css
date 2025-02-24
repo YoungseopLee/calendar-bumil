@@ -391,6 +391,6 @@
 
 .has-schedule {
   background-color: rgb(179, 206, 255); /* 배경색을 빨간색으로 설정 */
-  font-weight: bold;
+  /* font-weight: bold; */
   border-radius: 5px; /* 모서리를 둥글게 */
 }

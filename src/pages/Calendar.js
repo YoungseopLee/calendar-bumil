@@ -7,7 +7,7 @@ import "./Calendar.css";
 const Calendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
-
+  const [userSchedule, setUserSchedule] = useState([]);
   const [otherUsersSchedule, setOtherUsersSchedule] = useState([]);
   const [userStatus, setUserStatus] = useState("");
   const [departments, setDepartments] = useState([]);
@@ -15,6 +15,7 @@ const Calendar = () => {
   const [users, setUsers] = useState([]); // 직원 목록
   const [statusList, setStatusList] = useState([]); // 상태 목록 (백엔드 CRUD 결과)
   const navigate = useNavigate();
+  const [allSchedule, setAllSchedule] = useState([]);
 
   // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
   const user = JSON.parse(localStorage.getItem("user"));
@@ -50,6 +51,7 @@ const Calendar = () => {
     fetchData();
     fetchLoggedInUser(); // 사용자 상태 업데이트
     fetchStatusList(); // 상태 목록 가져오기
+    fetchUserSchedule(); // 전체 일정 가져오기
   }, []);
 
   const fetchStatusList = async () => {
@@ -62,6 +64,20 @@ const Calendar = () => {
       setStatusList(data.statuses); // 예: [{ id: "파견", comment: "파견" }, ...]
     } catch (error) {
       console.error("상태 목록 로딩 오류:", error);
+    }
+  };
+
+  const fetchUserSchedule = async () => {
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/schedule/get_all_schedule`
+      );
+      if (!response.ok) throw new Error("전체 일정을 불러오지 못했습니다.");
+      const data = await response.json();
+      console.log("전체일정: ", data.schedules);
+      setAllSchedule(data.schedules);
+    } catch (error) {
+      console.error("전체 일정 로딩 오류:", error);
     }
   };
 
@@ -100,69 +116,69 @@ const Calendar = () => {
   for (let i = 1; i <= daysInMonth; i++) {
     calendarDays.push(i);
   }
-  const userScheduletest = [
-    {
-      id: 1,
-      start_date: "Sun, 16 Feb 2025 00:00:00 GMT",
-      end_date: "Sun, 16 Feb 2025 00:00:00 GMT",
-      status: "준비 중",
-      task: "test1",
-    },
-    {
-      id: 2,
-      start_date: "Mon, 17 Feb 2025 14:00:00 GMT",
-      end_date: "Mon, 17 Feb 2025 16:00:00 GMT",
-      status: "진행 중",
-      task: "회의",
-    },
-    {
-      id: 3,
-      start_date: "Wed, 19 Feb 2025 09:30:00 GMT",
-      end_date: "Wed, 19 Feb 2025 11:00:00 GMT",
-      status: "완료",
-      task: "프로젝트 완료",
-    },
-    {
-      id: 4,
-      start_date: "Fri, 21 Feb 2025 18:00:00 GMT",
-      end_date: "Fri, 21 Feb 2025 20:00:00 GMT",
-      status: "대기 중",
-      task: "클라이언트 미팅",
-    },
-    {
-      id: 5,
-      start_date: "Sun, 23 Feb 2025 12:00:00 GMT",
-      end_date: "Sun, 23 Feb 2025 14:00:00 GMT",
-      status: "준비 중",
-      task: "팀 점검",
-    },
-  ];
-  const [userSchedule, setUserSchedule] = useState(userScheduletest);
-  console.log("유저스케쥴테스트: ", userSchedule);
+  // const userScheduletest = [
+  //   {
+  //     id: 1,
+  //     start_date: "Sun, 16 Feb 2025 00:00:00 GMT",
+  //     end_date: "Sun, 16 Feb 2025 00:00:00 GMT",
+  //     status: "준비 중",
+  //     task: "test1",
+  //   },
+  //   {
+  //     id: 2,
+  //     start_date: "Mon, 17 Feb 2025 14:00:00 GMT",
+  //     end_date: "Mon, 17 Feb 2025 16:00:00 GMT",
+  //     status: "진행 중",
+  //     task: "회의",
+  //   },
+  //   {
+  //     id: 3,
+  //     start_date: "Wed, 19 Feb 2025 09:30:00 GMT",
+  //     end_date: "Wed, 19 Feb 2025 11:00:00 GMT",
+  //     status: "완료",
+  //     task: "프로젝트 완료",
+  //   },
+  //   {
+  //     id: 4,
+  //     start_date: "Fri, 21 Feb 2025 18:00:00 GMT",
+  //     end_date: "Fri, 21 Feb 2025 20:00:00 GMT",
+  //     status: "대기 중",
+  //     task: "클라이언트 미팅",
+  //   },
+  //   {
+  //     id: 5,
+  //     start_date: "Sun, 23 Feb 2025 12:00:00 GMT",
+  //     end_date: "Sun, 23 Feb 2025 14:00:00 GMT",
+  //     status: "준비 중",
+  //     task: "팀 점검",
+  //   },
+  // ];
+  // const [userSchedule, setUserSchedule] = useState(userScheduletest);
+  // console.log("유저스케쥴테스트: ", userSchedule);
 
   const handleDateClick = async (day) => {
     if (day) {
       const selectedDate = new Date(currentYear, currentMonth, day);
-
+      console.log("selectedDate:",selectedDate);
       setSelectedDate(selectedDate);
       const selectedDateString = selectedDate.toISOString().split("T")[0];
 
-      // // 자신의 일정 가져오기
-      // try {
-      //   const response = await fetch(
-      //     `${process.env.REACT_APP_API_URL}/schedule/get_schedule?user_id=${user.id}&date=${selectedDateString}`
-      //   );
-      //   const data = await response.json();
-      //   console.log("스케쥴확인:", data);
-      //   if (response.ok) {
-      //     setUserSchedule(data.schedules || []);
-      //   } else {
-      //     alert("자신의 일정 로드에 실패했습니다.");
-      //   }
-      // } catch (error) {
-      //   console.error("자신의 일정 로드 실패:", error);
-      //   alert("자신의 일정 로드에 실패했습니다.");
-      // }
+      // 자신의 일정 가져오기
+      try {
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/schedule/get_schedule?user_id=${user.id}&date=${selectedDateString}`
+        );
+        const data = await response.json();
+        console.log("userSchedule:", data);
+        if (response.ok) {
+          setUserSchedule(data.schedules || []);
+        } else {
+          alert("자신의 일정 로드에 실패했습니다.");
+        }
+      } catch (error) {
+        console.error("자신의 일정 로드 실패:", error);
+        alert("자신의 일정 로드에 실패했습니다.");
+      }
 
       // 다른 사용자 일정 가져오기
       try {
@@ -378,10 +394,20 @@ const Calendar = () => {
 
             // 일정이 있는 날짜인지 확인
             const hasSchedule =
-              day &&
-              userSchedule.some(
-                (schedule) => new Date(schedule.start_date).getDate() === day
-              );
+            day &&
+            allSchedule.some((schedule) => {
+              const startDate = new Date(schedule.start_date);
+              const endDate = new Date(schedule.end_date);
+              const currentDate = new Date(Date.UTC(currentYear, currentMonth, day));
+          
+              // 시간 차이로 인한 오류 방지
+              startDate.setUTCHours(0, 0, 0, 0);
+              endDate.setUTCHours(0, 0, 0, 0);
+              currentDate.setUTCHours(0, 0, 0, 0);
+          
+              return currentDate >= startDate && currentDate <= endDate;
+            });
+          
 
             return (
               <div
