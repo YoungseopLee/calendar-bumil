@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { FiMenu } from "react-icons/fi"; // ✅ 심플한 햄버거 아이콘
 import "./Sidebar.css";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false); // 관리자 여부 상태
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,11 +37,12 @@ const Sidebar = () => {
 
   return (
     <div className="app-body">
+      {/* ✅ 햄버거 아이콘 버튼 */}
       <button className="hamburger-btn" onClick={toggleSidebar}>
-        <div className="bar"></div>
-        <div className="bar"></div>
-        <div className="bar"></div>
+        <FiMenu size={28} color="#333" />
       </button>
+
+      {/* ✅ 사이드바 메뉴 */}
       {isOpen && (
         <div className="sidebar">
           <ul className="menu">
@@ -65,7 +67,7 @@ const Sidebar = () => {
             )}
           </ul>
 
-          {/* ✅ 로그아웃 버튼을 하단에 고정 */}
+          {/* ✅ 로그아웃 버튼 하단 고정 */}
           <div className="logout-section">
             <Link to="/" onClick={handleLogout} className="logout-link">
               로그아웃
