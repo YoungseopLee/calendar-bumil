@@ -5,7 +5,7 @@
     gap: 16px;
     margin: 0 auto;
     max-width: 1200px; /* 최대 너비 제한 */
-    padding: 0 16px; /* 양쪽 여백 추가 */
+    padding: 0 0px; /* 양쪽 여백 추가 */
 }
 
 /* 바둑판 배열 (Grid) 스타일 */
