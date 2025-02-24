@@ -9,7 +9,6 @@ const Sidebar = () => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
-    console.log("localstorage user: ", user);
     if (user && user.role_id === "AD_ADMIN") {
       setIsAdmin(true);
     } else {
@@ -45,7 +44,6 @@ const Sidebar = () => {
       {isOpen && (
         <div className="sidebar">
           <ul className="menu">
-
             <li>
               <Link to="/projects">프로젝트</Link>
             </li>
@@ -65,12 +63,14 @@ const Sidebar = () => {
                 </a>
               </li>
             )}
-            <li>
-              <Link to="/" onClick={handleLogout} className="logout-link">
-                로그아웃
-              </Link>
-            </li>
           </ul>
+
+          {/* ✅ 로그아웃 버튼을 하단에 고정 */}
+          <div className="logout-section">
+            <Link to="/" onClick={handleLogout} className="logout-link">
+              로그아웃
+            </Link>
+          </div>
         </div>
       )}
     </div>
