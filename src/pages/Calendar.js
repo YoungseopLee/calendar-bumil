@@ -19,7 +19,7 @@ const Calendar = () => {
 
   // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
   const user = JSON.parse(localStorage.getItem("user"));
-
+  const userId = user.id;
   // 로그인 및 부서 데이터 가져오기
   useEffect(() => {
     const fetchData = async () => {
@@ -75,7 +75,15 @@ const Calendar = () => {
       if (!response.ok) throw new Error("전체 일정을 불러오지 못했습니다.");
       const data = await response.json();
       console.log("전체일정: ", data.schedules);
-      setAllSchedule(data.schedules);
+      setAllSchedule(data.schedules); // 전체 일정 저장
+
+      // 내 일정을 제외한 다른 사용자의 일정을 필터링
+      const filteredOtherUsersSchedule = data.schedules.filter(
+        (schedule) => schedule.user_id !== userId
+      );
+
+      // 다른 유저들의 일정 상태 업데이트
+      setOtherUsersSchedule(filteredOtherUsersSchedule);
     } catch (error) {
       console.error("전체 일정 로딩 오류:", error);
     }
@@ -126,7 +134,6 @@ const Calendar = () => {
       selectedDate.setMinutes(
         selectedDate.getMinutes() + selectedDate.getTimezoneOffset() + offset
       );
-      // 자신의 일정 가져오기
       // 한국 시간대로 날짜 문자열을 생성
       const selectedDateString = `${selectedDate.getFullYear()}-${(
         selectedDate.getMonth() + 1
@@ -154,25 +161,26 @@ const Calendar = () => {
       }
 
       // 다른 사용자 일정 가져오기
-      try {
-        const otherUsersResponse = await fetch(
-          `${process.env.REACT_APP_API_URL}/schedule/get_schedule?user_id=${user.id}&date=${selectedDateString}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        const otherUsersData = await otherUsersResponse.json();
-        if (otherUsersResponse.ok) {
-          setOtherUsersSchedule(otherUsersData.schedules || []);
-        } else {
-          alert("다른 사용자 일정 로드에 실패했습니다.");
-        }
-      } catch (error) {
-        console.error("다른 사용자 일정 로드 실패:", error);
-        alert("다른 사용자 일정 로드에 실패했습니다.");
-      }
+      // try {
+      //   const otherUsersResponse = await fetch(
+      //     `${process.env.REACT_APP_API_URL}/schedule/get_schedule?user_id=${user.id}&date=${selectedDateString}`,
+      //     {
+      //       headers: {
+      //         Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //       },
+      //     }
+      //   );
+      //   const otherUsersData = await otherUsersResponse.json();
+      //   console.log("otherUsersSchedule:", otherUsersData.schedule);
+      //   if (otherUsersResponse.ok) {
+      //     setOtherUsersSchedule(otherUsersData.schedules || []);
+      //   } else {
+      //     alert("다른 사용자 일정 로드에 실패했습니다.");
+      //   }
+      // } catch (error) {
+      //   console.error("다른 사용자 일정 로드 실패:", error);
+      //   alert("다른 사용자 일정 로드에 실패했습니다.");
+      // }
     }
     fetchUserSchedule();
   };
@@ -189,6 +197,11 @@ const Calendar = () => {
 
   // 일정 삭제
   const handleDeleteSchedule = async (scheduleId) => {
+    const isConfirmed = window.confirm("정말 삭제하시겠습니까?");
+
+    if (!isConfirmed) {
+      return;
+    }
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/schedule/delete-schedule/${scheduleId}`,
@@ -383,7 +396,6 @@ const Calendar = () => {
                 startDate.setUTCHours(0, 0, 0, 0);
                 endDate.setUTCHours(0, 0, 0, 0);
                 currentDate.setUTCHours(0, 0, 0, 0);
-
                 return currentDate >= startDate && currentDate <= endDate;
               });
 
@@ -503,7 +515,13 @@ const Calendar = () => {
               </div>
               <ul className="schedule-list">
                 {(() => {
-                  // 1. 선택한 부서 필터링
+                  if (!selectedDate) {
+                    return (
+                      <li className="empty-schedule">날짜를 선택해주세요.</li>
+                    );
+                  }
+
+                  // 1. 선택한 부서의 사용자 ID 필터링
                   const departmentUserIds = users
                     .filter(
                       (user) =>
@@ -512,28 +530,35 @@ const Calendar = () => {
                     )
                     .map((user) => user.id);
 
-                  // 2. 걸쳐 있는 월의 일정 표시하기 위한 필터
+                  // 2. 선택한 날짜에 포함되는 일정 필터링
                   const filtered = otherUsersSchedule
                     .filter((schedule) => {
                       const startDate = new Date(schedule.start_date);
                       const endDate = new Date(schedule.end_date);
+                      const selected = new Date(selectedDate);
 
+                      // 년, 월, 일만 비교하기 위해 시간을 00:00:00으로 설정
+                      startDate.setHours(0, 0, 0, 0);
+                      endDate.setHours(0, 0, 0, 0);
+                      selected.setHours(0, 0, 0, 0);
+
+                      // 년, 월, 일만 비교
                       return (
                         departmentUserIds.includes(schedule.user_id) &&
-                        startDate <=
-                          new Date(currentYear, currentMonth + 1, 0) && // 해당 월의 마지막 날 이하
-                        endDate >= new Date(currentYear, currentMonth, 1) // 해당 월의 첫날 이상
+                        selected >= startDate &&
+                        selected <= endDate
                       );
                     })
                     .sort(
                       (a, b) => new Date(a.start_date) - new Date(b.start_date)
                     );
 
-                  console.log("filteredAllschedule : ", filtered);
+                  console.log("filteredSchedules: ", filtered);
+
                   if (filtered.length === 0) {
                     return (
                       <li className="empty-schedule">
-                        선택한 부서에 이 날짜의 일정이 없습니다.
+                        선택한 날짜에 해당하는 일정이 없습니다.
                       </li>
                     );
                   }
@@ -546,6 +571,7 @@ const Calendar = () => {
                         .toISOString()
                         .slice(2, 10)
                         .replace(/-/g, ".");
+
                     return (
                       <li key={schedule.id} className="schedule-item">
                         <span
@@ -555,7 +581,7 @@ const Calendar = () => {
                           }}
                         ></span>
                         {userName} {": \u00A0"}
-                        <span className="task-name">{schedule.task}</span>
+                        <span className="task-name-two">{schedule.task}</span>
                         <span> {formatDate(schedule.start_date)}</span>
                         {"\u00A0"} ~ {"\u00A0"}
                         <span> {formatDate(schedule.end_date)}</span>
