@@ -12,7 +12,7 @@ const StatusManagement = () => {
   // 로그인한 사용자 정보 (localStorage에 저장된 최신 정보)
   const user = JSON.parse(localStorage.getItem("user"));
   const apiUrl = process.env.REACT_APP_API_URL;
-  
+
   // 로그인한 사용자 정보 최신화 및 어드민 여부 체크
   useEffect(() => {
     fetchLoggedInUser();
@@ -27,7 +27,6 @@ const StatusManagement = () => {
       navigate("/");
       return;
     }
-    
   }, []);
 
   // 로그인한 사용자 정보 API 호출
@@ -135,24 +134,31 @@ const StatusManagement = () => {
             <span>
               {s.id} ({s.comment})
             </span>
-            <button onClick={() => handleDeleteStatus(s.id)} className="reject-button">삭제</button>
+            <button
+              onClick={() => handleDeleteStatus(s.id)}
+              className="reject-button"
+            >
+              삭제
+            </button>
           </div>
         ))}
       </div>
       <div className="add-status">
         <input
           type="text"
-          placeholder="새 상태"
+          placeholder="상태 아이디 (영문)"
           value={newStatus}
           onChange={(e) => setNewStatus(e.target.value)}
         />
         <input
           type="text"
-          placeholder="상태 설명"
+          placeholder="상태 이름 (표시되는 이름)"
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
         />
-        <button onClick={handleAddStatus} className="approve-button">상태 추가</button>
+        <button onClick={handleAddStatus} className="approve-button">
+          상태 추가
+        </button>
       </div>
     </div>
   );
