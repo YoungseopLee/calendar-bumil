@@ -20,7 +20,7 @@ def get_pending_users():
         cursor.execute("""
             SELECT id, name, position, department, phone_number 
             FROM tb_user 
-            WHERE first_login_yn = 'n' AND is_delete_yn = 'n'
+            WHERE first_login_yn = 'N' AND is_delete_yn = 'N'
         """)
         pending_users = cursor.fetchall()
         return jsonify({'users': pending_users}), 200
@@ -45,7 +45,7 @@ def get_users():
         cursor.execute("""
             SELECT id, name, position, department, phone_number, role_id, status, first_login_yn 
             FROM tb_user 
-            WHERE is_delete_yn = 'n'
+            WHERE is_delete_yn = 'N'
             ORDER BY name ASC
         """)
         users = cursor.fetchall()

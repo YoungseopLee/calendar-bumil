@@ -96,7 +96,8 @@ def signup():
         # 생성일, 수정일은 NOW(), 생성자 및 수정자는 생략(또는 'SYSTEM' 대신 null)
         sql = """
         INSERT INTO tb_user 
-        (name, position, department, id, phone_number, password, role_id, is_delete_yn, first_login_yn, created_at, updated_at)
+        (name, position, department, id, phone_number, password, role_id, is_delete_yn, 
+        , created_at, updated_at)
         VALUES (%s, %s, %s, %s, %s, %s, %s, 'N', 'N', NOW(), NOW())
         """
         # AD_ADMIN, PR_ADMIN, PR_MANAGER, USR_GENERAL
