@@ -108,6 +108,49 @@ def add_status():
         except Exception:
             pass
 
+# 상태 목록 수정
+@status_bp.route('/edit_status/<string:status_id>', methods=['PUT', 'OPTIONS'])
+def edit_status(status_id):
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'CORS preflight request success'}), 200
+
+    try:
+        data = request.get_json()
+        new_comment = data.get('comment')
+
+        if not new_comment:
+            return jsonify({'message': '새로운 comment가 제공되지 않았습니다.'}), 400
+
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM tb_status WHERE id = %s", (status_id,))
+        existing_status = cursor.fetchone()
+
+        if not existing_status:
+            return jsonify({'message': '상태를 찾을 수 없습니다.'}), 404
+
+        cursor.execute(
+            "UPDATE tb_status SET comment = %s WHERE id = %s",
+            (new_comment, status_id)
+        )
+        conn.commit()
+
+        return jsonify({'message': '상태가 성공적으로 수정되었습니다.'}), 200
+
+    except Exception as e:
+        print(f"상태 수정 오류: {e}")
+        return jsonify({'message': '상태 수정 오류', 'error': str(e)}), 500
+
+    finally:
+        try:
+            cursor.close()
+            conn.close()
+        except Exception:
+            pass
+
 # 상태 목록 삭제
 @status_bp.route('/delete_status/<string:status>', methods=['DELETE', 'OPTIONS'])
 def delete_status(status):

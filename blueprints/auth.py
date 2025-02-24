@@ -150,7 +150,8 @@ def login():
             'user_id': user['id'],
             'name': user['name'],
             'role_id': user['role_id'],
-            'exp': datetime.now(timezone.utc) + timedelta(hours=1)
+            # 토큰 기간 2주 (임시방편, 수정필요)
+            'exp': datetime.now(timezone.utc) + timedelta(weeks=2)
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
