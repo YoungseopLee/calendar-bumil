@@ -224,7 +224,6 @@ const EmployeeList = () => {
           />
         </div>
 
-
         {/* 🏷️ 인덱스 바 */}
         <div className="employee-index-bar">
           <span className="index-item">즐겨찾기</span>
@@ -266,14 +265,17 @@ const EmployeeList = () => {
                 {userRole === "AD_ADMIN" ? (
                   <select
                     className="status-dropdown"
-                    value={employee.status}
+                    value={employee.status || ""}
                     onClick={(e) => e.stopPropagation()}
                     onChange={(e) =>
                       handleStatusChange(employee.id, e.target.value)
                     }
                   >
-                    {statusList.map((status) => (
-                      <option key={status.comment} value={status.comment}>
+                    {statusList.map((status, index) => (
+                      <option
+                        key={`${status.comment}-${index}`}
+                        value={status.id}
+                      >
                         {status.comment}
                       </option>
                     ))}

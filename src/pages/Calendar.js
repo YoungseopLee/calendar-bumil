@@ -335,8 +335,11 @@ const Calendar = () => {
               onChange={handleStatusChange}
             >
               {statusList.map((status) => (
-                <option key={status.id} value={status.id}>
-                  {status.id}
+                <option
+                  key={`${status.id}-${status.comment}`}
+                  value={status.id}
+                >
+                  {status.comment}
                 </option>
               ))}
             </select>

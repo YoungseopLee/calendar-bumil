@@ -68,7 +68,7 @@ def get_favorites():
         # 기존의 u.email 대신 u.id를 사용합니다.
         sql = """
         SELECT u.id, u.name, u.position, u.department, u.phone_number,
-            COALESCE(u.status, '출근') AS status
+            COALESCE(u.status, 'NULL') AS status
         FROM tb_favorite f
         JOIN tb_user u ON f.favorite_user_id = u.id
         WHERE f.user_id = %s
@@ -78,7 +78,6 @@ def get_favorites():
 
         for fav in favorites:
             try:
-                fav['id'] = decrypt_deterministic(fav['id'])
                 fav['phone_number'] = decrypt_aes(fav['phone_number'])
             except Exception as decryption_error:
                 print(f"복호화 오류: {decryption_error}")

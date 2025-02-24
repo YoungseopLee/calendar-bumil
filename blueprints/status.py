@@ -131,7 +131,6 @@ def delete_status(status):
         except Exception:
             pass
 
-
 @status_bp.route('/update_status_admin', methods=['PUT', 'OPTIONS'])
 def update_status_admin():
     if request.method == 'OPTIONS':
@@ -147,47 +146,37 @@ def update_status_admin():
         requester_user_id = payload['user_id']
         requester_role = payload.get('role_id')
 
-        # 데이터베이스 커넥션과 커서를 여기서 생성
+        # ✅ 디버깅 로그
+        print(f"🔑 요청자 ID: {requester_user_id}")
+        print(f"🔑 요청자 역할: {requester_role}")
+
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
 
-        # role_id가 없으면 DB에서 조회
-        if not requester_role:
-            user_id = requester_user_id
-            cursor.execute("SELECT role_id FROM tb_user WHERE id = %s", (user_id,))
-            result = cursor.fetchone()
-            requester_role = result.get('role_id') if result else None
-
         data = request.get_json()
         new_status = data.get('status')
-        target_user_email = data.get('user_id')
+        target_user_id = data.get('user_id')
 
-        # ✅ 이메일을 암호화하여 DB에서 조회
-        target_user_id = target_user_email
+        print(f"🎯 상태 변경 대상 ID: {target_user_id}")
+        print(f"🎯 새 상태: {new_status}")
 
-        print(f"✅ 요청자 ID: {requester_user_id}")
-        print(f"✅ 암호화된 대상 사용자 ID: {target_user_id}")
+        # ✅ 필수 값 체크
+        if not new_status:
+            return jsonify({'message': '새 상태가 제공되지 않았습니다.'}), 400
+        if not target_user_id:
+            return jsonify({'message': '대상 사용자 ID가 제공되지 않았습니다.'}), 400
 
-        # 관리자가 아니라면 본인 상태만 변경 가능
-        if requester_role != "AD_ADMIN" and target_user_id != user_id:
-            return jsonify({'message': '자신의 상태만 업데이트할 수 있습니다.'}), 403
-
-        # 암호화된 ID로 사용자 검색
         cursor.execute("SELECT status FROM tb_user WHERE id = %s", (target_user_id,))
         user_info = cursor.fetchone()
         if not user_info:
             return jsonify({'message': '사용자를 찾을 수 없습니다.'}), 404
 
-        old_status = user_info.get('status')
-        if old_status == new_status:
-            return jsonify({'message': '상태가 변경되지 않았습니다.'}), 200
-
-        # 상태 업데이트
+        # ✅ 상태 업데이트
         cursor.execute("UPDATE tb_user SET status = %s WHERE id = %s", (new_status, target_user_id))
 
-        # 변경 이력 기록
+        # ✅ 변경 이력 기록
         cursor.execute("""
             INSERT INTO tb_user_status_log (recorded_at, status_id, user_id, created_by)
             VALUES (NOW(3), %s, %s, %s)
@@ -201,8 +190,8 @@ def update_status_admin():
     except jwt.InvalidTokenError:
         return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
     except Exception as e:
-        print(f"상태 업데이트 오류: {e}")
-        return jsonify({'message': '상태 업데이트 오류'}), 500
+        print(f"🚨 상태 업데이트 오류: {e}")
+        return jsonify({'message': '상태 업데이트 오류', 'error': str(e)}), 500
     finally:
         try:
             cursor.close()
