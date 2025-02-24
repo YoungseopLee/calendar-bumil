@@ -20,7 +20,7 @@ const Sidebar = () => {
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
-  
+
   const handleManagerClick = () => {
     if (isAdmin) {
       navigate("/manager");
@@ -45,6 +45,19 @@ const Sidebar = () => {
       {isOpen && (
         <div className="sidebar">
           <ul className="menu">
+
+            <li>
+              <Link to="/projects">프로젝트</Link>
+            </li>
+            <li>
+              <Link to="/calendar">달력</Link>
+            </li>
+            <li>
+              <Link to="/employee">직원</Link>
+            </li>
+            <li>
+              <Link to="/mypage">내 정보</Link>
+            </li>
             {isAdmin && (
               <li>
                 <a href="#" onClick={handleManagerClick}>
@@ -52,18 +65,6 @@ const Sidebar = () => {
                 </a>
               </li>
             )}
-            <li>
-              <Link to="/projects">프로젝트</Link>
-            </li>
-            <li>
-              <Link to="/employee">직원</Link>
-            </li>
-            <li>
-              <Link to="/calendar">달력</Link>
-            </li>
-            <li>
-              <Link to="/mypage">내 정보</Link>
-            </li>
             <li>
               <Link to="/" onClick={handleLogout} className="logout-link">
                 로그아웃
