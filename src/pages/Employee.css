@@ -17,7 +17,7 @@
     padding-bottom: 50px;
     box-sizing: border-box; /* 패딩을 포함한 크기 계산 */
     overflow: auto; /* 일정이 많을 경우 스크롤 처리 */
-    max-height: 80vh; /* 캘린더 높이를 제한해서 일정을 추가했을 때 스크롤을 만들 수 있게 함 */
+    /* max-height: 80vh;  */
 }
 
 .title {
@@ -78,10 +78,6 @@
     font-size: 0.9em;
 }
 
-/* .employee-department {
-    flex: 1; 
-    text-align: left;
-} */
 
 .employee-name {
     padding-left: 40px;
@@ -260,3 +256,86 @@
 .employee-status.status-vacation { background-color: rgba(255, 0, 0, 0.836); color: white; }
 .employee-status.status-dispatch { background-color: rgba(77, 77, 77, 0.575); color: white; }
 .employee-status.status-default { background-color: gray; color: white; }
+
+/* ✅ 인덱스 바 (Header Bar) 스타일 */
+.employee-index-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #eaeaea;
+    font-weight: bold;
+    border-bottom: 2px solid #ccc;
+    border-radius: 6px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .index-item {
+    flex: 1;
+    text-align: center;
+    font-size: 1em;
+    color: #333;
+  }
+  
+  /* ✅ 사원 항목 정렬 및 스타일 */
+  .employee-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .employee-item:hover {
+    background-color: #dcdcdc;
+  }
+  
+  /* ✅ 즐겨찾기 아이콘 위치 조정 */
+  .favorite-icon {
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+    font-size: 1.5em;
+    margin-right: 10px;
+  }
+  
+  /* ✅ 이름, 직급, 상태 정렬 */
+  .employee-name,
+  .employee-position {
+    flex: 1;
+    text-align: center;
+    font-size: 1em;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  .status-dropdown {
+    flex: 1;
+    text-align: center;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    background-color: white;
+  }
+  
+  /* ✅ 상태별 색상 강조 */
+  .employee-status {
+    flex: 1;
+    text-align: center;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: inline-block;
+  }
+  
+  .employee-status.status-work { background-color: rgba(0, 143, 0, 0.829); color: white; }
+  .employee-status.status-outside { background-color: rgb(255, 174, 0); color: black; }
+  .employee-status.status-vacation { background-color: rgba(255, 0, 0, 0.836); color: white; }
+  .employee-status.status-dispatch { background-color: rgba(77, 77, 77, 0.575); color: white; }
+  .employee-status.status-default { background-color: gray; color: white; }

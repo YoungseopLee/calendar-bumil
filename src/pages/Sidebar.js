@@ -20,7 +20,7 @@ const Sidebar = () => {
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
   };
-
+  
   const handleManagerClick = () => {
     if (isAdmin) {
       navigate("/manager");
