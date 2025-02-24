@@ -13,10 +13,26 @@ import {
 
 const MyPage = () => {
   const [user, setUser] = useState(null);
+  const [statusList, setStatusList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const apiUrl = process.env.REACT_APP_API_URL || "http://3.38.20.237";
+  const apiUrl = process.env.REACT_APP_API_URL;
+
+  useEffect(() => {
+    const fetchStatusList = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/status/get_status_list`);
+        if (!response.ok) throw new Error("상태 목록을 가져오지 못했습니다.");
+        const data = await response.json();
+        setStatusList(data.statuses); // [{ id: 1, comment: "HQ" }, ...]
+      } catch (err) {
+        console.error("상태 목록 오류:", err);
+      }
+    };
+
+    fetchStatusList();
+  }, [apiUrl]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -52,6 +68,11 @@ const MyPage = () => {
     fetchUser();
   }, [apiUrl]);
 
+  const getStatusComment = (statusId) => {
+    const statusObj = statusList.find((s) => s.id === statusId);
+    return statusObj ? statusObj.comment : "알 수 없음";
+  };
+
   if (loading) return <div className="mypage-container">로딩 중...</div>;
   if (error) return <div className="mypage-container">{error}</div>;
 
@@ -86,10 +107,12 @@ const MyPage = () => {
             <p>
               <FaCircle
                 className={`status-icon ${
-                  user.status === "출근" ? "online" : "offline"
+                  getStatusComment(user.status) === "본사"
+                    ? "online"
+                    : "offline"
                 }`}
               />
-              {user.status}
+              {getStatusComment(user.status)}
             </p>
             <p>
               <FaPhone className="icon" />
@@ -97,7 +120,7 @@ const MyPage = () => {
             </p>
             <p>
               <FaEnvelope className="icon" />
-              {user.email}
+              {user.id}
             </p>
           </div>
         </div>
