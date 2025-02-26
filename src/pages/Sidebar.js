@@ -58,6 +58,9 @@ const Sidebar = () => {
             <li>
               <Link to="/mypage">내 정보</Link>
             </li>
+            <li>
+              <Link to="/situation_control">현황 관리</Link>
+            </li>
             {isAdmin && (
               <li>
                 <a href="#" onClick={handleManagerClick}>

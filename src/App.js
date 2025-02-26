@@ -35,7 +35,10 @@ function App() {
         {/* 어드민 페이지 */}
         <Route path="/manager" element={<Manager />} />
         {/* 유저의 권한을 변경하는 페이지 (UserRolesManagement)*/}
-        <Route path="/user-roles-management" element={<UserRolesManagement />} />
+        <Route
+          path="/user-roles-management"
+          element={<UserRolesManagement />}
+        />
         {/* 상태 CRUD 페이지 */}
         <Route path="/status-management" element={<StatusManagement />} />
         {/* 사원 페이지 */}
@@ -61,7 +64,7 @@ function App() {
         {/* 사원원 상세 페이지 */}
         <Route path="/user-details" element={<UserDetails />} />
         {/* 현황 관리 페이지 */}
-        <Route path="/SituationControl" element={<SituationControl />} />
+        <Route path="/situation_control" element={<SituationControl />} />
       </Routes>
     </Router>
   );
