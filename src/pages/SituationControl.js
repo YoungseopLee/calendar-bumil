@@ -384,7 +384,7 @@ const SituationControls = () => {
                         {`${getUserName(userId)}`}
                       </span>
                       {Array.from({ length: 12 }, (_, idx) => {
-                        const isHighlighted = userMonths.includes(startYear * 100 + idx); // 해당 월에 참여했으면 하이라이트
+                        const isHighlighted = userMonths.includes(year * 100 + idx); // 해당 월에 참여했으면 하이라이트
                         return (
                           <span
                             key={idx}
