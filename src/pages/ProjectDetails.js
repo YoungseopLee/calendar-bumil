@@ -205,6 +205,7 @@ const ProjectDetails = () => {
         department: employee ? employee.department : "정보 없음",
         phone: employee ? employee.phone_number : "정보 없음",
         status: employee ? employee.status : "정보 없음",
+        comment: employee ? employee.comment : "정보 없음",
         start_date: formatDate(participant.start_date),
         end_date: formatDate(participant.end_date),
       };
@@ -235,7 +236,7 @@ const ProjectDetails = () => {
               </td>
               <td>{participant.start_date}</td>
               <td>{participant.end_date}</td>
-              <td>{participant.status}</td>
+              <td>{participant.comment}</td>
             </tr>
           ))}
         </tbody>

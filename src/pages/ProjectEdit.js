@@ -61,7 +61,6 @@ const ProjectEdit = () => {
       navigate("/");
       return;
     }
-
   }, []);
 
   // 프로젝트 코드가 변경되면 상세정보 불러오기
@@ -224,6 +223,7 @@ const ProjectEdit = () => {
         department: employee ? employee.department : "정보 없음",
         phone: employee ? employee.phone_number : "정보 없음",
         status: employee ? employee.status : "정보 없음",
+        comment: employee ? employee.comment : "정보 없음",
         start_date: participant.start_date,
         end_date: participant.end_date,
       };
@@ -274,7 +274,7 @@ const ProjectEdit = () => {
                   }
                 />
               </td>
-              <td>{participant.status}</td>
+              <td>{participant.comment}</td>
               <td>
                 <button
                   className="remove-button"

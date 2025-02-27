@@ -43,10 +43,11 @@ def get_users():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT id, name, position, department, phone_number, role_id, status, first_login_yn 
-            FROM tb_user 
-            WHERE is_delete_yn = 'N'
-            ORDER BY name ASC
+            SELECT tu.id, tu.name, tu.position, tu.department, tu.phone_number, tu.role_id, tu.status, ts.comment, tu.first_login_yn 
+            FROM tb_user AS tu INNER JOIN tb_status AS ts
+            ON tu.status = ts.id
+            WHERE tu.is_delete_yn = 'N'
+            ORDER BY tu.name ASC
         """)
         users = cursor.fetchall()
         for user in users:
