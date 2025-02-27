@@ -304,15 +304,110 @@ const SituationControls = () => {
     }, {});
   
     const getUserName = (userId) => {
-      const user = users.find(user => user.id === userId); // users 배열에서 userId에 맞는 유저 찾기
-      return user ? user.name : "Unknown"; // 유저가 있으면 name, 없으면 "Unknown"
+      const user = users.find(user => user.id === userId);
+      return user ? user.name : "Unknown";
     };
-
+  
+    // 사람만 검색했는지 확인 (프로젝트는 선택하지 않고 사람만 선택한 경우)
+    const isOnlyUserSelected = selectedProjects.length === 0 && selectedUsers.length > 0;
+  
+    // 사람 기준으로 그룹화하는 함수 (사람만 검색했을 때 사용)
+    const groupedByUsers = () => {
+      const result = {};
+      
+      // 사용자 ID별로 그룹화
+      dateFilteredProjects.forEach(project => {
+        if (!result[project.user_id]) {
+          result[project.user_id] = [];
+        }
+        result[project.user_id].push(project);
+      });
+      
+      return result;
+    };
+  
+    // 사람만 검색한 경우와 그 외의 경우를 구분하여 다른 렌더링 로직 사용
+    if (isOnlyUserSelected) {
+      const userGroups = groupedByUsers();
+      
+      return (
+        <div className="project-chart">
+          {Object.keys(userGroups).map((userId) => {
+            const userProjects = userGroups[userId];
+            const userName = getUserName(userId);
+            
+            return (
+              <div key={userId} className="project-chart-row">
+                <div
+                  className="project-chart-title"
+                  onClick={() => navigate(`/user-details?user_id=${userId}`)}
+                >
+                  {userName}
+                </div>
+                
+                {/* 해당 사용자의 프로젝트별 차트 표시 */}
+                {userProjects.map((project) => {
+                  const startDate = new Date(project.start_date);
+                  const endDate = new Date(project.end_date);
+                  
+                  if (isNaN(startDate) || isNaN(endDate)) {
+                    return null;
+                  }
+                  
+                  // 각 프로젝트의 참여 월 계산
+                  const months = [];
+                  for (let projectYear = startDate.getFullYear(); projectYear <= endDate.getFullYear(); projectYear++) {
+                    let start = projectYear === startDate.getFullYear() ? startDate.getMonth() : 0;
+                    let end = projectYear === endDate.getFullYear() ? endDate.getMonth() : 11;
+                    
+                    for (let month = start; month <= end; month++) {
+                      months.push(projectYear * 100 + month);
+                    }
+                  }
+                  
+                  return (
+                    <div key={project.project_code} className="project-chart-user">
+                      <div className="project-chart-months">
+                        {/* 프로젝트 이름을 표시 */}
+                        <span 
+                          className="project-chart-user-name" 
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            navigate(`/project-details?project_code=${project.project_code}`);
+                          }}
+                          style={{ cursor: "pointer" }}
+                        >
+                          {project.project_name}
+                        </span>
+                        {Array.from({ length: 12 }, (_, idx) => {
+                          const isHighlighted = months.includes(year * 100 + idx); // 수정된 부분: startYear -> year
+                          return (
+                            <span
+                              key={idx}
+                              className={`project-month ${isHighlighted ? 'highlighted' : ''}`}
+                            >
+                              {idx + 1}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+    
+    // 기존의 프로젝트 중심 뷰 (프로젝트 선택 시 또는 아무것도 선택하지 않은 경우)
     return (
       <div className="project-chart">
+        {/* 기존 코드 유지 */}
         {Object.keys(groupedProjects).map((projectCode) => {
           const projects = groupedProjects[projectCode];
-          const project = projects[0]; // 프로젝트 정보를 첫 번째 프로젝트에서 가져옴
+          const project = projects[0];
           const startDate = new Date(project.start_date);
           const endDate = new Date(project.end_date);
   
@@ -324,34 +419,30 @@ const SituationControls = () => {
           const endYear = endDate.getFullYear();
           const months = [];
   
-          // 월 데이터를 저장하기 위한 로직
           for (let year = startYear; year <= endYear; year++) {
-            let start = year === startYear ? startDate.getMonth() : 0; // 시작 연도의 시작 월
-            let end = year === endYear ? endDate.getMonth() : 11; // 종료 연도의 종료 월
+            let start = year === startYear ? startDate.getMonth() : 0;
+            let end = year === endYear ? endDate.getMonth() : 11;
   
             for (let month = start; month <= end; month++) {
-              months.push(year * 100 + month); // 월을 '연도월' 형식으로 저장
+              months.push(year * 100 + month);
             }
           }
   
-          // 각 참가자별로 표시하기
           const usersParticipation = projects.reduce((acc, project) => {
-            const user = project.user_id; // 참가자 ID
+            const user = project.user_id;
             const startDate = new Date(project.start_date);
             const endDate = new Date(project.end_date);
-
-            // 해당 참가자의 참여 월 계산
+  
             const userMonths = [];
             for (let year = startDate.getFullYear(); year <= endDate.getFullYear(); year++) {
-              let start = year === startDate.getFullYear() ? startDate.getMonth() : 0; // 시작 월
-              let end = year === endDate.getFullYear() ? endDate.getMonth() : 11; // 종료 월
+              let start = year === startDate.getFullYear() ? startDate.getMonth() : 0;
+              let end = year === endDate.getFullYear() ? endDate.getMonth() : 11;
   
               for (let month = start; month <= end; month++) {
-                userMonths.push(year * 100 + month); // '연도월' 형식으로 저장
+                userMonths.push(year * 100 + month);
               }
             }
   
-            // 각 참가자별로 참여 월 데이터를 저장
             if (!acc[user]) {
               acc[user] = [];
             }
@@ -368,23 +459,23 @@ const SituationControls = () => {
                 {project.project_name}
               </div>
   
-              {/* 참가자별로 차트 표시 */}
               {Object.keys(usersParticipation).map((userId) => {
-                const userMonths = usersParticipation[userId]; // 해당 참가자의 참여 월
+                const userMonths = usersParticipation[userId];
                 return (
                   <div key={userId} className="project-chart-user">
                     <div className="project-chart-months">
-                      {/* 사람 이름을 표시 */}
-                      <span className="project-chart-user-name" onClick={(event) => {
-                          event.stopPropagation(); // 부모 요소의 클릭 이벤트 방지
-                          navigate(`/user-details?user_id=${userId}`); // 클릭 시 user_details로 네비게이션
+                      <span 
+                        className="project-chart-user-name" 
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          navigate(`/user-details?user_id=${userId}`);
                         }}
-                        style={{ cursor: "pointer" }} // 마우스 커서 변경 (클릭 가능한 요소임을 강조)
+                        style={{ cursor: "pointer" }}
                       >
-                        {`${getUserName(userId)}`}
+                        {getUserName(userId)}
                       </span>
                       {Array.from({ length: 12 }, (_, idx) => {
-                        const isHighlighted = userMonths.includes(year * 100 + idx); // 해당 월에 참여했으면 하이라이트
+                        const isHighlighted = userMonths.includes(year * 100 + idx); // 수정된 부분: startYear -> year
                         return (
                           <span
                             key={idx}
