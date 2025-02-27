@@ -20,6 +20,7 @@ const SituationControls = () => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   //const [searchCategory, setSearchCategory] = useState("projectName"); // ✅ 검색 카테고리 추가 시 사용
+  const [effectiveUsers, setEffectiveUsers] = useState([]); //프로젝트만 선택했을 시 보여줄 유저목록
   const [startFilter, setStartFilter] = useState("");
   const [endFilter, setEndFilter] = useState("");
   const [appliedStart, setAppliedStart] = useState("");
@@ -110,12 +111,15 @@ const SituationControls = () => {
   useEffect(() => {
     console.log("selectedProjects: ", selectedProjects);
   }, [selectedProjects]);
+  useEffect(() => {
+    console.log("selectedUsers: ", selectedUsers);
+  }, [selectedUsers]);
 
-  // 사용자가 선택한 유저들의 프로젝트 데이터 가져오기
+  // 사용자가 선택한 유저들의 프로젝트 데이터 가져오기, 선택 안했으면 effectiveUsers로 프로젝트의 모든 유저
   useEffect(() => {
     const fetchUserProjectData = async () => {
-      if (!selectedUsers || selectedUsers.length === 0) {
-        setUserProjects([]); //유저가 없으면 프로젝트 데이터 없애주기
+      if (!effectiveUsers || effectiveUsers.length === 0) {
+        setUserProjects([]);
         setLoading(false);
         return;
       }
@@ -126,11 +130,11 @@ const SituationControls = () => {
         setLoading(false);
         return;
       }
-      console.log("selectedUsers : ", selectedUsers);
+      console.log("effectiveUsers : ", effectiveUsers);
       try {
         // 선택된 사용자들의 프로젝트 정보 요청을 병렬 실행
         const responses = await Promise.all(
-          selectedUsers.map(async (user) => {
+          effectiveUsers.map(async (user) => {
             const response = await fetch(
               `${apiUrl}/project/get_user_and_projects?user_id=${user.id}`,
               {
@@ -164,7 +168,7 @@ const SituationControls = () => {
     };
 
     fetchUserProjectData();
-  }, [selectedUsers, apiUrl]); // selectedUsers가 변경될 때마다 실행
+  }, [effectiveUsers, apiUrl]); // effectiveUsers가 변경될 때마다 실행
 
   // 검색한 프로젝트 필터링
   useEffect(() => {
@@ -213,6 +217,32 @@ const SituationControls = () => {
       );
     }
   }, [searchQueryUser, users, selectedUsers]);
+
+  // selectedProjects나 selectedUsers가 변경될 때마다 effectiveUsers 계산
+  useEffect(() => {
+    if (selectedUsers.length > 0) {
+      // 사용자가 직접 선택한 경우, 선택된 사용자를 그대로 사용
+      setEffectiveUsers(selectedUsers);
+    } else if (selectedProjects.length > 0) {
+      // 프로젝트만 선택한 경우, 해당 프로젝트에 할당된 모든 사용자 ID 가져오기
+      const assignedUserIds = selectedProjects.flatMap(
+        project => project.assigned_user_ids || []
+      );
+      
+      // 중복 제거
+      const uniqueUserIds = [...new Set(assignedUserIds)];
+      
+      // ID에 해당하는 사용자 정보 찾기
+      const projectUsers = uniqueUserIds
+        .map(id => users.find(user => user.id === id))
+        .filter(user => user !== undefined); // undefined 필터링
+      
+      setEffectiveUsers(projectUsers);
+    } else {
+      // 아무것도 선택되지 않은 경우
+      setEffectiveUsers([]);
+    }
+  }, [selectedProjects, selectedUsers, users]);
 
   // 검색 후 선택한 유저 처리
   const selectUser = (user) => {
@@ -375,7 +405,6 @@ const SituationControls = () => {
     );
   };
   
-
   const TableView = ({ dateFilteredProjects }) => {
     const navigate = useNavigate(); // ✅ 네비게이션 훅 사용
 
