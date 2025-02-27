@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { FaEdit, FaTrash } from "react-icons/fa";
+import { IoIosArrowBack, IoIosArrowForward} from "react-icons/io";
 import "./Calendar.css";
 
 const Calendar = () => {
@@ -76,7 +77,11 @@ const Calendar = () => {
       const data = await response.json();
       console.log("전체일정: ", data.schedules);
       setAllSchedule(data.schedules); // 전체 일정 저장
-
+      const filteredUsersSchedule = data.schedules.filter(
+        (schedule) => schedule.user_id === userId
+      );
+      setUserSchedule(filteredUsersSchedule);
+      console.log("내일정: ", filteredUsersSchedule);
       // 내 일정을 제외한 다른 사용자의 일정을 필터링
       const filteredOtherUsersSchedule = data.schedules.filter(
         (schedule) => schedule.user_id !== userId
@@ -84,6 +89,7 @@ const Calendar = () => {
 
       // 다른 유저들의 일정 상태 업데이트
       setOtherUsersSchedule(filteredOtherUsersSchedule);
+      console.log("다른 유저들의 일정: ", filteredOtherUsersSchedule);
     } catch (error) {
       console.error("전체 일정 로딩 오류:", error);
     }
@@ -143,44 +149,6 @@ const Calendar = () => {
         .getDate()
         .toString()
         .padStart(2, "0")}`;
-
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/schedule/get_schedule?user_id=${user.id}&date=${selectedDateString}`
-        );
-        const data = await response.json();
-        console.log("userSchedule:", data);
-        if (response.ok) {
-          setUserSchedule(data.schedules || []);
-        } else {
-          alert("자신의 일정 로드에 실패했습니다.");
-        }
-      } catch (error) {
-        console.error("자신의 일정 로드 실패:", error);
-        alert("자신의 일정 로드에 실패했습니다.");
-      }
-
-      // 다른 사용자 일정 가져오기
-      // try {
-      //   const otherUsersResponse = await fetch(
-      //     `${process.env.REACT_APP_API_URL}/schedule/get_schedule?user_id=${user.id}&date=${selectedDateString}`,
-      //     {
-      //       headers: {
-      //         Authorization: `Bearer ${localStorage.getItem("token")}`,
-      //       },
-      //     }
-      //   );
-      //   const otherUsersData = await otherUsersResponse.json();
-      //   console.log("otherUsersSchedule:", otherUsersData.schedule);
-      //   if (otherUsersResponse.ok) {
-      //     setOtherUsersSchedule(otherUsersData.schedules || []);
-      //   } else {
-      //     alert("다른 사용자 일정 로드에 실패했습니다.");
-      //   }
-      // } catch (error) {
-      //   console.error("다른 사용자 일정 로드 실패:", error);
-      //   alert("다른 사용자 일정 로드에 실패했습니다.");
-      // }
     }
     fetchUserSchedule();
   };
@@ -330,7 +298,7 @@ const Calendar = () => {
   };
 
   return (
-    <div className="calendar-page">
+    <div>
       <Sidebar />
       <div className="calendar">
         {/* 사용자 상태 변경 UI */}
@@ -360,13 +328,13 @@ const Calendar = () => {
         </div>
         <div className="calendar-navigation">
           <button onClick={handlePrevMonth} className="nav-button">
-            {"<"}
+            {<IoIosArrowBack />}
           </button>
           <h2 className="calendar-title">
             {currentYear}년 {monthNames[currentMonth]}
           </h2>
           <button onClick={handleNextMonth} className="nav-button">
-            {">"}
+            {<IoIosArrowForward />}
           </button>
         </div>
         <div className="calendar-days-header">
@@ -383,9 +351,24 @@ const Calendar = () => {
               : `empty-${index}`;
 
             // 일정이 있는 날짜인지 확인
-            const hasSchedule =
+            const hasMySchedule =
               day &&
-              allSchedule.some((schedule) => {
+              userSchedule.some((schedule) => {
+                const startDate = new Date(schedule.start_date);
+                const endDate = new Date(schedule.end_date);
+                const currentDate = new Date(
+                  Date.UTC(currentYear, currentMonth, day)
+                );
+
+                // 시간 차이로 인한 오류 방지
+                startDate.setUTCHours(0, 0, 0, 0);
+                endDate.setUTCHours(0, 0, 0, 0);
+                currentDate.setUTCHours(0, 0, 0, 0);
+                return currentDate >= startDate && currentDate <= endDate;
+              });
+            const hasOtherSchedule =
+              day &&
+              otherUsersSchedule.some((schedule) => {
                 const startDate = new Date(schedule.start_date);
                 const endDate = new Date(schedule.end_date);
                 const currentDate = new Date(
@@ -405,10 +388,14 @@ const Calendar = () => {
                 className={`calendar-day ${day ? "active" : ""} 
           ${isToday(day) ? "today" : ""} 
           ${isSelected(day) ? "selected" : ""} 
-          ${hasSchedule ? "has-schedule" : ""}`}
+          `}
                 onClick={() => handleDateClick(day)}
               >
-                {day}
+                {hasMySchedule && <div className="day-has-schedule"></div>}
+                {hasOtherSchedule && (
+                  <div className="day-has-other-schedule"></div>
+                )}
+                <span className="day-number">{day}</span>
 
                 {/* {day &&
                   userSchedule.some(
@@ -447,43 +434,73 @@ const Calendar = () => {
             <div className="schedule-section">
               <h4>내 일정</h4>
               <ul className="schedule-list">
-                {userSchedule.length === 0 ? (
-                  <li className="empty-schedule">일정이 없습니다.</li>
-                ) : (
-                  userSchedule.map((schedule) => (
-                    <li
-                      key={schedule.id}
-                      className="schedule-item"
-                      onClick={() => handleScheduleClick(schedule)}
-                    >
-                      <div className="schedule-content">
-                        <span
-                          className="status-icon"
-                          style={{
-                            backgroundColor: getStatusClass(schedule.status),
-                          }}
-                        ></span>
-                        <span className="task-name">{schedule.task}</span>
-                      </div>
-                      <div className="button-group">
-                        <button
-                          className="edit-button icon-button"
-                          onClick={() => handleEditSchedule(schedule)}
-                          title="수정"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          className="delete-button icon-button"
-                          onClick={() => handleDeleteSchedule(schedule.id)}
-                          title="삭제"
-                        >
-                          <FaTrash />
-                        </button>
-                      </div>
-                    </li>
-                  ))
-                )}
+                {(() => {
+                  if (!selectedDate) {
+                    return (
+                      <li className="empty-schedule">날짜를 선택해주세요.</li>
+                    );
+                  }
+                  const filtered = userSchedule
+                    .filter((schedule) => {
+                      const startDate = new Date(schedule.start_date);
+                      const endDate = new Date(schedule.end_date);
+                      const selected = new Date(selectedDate);
+
+                      // 년, 월, 일만 비교하기 위해 시간을 00:00:00으로 설정
+                      startDate.setHours(0, 0, 0, 0);
+                      endDate.setHours(0, 0, 0, 0);
+                      selected.setHours(0, 0, 0, 0);
+
+                      // 년, 월, 일만 비교
+                      return selected >= startDate && selected <= endDate;
+                    })
+                    .sort(
+                      (a, b) => new Date(a.start_date) - new Date(b.start_date)
+                    );
+
+                  if (filtered.length === 0) {
+                    return (
+                      <li className="empty-schedule">
+                        선택한 날짜에 해당하는 일정이 없습니다.
+                      </li>
+                    );
+                  }
+                  return filtered.map((schedule) => {
+                    return (
+                      <li
+                        key={schedule.id}
+                        className="schedule-item"
+                        onClick={() => handleScheduleClick(schedule)}
+                      >
+                        <div className="schedule-content">
+                          <span
+                            className="status-icon"
+                            style={{
+                              backgroundColor: getStatusClass(schedule.status),
+                            }}
+                          ></span>
+                          <span className="task-name">{schedule.task}</span>
+                        </div>
+                        <div className="button-group">
+                          <button
+                            className="edit-button icon-button"
+                            onClick={() => handleEditSchedule(schedule)}
+                            title="수정"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            className="delete-button icon-button"
+                            onClick={() => handleDeleteSchedule(schedule.id)}
+                            title="삭제"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  });
+                })()}
               </ul>
             </div>
 
@@ -573,7 +590,11 @@ const Calendar = () => {
                         .replace(/-/g, ".");
 
                     return (
-                      <li key={schedule.id} className="schedule-item">
+                      <li
+                        key={schedule.id}
+                        className="schedule-item"
+                        style={{ position: "relative", cursor: "pointer" }}
+                      >
                         <span
                           className="status-icon"
                           style={{
@@ -582,9 +603,9 @@ const Calendar = () => {
                         ></span>
                         {userName} {": \u00A0"}
                         <span className="task-name-two">{schedule.task}</span>
-                        <span> {formatDate(schedule.start_date)}</span>
+                        {/* <span> {formatDate(schedule.start_date)}</span>
                         {"\u00A0"} ~ {"\u00A0"}
-                        <span> {formatDate(schedule.end_date)}</span>
+                        <span> {formatDate(schedule.end_date)}</span> */}
                       </li>
                     );
                   });
