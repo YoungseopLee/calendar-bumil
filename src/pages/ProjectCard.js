@@ -5,10 +5,13 @@ import "./ProjectCard.css";
 const ProjectCard = ({ project }) => {
   const navigate = useNavigate();
 
+  
+
   // ✅ 카드 클릭 시 상세페이지로 이동
   const handleCardClick = () => {
     navigate(`/project-details?project_code=${project.code}`);
   };
+
 
   // ✅ 상태 값에서 공백 제거 후 클래스 적용
   const statusClass = `status-${(project.status || "").replace(/\s/g, "")}`;
@@ -19,6 +22,7 @@ const ProjectCard = ({ project }) => {
     const date = new Date(dateString);
     return isNaN(date.getTime()) ? "날짜 없음" : date.toISOString().split("T")[0];
   };
+
 
   return (
     <div className="project-card" onClick={handleCardClick}>
