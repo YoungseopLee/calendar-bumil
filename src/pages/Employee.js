@@ -143,7 +143,7 @@ const EmployeeList = () => {
   // 🔄 **사원 상태 변경 (관리자만 가능)**
   const handleStatusChange = async (employeeId, newStatus) => {
     try {
-      const response = await fetch(`${apiUrl}/status/update_status_admin`, {
+      const response = await fetch(`${apiUrl}/admin/update_status_admin`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -242,7 +242,9 @@ const EmployeeList = () => {
                 <li
                   key={employee.id}
                   className="employee-item"
-                  onClick={() => navigate(`/user-details?user_id=${employee.id}`)}
+                  onClick={() =>
+                    navigate(`/user-details?user_id=${employee.id}`)
+                  }
                 >
                   {/* ⭐ 즐겨찾기 토글 */}
                   <span
@@ -268,7 +270,7 @@ const EmployeeList = () => {
                     <select
                       className="status-dropdown"
                       value={employee.status || ""}
-                      onClick={(e) => e.stopPropagation()}  
+                      onClick={(e) => e.stopPropagation()}
                       onChange={(e) =>
                         handleStatusChange(employee.id, e.target.value)
                       }
