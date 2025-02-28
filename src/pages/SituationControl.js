@@ -118,21 +118,19 @@ const SituationControls = () => {
     console.log("selectedUsers: ", selectedUsers);
   }, [selectedUsers]);
 
-  // 사용자가 선택한 유저들의 프로젝트 데이터 가져오기, 선택 안했으면 effectiveUsers로 프로젝트의 모든 유저
+  
+  // 사용자가 선택한 유저들의 프로젝트 데이터 가져오기, 선택 안했으면 effectiveUsers로 모든 유저의 프로젝트
   useEffect(() => {
     const fetchUserProjectData = async () => {
-      if (!effectiveUsers || effectiveUsers.length === 0) {
-        setUserProjects([]);
-        setLoading(false);
-        return;
-      }
-
       const token = localStorage.getItem("token");
       if (!token) {
         setError("로그인이 필요합니다.");
         setLoading(false);
         return;
       }
+      
+      // 아무것도 선택되지 않았을 때는 모든 유저 정보를 effectiveUsers에 설정했으므로
+      // 그대로 진행하면 모든 프로젝트가 로드됨
       console.log("effectiveUsers : ", effectiveUsers);
       try {
         // 선택된 사용자들의 프로젝트 정보 요청을 병렬 실행
@@ -172,7 +170,6 @@ const SituationControls = () => {
 
     fetchUserProjectData();
   }, [effectiveUsers, apiUrl]); // effectiveUsers가 변경될 때마다 실행
-
   // 검색한 프로젝트 필터링
   useEffect(() => {
     if (searchQueryProject.trim() === "") {
@@ -242,8 +239,8 @@ const SituationControls = () => {
       
       setEffectiveUsers(projectUsers);
     } else {
-      // 아무것도 선택되지 않은 경우
-      setEffectiveUsers([]);
+      // 아무것도 선택되지 않은 경우 모든 사용자 정보를 사용
+      setEffectiveUsers(users); 
     }
   }, [selectedProjects, selectedUsers, users]);
 
