@@ -9,7 +9,7 @@ const Manager = () => {
   // 로그인한 사용자 정보 (localStorage에 저장된 최신 정보)
   const user = JSON.parse(localStorage.getItem("user"));
   const apiUrl = process.env.REACT_APP_API_URL;
-  
+
   // 로그인한 사용자 정보 최신화 및 어드민 여부 체크
   useEffect(() => {
     fetchLoggedInUser();
@@ -24,7 +24,6 @@ const Manager = () => {
       navigate("/");
       return;
     }
-    
   }, []);
 
   // 로그인한 사용자 정보 API 호출
@@ -70,6 +69,11 @@ const Manager = () => {
     navigate("/user-roles-management");
   };
 
+  // 유저 추가 페이지 이동
+  const goToAddUserPage = () => {
+    navigate("/add-user");
+  };
+
   return (
     <div className="manager-page">
       <Sidebar />
@@ -87,6 +91,12 @@ const Manager = () => {
           <div className="manager-card" onClick={goToRoleManagement}>
             <h2>역할 관리</h2>
             <p>사원의 역할 (관리자, 일반 사용자 등)을 관리할 수 있습니다.</p>
+            <button className="manage-button">이동</button>
+          </div>
+
+          <div className="manager-card" onClick={goToAddUserPage}>
+            <h2>유저 추가</h2>
+            <p>유저를 추가할 수 있습니다.</p>
             <button className="manage-button">이동</button>
           </div>
         </div>

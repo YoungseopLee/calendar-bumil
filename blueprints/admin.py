@@ -255,3 +255,51 @@ def update_role_id():
     finally:
         cursor.close()
         conn.close()
+
+# 권한 목록 조회
+@admin_bp.route('/get_role_list', methods=['GET'])
+def get_roles():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT id, comment FROM tb_role ORDER BY id")
+        roles = cursor.fetchall()
+        return jsonify(roles), 200
+    except Exception as e:
+        print(f"권한 조회 오류: {e}")
+        return jsonify({'message': '권한 목록 조회 오류'}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+# 부서 목록 조회
+@admin_bp.route('/get_department_list', methods=['GET'])
+def get_unique_departments():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT DISTINCT department FROM tb_user WHERE department IS NOT NULL AND department != '' ORDER BY department")
+        departments = cursor.fetchall()
+        return jsonify([d['department'] for d in departments]), 200
+    except Exception as e:
+        print(f"부서 조회 오류: {e}")
+        return jsonify({'message': '부서 목록 조회 오류'}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+# 직급 목록 조회
+@admin_bp.route('/get_position_list', methods=['GET'])
+def get_unique_position():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT DISTINCT position FROM tb_user WHERE position IS NOT NULL AND position != '' ORDER BY position")
+        positions = cursor.fetchall()
+        return jsonify([p['position'] for p in positions]), 200
+    except Exception as e:
+        print(f"직급 조회 오류: {e}")
+        return jsonify({'message': '직급 목록 조회 오류'}), 500
+    finally:
+        cursor.close()
+        conn.close()

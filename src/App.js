@@ -19,6 +19,7 @@ import ChangePWPage from "./pages/ChangePWPage";
 import UserDetails from "./pages/UserDetails";
 import UserRolesManagement from "./pages/UserRolesManagement";
 import SituationControl from "./pages/SituationControl";
+import AddUserPage from "./pages/AddUserPage";
 
 function App() {
   return (
@@ -26,6 +27,8 @@ function App() {
       <Routes>
         {/* 로그인 페이지 */}
         <Route path="/" element={<LoginPage />} />
+        {/* 유저 생성 페이지 */}
+        <Route path="/add-user" element={<AddUserPage />} />
         {/* 회원가입 페이지 */}
         <Route path="/signup" element={<SignupPage />} />
         {/* Calendar 페이지 */}
