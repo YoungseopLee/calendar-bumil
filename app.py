@@ -70,5 +70,6 @@ app.register_blueprint(project_bp)
 app.register_blueprint(status_bp)
 app.register_blueprint(admin_bp)
 
-if __name__ == "__main__":
-    app.run(debug=False, host="0.0.0.0", port=3000)
+# gunicorn 사용 시 주석 처리
+# if __name__ == "__main__":
+#     app.run(debug=False, host="0.0.0.0", port=5000)
