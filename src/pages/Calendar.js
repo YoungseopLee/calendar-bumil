@@ -439,6 +439,12 @@ const Calendar = () => {
             );
           })}
         </div>
+        <div className="color-check">
+          <div className="blue-tag"></div>
+          <span className="blue-text">내 일정</span>
+        </div>
+        <div className="red-tag"></div>
+          <span className="red-text">전체 일정</span>
 
         {selectedDate && (
           <div className="schedule-area">
