@@ -171,28 +171,46 @@ const Calendar = () => {
 
   // 일정 삭제
   const handleDeleteSchedule = async (scheduleId) => {
-    const isConfirmed = window.confirm("정말 삭제하시겠습니까?");
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user"));
 
-    if (!isConfirmed) {
+    if (!token || !user) {
+      alert(
+        "❌ 인증 토큰이 없거나 사용자 정보가 없습니다. 다시 로그인해주세요."
+      );
       return;
     }
+
+    const isConfirmed = window.confirm("정말 삭제하시겠습니까?");
+    if (!isConfirmed) return;
+
+    console.log("🔹 삭제 요청 전송:", scheduleId);
+    console.log("🔹 Authorization 헤더:", `Bearer ${token}`);
+
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/schedule/delete-schedule/${scheduleId}`,
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // 토큰이 제대로 들어가는지 확인
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
+      const data = await response.json();
+      console.log("🔹 삭제 응답:", response.status, data);
+
       if (response.ok) {
-        handleDateClick(selectedDate.getDate()); // 삭제 후 일정 목록 새로고침
+        alert("✅ 일정이 삭제되었습니다.");
+        handleDateClick(selectedDate.getDate());
       } else {
+        alert(`⚠️ 삭제 실패: ${data.message}`);
       }
     } catch (error) {
-      console.error("일정 삭제 오류:", error);
+      console.error("❌ 일정 삭제 오류:", error);
+      alert("❌ 일정 삭제 중 오류가 발생했습니다.");
     }
   };
 

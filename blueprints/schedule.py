@@ -200,25 +200,39 @@ def edit_schedule(schedule_id):
         except Exception:
             pass
 
+# 일정 삭제
 @schedule_bp.route('/delete-schedule/<int:schedule_id>', methods=['DELETE', 'OPTIONS'])
 def delete_schedule(schedule_id):
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
+
     token = request.headers.get('Authorization')
     if not token:
         return jsonify({'message': '토큰이 없습니다.'}), 401
     token = token.split(" ")[1]
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
         user_id = payload['user_id']
+        role_id = payload.get('role_id', '')  # role_id 가져오기
+
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor()
+
+        # 삭제하려는 일정의 user_id 가져오기
         cursor.execute("SELECT user_id FROM tb_schedule WHERE id = %s", (schedule_id,))
         schedule_owner = cursor.fetchone()
-        if schedule_owner and schedule_owner[0] != user_id:
+
+        # 🔹 디버깅 로그 추가
+        print(f"🔹 요청한 사용자 ID: {user_id}, 역할: {role_id}, 일정 소유자 ID: {schedule_owner}")
+
+        # 🔹 일정 소유자이거나 `AD_ADMIN`이면 삭제 가능
+        if schedule_owner and (schedule_owner[0] != user_id and role_id != "AD_ADMIN"):
             return jsonify({'message': '일정을 삭제할 권한이 없습니다.'}), 403
+
+        # 삭제 실행
         cursor.execute("DELETE FROM tb_schedule WHERE id = %s", (schedule_id,))
         conn.commit()
         return jsonify({'message': '일정이 삭제되었습니다.'}), 200
