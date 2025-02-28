@@ -224,68 +224,71 @@ const EmployeeList = () => {
           />
         </div>
 
-        {/* 🏷️ 인덱스 바 */}
-        <div className="employee-index-bar">
-          <span className="index-item">즐겨찾기</span>
-          <span className="index-item">이름</span>
-          <span className="index-item">직급</span>
-          <span className="index-item">상태</span>
-        </div>
+        {/* 스크롤 가능한 컨테이너 추가 */}
+        <div className="employee-list-container">
+          {/* 🏷️ 인덱스 바 - sticky로 변경 */}
+          <div className="employee-index-bar sticky-header">
+            <span className="index-item">즐겨찾기</span>
+            <span className="index-item">이름</span>
+            <span className="index-item">직급</span>
+            <span className="index-item">상태</span>
+          </div>
 
-        {/* 👥 사원 목록 렌더링 */}
-        <ul className="employee-list">
-          {(showFavorites ? favoriteEmployees : employees)
-            .filter(filterEmployees)
-            .map((employee) => (
-              <li
-                key={employee.id}
-                className="employee-item"
-                onClick={() => navigate(`/user-details?user_id=${employee.id}`)}
-              >
-                {/* ⭐ 즐겨찾기 토글 */}
-                <span
-                  className={`favorite-icon ${
-                    favoriteEmployees.some((fav) => fav.id === employee.id)
-                      ? ""
-                      : "not-favorite"
-                  }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavorite(employee.id);
-                  }}
+          {/* 👥 사원 목록 렌더링 */}
+          <ul className="employee-list">
+            {(showFavorites ? favoriteEmployees : employees)
+              .filter(filterEmployees)
+              .map((employee) => (
+                <li
+                  key={employee.id}
+                  className="employee-item"
+                  onClick={() => navigate(`/user-details?user_id=${employee.id}`)}
                 >
-                  ★
-                </span>
-
-                {/* 🔠 사원 정보 */}
-                <span className="employee-name">{employee.name}</span>
-                <span className="employee-position">{employee.position}</span>
-
-                {/* 🔄 관리자 전용 상태 변경 드롭다운 */}
-                {userRole === "AD_ADMIN" ? (
-                  <select
-                    className="status-dropdown"
-                    value={employee.status || ""}
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={(e) =>
-                      handleStatusChange(employee.id, e.target.value)
-                    }
+                  {/* ⭐ 즐겨찾기 토글 */}
+                  <span
+                    className={`favorite-icon ${
+                      favoriteEmployees.some((fav) => fav.id === employee.id)
+                        ? ""
+                        : "not-favorite"
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(employee.id);
+                    }}
                   >
-                    {statusList.map((status, index) => (
-                      <option
-                        key={`${status.comment}-${index}`}
-                        value={status.id}
-                      >
-                        {status.comment}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <span>{employee.status}</span>
-                )}
-              </li>
-            ))}
-        </ul>
+                    ★
+                  </span>
+
+                  {/* 🔠 사원 정보 */}
+                  <span className="employee-name">{employee.name}</span>
+                  <span className="employee-position">{employee.position}</span>
+
+                  {/* 🔄 관리자 전용 상태 변경 드롭다운 */}
+                  {userRole === "AD_ADMIN" ? (
+                    <select
+                      className="status-dropdown"
+                      value={employee.status || ""}
+                      onClick={(e) => e.stopPropagation()}  
+                      onChange={(e) =>
+                        handleStatusChange(employee.id, e.target.value)
+                      }
+                    >
+                      {statusList.map((status, index) => (
+                        <option
+                          key={`${status.comment}-${index}`}
+                          value={status.id}
+                        >
+                          {status.comment}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <span>{employee.status}</span>
+                  )}
+                </li>
+              ))}
+          </ul>
+        </div>
       </div>
     </div>
   );
