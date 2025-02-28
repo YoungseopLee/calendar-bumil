@@ -213,7 +213,7 @@ const ProjectPage = () => {
 
         {/* ✅ 상태 토글 필터 */}
         <div className="status-toggle-container">
-          {["제안", "진행 중", "완료"].map((status) => (
+          {["제안", "수행", "실주종료"].map((status) => (
             <button
               key={status}
               className={`status-toggle ${selectedStatus.includes(status) ? "active" : ""}`}

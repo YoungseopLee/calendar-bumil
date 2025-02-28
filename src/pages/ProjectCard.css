@@ -51,7 +51,21 @@
     margin-top: 5px;
 }
 
-/* ✅ 상태별 색상 적용 */
-.status-진행중 { background-color: #eaf5ea; color: #2d6a2d; border-color: #8bc34a; }
-.status-완료 { background-color: #e8f0ff; color: #2d5a8e; border-color: #64b5f6; }
-.status-보류 { background-color: #fbeaea; color: #9e2a2b; border-color: #e57373; }
+/* ✅ 상태별 스타일 */
+.status-제안 {
+    background-color: #fde8d6; /* 밝은 살구색 */
+    color: #b95d00; /* 부드러운 다크 오렌지 */
+    border-color: #ff9800; /* 진한 오렌지 */
+}
+
+.status-수행 {
+    background-color: #d6e6fd; /* 연한 스카이 블루 */
+    color: #0b60b0; /* 진한 네이비 블루 */
+    border-color: #2196f3; /* 선명한 블루 */
+}
+
+.status-실주종료 {
+    background-color: #d8f3dc; /* 밝은 민트 그린 */
+    color: #1b4332; /* 딥 그린 */
+    border-color: #4caf50; /* 선명한 녹색 */
+}
