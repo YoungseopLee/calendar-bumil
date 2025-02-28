@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../pages/Sidebar";
 import BackButton from "./BackButton";
 import "./SituationControl.css";
@@ -30,6 +30,9 @@ const SituationControls = () => {
   const navigate = useNavigate();
   // 로그인한 사용자 정보 (localStorage에 저장된 최신 정보)
   const user = JSON.parse(localStorage.getItem("user"));
+
+  const location = useLocation();
+
   // 로그인한 사용자 정보 체크
   useEffect(() => {
     fetchLoggedInUser();
@@ -66,14 +69,14 @@ const SituationControls = () => {
   };
 
   // 로그아웃 함수
-  const handleLogout = () => {
+    const handleLogout = () => {
     alert("세션이 만료되었습니다. 다시 로그인해주세요.");
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/");
   };
 
-  //검색을 위해서 사용자 목록과 프로젝트 목록을 가져오는 API 호출
+  //검색을 위해서 사용자 목록과 프로젝트   목록을 가져오는 API 호출
   useEffect(() => {
     const fetchUsersAndProjects = async () => {
       try {
@@ -100,7 +103,7 @@ const SituationControls = () => {
   
     fetchProjects();
     fetchUsersAndProjects();
-  }, [apiUrl]); // ✅ apiUrl이 변경될 때만 실행 (userIdToNameMap 의존성 제거)
+  }, [location.pathname]); // ✅ location.pathname이 변경될 때마다 실행(페이지 이동 시)
   
   useEffect(() => {
     console.log("projects: ", projects);
@@ -277,6 +280,7 @@ const SituationControls = () => {
     setAppliedEnd(endFilter);
   };
 
+  //Date형으로 전환하고 yearselector에 맞춰 표시해줄 데이터 조건 정리
   const dateFilteredProjects = userprojects.filter(project => {
     const projectStartYear = new Date(project.start_date).getFullYear();
     const projectEndYear = new Date(project.end_date).getFullYear();
@@ -380,7 +384,7 @@ const SituationControls = () => {
                           {project.project_name}
                         </span>
                         {Array.from({ length: 12 }, (_, idx) => {
-                          const isHighlighted = months.includes(year * 100 + idx); // 수정된 부분: startYear -> year
+                          const isHighlighted = months.includes(year * 100 + idx); // year 가 포함되면 하이라이트
                           return (
                             <span
                               key={idx}
@@ -496,6 +500,7 @@ const SituationControls = () => {
     );
   };
   
+  // ✅ 표 형태로 보여주는 컴포넌트
   const TableView = ({ dateFilteredProjects }) => {
     const navigate = useNavigate(); // ✅ 네비게이션 훅 사용
 
