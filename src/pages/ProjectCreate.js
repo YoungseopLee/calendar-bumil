@@ -189,7 +189,7 @@ const ProjectCreate = () => {
           {/* ✅ 카테고리 및 상태 */}
           {[
             ["카테고리", "category", ["구축 인프라", "구축 SW", "유지보수 인프라", "유지보수 SW", "연구과제"]],
-            ["상태", "status", ["제안", "진행 중", "완료"]],
+            ["상태", "status", ["제안", "수행", "실주종료"]],
           ].map(([label, name, options]) => (
             <div className="form-row" key={name}>
               <label>{label}:</label>
