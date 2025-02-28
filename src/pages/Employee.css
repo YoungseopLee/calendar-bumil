@@ -12,12 +12,11 @@
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 1000px; /* 최대 너비 설정 (선택사항) */
+    max-width: 1000px;
     position: relative;
     padding-bottom: 50px;
-    box-sizing: border-box; /* 패딩을 포함한 크기 계산 */
-    overflow: auto; /* 일정이 많을 경우 스크롤 처리 */
-    /* max-height: 80vh;  */
+    box-sizing: border-box;
+    overflow: auto;
 }
 
 .title {
@@ -26,149 +25,134 @@
     color: #333;
 }
 
+/* 리스트 스타일 */
 .employee-list {
     list-style: none;
+    margin: 0;
     padding: 0;
 }
 
 .favorite-list {
     padding: 0;
     margin-top: 20px;
-    width: 100%; /* 부모 크기에 맞춰 너비 설정 */
+    width: 100%;
     justify-content: space-between;
 }
 
+/* 스크롤 가능한 컨테이너 스타일 */
+.employee-list-container {
+    position: relative;
+    max-height: calc(100vh - 250px);
+    overflow-y: auto;
+    border: 1px solid #eaeaea;
+    border-radius: 5px;
+}
+
+/* 공통 아이템 스타일 */
 .favorite-item, .employee-item {
-    background-color: #f0f0f0; /* 연한 회색으로 고정 */
-    color: #333; /* 기본 텍스트 색상 */
+    background-color: #f0f0f0;
+    color: #333;
     display: flex;
     align-items: center;
-    padding: 10px;
+    justify-content: space-between;
+    padding: 10px 15px;
     border-radius: 6px;
     margin-bottom: 10px;
     font-weight: bold;
-    justify-content: space-between;
-    transition: transform 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out, background-color 0.3s ease;
+    cursor: pointer;
 }
 
 .favorite-item:hover, .employee-item:hover {
     transform: scale(1.03);
-    background-color: #8f8f8f9a;
+    background-color: #dcdcdc;
 }
 
-/* 상태 텍스트 스타일 */
-.employee-status {
+/* 인덱스 바 (Header Bar) 스타일 */
+.employee-index-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #eaeaea;
     font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 4px;
-    text-align: center;
-    width: 80px;
-    display: inline-block;
+    border-bottom: 2px solid #ccc;
+    border-radius: 6px;
+    margin-top: 0px;
+    margin-bottom: 10px;
 }
 
-/* 사원 이름과 직무 */
-.employee-name,
-.employee-position {
+.index-item {
+    flex: 1;
+    text-align: center;
     font-size: 1em;
     color: #333;
 }
 
-.employee-position {
-    color: #777;
-    font-size: 0.9em;
+/* 고정 헤더 스타일 */
+.sticky-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #f9f9f9;
+    border-bottom: 2px solid #ddd;
 }
 
-
-.employee-name {
-    padding-left: 40px;
-    text-align: left;
-    font-size: 1em;
-}
-
-.employee-position {
-    text-align: left;
-    font-size: 1em; 
-    color: black; 
-    font-weight: bold; 
-}
-
-
-.employee-status {
-    text-align: center;
-    font-size: 1em;
-}
-
+/* 즐겨찾기 아이콘 */
 .favorite-icon {
-    color: #ffd700;
+    flex: 1;
+    text-align: center;
     cursor: pointer;
     font-size: 1.5em;
     margin-right: 10px;
-    flex: 0 0 40px;
-    text-align: center;
-    cursor: pointer;
 }
 
 .not-favorite {
     color: #ccc;
 }
 
+.favorite-icon:not(.not-favorite) {
+    color: #ffd700;
+}
+
+/* 사원 정보 스타일 */
+.employee-name,
+.employee-position {
+    flex: 1;
+    text-align: center;
+    font-size: 1em;
+    font-weight: bold;
+    margin-left:15px; /* 위의 카테고리에 맞추기 위한 margin, 없애도 상관없음 */
+}
+
 .employee-name {
-    font-size: 1em;
     color: #333;
-    /* margin-right: 10px; */
 }
 
-/* 검색창 스타일 */
-.search-input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1em;
-    box-sizing: border-box;
+.employee-position {
+    color: black;
+    
 }
 
-/* 뒤로가기 버튼 스타일 */
-.box > .back-button {
-    position: relative;
-    width: 100%;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    font-size: 1em;
-    cursor: pointer;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-}
-
-.back-button:hover {
-    background-color: #0056b3;
-}
-.toggle-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
+/* 상태 스타일 */
+.employee-status {
+    flex: 1;
+    text-align: center;
+    font-weight: bold;
     padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
+    border-radius: 4px;
+    width: 80px;
+    display: inline-block;
 }
 
-.toggle-button:hover {
-    background-color: #0056b3;
-}
+/* 상태별 배경색 적용 */
+.employee-status.status-work { background-color: rgba(0, 143, 0, 0.829); color: white; }
+.employee-status.status-outside { background-color: rgb(255, 174, 0); color: black; }
+.employee-status.status-vacation { background-color: rgba(255, 0, 0, 0.836); color: white; }
+.employee-status.status-dispatch { background-color: rgba(77, 77, 77, 0.575); color: white; }
+.employee-status.status-default { background-color: gray; color: white; }
 
-/* ✅ 즐겨찾기 보기 버튼을 검색창 위로 이동 */
-.toggle-container {
-    display: flex;
-    justify-content: flex-start; /* 왼쪽 정렬 */
-    width: 100%;
-    margin-bottom: 10px; /* 버튼과 검색창 간격 조정 */
-}
-
-/* ✅ 검색 컨테이너 (드롭다운 + 검색창) */
+/* 검색 및 필터 스타일 */
 .search-container {
     display: flex;
     gap: 10px;
@@ -176,7 +160,15 @@
     margin-bottom: 15px;
 }
 
-/* ✅ 검색 드롭다운 스타일 */
+.search-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
 .search-dropdown {
     padding: 10px;
     border: 1px solid #ddd;
@@ -187,11 +179,46 @@
     width: 120px;
 }
 
-/* ✅ 검색 입력창 스타일 */
-.search-input {
-    flex-grow: 1;
+/* 상태 드롭다운 */
+.status-dropdown {
+    flex: 1;
+    text-align: center;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    background-color: white;
+    margin-left: 10px;
 }
 
+/* 토글 컨테이너 */
+.toggle-container {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+/* 버튼 스타일 */
+.toggle-button, .department-tab {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.toggle-button {
+    padding: 5px 10px;
+}
+
+.toggle-button:hover, .department-tab:hover {
+    background-color: #0056b3;
+}
+
+/* 부서 관련 스타일 */
 .department-tabs {
     display: flex;
     justify-content: center;
@@ -200,22 +227,15 @@
 }
 
 .department-tab {
-    background-color: #007bff;
-    color: white;
     padding: 8px 15px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
     font-size: 1em;
 }
 
 .department-tab:hover {
-    background-color: #0056b3;
     transform: scale(1.05);
 }
 
-/* ✅ 선택된 부서 탭 스타일 */
 .department-tab.active {
     background-color: #004085;
     color: #f8f9fa;
@@ -239,103 +259,21 @@
     outline: none;
 }
 
-/* ✅ 상태 변경 드롭다운 스타일 */
-.status-dropdown {
-    padding: 5px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+/* 뒤로가기 버튼 스타일 */
+.box > .back-button {
+    position: relative;
+    width: 100%;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
     font-size: 1em;
     cursor: pointer;
-    background-color: white;
-    margin-left: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
 }
 
-/* ✅ 상태별 배경색 적용 (작은 박스만 변경) */
-.employee-status.status-work { background-color: rgba(0, 143, 0, 0.829); color: white; }
-.employee-status.status-outside { background-color: rgb(255, 174, 0); color: black; }
-.employee-status.status-vacation { background-color: rgba(255, 0, 0, 0.836); color: white; }
-.employee-status.status-dispatch { background-color: rgba(77, 77, 77, 0.575); color: white; }
-.employee-status.status-default { background-color: gray; color: white; }
-
-/* ✅ 인덱스 바 (Header Bar) 스타일 */
-.employee-index-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 15px;
-    background-color: #eaeaea;
-    font-weight: bold;
-    border-bottom: 2px solid #ccc;
-    border-radius: 6px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-  }
-  
-  .index-item {
-    flex: 1;
-    text-align: center;
-    font-size: 1em;
-    color: #333;
-  }
-  
-  /* ✅ 사원 항목 정렬 및 스타일 */
-  .employee-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #f0f0f0;
-    padding: 10px 15px;
-    border-radius: 6px;
-    margin-bottom: 10px;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-  }
-  
-  .employee-item:hover {
-    background-color: #dcdcdc;
-  }
-  
-  /* ✅ 즐겨찾기 아이콘 위치 조정 */
-  .favorite-icon {
-    flex: 1;
-    text-align: center;
-    cursor: pointer;
-    font-size: 1.5em;
-    margin-right: 10px;
-  }
-  
-  /* ✅ 이름, 직급, 상태 정렬 */
-  .employee-name,
-  .employee-position {
-    flex: 1;
-    text-align: center;
-    font-size: 1em;
-    color: #333;
-    font-weight: bold;
-  }
-  
-  .status-dropdown {
-    flex: 1;
-    text-align: center;
-    padding: 5px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1em;
-    background-color: white;
-  }
-  
-  /* ✅ 상태별 색상 강조 */
-  .employee-status {
-    flex: 1;
-    text-align: center;
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 4px;
-    display: inline-block;
-  }
-  
-  .employee-status.status-work { background-color: rgba(0, 143, 0, 0.829); color: white; }
-  .employee-status.status-outside { background-color: rgb(255, 174, 0); color: black; }
-  .employee-status.status-vacation { background-color: rgba(255, 0, 0, 0.836); color: white; }
-  .employee-status.status-dispatch { background-color: rgba(77, 77, 77, 0.575); color: white; }
-  .employee-status.status-default { background-color: gray; color: white; }
+.back-button:hover {
+    background-color: #0056b3;
+}
