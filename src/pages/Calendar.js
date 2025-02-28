@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import { IoIosArrowBack, IoIosArrowForward} from "react-icons/io";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import "./Calendar.css";
 
 const Calendar = () => {
@@ -17,6 +17,7 @@ const Calendar = () => {
   const [statusList, setStatusList] = useState([]); // 상태 목록 (백엔드 CRUD 결과)
   const navigate = useNavigate();
   const [allSchedule, setAllSchedule] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
   const user = JSON.parse(localStorage.getItem("user"));
@@ -43,11 +44,16 @@ const Calendar = () => {
         const uniqueDepartments = [
           ...new Set(usersData.users.map((user) => user.department)),
         ];
+        console.log("부서: ", uniqueDepartments);
         setDepartments(uniqueDepartments);
       } catch (error) {
         console.error("데이터 로딩 오류:", error);
       }
     };
+    if (user.role_id === "AD_ADMIN") {
+      console.log("관리자: ", user.id);
+      setIsAdmin(true);
+    }
 
     fetchData();
     fetchLoggedInUser(); // 사용자 상태 업데이트
@@ -603,6 +609,15 @@ const Calendar = () => {
                         ></span>
                         {userName} {": \u00A0"}
                         <span className="task-name-two">{schedule.task}</span>
+                        {isAdmin && (
+                          <button
+                            className="delete-button icon-button"
+                            onClick={() => handleDeleteSchedule(schedule.id)}
+                            title="삭제"
+                          >
+                            <FaTrash />
+                          </button>
+                        )}
                         {/* <span> {formatDate(schedule.start_date)}</span>
                         {"\u00A0"} ~ {"\u00A0"}
                         <span> {formatDate(schedule.end_date)}</span> */}

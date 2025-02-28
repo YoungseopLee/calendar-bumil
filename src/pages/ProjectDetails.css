@@ -122,7 +122,6 @@
 }
 
 .project-table input[type="date"] {
-  height: 20px; /* 높이 맞추기 */
   line-height: 40px;
   display: inline-block;
 }
