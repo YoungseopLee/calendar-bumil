@@ -4,6 +4,26 @@ import Sidebar from "./Sidebar";
 import BackButton from "./BackButton";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * 📌 EmployeeList - 사원 목록을 조회하고 필터링하는 페이지
+ *
+ * ✅ 주요 기능:
+ *  - 사원 목록 조회 (GET /user/get_users)
+ *  - 즐겨찾기 기능 (GET/POST /favorite/get_favorites, /favorite/toggle_favorite)
+ *  - 상태 목록 조회 (GET /status/get_status_list)
+ *  - 관리자 권한 확인 후 상태 변경 가능 (PUT /admin/update_status_admin)
+ *  - 검색 필터 적용 (이름, 직급, 부서, 상태)
+ *  - 부서별 정렬 및 펼치기/닫기 기능
+ *
+ * ✅ UI(또는 Component) 구조:
+ *  - EmployeeList (메인 페이지)
+ *    ├── Sidebar (사이드바)
+ *    ├── BackButton (뒤로가기 버튼)
+ *    ├── 검색 및 필터링 UI
+ *    ├── 즐겨찾기 토글 버튼
+ *    ├── 사원 목록 (부서별 그룹화)
+ */
+
 const EmployeeList = () => {
   // ✅ 상태 관리 (State)
   const [employees, setEmployees] = useState([]); // 전체 사원 목록
@@ -24,7 +44,12 @@ const EmployeeList = () => {
   const navigate = useNavigate(); // 페이지 이동 훅
   const apiUrl = process.env.REACT_APP_API_URL; // API URL 환경 변수
 
-  // 🔄 **1. 로그인 사용자 정보 및 상태 목록 로딩**
+  /**
+   * 🔄 **1. 로그인된 사용자 정보 및 상태 목록 불러오기**
+   * - 로그인한 사용자 정보 확인
+   * - 사용자 ID 및 역할 저장
+   * - 상태 목록 불러오기 (근무 중, 휴가 등)
+   */
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
@@ -54,7 +79,10 @@ const EmployeeList = () => {
     fetchInitialData();
   }, []);
 
-  // 🔄 **2. 사용자 및 즐겨찾기 목록 불러오기**
+  /**
+   * 🔄 **2. 사원 및 즐겨찾기 목록 불러오기**
+   * - 로그인된 사용자 ID가 있을 경우 실행
+   */
   useEffect(() => {
     if (loggedInUserId) {
       fetchFavorites(loggedInUserId); // 즐겨찾기 목록
@@ -247,7 +275,7 @@ const EmployeeList = () => {
 
         {/* 스크롤 가능한 컨테이너 추가 */}
         <div className="employee-list-container">
-          {/* 🏷️ 인덱스 바 - sticky로 변경 */}
+          {/* 🏷️ 인덱스 바 */}
           <div className="employee-index-bar sticky-header">
             <span className="index-item-1">즐겨찾기</span>
             <span className="index-item">이름</span>
