@@ -142,7 +142,9 @@
 
 /* ✅ 반응형 처리: 갤럭시 폴드 (~280px) */
 @media screen and (max-width: 280px) {
-    .content, .projectPage-box {
+
+    .content,
+    .projectPage-box {
         max-width: 95%;
         padding: 15px;
     }
@@ -172,7 +174,9 @@
 
 /* ✅ 반응형 처리: 아이폰 13 (~390px) */
 @media screen and (max-width: 390px) {
-    .content, .projectPage-box {
+
+    .content,
+    .projectPage-box {
         max-width: 100%;
         padding: 10px;
     }
@@ -207,34 +211,41 @@
 .fixed-header {
     position: sticky;
     top: 0;
-    background-color: white;  /* 배경색 */
+    background-color: white;
+    /* 배경색 */
     padding: 10px 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);  /* 그림자 효과 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    /* 그림자 효과 */
     margin-top: 15px;
     margin-bottom: 15px;
-  }
-  
-  /* ✅ 타이틀 스타일 */
-  .fixed-header .title {
+}
+
+/* ✅ 타이틀 스타일 */
+.fixed-header .title {
     margin: 0;
     padding: 10px 0;
     font-size: 20px;
     text-align: center;
-  }
-  
-  /* ✅ 검색 필터 컨테이너 (간격 축소) */
-  .search-container,
-  .filter-container,
-  .status-toggle-container {
+}
+
+/* ✅ 검색 필터 컨테이너 */
+.search-container,
+.filter-container,
+.status-toggle-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    margin-bottom: 5px;  /* ✅ 간격 축소 */
-    padding: 5px 0;      /* ✅ 패딩 축소 */
-  }
-  
-  /* ✅ 사이드바가 열릴 때 고정된 헤더 가리지 않도록 */
-  .sidebar {
-    z-index: 1200;  /* 고정된 헤더보다 위에 표시 */
-  }
+    margin-bottom: 5px;
+    padding: 5px 0;
+
+    /* 각 컨테이너를 중앙으로 정렬 */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ✅ 사이드바가 열릴 때 고정된 헤더 가리지 않도록 */
+.sidebar {
+    z-index: 1200;
+    /* 고정된 헤더보다 위에 표시 */
+}
