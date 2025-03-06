@@ -2,27 +2,41 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./ProjectCard.css";
 
+/**
+  * 📌 ProjectCard - 프로젝트 정보를 보여주는 카드 컴포넌트
+  * 
+  * ✅ 주요 기능:
+  * - 프로젝트 정보를 카드 형태로 보여줌
+  * - 클릭 시 상세 페이지로 이동
+  *
+  * ✅ UI (또는 Component) 구조:
+  * - ProjectCard (프로젝트 카드)
+  * ├── ProjectTitle (프로젝트 제목)
+  * ├── ProjectCode (프로젝트 코드)
+  * ├── ProjectGroup (프로젝트 그룹)
+  * ├── ProjectOwner (영업대표)
+  * ├── ProjectPM (PM)
+  * ├── ProjectPeriod (프로젝트 기간)
+  * └── ProjectStatus (프로젝트 상태)
+  */
+
 const ProjectCard = ({ project }) => {
+
+  //  클릭 시 상세페이지로 이동
   const navigate = useNavigate();
-
-  
-
-  // ✅ 카드 클릭 시 상세페이지로 이동
   const handleCardClick = () => {
     navigate(`/project-details?project_code=${project.code}`);
   };
 
-
-  // ✅ 상태 값에서 공백 제거 후 클래스 적용
+  // 상태 값에서 공백 제거 후 클래스 적용
   const statusClass = `status-${(project.status || "").replace(/\s/g, "")}`;
 
-  // ✅ 날짜 형식 변환 (오류 방지)
+  // 날짜 형식 변환 (오류 방지)
   const formatDate = (dateString) => {
-    if (!dateString) return "날짜 없음"; // ✅ 빈 값 처리
+    if (!dateString) return "날짜 없음"; // 빈 값 처리
     const date = new Date(dateString);
     return isNaN(date.getTime()) ? "날짜 없음" : date.toISOString().split("T")[0];
   };
-
 
   return (
     <div className="project-card" onClick={handleCardClick}>
