@@ -5,37 +5,83 @@ import BackButton from "./BackButton";
 import "./SituationControl.css";
 import { FaSearch } from "react-icons/fa";
 
+/**
+ * 📌 SituationControlPage 
+ * - 프로젝트와 사용자 목록을 불러오고, 
+ * 어떤 사용자가 어떤 프로젝트에 참여중인지 연도별로 보여주는 페이지
+ *
+ * ✅ 주요 기능:
+ *  - 프로젝트 목록 조회 (GET /project/get_all_project)
+ *  - 사용자 목록 조회 (GET /user/get_users)
+ *  - 프로젝트별 참여자 목록 조회 (POST /project/get_users_and_projects)
+ *  - 프로젝트로 검색하면 해당 프로젝트에 참여중인 사용자 목록 표시
+ *  - 사용자로 검색하면 해당 사용자가 참여중인 프로젝트 목록 표시
+ *  - 이때, 연도별로 참여 월을 색칠해서 표시함
+ *  - 표 형태로 전환 가능 (프로젝트별 참여자, 사용자별 프로젝트)
+ *    - 전환하면 날짜 데이터를 YYYY-MM-DD 형식의 표로 표시해줌
+ * 
+ * ✅ 컴포넌트 목록:
+ *  - ChartView: 차트 형태로 데이터 표시
+ *  - TableView: 표 형태로 데이터 표시
+ * 
+ * ✅ UI 구조:
+ *  - SituationControlPage (메인 페이지)
+ *    ├── Sidebar (사이드바)
+ *    ├── BackButton (뒤로 가기 버튼)
+ *    ├── SituationControl-search-container (현황관리 검색 칸)
+ *    │      ├── search-project-container(div : 프로젝트 검색 칸)
+ *    │      ├── selected-projects(div : 선택된 프로젝트 목록 칸)
+ *    │      ├── search-user-container(div : 사용자 검색 칸)
+ *    │      ├── selected-users(div : 선택된 사용자 목록 칸)
+ *    ├── SituationControl-projects (현황관리 차트/표 표시 칸)
+ *    │      ├── project-checkbox (표시 방식 전환 체크박스(차트/표))
+ *    │      ├── year-selector (연도 선택기)
+ *    │      ├── TableView or ChartView (표 또는 차트 표시) 
+ * 
+ */
+
 const SituationControls = () => {
-  const [projects, setProjects] = useState([]); // 프로젝트 데이터 추가
-  const [users, setUsers] = useState([]); // 사용자 목록 데이터 추가
-  const [userprojects, setUserProjects] = useState([]); // 유저의 프로젝트 데이터 추가
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [isTableView, setIsTableView] = useState(false); // ✅ 추가: 표 형태 전환 상태
-  const [searchQueryProject, setSearchQueryProject] = useState("");
-  const [selectedProjects, setSelectedProjects] = useState([]);
-  const [filteredProjects, setFilteredProjects] = useState([]);
-  const [searchQueryUser, setSearchQueryUser] = useState("");
-  const [selectedUsers, setSelectedUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  //const [searchCategory, setSearchCategory] = useState("projectName"); // ✅ 검색 카테고리 추가 시 사용
-  const [effectiveUsers, setEffectiveUsers] = useState([]); //프로젝트만 선택했을 시 보여줄 유저목록
+  // ===== 상태 관리 변수들 =====
+  const [projects, setProjects] = useState([]); // 모든 프로젝트 데이터 저장
+  const [users, setUsers] = useState([]); // 모든 사용자 목록 데이터 저장
+  const [userprojects, setUserProjects] = useState([]); // 사용자-프로젝트 관계 데이터 저장 
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중)
+  const [error, setError] = useState(null); // 에러 상태 관리
+  const [year, setYear] = useState(new Date().getFullYear()); // 현재 선택된 연도 (기본값: 현재 연도)
+  const [isTableView, setIsTableView] = useState(false); // 뷰 타입 관리 (false: 차트 뷰, true: 테이블 뷰)
+  
+  // 프로젝트 검색 관련 상태
+  const [searchQueryProject, setSearchQueryProject] = useState(""); // 프로젝트 검색어
+  const [selectedProjects, setSelectedProjects] = useState([]); // 선택된 프로젝트 목록
+  const [filteredProjects, setFilteredProjects] = useState([]); // 검색 결과 필터링된 프로젝트 목록
+  
+  // 사용자 검색 관련 상태
+  const [searchQueryUser, setSearchQueryUser] = useState(""); // 사용자 검색어
+  const [selectedUsers, setSelectedUsers] = useState([]); // 선택된 사용자 목록
+  const [filteredUsers, setFilteredUsers] = useState([]); // 검색 결과 필터링된 사용자 목록
+  
+  //const [searchCategory, setSearchCategory] = useState("projectName"); // 현재 사용되지 않는 검색 카테고리 (주석 처리됨)
+  const [effectiveUsers, setEffectiveUsers] = useState([]); // 실제로 데이터를 보여줄 사용자 목록 (선택된 프로젝트의 사용자들 또는 선택된 사용자들)
+  
+  // 날짜 필터링 관련 상태 - 현재는 UI에 직접 연결되어 사용되지 않음
   const [startFilter, setStartFilter] = useState("");
   const [endFilter, setEndFilter] = useState("");
   const [appliedStart, setAppliedStart] = useState("");
   const [appliedEnd, setAppliedEnd] = useState("");
 
-  const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
-  const navigate = useNavigate();
-  // 로그인한 사용자 정보 (localStorage에 저장된 최신 정보)
+  // 환경변수에서 API URL 가져오기
+  const apiUrl = process.env.REACT_APP_API_URL;
+  const navigate = useNavigate(); // 페이지 이동을 위한 react-router-dom 훅
+  
+  // 로컬 스토리지에서 로그인한 사용자 정보 가져오기
   const user = JSON.parse(localStorage.getItem("user"));
+  const location = useLocation(); // 현재 위치 정보를 위한 react-router-dom 훅
 
-  const location = useLocation();
-
-  // 로그인한 사용자 정보 체크
+  // ===== 컴포넌트 초기 마운트 시 로그인 사용자 체크 =====
   useEffect(() => {
-    fetchLoggedInUser();
+    fetchLoggedInUser(); // 로그인한 사용자 정보 가져오기
+    
+    // 로그인 정보가 없으면 로그인 페이지로 리다이렉트
     if (!user) {
       alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
       navigate("/");
@@ -43,23 +89,26 @@ const SituationControls = () => {
     }
   }, []);
 
-  // 로그인한 사용자 정보 API 호출
+  // ===== API 함수: 로그인한 사용자 정보 가져오기 =====
   const fetchLoggedInUser = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token"); // 인증 토큰 가져오기
       const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // 인증 헤더 설정
         },
       });
+      
+      // 401 오류면 로그아웃 처리
       if (response.status === 401) {
         handleLogout();
         return;
       }
+      
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("user", JSON.stringify(data.user)); // 최신 사용자 정보 로컬 스토리지에 저장
       } else {
         console.error("사용자 정보 불러오기 실패");
       }
@@ -68,22 +117,22 @@ const SituationControls = () => {
     }
   };
 
-  // 로그아웃 함수
-    const handleLogout = () => {
+  // ===== 로그아웃 처리 함수 =====
+  const handleLogout = () => {
     alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
+    localStorage.removeItem("token"); // 토큰 제거
+    localStorage.removeItem("user"); // 사용자 정보 제거
+    navigate("/"); // 로그인 페이지로 이동
   };
 
-  //검색을 위해서 사용자 목록과 프로젝트   목록을 가져오는 API 호출
+  // ===== API 호출: 사용자 목록과 프로젝트 목록 가져오기 =====
   useEffect(() => {
     const fetchUsersAndProjects = async () => {
       try {
         const response = await fetch(`${apiUrl}/user/get_users`);
         if (!response.ok) throw new Error("사용자 데이터를 불러오지 못했습니다.");
         const data = await response.json();
-        setUsers(data.users);
+        setUsers(data.users); // 사용자 목록 상태 업데이트
       } catch (err) {
         console.error("🚨 사용자 목록 불러오기 오류:", err);
       }
@@ -94,32 +143,34 @@ const SituationControls = () => {
         const response = await fetch(`${apiUrl}/project/get_all_project`);
         if (!response.ok) throw new Error("프로젝트 데이터를 불러오지 못했습니다.");
         const data = await response.json();
-
-        setProjects(data.projects);
+        setProjects(data.projects); // 프로젝트 목록 상태 업데이트
       } catch (error) {
         console.error("🚨 프로젝트 목록 불러오기 오류:", error);
       }
     };
   
-    fetchProjects();
-    fetchUsersAndProjects();
-  }, [location.pathname]); // ✅ location.pathname이 변경될 때마다 실행(페이지 이동 시)
+    fetchProjects(); // 프로젝트 목록 가져오기
+    fetchUsersAndProjects(); // 사용자 목록 가져오기
+  }, [location.pathname]); // 페이지 이동 시마다 데이터 새로 불러오기
   
+  // ===== 디버깅용 useEffect: 상태 변경 로깅 =====
   useEffect(() => {
     console.log("projects: ", projects);
   }, [projects]);
+  
   useEffect(() => {
     console.log("users: ", users);
   }, [users]);
+  
   useEffect(() => {
     console.log("selectedProjects: ", selectedProjects);
   }, [selectedProjects]);
+  
   useEffect(() => {
     console.log("selectedUsers: ", selectedUsers);
   }, [selectedUsers]);
 
-  
-  // 사용자가 선택한 유저들의 프로젝트 데이터 가져오기, 선택 안했으면 effectiveUsers로 모든 유저의 프로젝트
+  // ===== API 호출: 선택된 사용자들(effectiveUsers)의 프로젝트 데이터 가져오기 =====
   useEffect(() => {
     const fetchUserProjectData = async () => {
       const token = localStorage.getItem("token");
@@ -170,12 +221,15 @@ const SituationControls = () => {
 
     fetchUserProjectData();
   }, [effectiveUsers, apiUrl]); // effectiveUsers가 변경될 때마다 실행
-  // 검색한 프로젝트 필터링
+  
+  // ===== 프로젝트 검색 관련 함수들 =====
+  
+  // 검색어에 따라 프로젝트 필터링
   useEffect(() => {
     if (searchQueryProject.trim() === "") {
-      setFilteredProjects([]); // 검색어가 없을 경우 필터링된 프로젝트를 비웁니다.
+      setFilteredProjects([]); // 검색어가 없을 경우 필터링된 프로젝트 목록 비우기
     } else {
-      // 선택된 프로젝트를 제외한 프로젝트만 필터링
+      // 검색어와 일치하는 프로젝트 필터링 (이미 선택된 프로젝트는 제외)
       setFilteredProjects(
         projects.filter((proj) =>
           (proj.project_name || "")
@@ -187,44 +241,47 @@ const SituationControls = () => {
     }
   }, [searchQueryProject, projects, selectedProjects]);
 
-  // 검색 후 선택한 프로젝트 처리
+  // 검색 결과에서 프로젝트 선택 처리
   const selectProject = (project) => {
-    if (!selectedProjects.some((p) => p.project_code === project.project_code  )) {
+    // 이미 선택되지 않은 프로젝트만 추가
+    if (!selectedProjects.some((p) => p.project_code === project.project_code)) {
       setSelectedProjects([...selectedProjects, project]);
     }
-    setSearchQueryProject("");
-    setFilteredProjects([]);
+    setSearchQueryProject(""); // 검색어 초기화
+    setFilteredProjects([]); // 필터링된 목록 초기화
   };
 
-  // 선택한 프로젝트 리스트에서 삭제
+  // 선택된 프로젝트 제거
   const handleRemoveProject = (projectCode) => {
     setSelectedProjects(selectedProjects.filter((proj) => proj.project_code !== projectCode));
   };
 
-  // 검색한 유저 필터링
+  // ===== 사용자 검색 관련 함수들 =====
+  
+  // 검색어에 따라 사용자 필터링
   useEffect(() => {
     if (searchQueryUser.trim() === "") {
-      setFilteredUsers([]); // 검색어가 없을 경우 필터링된 프로젝트를 비웁니다.
+      setFilteredUsers([]); // 검색어가 없을 경우 필터링된 사용자 목록 비우기
     } else {
-      // 선택된 프로젝트를 제외한 프로젝트만 필터링
+      // 검색어와 일치하는 사용자 필터링 (이미 선택된 사용자는 제외)
       setFilteredUsers(
         users.filter((userdata) =>
           (userdata.name || "")
             .toLowerCase()
             .includes(searchQueryUser.toLowerCase()) &&
-          !selectedUsers.some((selectedProj) => selectedProj.name === userdata.name) // 선택된 프로젝트는 제외
+          !selectedUsers.some((selectedProj) => selectedProj.name === userdata.name) // 선택된 사용자는 제외
         )
       );
     }
   }, [searchQueryUser, users, selectedUsers]);
 
-  // selectedProjects나 selectedUsers가 변경될 때마다 effectiveUsers 계산
+  // ===== effectiveUsers 계산 (실제로 데이터를 보여줄 사용자 목록) =====
   useEffect(() => {
     if (selectedUsers.length > 0) {
-      // 사용자가 직접 선택한 경우, 선택된 사용자를 그대로 사용
+      // 1. 사용자가 직접 선택한 경우: 선택된 사용자를 그대로 사용
       setEffectiveUsers(selectedUsers);
     } else if (selectedProjects.length > 0) {
-      // 프로젝트만 선택한 경우, 해당 프로젝트에 할당된 모든 사용자 ID 가져오기
+      // 2. 프로젝트만 선택한 경우: 해당 프로젝트에 할당된 모든 사용자 찾기
       const assignedUserIds = selectedProjects.flatMap(
         project => project.assigned_user_ids || []
       );
@@ -239,63 +296,54 @@ const SituationControls = () => {
       
       setEffectiveUsers(projectUsers);
     } else {
-      // 아무것도 선택되지 않은 경우 모든 사용자 정보를 사용
+      // 3. 아무것도 선택되지 않은 경우: 모든 사용자 정보 사용
       setEffectiveUsers(users); 
     }
   }, [selectedProjects, selectedUsers, users]);
 
-  // 검색 후 선택한 유저 처리
+  // 검색 결과에서 사용자 선택 처리
   const selectUser = (user) => {
-    if (!selectedUsers.some((u) => u.id === user.id  )) {
+    // 이미 선택되지 않은 사용자만 추가
+    if (!selectedUsers.some((u) => u.id === user.id)) {
       setSelectedUsers([...selectedUsers, user]);
     }
-    setSearchQueryUser("");
-    setFilteredUsers([]);
+    setSearchQueryUser(""); // 검색어 초기화
+    setFilteredUsers([]); // 필터링된 목록 초기화
   };
 
-  // 선택한 유저 리스트에서 삭제
+  // 선택된 사용자 제거
   const handleRemoveUser = (id) => {
     setSelectedUsers(selectedUsers.filter((userdata) => userdata.id !== id));
   };
 
-  const getMonthStatus = (start, end) => {
-    const months = Array(12).fill(""); // 1월~12월 배열
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-
-    for (let i = 0; i < 12; i++) {
-      const monthDate = new Date(startDate.getFullYear(), i, 1);
-      if (monthDate >= startDate && monthDate <= endDate) {
-        months[i] = "O";
-      }
-    }
-    return months;
-  };
-
+  // 필터 적용 함수 - 현재는 날짜 필터만 설정됨
   const applyFilters = () => {
     setAppliedStart(startFilter);
     setAppliedEnd(endFilter);
   };
 
-  //Date형으로 전환하고 yearselector에 맞춰 표시해줄 데이터 조건 정리
+  // ===== 선택된 연도에 해당하는 프로젝트 필터링 =====
+  // 선택된 연도와 프로젝트에 맞는 데이터만 필터링
   const dateFilteredProjects = userprojects.filter(project => {
     const projectStartYear = new Date(project.start_date).getFullYear();
     const projectEndYear = new Date(project.end_date).getFullYear();
   
-    // ✅ 프로젝트가 선택한 연도(`year`)에 걸쳐 있고, 삭제되지 않은 프로젝트인지 확인
+    // 프로젝트가 선택한 연도에 걸쳐 있고, 삭제되지 않은 프로젝트인지 확인
     const isWithinYear = projectStartYear <= year && projectEndYear >= year && project.is_delete_yn !== "Y";
   
-    // ✅ selectedProjects가 비어 있으면 모든 프로젝트 포함, 아니라면 선택한 프로젝트만 포함
+    // selectedProjects가 비어 있으면 모든 프로젝트 포함, 아니라면 선택한 프로젝트만 포함
     const isSelected = selectedProjects.length === 0 || selectedProjects.some(selected => selected.project_code === project.project_code);
     
     return isWithinYear && isSelected;
   });
   
+  // 로딩 및 에러 처리
   if (loading) return <div className="userdetail-container">로딩 중...</div>;
   if (error) return <div className="userdetail-container">{error}</div>;
 
   const ChartView = ({ dateFilteredProjects }) => {
-    // 프로젝트별로 참가자들을 그룹화 (project_code 별)
+    // 프로젝트별로 참가자들을 그룹화 (project_code를 기준으로 데이터 그룹화)
+    // 같은 프로젝트 코드를 가진 모든 항목들을 하나의 배열로 모음
     const groupedProjects = dateFilteredProjects.reduce((acc, project) => {
       if (!acc[project.project_code]) {
         acc[project.project_code] = [];
@@ -304,19 +352,23 @@ const SituationControls = () => {
       return acc;
     }, {});
   
+    // 사용자 ID를 기반으로 사용자 이름을 찾는 헬퍼 함수
+    // users 배열에서 해당 ID를 가진 사용자 정보를 조회하여 이름 반환
     const getUserName = (userId) => {
       const user = users.find(user => user.id === userId);
       return user ? user.name : "Unknown";
     };
   
     // 사람만 검색했는지 확인 (프로젝트는 선택하지 않고 사람만 선택한 경우)
+    // 프로젝트 필터가 없고 사용자 필터만 있는 경우를 확인
     const isOnlyUserSelected = selectedProjects.length === 0 && selectedUsers.length > 0;
   
     // 사람 기준으로 그룹화하는 함수 (사람만 검색했을 때 사용)
+    // 사용자 ID를 키로 하여 해당 사용자가 참여한 모든 프로젝트를 그룹화
     const groupedByUsers = () => {
       const result = {};
       
-      // 사용자 ID별로 그룹화
+      // 사용자 ID별로 프로젝트 데이터 그룹화
       dateFilteredProjects.forEach(project => {
         if (!result[project.user_id]) {
           result[project.user_id] = [];
@@ -327,18 +379,22 @@ const SituationControls = () => {
       return result;
     };
   
-    // 사람만 검색한 경우와 그 외의 경우를 구분하여 다른 렌더링 로직 사용
+    // 사람만 검색한 경우를 구분하여 다른 렌더링 로직 사용
+    // 사람을 위에 표시하고, 프로젝트를 아래에 표시
     if (isOnlyUserSelected) {
+      // 사용자 ID를 기준으로 프로젝트 데이터 그룹화
       const userGroups = groupedByUsers();
       
       return (
         <div className="project-chart">
+          {/* 각 사용자 그룹별로 순회하며 차트 생성 */}
           {Object.keys(userGroups).map((userId) => {
-            const userProjects = userGroups[userId];
-            const userName = getUserName(userId);
+            const userProjects = userGroups[userId]; // 해당 사용자의 모든 프로젝트
+            const userName = getUserName(userId); // 사용자 이름 조회
             
             return (
               <div key={userId} className="project-chart-row">
+                {/* 사용자 이름 표시 - 클릭 시 해당 사용자 상세 페이지로 이동 */}
                 <div
                   className="project-chart-title"
                   onClick={() => navigate(`/user-details?user_id=${userId}`)}
@@ -348,19 +404,25 @@ const SituationControls = () => {
                 
                 {/* 해당 사용자의 프로젝트별 차트 표시 */}
                 {userProjects.map((project) => {
+                  // 프로젝트 시작일과 종료일 파싱
                   const startDate = new Date(project.start_date);
                   const endDate = new Date(project.end_date);
                   
+                  // 유효하지 않은 날짜인 경우 렌더링하지 않음
                   if (isNaN(startDate) || isNaN(endDate)) {
                     return null;
                   }
                   
-                  // 각 프로젝트의 참여 월 계산
+                  // 각 프로젝트의 참여 월 계산 (연도*100 + 월 형식으로 저장)
+                  // 예: 2023년 5월 = 202305
                   const months = [];
                   for (let projectYear = startDate.getFullYear(); projectYear <= endDate.getFullYear(); projectYear++) {
+                    // 시작 연도인 경우 실제 시작 월부터, 아니면 1월(0)부터 시작
                     let start = projectYear === startDate.getFullYear() ? startDate.getMonth() : 0;
+                    // 종료 연도인 경우 실제 종료 월까지, 아니면 12월(11)까지 포함
                     let end = projectYear === endDate.getFullYear() ? endDate.getMonth() : 11;
                     
+                    // 해당 연도의 모든 참여 월을 배열에 추가
                     for (let month = start; month <= end; month++) {
                       months.push(projectYear * 100 + month);
                     }
@@ -369,25 +431,28 @@ const SituationControls = () => {
                   return (
                     <div key={project.project_code} className="project-chart-user">
                       <div className="project-chart-months">
-                        {/* 프로젝트 이름을 표시 */}
+                        {/* 프로젝트 이름을 표시 - 클릭 시 해당 프로젝트 상세 페이지로 이동 */}
                         <span 
                           className="project-chart-user-name" 
                           onClick={(event) => {
-                            event.stopPropagation();
+                            event.stopPropagation(); // 이벤트 버블링 방지
                             navigate(`/project-details?project_code=${project.project_code}`);
                           }}
                           style={{ cursor: "pointer" }}
                         >
                           {project.project_name}
                         </span>
+                        {/* 1월부터 12월까지 각 월별 참여 여부를 시각화 */}
                         {Array.from({ length: 12 }, (_, idx) => {
-                          const isHighlighted = months.includes(year * 100 + idx); // year 가 포함되면 하이라이트
+                          // 해당 월이 프로젝트 참여 기간에 포함되는지 확인
+                          // year 변수는 외부에서 선언된 것 (현재 선택된 연도)
+                          const isHighlighted = months.includes(year * 100 + idx);
                           return (
                             <span
                               key={idx}
                               className={`project-month ${isHighlighted ? 'highlighted' : ''}`}
                             >
-                              {idx + 1}
+                              {idx + 1} {/* 월 표시 (1~12) */}
                             </span>
                           );
                         })}
@@ -405,35 +470,46 @@ const SituationControls = () => {
     // 기존의 프로젝트 중심 뷰 (프로젝트 선택 시 또는 아무것도 선택하지 않은 경우)
     return (
       <div className="project-chart">
-        {/* 기존 코드 유지 */}
+        {/* 각 프로젝트 그룹별로 순회하며 차트 생성 */}
         {Object.keys(groupedProjects).map((projectCode) => {
-          const projects = groupedProjects[projectCode];
-          const project = projects[0];
+          const projects = groupedProjects[projectCode]; // 해당 프로젝트 코드의 모든 데이터
+          const project = projects[0]; // 첫 번째 프로젝트 데이터 사용 (대표값)
+          // 프로젝트 시작일과 종료일 파싱
           const startDate = new Date(project.start_date);
           const endDate = new Date(project.end_date);
   
+          // 유효하지 않은 날짜인 경우 렌더링하지 않음
           if (isNaN(startDate) || isNaN(endDate)) {
             return null;
           }
   
+          // 프로젝트 시작 및 종료 연도 추출
           const startYear = startDate.getFullYear();
           const endYear = endDate.getFullYear();
+          // 프로젝트 전체 기간의 월 목록 계산 (연도*100 + 월 형식)
           const months = [];
   
+          // 시작 연도부터 종료 연도까지 모든 해당 월을 계산
           for (let year = startYear; year <= endYear; year++) {
+            // 시작 연도인 경우 실제 시작 월부터, 아니면 1월(0)부터 시작
             let start = year === startYear ? startDate.getMonth() : 0;
+            // 종료 연도인 경우 실제 종료 월까지, 아니면 12월(11)까지 포함
             let end = year === endYear ? endDate.getMonth() : 11;
   
+            // 해당 연도의 모든 참여 월을 배열에 추가
             for (let month = start; month <= end; month++) {
               months.push(year * 100 + month);
             }
           }
   
+          // 프로젝트에 참여한 각 사용자별 참여 월 정보 계산
           const usersParticipation = projects.reduce((acc, project) => {
-            const user = project.user_id;
+            const user = project.user_id; // 사용자 ID
+            // 해당 프로젝트-사용자 조합의 시작일과 종료일
             const startDate = new Date(project.start_date);
             const endDate = new Date(project.end_date);
   
+            // 해당 사용자의 프로젝트 참여 월 계산
             const userMonths = [];
             for (let year = startDate.getFullYear(); year <= endDate.getFullYear(); year++) {
               let start = year === startDate.getFullYear() ? startDate.getMonth() : 0;
@@ -444,6 +520,7 @@ const SituationControls = () => {
               }
             }
   
+            // 사용자별 참여 월 정보를 누적
             if (!acc[user]) {
               acc[user] = [];
             }
@@ -453,6 +530,7 @@ const SituationControls = () => {
   
           return (
             <div key={projectCode} className="project-chart-row">
+              {/* 프로젝트 이름 표시 - 클릭 시 해당 프로젝트 상세 페이지로 이동 */}
               <div
                 className="project-chart-title"
                 onClick={() => navigate(`/project-details?project_code=${projectCode}`)}
@@ -460,29 +538,34 @@ const SituationControls = () => {
                 {project.project_name}
               </div>
   
+              {/* 해당 프로젝트에 참여한 각 사용자별 차트 표시 */}
               {Object.keys(usersParticipation).map((userId) => {
-                const userMonths = usersParticipation[userId];
+                const userMonths = usersParticipation[userId]; // 해당 사용자의 참여 월 목록
                 return (
                   <div key={userId} className="project-chart-user">
                     <div className="project-chart-months">
+                      {/* 사용자 이름 표시 - 클릭 시 해당 사용자 상세 페이지로 이동 */}
                       <span 
                         className="project-chart-user-name" 
                         onClick={(event) => {
-                          event.stopPropagation();
+                          event.stopPropagation(); // 이벤트 버블링 방지
                           navigate(`/user-details?user_id=${userId}`);
                         }}
                         style={{ cursor: "pointer" }}
                       >
                         {getUserName(userId)}
                       </span>
+                      {/* 1월부터 12월까지 각 월별 참여 여부를 시각화 */}
                       {Array.from({ length: 12 }, (_, idx) => {
-                        const isHighlighted = userMonths.includes(year * 100 + idx); // 수정된 부분: startYear -> year
+                        // 해당 월이 사용자의 프로젝트 참여 기간에 포함되는지 확인
+                        // year 변수는 외부에서 선언된 것으로 보임 (현재 선택된 연도)
+                        const isHighlighted = userMonths.includes(year * 100 + idx);
                         return (
                           <span
                             key={idx}
                             className={`project-month ${isHighlighted ? 'highlighted' : ''}`}
                           >
-                            {idx + 1}
+                            {idx + 1} {/* 월 표시 (1~12) */}
                           </span>
                         );
                       })}
@@ -496,7 +579,7 @@ const SituationControls = () => {
       </div>
     );
   };
-  
+
   // ✅ 표 형태로 보여주는 컴포넌트
   const TableView = ({ dateFilteredProjects }) => {
     const navigate = useNavigate(); // ✅ 네비게이션 훅 사용
@@ -659,7 +742,7 @@ const SituationControls = () => {
           </div>
         </div>
         <div className="year-selector">
-        <button className="year-button" onClick={() => setYear(year - 1)}>◀</button>
+          <button className="year-button" onClick={() => setYear(year - 1)}>◀</button>
           <span className="year-text">{year}년</span>
           <button className="year-button" onClick={() => setYear(year + 1)}>▶</button>
         </div>
