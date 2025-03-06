@@ -88,7 +88,7 @@ const LoginPage = () => {
 
         // ✅ 최초 로그인 여부에 따라 라우팅
         if (data.user.first_login_yn === "Y") {
-          navigate("/projects", { replace: true });
+          navigate("/calendar", { replace: true });
         } else if (data.user.first_login_yn === "N") {
           navigate("/change-pw", { replace: true });
         }
