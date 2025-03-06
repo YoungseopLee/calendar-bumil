@@ -3,10 +3,26 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import "./ProjectDetails.css";
 
+/**
+ * 📌 ProjectDetails - 프로젝트 상세 정보를 조회하는 페이지
+ *
+ * ✅ 주요 기능:
+ *  - 특정 프로젝트 코드(project_code)에 대한 상세 정보 조회
+ *  - 프로젝트 참여자 목록 표시
+ *  - 로그인한 사용자 정보 확인 후 권한에 따라 프로젝트 수정 버튼 표시
+ * 
+ * ✅ UI(또는 Component) 구조:
+ *  - ProjectDetails (메인 페이지)
+ *    ├── Sidebar (사이드바)
+ *    ├── ProjectTable (프로젝트 기본 정보 테이블) 추후 컴포넌트로 분리 가능
+ *    ├── ProjectUsersTable (참여자 목록 테이블) 추후 컴포넌트로 분리 가능
+ *    ├── 프로젝트 수정 버튼 (관리자 권한 사용자만 접근 가능)
+ */
+
 const ProjectDetails = () => {
-  const [employees, setEmployees] = useState([]);
-  const [loggedInUserId, setLoggedInUserId] = useState(null);
-  const [Project, setProject] = useState(null); // 이 페이지에 표시할 프로젝트 정보(projectCode로 불러옴)
+  const [employees, setEmployees] = useState([]); // 전체 사원 목록
+  const [loggedInUserId, setLoggedInUserId] = useState(null); // 로그인한 사용자 ID
+  const [Project, setProject] = useState(null); // 현재 프로젝트 상세 정보
   const [loading, setLoading] = useState(true); // 로딩 상태 표시
   const [error, setError] = useState(null); // 에러 메시지
 
@@ -14,12 +30,13 @@ const ProjectDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // ✅ URL에서 project_code 가져오기
   const projectCode = new URLSearchParams(location.search).get("project_code");
 
-  // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
+  // ✅ 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
   const user = JSON.parse(localStorage.getItem("user"));
 
-  //필드 매핑(표시해야 할 프로젝트 요소가 추가되면 여기서 매핑해줘야 함, 그래야 표에 표시됨)
+  // ✅ 필드 매핑(표시해야 할 프로젝트 요소가 추가되면 여기서 매핑해줘야 함, 그래야 표에 표시됨)
   const fieldMappings = {
     project_code: "프로젝트 코드",
     project_name: "프로젝트 명",
@@ -36,7 +53,7 @@ const ProjectDetails = () => {
     changes: "비고",
   };
 
-  // 사용자 로그인 확인
+  // ✅ 사용자 로그인 확인
   useEffect(() => {
     fetchLoggedInUser();
 
@@ -47,24 +64,24 @@ const ProjectDetails = () => {
     }
   }, []);
 
-  // 프로젝트 코드가 변경될 때 마다 fetchProjectDetails실행
+  // ✅ 프로젝트 코드가 변경될 때 마다 fetchProjectDetails실행
   useEffect(() => {
     if (projectCode) {
       fetchProjectDetails();
     }
   }, [projectCode]);
 
-  //Employee 업데이트 확인
+  // ✅ 프로젝트 코드가 변경될 때마다 상세 정보 조회
   useEffect(() => {
     console.log("Employees 업데이트됨:", employees);
   }, [employees]); // Project가 변경될 때마다 실행
 
-  //프로젝트 인원 상태 표시에 필요한 인원 목록 데이터 불러오기
+  // ✅ 프로젝트 참여 인원 목록 불러오기
   useEffect(() => {
     fetchEmployees();
   }, []);
 
-  //로그아웃 처리 함수
+  // ✅ 로그아웃 처리 함수
   const handleLogout = () => {
     alert("세션이 만료되었습니다. 다시 로그인해주세요.");
     localStorage.removeItem("token");
@@ -72,7 +89,7 @@ const ProjectDetails = () => {
     navigate("/");
   };
 
-  //프로젝트 상세정보 받아오는 API 사용하는 함수
+  // ✅ 프로젝트 상세정보 조회 API 호출
   const fetchProjectDetails = async () => {
     setLoading(true);
     try {
@@ -92,7 +109,7 @@ const ProjectDetails = () => {
     }
   };
 
-  //로그인 유저 확인 함수
+  // ✅ 로그인한 사용자 정보 가져오기
   const fetchLoggedInUser = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -122,7 +139,7 @@ const ProjectDetails = () => {
     }
   };
 
-  //사용자 목록 데이터 가져오기(프로젝트 인원 상태 표시에 필요함)
+  // ✅ 사용자 목록 데이터 가져오기 (프로젝트 인원 상태 표시에 필요함)
   const fetchEmployees = async () => {
     try {
       const response = await fetch(`${apiUrl}/user/get_users`);
@@ -139,23 +156,23 @@ const ProjectDetails = () => {
     }
   };
 
-  //로딩 중 또는 에러 발생 시 표시
+  // ✅ 데이터 로딩 중 또는 에러 발생 시 처리
   if (loading) return <p>데이터를 불러오는 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
 
+  // ✅ 프로젝트 수정 페이지로 이동
   const handleEditClick = () => {
     navigate(`/project-edit?project_code=${projectCode}`);
   };
 
-  //날짜 형식 변환 함수 ("Thu, 27 Feb 2025 00:00:00 GMT" → "2025-02-27" 변환)
-  // ProjectEdit.js의 함수와 다름(여기서는 표에 표시만 하기 때문에 날짜가 아니면 변환하지 않음)
+  // ✅ 날짜 형식 변환 함수 (YYYY-MM-DD)
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    if (isNaN(date)) return dateString; // 날짜가 아니면 변환하지 않음
-    return date.toISOString().split("T")[0]; // 'YYYY-MM-DD' 형식으로 변환
+    if (isNaN(date)) return dateString; 
+    return date.toISOString().split("T")[0]; 
   };
 
-  //프로젝트 정보 표를 표시하는 컴포넌트
+  // ✅ 프로젝트 상세 정보 테이블 컴포넌트
   const ProjectTable = ({ project }) => {
     return (
       <table className="project-table">
@@ -180,7 +197,7 @@ const ProjectDetails = () => {
     );
   };
 
-  //참여자 목록 표를 표시하는 컴포넌트
+  // ✅ 프로젝트 참여 인력 목록 테이블 컴포넌트
   const Projectuserstable = ({ project_users, employees }) => {
     console.log("project_users : ", project_users);
     if (!project_users || project_users.length === 0) {
