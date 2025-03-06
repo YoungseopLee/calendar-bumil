@@ -93,7 +93,6 @@
 .sticky-header {
     position: sticky;
     top: 0;
-    z-index: 10;
     background-color: #f9f9f9;
     border-bottom: 2px solid #ddd;
 }

@@ -21,6 +21,10 @@ const Sidebar = () => {
     setIsOpen(!isOpen);
   };
 
+  const closeSidebar = () => {
+    setIsOpen(false);
+  };
+
   const handleManagerClick = () => {
     if (isAdmin) {
       navigate("/manager");
@@ -41,6 +45,9 @@ const Sidebar = () => {
       <button className="hamburger-btn" onClick={toggleSidebar}>
         <FiMenu size={28} color="#333" />
       </button>
+
+      {/* 오버레이 (사이드바 외부 클릭 시 닫힘) */}
+      {isOpen && <div className="overlay" onClick={closeSidebar}></div>}
 
       {/* ✅ 사이드바 메뉴 */}
       {isOpen && (

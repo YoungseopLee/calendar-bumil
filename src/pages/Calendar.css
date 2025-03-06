@@ -26,7 +26,6 @@ body {
   position: sticky;
   top: 0;
   background-color: white;
-  z-index: 10; /* 네비게이션이 캘린더 위에 고정되도록 설정 */
 }
 
 .calendar-navigation .nav-button {

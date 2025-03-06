@@ -3,7 +3,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 200px;
+  width: 40%;
+  max-width: 180px;
   background-color: #f8f9fa;
   color: #343a40;
   min-height: 100vh;  /* 최소 높이: 전체 화면 */
@@ -83,4 +84,16 @@
 
 .logout-link:hover {
   background-color: #b02a37;
+}
+
+/* 오버레이 스타일 */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.249) !important; /* ✅ 강제 적용 */
+  z-index: 9;
+  display: block; /* ✅ 보이도록 설정 */
 }

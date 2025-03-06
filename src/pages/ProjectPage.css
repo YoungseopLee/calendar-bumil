@@ -208,7 +208,6 @@
     position: sticky;
     top: 0;
     background-color: white;  /* 배경색 */
-    z-index: 1100;  /* 사이드바보다 높은 값으로 설정 */
     padding: 10px 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);  /* 그림자 효과 */
     margin-top: 15px;
