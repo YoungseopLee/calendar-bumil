@@ -7,7 +7,7 @@
     margin-bottom: 8px;
 }
 
-/* ✅ 참여자 선택 바 크기 조정 */
+/* ✅ 참여자 선택 바  */
 .react-select-container {
     flex-grow: 1;
     font-size: 14px;
@@ -69,7 +69,7 @@
     color: darkred;
 }
 
-/* ✅ 참여자 날짜 입력 바 크기 조정 */
+/* ✅ 참여자 날짜 입력 바 */
 .small-date-input {
     width: 120px;
     padding: 6px;
