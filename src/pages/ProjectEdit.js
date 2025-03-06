@@ -2,9 +2,25 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Select from "react-select";
-import "./ProjectDetails.css";
+import "./ProjectEdit.css";
 
-// date 문자열을 "YYYY-MM-DD" 형식으로 변환하는 함수
+/**
+ * 📌 ProjectEdit - 프로젝트 수정 페이지
+ *
+ * ✅ 주요 기능:
+ *  - 프로젝트 상세 정보 조회 (GET /project/get_project_details)
+ *  - 프로젝트 정보 수정 및 저장 (POST /project/update_project)
+ *  - 참여 가능한 사용자 목록 조회 (GET /user/get_users)
+ *  - 프로젝트 참여자 추가 및 제거
+ *
+ * ✅ UI(또는 Component) 구조:
+ *  - ProjectEdit (메인 페이지)
+ *    ├── Sidebar (사이드바)
+ *    ├── 프로젝트 정보 입력 폼
+ *    ├── 참여자 추가/제거 UI
+ */
+
+ // 날짜를 "YYYY-MM-DD" 형식으로 변환하는 유틸리티 함수
 const formatDate = (dateString) => {
   if (!dateString) return "";
   const date = new Date(dateString);
@@ -12,24 +28,26 @@ const formatDate = (dateString) => {
 };
 
 const ProjectEdit = () => {
-  const [employees, setEmployees] = useState([]);
-  const [Project, setProject] = useState(null); // 프로젝트 정보 (project_code로 불러옴)
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [message, setMessage] = useState(""); // 저장 메시지
-  const [selectedUser, setSelectedUser] = useState(null); // 추가할 유저 선택
+  // 상태관리 (State)
+  const [employees, setEmployees] = useState([]); // 전체 유저 목록
+  const [Project, setProject] = useState(null); // 프로젝트 상세 정보
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태
+  const [error, setError] = useState(null); // 에러 메세지
+  const [message, setMessage] = useState(""); // 저장 성공여부 메시지
+  const [selectedUser, setSelectedUser] = useState(null); // 새로 추가할 유저 선택
   const [users, setUsers] = useState([]); // 참여 가능한 유저 목록
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
   const location = useLocation();
 
+  // 현재 페이지 URL 에서 프로젝트 코드 가져오기
   const projectCode = new URLSearchParams(location.search).get("project_code");
 
-  // 로그인한 사용자 정보 (localStorage에 저장된 최신 정보)
+  // 로그인한 사용자 정보 (localStorage에서 불러옴)
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // 화면에 표시할 프로젝트 필드 매핑
+  // 프로젝트 필드 매핑 (UI에서 표시할 필드명 설정)
   const fieldMappings = {
     project_code: "프로젝트 코드",
     project_name: "프로젝트 명",
@@ -46,7 +64,7 @@ const ProjectEdit = () => {
     changes: "비고",
   };
 
-  // 로그인한 사용자 정보 최신화 및 체크
+  // 🔄 **1. 로그인한 사용자 정보 확인 및 권한 체크**
   useEffect(() => {
     fetchLoggedInUser();
     if (!user) {
@@ -55,7 +73,6 @@ const ProjectEdit = () => {
       return;
     }
 
-    // 권한 체크
     if (user.role_id !== "AD_ADMIN" && user.role_id !== "PR_ADMIN") {
       alert("관리자 권한이 없습니다.");
       navigate("/");
@@ -63,14 +80,14 @@ const ProjectEdit = () => {
     }
   }, []);
 
-  // 프로젝트 코드가 변경되면 상세정보 불러오기
+  // 🔄 **2. 프로젝트 코드가 변경되면 상세 정보 가져오기**
   useEffect(() => {
     if (projectCode) {
       fetchProjectDetails();
     }
   }, [projectCode]);
 
-  // employees 업데이트 확인 및 참여 가능한 유저 목록 업데이트
+  // 🔄 **3. 직원 목록이 업데이트될 때 참여 가능한 사용자 목록 갱신**
   useEffect(() => {
     console.log("Employees 업데이트됨:", employees);
     // 이미 할당된 유저 ID 목록(Set으로 변환)
@@ -90,17 +107,17 @@ const ProjectEdit = () => {
     setUsers(availableUsers);
   }, [employees, Project?.assigned_user_ids]);
 
-  // employees가 변경되면 로그 출력
+  // 🔄 **4. users가 변경될 때 로그 출력**
   useEffect(() => {
     console.log("users 업데이트됨:", users);
   }, [users]);
 
-  // 프로젝트 인원 표시에 필요한 employees 목록 불러오기
+  // 🔄 **5. 직원 목록 가져오기**
   useEffect(() => {
     fetchEmployees();
   }, []);
 
-  // 로그아웃 함수
+  // ✅ 로그아웃 함수 - 세션이 만료되었을 경우 사용자 정보를 삭제하고 로그인 페이지로 이동
   const handleLogout = () => {
     alert("세션이 만료되었습니다. 다시 로그인해주세요.");
     localStorage.removeItem("token");
@@ -108,7 +125,7 @@ const ProjectEdit = () => {
     navigate("/");
   };
 
-  // 프로젝트 상세정보 API 호출
+  // ✅ 프로젝트 상세정보 API 호출
   const fetchProjectDetails = async () => {
     setLoading(true);
     try {
@@ -128,7 +145,9 @@ const ProjectEdit = () => {
     }
   };
 
-  // 로그인한 사용자 정보 API 호출
+
+  // ✅ 현재 로그인한 사용자의 정보를 API에서 가져옴
+  // ✅ 사용자 정보가 없거나 세션이 만료되었을 경우 자동 로그아웃 처리
   const fetchLoggedInUser = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -153,7 +172,7 @@ const ProjectEdit = () => {
     }
   };
 
-  // employees 목록 API 호출
+  // ✅ 현재 시스템에 등록된 모든 직원 목록을 API 에서 불러옴
   const fetchEmployees = async () => {
     try {
       const response = await fetch(`${apiUrl}/user/get_users`);
@@ -168,10 +187,11 @@ const ProjectEdit = () => {
     }
   };
 
+  // ✅ 로딩 중 또는 에러 시 화면에 표시할 메세지
   if (loading) return <p>데이터를 불러오는 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
 
-  // 상위 필드 변경 핸들러 (프로젝트의 top-level 필드 업데이트)
+  // ✅ 입력 필드 값 변경 시 Project 상태 업데이트
   const handleChange = (key, value) => {
     setProject((prevProject) => ({
       ...prevProject,
@@ -179,12 +199,11 @@ const ProjectEdit = () => {
     }));
   };
 
-  // 참여자 날짜 업데이트 함수
+  // ✅ 참여자의 참여 날짜 변경 시 업데이트 함수
   const handleParticipantDateChange = (participantId, field, value) => {
     setProject((prevProject) => ({
       ...prevProject,
       project_users: prevProject.project_users.map((participant) =>
-        // participant.id를 기준으로 업데이트 (각 참여자마다 고유 ID 존재)
         participant.id === participantId
           ? { ...participant, [field]: value }
           : participant
@@ -192,7 +211,7 @@ const ProjectEdit = () => {
     }));
   };
 
-  // 참여자 제거 핸들러
+  // ✅ 선택된 참여자 프로젝트에서 삭제
   const handleRemoveParticipant = (participantId) => {
     setProject((prevProject) => {
       const updatedParticipants = prevProject.project_users.filter(
@@ -205,13 +224,13 @@ const ProjectEdit = () => {
     });
   };
 
-  // 참여자 목록 표 컴포넌트
+  // ✅ 사용자 입력을 기반으로 프로젝트 정보를 API 로 업데이트, 참여자 목록도 함께 저장
   const Projectuserstable = ({ project_users, employees }) => {
     if (!project_users || project_users.length === 0) {
       return <p>참여 인원이 없습니다.</p>;
     }
 
-    // 참여자 정보 매칭
+    // ✅ 참여자 정보 매칭
     const matchedParticipants = project_users.map((participant) => {
       const employee = employees.find(
         (emp) => emp.id.toString() === participant.user_id.toString()
@@ -332,7 +351,7 @@ const ProjectEdit = () => {
     }
   };
 
-  // 참여자 추가 핸들러
+  // 참여자 추가 
   const handleAddParticipant = () => {
     if (!selectedUser) {
       alert("추가할 참여자를 선택하세요.");
@@ -378,7 +397,7 @@ const ProjectEdit = () => {
     setSelectedUser(null);
   };
 
-  // 프로젝트 삭제 핸들러
+  // 사용자가 삭제를 확정하면 삭제 API 호출
   const deleteProject = async (project_code) => {
     const confirmDelete = window.confirm(
       "정말로 이 프로젝트를 삭제하시겠습니까?"

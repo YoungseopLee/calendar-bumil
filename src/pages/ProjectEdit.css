@@ -1,0 +1,168 @@
+/* ✅ 프로젝트 상세 정보 컨테이너 */
+.project-container {
+    width: 100%; /* 전체 너비 */
+    max-width: 600px; /* 최대 너비 설정 */
+    background: white; /* 배경색 */
+    border-radius: 8px; /* 모서리 둥글게 */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    padding: 8px; /* 내부 여백 */
+    font-family: Arial, sans-serif; /* 기본 폰트 */
+  }
+  
+  /* ✅ 프로젝트 상세 정보 제목 */
+  .project-title2 {
+    margin-left: 55px; /* 왼쪽 여백 */
+    float: left; /* 왼쪽 정렬 */
+    font-size: 18px; /* 폰트 크기 */
+    font-weight: bold; /* 글자 굵게 */
+    color: #333; /* 글자 색상 */
+    margin-bottom: 10px; /* 아래 여백 */
+  }
+  
+  /* ✅ 프로젝트 수정 버튼 */
+  .EditProjectButton {
+    margin-right: 10px; /* 오른쪽 여백 */
+    background-color: #007bff; /* 배경색 (파란색) */
+    color: white; /* 글자 색상 (흰색) */
+    border: none; /* 테두리 없음 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    padding: 10px 20px; /* 내부 여백 */
+    cursor: pointer; /* 마우스 커서 변경 */
+    font-size: 1em; /* 폰트 크기 */
+    transition: background-color 0.3s ease; /* 부드러운 색상 전환 */
+  }
+  
+  /* ✅ 프로젝트 목록 버튼 */
+  .project-list-button {
+    margin-right: 10px; /* 오른쪽 여백 */
+    background-color: #007bff; /* 배경색 (파란색) */
+    color: white; /* 글자 색상 */
+    border: none; /* 테두리 없음 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    padding: 5px 10px; /* 내부 여백 */
+    cursor: pointer; /* 마우스 커서 변경 */
+    font-size: 0.8em; /* 폰트 크기 */
+    transition: background-color 0.3s ease; /* 부드러운 색상 전환 */
+  }
+  
+  /* ✅ 프로젝트 수정 저장 버튼 */
+  .edit-save-button {
+    margin: 10px; /* 바깥 여백 */
+    background-color: #007bff; /* 배경색 (파란색) */
+    color: white; /* 글자 색상 */
+    border: none; /* 테두리 없음 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    padding: 10px 20px; /* 내부 여백 */
+    cursor: pointer; /* 마우스 커서 변경 */
+    font-size: 1em; /* 폰트 크기 */
+    transition: background-color 0.3s ease; /* 부드러운 색상 전환 */
+  }
+  
+  /* ✅ 프로젝트 수정 취소 버튼 */
+  .edit-cancel-button {
+    margin: 10px; /* 바깥 여백 */
+    background-color: #dc3545; /* 배경색 (빨간색) */
+    color: white; /* 글자 색상 */
+    border: none; /* 테두리 없음 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    padding: 10px 20px; /* 내부 여백 */
+    cursor: pointer; /* 마우스 커서 변경 */
+    font-size: 1em; /* 폰트 크기 */
+    transition: background-color 0.3s ease; /* 부드러운 색상 전환 */
+  }
+  
+  /* ✅ 프로젝트 삭제 버튼 */
+  .edit-delete-button {
+    margin: 10px; /* 바깥 여백 */
+    margin-left: 10px; /* 왼쪽 여백 */
+    background-color: #ff5a5a; /* 배경색 (밝은 빨간색) */
+    color: white; /* 글자 색상 */
+    border: none; /* 테두리 없음 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    padding: 10px 20px; /* 내부 여백 */
+    cursor: pointer; /* 마우스 커서 변경 */
+    font-size: 1em; /* 폰트 크기 */
+    transition: background-color 0.3s ease; /* 부드러운 색상 전환 */
+  }
+  
+  /* ✅ 버튼을 감싸는 컨테이너 */
+  .edit-button-container {
+    display: flex; /* 가로 정렬 */
+    justify-content: space-between; /* 좌우 끝으로 정렬 */
+    align-items: center; /* 수직 중앙 정렬 */
+    margin-bottom: 10px; /* 아래 여백 */
+    margin-top: 5px; /* 위 여백 */
+  }
+  
+  /* ✅ 섹션 제목 스타일 */
+  .section-title {
+    float: left; /* 왼쪽 정렬 */
+    font-size: 16px; /* 폰트 크기 */
+    font-weight: bold; /* 글자 굵게 */
+    color: #007acc; /* 글자 색상 (파란색) */
+    margin-bottom: 10px; /* 아래 여백 */
+  }
+  
+  /* ✅ 프로젝트 정보 테이블 */
+  .project-table {
+    width: 100%; /* 전체 너비 */
+    border-collapse: collapse; /* 테두리 겹침 제거 */
+  }
+  
+  /* ✅ 테이블 헤더 및 데이터 셀 스타일 */
+  .project-table th, .project-table td {
+    border: 1px solid #ddd; /* 테두리 색상 */
+    padding: 10px; /* 내부 여백 */
+    text-align: left; /* 텍스트 왼쪽 정렬 */
+  }
+  
+  /* ✅ 테이블 헤더 스타일 */
+  .project-table th {
+    background: #f8f8f8; /* 배경색 */
+    font-weight: bold; /* 글자 굵게 */
+    width: 30%; /* 헤더 너비 */
+  }
+  
+  /* ✅ 날짜 입력 필드 컨테이너 */
+  .project-table datebox {
+    display: flex; /* 가로 정렬 */
+    align-items: center; /* 수직 중앙 정렬 */
+    gap: 10px; /* 요소 간격 */
+  }
+  
+  /* ✅ 테이블의 짝수 행 배경색 변경 */
+  .project-table tr:nth-child(even) td {
+    background: #f9f9f9;
+  }
+  
+  /* ✅ 날짜 입력 필드 스타일 */
+  .project-table input[type="date"] {
+    line-height: 40px;
+    display: inline-block;
+  }
+  
+  /* ✅ 테이블 내 입력 필드 및 텍스트 영역 스타일 */
+  .project-table input,
+  .project-table textarea {
+    width: 90%; /* 너비 */
+    padding: 8px; /* 내부 여백 */
+    font-size: 1em; /* 폰트 크기 */
+    border: 1px solid #ccc; /* 테두리 색상 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease; /* 전환 효과 */
+    height: 40px;
+    resize: vertical; /* 세로 크기 조절 가능 */
+  }
+  
+  /* ✅ 입력 필드 포커스 효과 */
+  .project-table input:focus,
+  .project-table textarea:focus {
+    border-color: #007bff; /* 테두리 색상 변경 (파란색) */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* 그림자 효과 */
+    outline: none; /* 기본 아웃라인 제거 */
+  }
+  
+  /* ✅ 폼 섹션 */
+  .form-section {
+    margin-left: 10px; /* 왼쪽 여백 */
+  }
