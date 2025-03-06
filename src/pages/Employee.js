@@ -228,7 +228,7 @@ const EmployeeList = () => {
         <div className="employee-list-container">
           {/* 🏷️ 인덱스 바 - sticky로 변경 */}
           <div className="employee-index-bar sticky-header">
-            <span className="index-item">즐겨찾기</span>
+            <span className="index-item-1">즐겨찾기</span>
             <span className="index-item">이름</span>
             <span className="index-item">직급</span>
             <span className="index-item">상태</span>
@@ -285,7 +285,17 @@ const EmployeeList = () => {
                       ))}
                     </select>
                   ) : (
-                    <span>{employee.status}</span>
+                    <span className="status-dropdown2">
+                      {employee.status === "DISPATCH"
+                        ? "파견"
+                        : employee.status === "HQ"
+                        ? "본사"
+                        : employee.status === "LEAVE"
+                        ? "휴가"
+                        : employee.status === "OUT"
+                        ? "외근"
+                        : employee.status}
+                    </span>
                   )}
                 </li>
               ))}

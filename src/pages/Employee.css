@@ -61,6 +61,7 @@
     font-weight: bold;
     transition: transform 0.2s ease-in-out, background-color 0.3s ease;
     cursor: pointer;
+    grid-template-columns: 50px 1fr 1fr 1fr; /* 동일한 너비 설정 */
 }
 
 .favorite-item:hover, .employee-item:hover {
@@ -80,12 +81,19 @@
     border-radius: 6px;
     margin-top: 0px;
     margin-bottom: 10px;
+    grid-template-columns: 50px 1fr 1fr 1fr; /* 첫 번째 열(즐겨찾기)만 작게 설정 */
 }
 
 .index-item {
     flex: 1;
     text-align: center;
     font-size: 1em;
+    color: #333;
+}
+.index-item-1 {
+    margin-right: 5px;
+    text-align: center;
+    font-size: 0.9em;
     color: #333;
 }
 
@@ -103,7 +111,8 @@
     text-align: center;
     cursor: pointer;
     font-size: 1.5em;
-    margin-right: 10px;
+    /* margin-right: 10px; */
+    margin-left: -10px;
 }
 
 .not-favorite {
@@ -126,6 +135,7 @@
 
 .employee-name {
     color: #333;
+    margin-left:7px;
 }
 
 .employee-position {
@@ -190,7 +200,17 @@
     background-color: white;
     margin-left: 10px;
 }
-
+.status-dropdown2 {
+    flex: 1;
+    text-align: center;
+    padding: 5px;
+    /* border: 1px solid #ddd; */
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    /* background-color: white; */
+    margin-left: 10px;
+}
 /* 토글 컨테이너 */
 .toggle-container {
     display: flex;
