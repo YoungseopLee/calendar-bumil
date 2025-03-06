@@ -1,3 +1,4 @@
+/* ✅ 프로젝트 카드 스타일 */
 .project-card {
     background-color: #f9fafb;
     color: #333;
@@ -15,10 +16,11 @@
 }
 
 .project-card:hover {
-    transform: translateY(-2px); /* 📌 이동 거리 줄이기 (기존 -5px → -2px) */
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); /* 📌 그림자 크기 줄이기 */
+    transform: translateY(-2px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15); 
 }
 
+/* ✅ 프로젝트 헤더 스타일 */
 .project-header {
     display: flex;
     align-items: center;
@@ -26,12 +28,14 @@
     margin-bottom: 8px;
 }
 
+/* ✅ 프로젝트 제목 스타일 */
 .project-title {
     font-size: 1.2em;
     font-weight: bold;
     margin-left: 0px;
 }
 
+/* ✅ 프로젝트 상태 스타일 */
 .project-status {
     font-size: 0.8em;
     font-weight: bold;

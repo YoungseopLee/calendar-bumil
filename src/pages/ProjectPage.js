@@ -5,21 +5,42 @@ import Sidebar from "./Sidebar";
 import AddProjectButton from "./AddProjectButton";
 import "./ProjectPage.css";
 
-const ProjectPage = () => {
-  const [projects, setProjects] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [userIdToNameMap, setUserIdToNameMap] = useState({});
-  const [roleId, setRoleId] = useState("");
-  const [searchCategory, setSearchCategory] = useState("projectName");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState([]);
-  const [startFilter, setStartFilter] = useState("");
-  const [endFilter, setEndFilter] = useState("");
-  const [appliedStart, setAppliedStart] = useState("");
-  const [appliedEnd, setAppliedEnd] = useState("");
+/**
+ * 📌 ProjectPage - 프로젝트 목록을 조회하고 필터링하는 페이지
+ *
+ * ✅ 주요 기능:
+ *  - 프로젝트 목록 조회 (GET /project/get_all_project)
+ *  - 사용자 목록 조회 (GET /user/get_users)
+ *  - 검색 / 필터링 기능 (상태별, 날짜별, 텍스트 검색)
+ *  - 권한(AD_ADMIN, PR_ADMIN) 확인 후 프로젝트 추가 버튼 표시
+ *
+ * ✅ UI(또는 Component) 구조:
+ *  - ProjectPage (메인 페이지)
+ *    ├── Sidebar (사이드바)
+ *    ├── AddProjectButton (프로젝트 추가 버튼 - 관리자 전용)
+ *    ├── ProjectList (프로젝트 목록)
+ *    │      ├── ProjectCard (각 프로젝트 카드)
+ */
 
+const ProjectPage = () => {
+  const [projects, setProjects] = useState([]); // 프로젝트 목록
+  const [users, setUsers] = useState([]); // 사용자 목록
+  const [userIdToNameMap, setUserIdToNameMap] = useState({}); // 사용자 ID-이름 매핑
+  const [roleId, setRoleId] = useState(""); // 현재 로그인한 사용자의 권한
+
+  // 검색 및 필터링 관련 상태
+  const [searchCategory, setSearchCategory] = useState("projectName"); // 검색 카테고리
+  const [searchQuery, setSearchQuery] = useState(""); // 검색어
+  const [selectedStatus, setSelectedStatus] = useState([]); // 선택된 상태
+  const [startFilter, setStartFilter] = useState(""); // 시작 날짜 필터
+  const [endFilter, setEndFilter] = useState(""); // 종료 날짜 필터
+  const [appliedStart, setAppliedStart] = useState(""); // 적용된 시작 날짜
+  const [appliedEnd, setAppliedEnd] = useState(""); // 적용된 종료 날짜
+
+  // 환경 변수에서 API URL 가져오기
   const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
+  // 🔹 [1] 사용자 권한 조회
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
@@ -50,7 +71,10 @@ const ProjectPage = () => {
     fetchUserRole();
   }, [apiUrl]);
 
+
+  // 🔹 [2] 사용자 목록 조회
   useEffect(() => {
+
     const fetchUsers = async () => {
       try {
         const response = await fetch(`${apiUrl}/user/get_users`);
@@ -58,6 +82,7 @@ const ProjectPage = () => {
         const data = await response.json();
         setUsers(data.users);
 
+        // 사용자 ID-이름 매핑 생성
         const idToNameMapping = {};
         data.users.forEach((user) => {
           idToNameMapping[user.id] = user.name;
@@ -72,6 +97,7 @@ const ProjectPage = () => {
     fetchUsers();
   }, [apiUrl]);
 
+  // 🔹 [3] 프로젝트 목록 조회
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -80,6 +106,7 @@ const ProjectPage = () => {
         const data = await response.json();
         if (!data.projects) return;
 
+        // 프로젝트 데이터를 변환하여 상태에 저장
         const transformedProjects = data.projects.map((proj) => ({
           id: proj.project_code || "",
           code: proj.project_code || "",
@@ -106,11 +133,13 @@ const ProjectPage = () => {
     }
   }, [apiUrl, userIdToNameMap]);
 
+  // 날짜 필터 적용
   const applyFilters = () => {
     setAppliedStart(startFilter);
     setAppliedEnd(endFilter);
   };
 
+  // 상태 필터 토글 (제안, 수행, 실주종료)
   const handleStatusClick = (status) => {
     if (selectedStatus.includes(status)) {
       // 이미 선택된 상태일 경우 제거
@@ -121,11 +150,13 @@ const ProjectPage = () => {
     }
   };
 
+  // 검색 및 필터링 적용된 프로젝트 목록 필터링
   const filteredProjects = projects.filter((project) => {
     const projectStart = new Date(project.startDate);
     const projectEnd = new Date(project.endDate);
     const filterStart = appliedStart ? new Date(appliedStart) : null;
     const filterEnd = appliedEnd ? new Date(appliedEnd) : null;
+
 
     const matchesSearch =
       searchCategory === "projectName"
@@ -144,6 +175,7 @@ const ProjectPage = () => {
                   ? project.participantNames.some((name) => name.includes(searchQuery))
                   : false;
 
+
     const matchesStatus =
       selectedStatus.length === 0 || selectedStatus.includes(project.status);
 
@@ -158,14 +190,14 @@ const ProjectPage = () => {
   return (
     <div className="project-page">
       <Sidebar />
+      {/* ✅ ADMIN 권한만 프로젝트 추가 버튼 표시 */}
       {roleId && ["AD_ADMIN", "PR_ADMIN"].includes(roleId) && <AddProjectButton />}
       <div className="content">
         <div className="projectPage-box">
-          {/* ✅ 타이틀과 필터를 함께 고정 */}
           <div className="fixed-header">
             <h1 className="title">프로젝트 목록</h1>
 
-            {/* ✅ 검색 필터 */}
+            {/* 🔍 검색 필터 */}
             <div className="search-container">
               <select
                 className="search-category"
@@ -191,7 +223,7 @@ const ProjectPage = () => {
               </button>
             </div>
 
-            {/* ✅ 날짜 필터 */}
+            {/* 📅 날짜 필터 */}
             <div className="filter-container">
               <input
                 type="date"
@@ -227,7 +259,7 @@ const ProjectPage = () => {
               </button>
             </div>
 
-            {/* ✅ 상태 토글 필터 */}
+            {/* 상태 필터 */}
             <div className="status-toggle-container">
               {["제안", "수행", "실주종료"].map((status) => (
                 <button
@@ -241,7 +273,7 @@ const ProjectPage = () => {
             </div>
           </div>
 
-          {/* ✅ 필터된 프로젝트 목록 */}
+          {/* 필터링 된 프로젝트 목록 */}
           {filteredProjects.length > 0 ? (
             <ProjectList projects={filteredProjects} />
           ) : (
