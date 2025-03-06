@@ -8,7 +8,7 @@
   font-family: Arial, sans-serif;
 }
 
-.project-title {
+.project-title2 {
   margin-left: 55px;
   float: left;
   font-size: 18px;
@@ -83,7 +83,8 @@
   display: flex;
   justify-content: space-between; /* 양쪽 끝에 배치 */
   align-items: center; /* 수직 정렬 */
-  margin-bottom: 10px; /* 아래 여백 추가 */
+  margin-bottom: 10px;
+  margin-top: 5px;
 }
 
 .section-title {

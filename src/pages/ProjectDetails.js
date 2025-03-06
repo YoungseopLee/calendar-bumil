@@ -252,7 +252,7 @@ const ProjectDetails = () => {
       <Sidebar />
       <div className="project-container">
         <div className="edit-button-container">
-          <h2 className="project-title">프로젝트 상세정보(품의서)</h2>
+          <h2 className="project-title2">프로젝트 상세정보(품의서)</h2>
           <button
             onClick={() => navigate("/projects")}
             className="project-list-button"
