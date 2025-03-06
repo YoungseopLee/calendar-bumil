@@ -4,14 +4,35 @@ import Sidebar from "./Sidebar";
 import "./ProjectCreate.css";
 import ParticipantSelection from "./ParticipantSelection";
 
+/**
+ * 📌 ProjectCreate - 프로젝트를 생성하는 페이지
+ *
+ * ✅ 주요 기능:
+ *  - 프로젝트 생성 (POST /project/add_project)
+ *  - 프로젝트 참여자 선택 및 관리
+ *  - 필수 입력값 확인 및 오류 처리
+ *  - 권한 확인 후 접근 제한 (AD_ADMIN, PR_ADMIN)
+ *
+ * ✅ UI(또는 Component) 구조:
+ *  - ProjectCreate (메인 페이지)
+ *    ├── Sidebar (사이드바)
+ *    ├── 프로젝트 생성 입력 폼
+ *    ├── ParticipantSelection (참여자 추가 및 관리)
+ *    ├── 프로젝트 생성 & 취소 버튼
+ */
+
 const ProjectCreate = () => {
   const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL || "http://3.38.20.237";
 
-  // 로그인한 사용자 정보 (localStorage에 저장된 최신 정보)
+  // ✅ 로그인한 사용자 정보 확인 (로컬 스토리지에서 가져오기)
   const user = JSON.parse(localStorage.getItem("user"));
   
-  // 로그인한 사용자 정보 최신화 및 어드민 여부 체크
+    /**
+   * ✅ 컴포넌트 마운트 시 실행
+   * - 로그인된 사용자 정보 확인
+   * - 관리 권한이 없는 경우 접근 차단
+   */
   useEffect(() => {
     fetchLoggedInUser();
     if (!user) {
@@ -63,7 +84,11 @@ const ProjectCreate = () => {
   };
 
 
-// ✅ 초기값이 확실하게 배열로 설정되도록 변경
+
+  /**
+   * ✅ 프로젝트 생성 폼의 상태 관리
+   * - 초기값 설정 (배열 형태 필드 포함)
+   */
   const [formData, setFormData] = useState({
     project_code: "",
     project_name: "",
@@ -86,12 +111,12 @@ const ProjectCreate = () => {
 
   const [error, setError] = useState(null);
 
-  // ✅ 입력값 변경 핸들러
+  // ✅ 입력값 변경 핸들러 (폼 필드 업데이트)
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ 참여자 추가 및 삭제를 위한 핸들러 (ParticipantSelection에서 사용)
+  // ✅ 참여자 추가 및 삭제를 위한 핸들러 (ParticipantSelection에서 데이터 업데이트)
   const setParticipants = (newParticipants) => {
     setFormData((prevState) => ({
       ...prevState,
@@ -99,10 +124,16 @@ const ProjectCreate = () => {
     }));
   };
 
+    /**
+   * ✅ 프로젝트 생성 요청 핸들러
+   * - 필수 입력값 검증 후 API 호출 (POST /project/add_project)
+   * - 참여자 데이터를 백엔드에서 요구하는 형식으로 변환 후 전송
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
   
+    // ✅ 필수 입력값 확인
     if (
       !formData.project_code ||
       !formData.category ||
@@ -122,7 +153,7 @@ const ProjectCreate = () => {
         throw new Error("로그인이 필요합니다.");
       }
   
-      // ✅ 참여자 데이터를 백엔드가 요구하는 형식으로 변환
+      // ✅ 참여자 데이터를 사용할 API 형식으로 변환
       const participants = formData.participants.map((p) => ({
         id: p.id,
         start_date: p.participant_start_date || formData.business_start_date,
@@ -166,7 +197,7 @@ const ProjectCreate = () => {
         {error && <p className="error-message">⚠️ {error}</p>}
 
         <form onSubmit={handleSubmit} className="project-form">
-          {/* ✅ 기존 프로젝트 정보 입력 필드 유지 */}
+          {/* ✅ 텍스트 입력 필드 */}
           {[
             ["프로젝트 코드", "project_code"],
             ["프로젝트명", "project_name"],
