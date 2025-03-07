@@ -16,7 +16,7 @@ const EditSchedule = () => {
   // 날짜에서 하루를 빼는 함수
   const subtractOneDay = (dateString) => {
     const date = new Date(dateString);
-    date.setDate(date.getDate() - 1); // 하루를 빼는 부분
+    date.setDate(date.getDate()); // 하루를 빼는 부분 (필요없어짐)
     return date.toISOString().split("T")[0]; // 날짜 포맷: YYYY-MM-DD
   };
 
@@ -33,7 +33,7 @@ const EditSchedule = () => {
     const addOneDay = (dateString) => {
       if (!dateString) return "";
       const date = new Date(dateString);
-      date.setDate(date.getDate() + 1);
+      date.setDate(date.getDate()); 
       return date.toISOString().split("T")[0]; // YYYY-MM-DD 형식으로 변환
     };
 
