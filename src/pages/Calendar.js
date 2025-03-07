@@ -73,7 +73,7 @@ const Calendar = () => {
       console.error("상태 목록 로딩 오류:", error);
     }
   };
-  
+
   // 로그인한 사용자의 일정 가져오기
   const fetchUserSchedule = async () => {
     try {
@@ -324,315 +324,321 @@ const Calendar = () => {
   return (
     <div>
       <Sidebar />
-      <div className="calendar">
-        {/* 사용자 상태 변경 UI */}
-        <div className="user-status">
-          <div className="user-info">
-            <span>
-              {user.name} ({user.position})
-            </span>
-          </div>
-          <div className="status-container">
-            <label htmlFor="status">상태 변경:</label>
-            <select
-              id="status"
-              value={userStatus || ""}
-              onChange={handleStatusChange}
-            >
-              {statusList.map((status) => (
-                <option
-                  key={`${status.id}-${status.comment}`}
-                  value={status.id}
-                >
-                  {status.comment}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="calendar-navigation">
-          <button onClick={handlePrevMonth} className="nav-button">
-            {<IoIosArrowBack />}
-          </button>
-          <h2 className="calendar-title">
-            {currentYear}년 {monthNames[currentMonth]}
-          </h2>
-          <button onClick={handleNextMonth} className="nav-button">
-            {<IoIosArrowForward />}
-          </button>
-        </div>
-        <div className="calendar-days-header">
-          {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
-            <div key={day} className="day-header">
-              {day}
+      <div className="calendar-parent">
+        <div className="calendar">
+          {/* 사용자 상태 변경 UI */}
+          <div className="user-status">
+            <div className="user-info">
+              <span>
+                {user.name} ({user.position})
+              </span>
             </div>
-          ))}
-        </div>
-        <div className="calendar-days">
-          {calendarDays.map((day, index) => {
-            const key = day
-              ? `${currentYear}-${currentMonth}-${day}`
-              : `empty-${index}`;
+            <div className="status-container">
+              <label htmlFor="status">상태 변경:</label>
+              <select
+                id="status"
+                value={userStatus || ""}
+                onChange={handleStatusChange}
+              >
+                {statusList.map((status) => (
+                  <option
+                    key={`${status.id}-${status.comment}`}
+                    value={status.id}
+                  >
+                    {status.comment}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="calendar-navigation">
+            <button onClick={handlePrevMonth} className="nav-button">
+              {<IoIosArrowBack />}
+            </button>
+            <h2 className="calendar-title">
+              {currentYear}년 {monthNames[currentMonth]}
+            </h2>
+            <button onClick={handleNextMonth} className="nav-button">
+              {<IoIosArrowForward />}
+            </button>
+          </div>
+          <div className="calendar-days-header">
+            {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
+              <div key={day} className="day-header">
+                {day}
+              </div>
+            ))}
+          </div>
+          <div className="calendar-days">
+            {calendarDays.map((day, index) => {
+              const key = day
+                ? `${currentYear}-${currentMonth}-${day}`
+                : `empty-${index}`;
 
-            // 일정이 있는 날짜인지 확인
-            const hasMySchedule =
-              day &&
-              userSchedule.some((schedule) => {
-                const startDate = new Date(schedule.start_date);
-                const endDate = new Date(schedule.end_date);
-                const currentDate = new Date(
-                  Date.UTC(currentYear, currentMonth, day)
-                );
+              // 일정이 있는 날짜인지 확인
+              const hasMySchedule =
+                day &&
+                userSchedule.some((schedule) => {
+                  const startDate = new Date(schedule.start_date);
+                  const endDate = new Date(schedule.end_date);
+                  const currentDate = new Date(
+                    Date.UTC(currentYear, currentMonth, day)
+                  );
 
-                // 시간 차이로 인한 오류 방지
-                startDate.setUTCHours(0, 0, 0, 0);
-                endDate.setUTCHours(0, 0, 0, 0);
-                currentDate.setUTCHours(0, 0, 0, 0);
-                return currentDate >= startDate && currentDate <= endDate;
-              });
-            const hasOtherSchedule =
-              day &&
-              otherUsersSchedule.some((schedule) => {
-                const startDate = new Date(schedule.start_date);
-                const endDate = new Date(schedule.end_date);
-                const currentDate = new Date(
-                  Date.UTC(currentYear, currentMonth, day)
-                );
+                  // 시간 차이로 인한 오류 방지
+                  startDate.setUTCHours(0, 0, 0, 0);
+                  endDate.setUTCHours(0, 0, 0, 0);
+                  currentDate.setUTCHours(0, 0, 0, 0);
+                  return currentDate >= startDate && currentDate <= endDate;
+                });
+              const hasOtherSchedule =
+                day &&
+                otherUsersSchedule.some((schedule) => {
+                  const startDate = new Date(schedule.start_date);
+                  const endDate = new Date(schedule.end_date);
+                  const currentDate = new Date(
+                    Date.UTC(currentYear, currentMonth, day)
+                  );
 
-                // 시간 차이로 인한 오류 방지
-                startDate.setUTCHours(0, 0, 0, 0);
-                endDate.setUTCHours(0, 0, 0, 0);
-                currentDate.setUTCHours(0, 0, 0, 0);
-                return currentDate >= startDate && currentDate <= endDate;
-              });
+                  // 시간 차이로 인한 오류 방지
+                  startDate.setUTCHours(0, 0, 0, 0);
+                  endDate.setUTCHours(0, 0, 0, 0);
+                  currentDate.setUTCHours(0, 0, 0, 0);
+                  return currentDate >= startDate && currentDate <= endDate;
+                });
 
-            return (
-              <div
-                key={key}
-                className={`calendar-day ${day ? "active" : ""} 
+              return (
+                <div
+                  key={key}
+                  className={`calendar-day ${day ? "active" : ""} 
           ${isToday(day) ? "today" : ""} 
           ${isSelected(day) ? "selected" : ""} 
           `}
-                onClick={() => handleDateClick(day)}
-              >
-                {hasMySchedule && <div className="day-has-schedule"></div>}
-                {hasOtherSchedule && (
-                  <div className="day-has-other-schedule"></div>
-                )}
-                <span className="day-number">{day}</span>
-              </div>
-            );
-          })}
-        </div>
-        <div className="color-check">
-          <div className="blue-tag"></div>
-          <span className="blue-text">내 일정</span>
-        </div>
-        <div className="red-tag"></div>
+                  onClick={() => handleDateClick(day)}
+                >
+                  {hasMySchedule && <div className="day-has-schedule"></div>}
+                  {hasOtherSchedule && (
+                    <div className="day-has-other-schedule"></div>
+                  )}
+                  <span className="day-number">{day}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="color-check">
+            <div className="blue-tag"></div>
+            <span className="blue-text">내 일정</span>
+          </div>
+          <div className="red-tag"></div>
           <span className="red-text">전체 일정</span>
 
-        {selectedDate && (
-          <div className="schedule-area">
-            <div className="selected-date-info">
-              <h3>{selectedDate.toLocaleDateString()}</h3>
-            </div>
+          {selectedDate && (
+            <div className="schedule-area">
+              <div className="selected-date-info">
+                <h3>{selectedDate.toLocaleDateString()}</h3>
+              </div>
 
-            <div className="add-schedule-container">
-              <button
-                className="button add-schedule-button"
-                onClick={handleAddScheduleClick}
-              >
-                일정 추가
-              </button>
-            </div>
+              <div className="add-schedule-container">
+                <button
+                  className="button add-schedule-button"
+                  onClick={handleAddScheduleClick}
+                >
+                  일정 추가
+                </button>
+              </div>
 
-            <div className="schedule-section">
-              <h4>내 일정</h4>
-              <ul className="schedule-list">
-                {(() => {
-                  if (!selectedDate) {
-                    return (
-                      <li className="empty-schedule">날짜를 선택해주세요.</li>
-                    );
-                  }
-                  const filtered = userSchedule
-                    .filter((schedule) => {
-                      const startDate = new Date(schedule.start_date);
-                      const endDate = new Date(schedule.end_date);
-                      const selected = new Date(selectedDate);
+              <div className="schedule-section">
+                <h4>내 일정</h4>
+                <ul className="schedule-list">
+                  {(() => {
+                    if (!selectedDate) {
+                      return (
+                        <li className="empty-schedule">날짜를 선택해주세요.</li>
+                      );
+                    }
+                    const filtered = userSchedule
+                      .filter((schedule) => {
+                        const startDate = new Date(schedule.start_date);
+                        const endDate = new Date(schedule.end_date);
+                        const selected = new Date(selectedDate);
 
-                      // 년, 월, 일만 비교하기 위해 시간을 00:00:00으로 설정
-                      startDate.setHours(0, 0, 0, 0);
-                      endDate.setHours(0, 0, 0, 0);
-                      selected.setHours(0, 0, 0, 0);
+                        // 년, 월, 일만 비교하기 위해 시간을 00:00:00으로 설정
+                        startDate.setHours(0, 0, 0, 0);
+                        endDate.setHours(0, 0, 0, 0);
+                        selected.setHours(0, 0, 0, 0);
 
-                      // 년, 월, 일만 비교
-                      return selected >= startDate && selected <= endDate;
-                    })
-                    .sort(
-                      (a, b) => new Date(a.start_date) - new Date(b.start_date)
-                    );
+                        // 년, 월, 일만 비교
+                        return selected >= startDate && selected <= endDate;
+                      })
+                      .sort(
+                        (a, b) =>
+                          new Date(a.start_date) - new Date(b.start_date)
+                      );
 
-                  if (filtered.length === 0) {
-                    return (
-                      <li className="empty-schedule">
-                        선택한 날짜에 해당하는 일정이 없습니다.
-                      </li>
-                    );
-                  }
-                  return filtered.map((schedule) => {
-                    return (
-                      <li
-                        key={schedule.id}
-                        className="schedule-item"
-                        onClick={() => handleScheduleClick(schedule)}
-                      >
-                        <div className="schedule-content">
+                    if (filtered.length === 0) {
+                      return (
+                        <li className="empty-schedule">
+                          선택한 날짜에 해당하는 일정이 없습니다.
+                        </li>
+                      );
+                    }
+                    return filtered.map((schedule) => {
+                      return (
+                        <li
+                          key={schedule.id}
+                          className="schedule-item"
+                          onClick={() => handleScheduleClick(schedule)}
+                        >
+                          <div className="schedule-content">
+                            <span
+                              className="status-icon"
+                              style={{
+                                backgroundColor: getStatusClass(
+                                  schedule.status
+                                ),
+                              }}
+                            ></span>
+                            <span className="task-name">{schedule.task}</span>
+                          </div>
+                          <div className="button-group">
+                            <button
+                              className="edit-button icon-button"
+                              onClick={() => handleEditSchedule(schedule)}
+                              title="수정"
+                            >
+                              <FaEdit />
+                            </button>
+                            <button
+                              className="delete-button icon-button"
+                              onClick={() => handleDeleteSchedule(schedule.id)}
+                              title="삭제"
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
+                        </li>
+                      );
+                    });
+                  })()}
+                </ul>
+              </div>
+
+              <div className="schedule-section">
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    width: "100%",
+                  }}
+                >
+                  <h4 style={{ margin: 0 }}>전체 일정</h4>
+                  {"\u00A0 "}
+                  {/* 제목의 기본 마진을 제거 */}
+                  {/* 부서별 보기 버튼 */}
+                  <select
+                    className="department-dropdown"
+                    value={selectedDepartment}
+                    onChange={(e) => setSelectedDepartment(e.target.value)}
+                  >
+                    <option value="">전체 부서</option>
+                    {departments.map((dept) => (
+                      <option key={dept} value={dept}>
+                        {dept}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <ul className="schedule-list">
+                  {(() => {
+                    if (!selectedDate) {
+                      return (
+                        <li className="empty-schedule">날짜를 선택해주세요.</li>
+                      );
+                    }
+
+                    // 1. 선택한 부서의 사용자 ID 필터링
+                    const departmentUserIds = users
+                      .filter(
+                        (user) =>
+                          selectedDepartment === "" ||
+                          user.department === selectedDepartment
+                      )
+                      .map((user) => user.id);
+
+                    // 2. 선택한 날짜에 포함되는 일정 필터링
+                    const filtered = otherUsersSchedule
+                      .filter((schedule) => {
+                        const startDate = new Date(schedule.start_date);
+                        const endDate = new Date(schedule.end_date);
+                        const selected = new Date(selectedDate);
+
+                        // 년, 월, 일만 비교하기 위해 시간을 00:00:00으로 설정
+                        startDate.setHours(0, 0, 0, 0);
+                        endDate.setHours(0, 0, 0, 0);
+                        selected.setHours(0, 0, 0, 0);
+
+                        // 년, 월, 일만 비교
+                        return (
+                          departmentUserIds.includes(schedule.user_id) &&
+                          selected >= startDate &&
+                          selected <= endDate
+                        );
+                      })
+                      .sort(
+                        (a, b) =>
+                          new Date(a.start_date) - new Date(b.start_date)
+                      );
+
+                    if (filtered.length === 0) {
+                      return (
+                        <li className="empty-schedule">
+                          선택한 날짜에 해당하는 일정이 없습니다.
+                        </li>
+                      );
+                    }
+
+                    return filtered.map((schedule) => {
+                      const user = users.find((u) => u.id === schedule.user_id);
+                      const userName = user ? user.name : "알 수 없음";
+                      const formatDate = (dateString) =>
+                        new Date(dateString)
+                          .toISOString()
+                          .slice(2, 10)
+                          .replace(/-/g, ".");
+
+                      return (
+                        <li
+                          key={schedule.id}
+                          className="schedule-item"
+                          style={{ position: "relative", cursor: "pointer" }}
+                        >
                           <span
                             className="status-icon"
                             style={{
                               backgroundColor: getStatusClass(schedule.status),
                             }}
                           ></span>
-                          <span className="task-name">{schedule.task}</span>
-                        </div>
-                        <div className="button-group">
-                          <button
-                            className="edit-button icon-button"
-                            onClick={() => handleEditSchedule(schedule)}
-                            title="수정"
-                          >
-                            <FaEdit />
-                          </button>
-                          <button
-                            className="delete-button icon-button"
-                            onClick={() => handleDeleteSchedule(schedule.id)}
-                            title="삭제"
-                          >
-                            <FaTrash />
-                          </button>
-                        </div>
-                      </li>
-                    );
-                  });
-                })()}
-              </ul>
-            </div>
-
-            <div className="schedule-section">
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  width: "100%",
-                }}
-              >
-                <h4 style={{ margin: 0 }}>전체 일정</h4>
-                {"\u00A0 "}
-                {/* 제목의 기본 마진을 제거 */}
-                {/* 부서별 보기 버튼 */}
-                <select
-                  className="department-dropdown"
-                  value={selectedDepartment}
-                  onChange={(e) => setSelectedDepartment(e.target.value)}
-                >
-                  <option value="">전체 부서</option>
-                  {departments.map((dept) => (
-                    <option key={dept} value={dept}>
-                      {dept}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <ul className="schedule-list">
-                {(() => {
-                  if (!selectedDate) {
-                    return (
-                      <li className="empty-schedule">날짜를 선택해주세요.</li>
-                    );
-                  }
-
-                  // 1. 선택한 부서의 사용자 ID 필터링
-                  const departmentUserIds = users
-                    .filter(
-                      (user) =>
-                        selectedDepartment === "" ||
-                        user.department === selectedDepartment
-                    )
-                    .map((user) => user.id);
-
-                  // 2. 선택한 날짜에 포함되는 일정 필터링
-                  const filtered = otherUsersSchedule
-                    .filter((schedule) => {
-                      const startDate = new Date(schedule.start_date);
-                      const endDate = new Date(schedule.end_date);
-                      const selected = new Date(selectedDate);
-
-                      // 년, 월, 일만 비교하기 위해 시간을 00:00:00으로 설정
-                      startDate.setHours(0, 0, 0, 0);
-                      endDate.setHours(0, 0, 0, 0);
-                      selected.setHours(0, 0, 0, 0);
-
-                      // 년, 월, 일만 비교
-                      return (
-                        departmentUserIds.includes(schedule.user_id) &&
-                        selected >= startDate &&
-                        selected <= endDate
+                          {userName} {": \u00A0"}
+                          <span className="task-name-two">{schedule.task}</span>
+                          {isAdmin && (
+                            <button
+                              className="delete-button icon-button"
+                              onClick={() => handleDeleteSchedule(schedule.id)}
+                              title="삭제"
+                            >
+                              <FaTrash />
+                            </button>
+                          )}
+                        </li>
                       );
-                    })
-                    .sort(
-                      (a, b) => new Date(a.start_date) - new Date(b.start_date)
-                    );
-
-                  if (filtered.length === 0) {
-                    return (
-                      <li className="empty-schedule">
-                        선택한 날짜에 해당하는 일정이 없습니다.
-                      </li>
-                    );
-                  }
-
-                  return filtered.map((schedule) => {
-                    const user = users.find((u) => u.id === schedule.user_id);
-                    const userName = user ? user.name : "알 수 없음";
-                    const formatDate = (dateString) =>
-                      new Date(dateString)
-                        .toISOString()
-                        .slice(2, 10)
-                        .replace(/-/g, ".");
-
-                    return (
-                      <li
-                        key={schedule.id}
-                        className="schedule-item"
-                        style={{ position: "relative", cursor: "pointer" }}
-                      >
-                        <span
-                          className="status-icon"
-                          style={{
-                            backgroundColor: getStatusClass(schedule.status),
-                          }}
-                        ></span>
-                        {userName} {": \u00A0"}
-                        <span className="task-name-two">{schedule.task}</span>
-                        {isAdmin && (
-                          <button
-                            className="delete-button icon-button"
-                            onClick={() => handleDeleteSchedule(schedule.id)}
-                            title="삭제"
-                          >
-                            <FaTrash />
-                          </button>
-                        )}
-                      </li>
-                    );
-                  });
-                })()}
-              </ul>
+                    });
+                  })()}
+                </ul>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
