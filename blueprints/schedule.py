@@ -5,7 +5,7 @@ from config import SECRET_KEY
 from .auth import decrypt_deterministic  # 이메일 복호화 함수
 
 schedule_bp = Blueprint('schedule', __name__, url_prefix='/schedule')
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 @schedule_bp.route('/get_schedule', methods=['GET', 'OPTIONS'])
 def get_schedule():
@@ -23,7 +23,7 @@ def get_schedule():
             FROM tb_schedule
             WHERE user_id = %s AND DATE(start_date) <= %s AND DATE(end_date) >= %s"""
         cursor.execute(sql, (user_id, date, date))
-        logging.info(f"[SQL/SELECT] tb_schedule /get_schedule{sql}")
+        logger.info(f"[SQL/SELECT] tb_schedule /get_schedule{sql}")
 
         schedules = cursor.fetchall()
         return jsonify({'schedules': schedules}), 200
@@ -77,7 +77,7 @@ def get_other_users_schedule():
             ON s.user_id = u.id
             WHERE DATE(s.start_date) <= %s AND DATE(s.end_date) >= %s"""
         cursor.execute(sql, (date, date))
-        logging.info(f"[SQL/SELECT] tb_schedule, tb_user /get_other_users_schedule{sql}")
+        logger.info(f"[SQL/SELECT] tb_schedule, tb_user /get_other_users_schedule{sql}")
 
         schedules = cursor.fetchall()
         
@@ -132,7 +132,7 @@ def add_schedule():
             VALUES (%s, %s, %s, %s, %s)"""
         values = (user_id, start_date, end_date, task, status)
         cursor.execute(sql, values)
-        logging.info(f"[SQL/INSERT] tb_schedule /add-schedule{sql}")
+        logger.info(f"[SQL/INSERT] tb_schedule /add-schedule{sql}")
 
         conn.commit()
         return jsonify({'message': '일정이 추가되었습니다.'}), 200
@@ -178,7 +178,7 @@ def edit_schedule(schedule_id):
         
         sql_user_id_select = "SELECT user_id FROM tb_schedule WHERE id = %s"
         cursor.execute(sql_user_id_select, (schedule_id,))
-        logging.info(f"[SQL/SELECT] tb_schedule /edit-schedule{sql_user_id_select}")
+        logger.info(f"[SQL/SELECT] tb_schedule /edit-schedule{sql_user_id_select}")
 
         schedule_owner = cursor.fetchone()
         if schedule_owner and schedule_owner[0] != user_id_from_token:
@@ -190,7 +190,7 @@ def edit_schedule(schedule_id):
             WHERE id = %s"""
         values = (start_date, end_date, task, status, schedule_id)
         cursor.execute(sql_schedule_update, values)
-        logging.info(f"[SQL/UPDATE] tb_schedule /edit-schedule{sql_schedule_update}")
+        logger.info(f"[SQL/UPDATE] tb_schedule /edit-schedule{sql_schedule_update}")
 
         conn.commit()
         return jsonify({'message': '일정이 수정되었습니다.'}), 200
@@ -233,7 +233,7 @@ def delete_schedule(schedule_id):
         sql_user_id_select = """
             SELECT user_id FROM tb_schedule WHERE id = %s"""
         cursor.execute(sql_user_id_select, (schedule_id,))
-        logging.info(f"[SQL/SELECT] tb_schedule /delete-schedule{sql_user_id_select}")
+        logger.info(f"[SQL/SELECT] tb_schedule /delete-schedule{sql_user_id_select}")
 
         schedule_owner = cursor.fetchone()
 
@@ -244,7 +244,7 @@ def delete_schedule(schedule_id):
         # 삭제 실행
         sql_schedule_id_delete = "DELETE FROM tb_schedule WHERE id = %s"
         cursor.execute(sql_schedule_id_delete, (schedule_id,))
-        logging.info(f"[SQL/DELETE] tb_schedule /delete-schedule{sql_schedule_id_delete}")
+        logger.info(f"[SQL/DELETE] tb_schedule /delete-schedule{sql_schedule_id_delete}")
 
         conn.commit()
         return jsonify({'message': '일정이 삭제되었습니다.'}), 200
@@ -272,7 +272,7 @@ def get_all_schedule():
         sql = """
             SELECT * FROM tb_schedule"""
         cursor.execute(sql)
-        logging.info(f"[SQL/SELECT] tb_schedule /get_all_schedule{sql}")
+        logger.info(f"[SQL/SELECT] tb_schedule /get_all_schedule{sql}")
 
         schedules = cursor.fetchall()
         return jsonify({'schedules': schedules}), 200

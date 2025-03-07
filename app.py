@@ -1,4 +1,3 @@
-import logging
 from flask import Flask, request, send_from_directory, jsonify, render_template
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
@@ -10,9 +9,28 @@ from blueprints.favorite import favorite_bp
 from blueprints.project import project_bp
 from blueprints.status import status_bp
 from blueprints.admin import admin_bp
-import os
+import os, logging
 
 app = Flask(__name__, static_folder="build", static_url_path="/")
+# 로그 포맷 설정
+log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+# STDOUT (도커 컨테이너 로그에 출력됨)
+stdout_handler = logging.StreamHandler()
+stdout_handler.setFormatter(log_formatter)
+
+# 파일 로그 (컨테이너 내부에 로그 저장)
+file_handler = logging.FileHandler("/app/logs/app.log")
+file_handler.setFormatter(log_formatter)
+
+# Flask의 기본 로거 설정
+app.logger.setLevel(logging.INFO)
+app.logger.addHandler(stdout_handler)
+app.logger.addHandler(file_handler)
+
+# 다른 모듈에서도 app.logger를 사용하도록 함
+logging.getLogger().addHandler(stdout_handler)
+logging.getLogger().addHandler(file_handler)
 
 # Bcrypt 설정
 bcrypt = Bcrypt()
@@ -34,16 +52,23 @@ app.logger.addHandler(access_handler)
 app.logger.addHandler(error_handler)
 
 # React 정적 파일 서빙 (index.html 없을 경우 404 처리)
-@app.route("/")
+@app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
-def serve_react(path=""):
-    return send_from_directory("build", "index.html")
+def serve_react(path):
+    if os.path.exists(os.path.join("build", path)):  # 정적 파일 요청이면 반환
+        return send_from_directory("build", path)
+    return send_from_directory("build", "index.html")  # React SPA 대응
 
 # API 동작 확인용 엔드포인트 추가
 @app.route("/health")
 def health_check():
     app.logger.info("Health check 요청 받음")
     return jsonify({"status": "OK"}), 200
+
+# ✅ 모든 404 요청을 React `index.html`로 리디렉트 (React 클라이언트 라우팅 지원)
+@app.errorhandler(404)
+def not_found(e):
+    return send_from_directory("build", "index.html"), 200
 
 # CORS 설정 개선
 @app.after_request
@@ -57,11 +82,6 @@ def after_request(response):
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     return response
-
-# 404 에러 처리 - React SPA를 위해 index.html 반환
-@app.errorhandler(404)
-def not_found(e):
-    return send_from_directory("build", "index.html"), 200
 
 # 블루프린트 등록
 app.register_blueprint(auth_bp)

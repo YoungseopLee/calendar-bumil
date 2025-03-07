@@ -6,7 +6,7 @@ from datetime import datetime
 from .auth import decrypt_deterministic, encrypt_deterministic, decrypt_aes
 
 project_bp = Blueprint('project', __name__, url_prefix='/project')
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 def parse_date(date_str: str) -> str:
     try:
@@ -42,7 +42,7 @@ def get_all_project():
         ORDER BY p.created_at DESC
         """
         cursor.execute(sql)
-        logging.info(f"[SQL/SELECT] tb_project, tb_project_user /get_all_project{sql}")
+        logger.info(f"[SQL/SELECT] tb_project, tb_project_user /get_all_project{sql}")
         
         projects = cursor.fetchall()
         
@@ -105,7 +105,7 @@ def get_search_project():
             params.append(f"%{request.args.get('Project_Name')}%")
         sql += " GROUP BY p.project_code"
         cursor.execute(sql, tuple(params))
-        logging.info(f"[SQL/SELECT] tb_project, tb_project_user /get_search_project{sql}")
+        logger.info(f"[SQL/SELECT] tb_project, tb_project_user /get_search_project{sql}")
 
         search_projects = cursor.fetchall()
         return jsonify({'projects': search_projects}), 200
@@ -141,7 +141,7 @@ def get_project_details():
             FROM tb_project
             WHERE project_code = %s AND is_delete_yn = 'N'"""
         cursor.execute(sql_project, (project_code,))
-        logging.info(f"[SQL/SELECT] tb_project /get_project_details{sql_project}")
+        logger.info(f"[SQL/SELECT] tb_project /get_project_details{sql_project}")
         project = cursor.fetchone()
 
         if not project:
@@ -153,7 +153,7 @@ def get_project_details():
             FROM tb_project_user
             WHERE project_code = %s AND is_delete_yn = 'N'"""
         cursor.execute(sql_project_users, (project_code,))
-        logging.info(f"[SQL/SELECT] tb_project_user /get_search_project{sql_project_users}")
+        logger.info(f"[SQL/SELECT] tb_project_user /get_search_project{sql_project_users}")
         project_users = cursor.fetchall()
 
         # 프로젝트 정보에 참여자 정보를 추가 (원하는 키 이름으로 지정 가능: participants 또는 project_users)
@@ -240,7 +240,7 @@ def add_project():
             group_name, created_by, created_by
         )
         cursor.execute(sql_project, values_project)
-        logging.info(f"[SQL/INSERT] tb_project /add_project{sql_project}")
+        logger.info(f"[SQL/INSERT] tb_project /add_project{sql_project}")
 
         sql_project_user = """
         INSERT INTO tb_project_user
@@ -257,7 +257,7 @@ def add_project():
                 return jsonify({'message': '참여자 ID가 누락되었습니다.'}), 400
 
             cursor.execute(sql_project_user, (project_code, participant_id, start_date, end_date, current_project_yn, created_by, created_by))
-            logging.info(f"[SQL/INSERT] tb_project_user /add_project{sql_project_user}")
+            logger.info(f"[SQL/INSERT] tb_project_user /add_project{sql_project_user}")
         conn.commit()
         return jsonify({'message': '프로젝트가 추가되었습니다.'}), 201
     except Exception as e:
@@ -331,7 +331,7 @@ def edit_project():
             SELECT project_code FROM tb_project
             WHERE project_code = %s AND is_delete_yn = 'N'"""
         cursor.execute(sql_select_project, (new_project_code,))
-        logging.info(f"[SQL/SELECT] tb_project /edit_project{sql_select_project}")
+        logger.info(f"[SQL/SELECT] tb_project /edit_project{sql_select_project}")
 
         old_project = cursor.fetchone()
         if not old_project:
@@ -372,7 +372,7 @@ def edit_project():
             old_project_code
         )
         cursor.execute(sql_project, values_project)
-        logging.info(f"[SQL/UPDATE] tb_project /edit_project{sql_project}")
+        logger.info(f"[SQL/UPDATE] tb_project /edit_project{sql_project}")
 
         cursor.close()
 
@@ -403,7 +403,7 @@ def edit_project():
                 new_project_code, participant_user_id, participant_start_date, participant_end_date,
                 current_project_yn, updated_by, updated_by
             ))
-            logging.info(f"[SQL/INSERT] tb_project_user /edit_project{sql_project_user}")
+            logger.info(f"[SQL/INSERT] tb_project_user /edit_project{sql_project_user}")
 
         conn.commit()
 
@@ -433,11 +433,11 @@ def delete_project(project_code):
         cursor = conn.cursor()
         sql_project = "UPDATE tb_project SET is_delete_yn = 'Y', updated_at = NOW() WHERE project_code = %s"
         cursor.execute(sql_project, (project_code,))
-        logging.info(f"[SQL/UPDATE] tb_project /delete_project{sql_project}")
+        logger.info(f"[SQL/UPDATE] tb_project /delete_project{sql_project}")
 
         sql_project_user = "UPDATE tb_project_user SET is_delete_yn = 'Y', updated_at = NOW() WHERE project_code = %s"
         cursor.execute(sql_project_user, (project_code,))
-        logging.info(f"[SQL/UPDATE] tb_project_user /delete_project{sql_project_user}")
+        logger.info(f"[SQL/UPDATE] tb_project_user /delete_project{sql_project_user}")
 
         conn.commit()
         return jsonify({'message': '프로젝트가 삭제되었습니다.'}), 200
@@ -479,7 +479,7 @@ def get_user_and_projects():
             WHERE id = %s AND is_delete_yn = 'N'"""
         cursor.execute(sql, (user_id,))
         user_info = cursor.fetchone()
-        logging.info(f"[SQL/SELECT] tb_user /get_user_and_projects{sql}")
+        logger.info(f"[SQL/SELECT] tb_user /get_user_and_projects{sql}")
 
         if not user_info:
             return jsonify({'message': '사용자 정보를 찾을 수 없습니다.'}), 404
@@ -498,7 +498,7 @@ def get_user_and_projects():
             JOIN tb_project p ON tpu.project_code = p.project_code
             WHERE tpu.user_id = %s"""
         cursor.execute(sql_project_and_project_user, (user_id,))
-        logging.info(f"[SQL/SELECT] tb_project, tb_project_user /get_user_and_projects{sql_project_and_project_user}")
+        logger.info(f"[SQL/SELECT] tb_project, tb_project_user /get_user_and_projects{sql_project_and_project_user}")
 
         participants = cursor.fetchall()
 
@@ -542,7 +542,7 @@ def get_users_and_projects():
             FROM tb_user
             WHERE id IN ({format_strings}) AND is_delete_yn = 'N'"""
         cursor.execute(sql, tuple(user_ids))
-        logging.info(f"[SQL/SELECT] tb_user /get_users_and_projects{sql}")
+        logger.info(f"[SQL/SELECT] tb_user /get_users_and_projects{sql}")
 
         users = cursor.fetchall()
 
@@ -564,7 +564,7 @@ def get_users_and_projects():
             JOIN tb_project p ON tpu.project_code = p.project_code
             WHERE tpu.user_id IN ({format_strings})"""
         cursor.execute(sql_project_and_project_user, tuple(user_ids))
-        logging.info(f"[SQL/SELECT] tb_project, tb_project_user /get_users_and_projects{sql_project_and_project_user}")
+        logger.info(f"[SQL/SELECT] tb_project, tb_project_user /get_users_and_projects{sql_project_and_project_user}")
 
         participants = cursor.fetchall()
 

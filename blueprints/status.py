@@ -4,7 +4,7 @@ from db import get_db_connection
 from config import SECRET_KEY
 
 status_bp = Blueprint('status', __name__, url_prefix='/status')
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 # 전체 상태 목록 조회
 @status_bp.route('/get_all_status', methods=['GET', 'OPTIONS'])
@@ -19,7 +19,7 @@ def get_all_status():
         sql = """
             SELECT id, comment FROM tb_status"""
         cursor.execute(sql)
-        logging.info(f"[SQL/SELECT] tb_status /get_all_status{sql}")
+        logger.info(f"[SQL/SELECT] tb_status /get_all_status{sql}")
 
         statuses = cursor.fetchall()
         return jsonify({'statuses': statuses}), 200
@@ -46,7 +46,7 @@ def get_status_list():
         sql = """
             SELECT id, comment FROM tb_status ORDER BY comment"""
         cursor.execute(sql)
-        logging.info(f"[SQL/SELECT] tb_status /get_status_list{sql}")
+        logger.info(f"[SQL/SELECT] tb_status /get_status_list{sql}")
 
         statuses = cursor.fetchall()
         return jsonify({'statuses': statuses}), 200
@@ -80,7 +80,7 @@ def get_users_status():
             FROM tb_user 
             WHERE id IN ({format_strings})"""
         cursor.execute(sql, tuple(user_ids))
-        logging.info(f"[SQL/SELECT] tb_user /get_users_status{sql}")
+        logger.info(f"[SQL/SELECT] tb_user /get_users_status{sql}")
         
         statuses = cursor.fetchall()
         statuses_dict = {user["id"]: user["status"] for user in statuses}
@@ -115,7 +115,7 @@ def add_status():
             INSERT INTO tb_status (id, comment)
             VALUES (%s, %s)"""
         cursor.execute(sql, (new_status, comment))
-        logging.info(f"[SQL/INSERT] tb_status /add_status{sql}")
+        logger.info(f"[SQL/INSERT] tb_status /add_status{sql}")
         
         conn.commit()
         return jsonify({'message': '상태가 추가되었습니다.'}), 201
@@ -150,7 +150,7 @@ def edit_status(status_id):
         sql_select = """
             SELECT * FROM tb_status WHERE id = %s"""
         cursor.execute(sql_select, (status_id,))
-        logging.info(f"[SQL/SELECT] tb_status /edit_status{sql_select}")
+        logger.info(f"[SQL/SELECT] tb_status /edit_status{sql_select}")
         
         existing_status = cursor.fetchone()
 
@@ -159,7 +159,7 @@ def edit_status(status_id):
         
         sql_update = "UPDATE tb_status SET comment = %s WHERE id = %s"
         cursor.execute(sql_update, (new_comment, status_id))
-        logging.info(f"[SQL/UPDATE] tb_status /edit_status{sql_update}")
+        logger.info(f"[SQL/UPDATE] tb_status /edit_status{sql_update}")
 
         conn.commit()
 
@@ -190,7 +190,7 @@ def delete_status(status):
         sql = """
             DELETE FROM tb_status WHERE id = %s"""
         cursor.execute(sql, (status,))
-        logging.info(f"[SQL/DELETE] tb_status /delete_status{sql}")
+        logger.info(f"[SQL/DELETE] tb_status /delete_status{sql}")
 
         conn.commit()
         return jsonify({'message': '상태가 삭제되었습니다.'}), 200
@@ -233,7 +233,7 @@ def update_status():
                 SELECT role_id FROM tb_user WHERE id = %s"""
             cursor.execute(sql_role_select, (user_id,))
             result = cursor.fetchone()
-            logging.info(f"[SQL/SELECT] tb_status /update_status{sql_role_select}")
+            logger.info(f"[SQL/SELECT] tb_status /update_status{sql_role_select}")
             
             requester_role = result.get('role_id') if result else None
 
@@ -244,7 +244,7 @@ def update_status():
         sql_status_select = """
             SELECT status FROM tb_user WHERE id = %s"""
         cursor.execute(sql_status_select, (target_user_id,))
-        logging.info(f"[SQL/SELECT] tb_status /update_status{sql_status_select}")
+        logger.info(f"[SQL/SELECT] tb_status /update_status{sql_status_select}")
 
         user_info = cursor.fetchone()
         if not user_info:
@@ -258,14 +258,14 @@ def update_status():
         sql_status_update = """
             UPDATE tb_user SET status = %s WHERE id = %s"""
         cursor.execute(sql_status_update, (new_status, target_user_id))
-        logging.info(f"[SQL/UPDATE] tb_status /update_status{sql_status_update}")
+        logger.info(f"[SQL/UPDATE] tb_status /update_status{sql_status_update}")
 
         # 변경 이력 기록
         sql_status_log_insert = """
             INSERT INTO tb_user_status_log (recorded_at, status_id, user_id, created_by)
             VALUES (NOW(3), %s, %s, %s)"""
         cursor.execute(sql_status_log_insert, (new_status, target_user_id, requester_user_id))
-        logging.info(f"[SQL/INSERT] tb_user_status_log /update_status{sql_status_log_insert}")
+        logger.info(f"[SQL/INSERT] tb_user_status_log /update_status{sql_status_log_insert}")
 
         conn.commit()
         return jsonify({'message': '상태가 업데이트되었습니다.'}), 200

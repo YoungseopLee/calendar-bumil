@@ -7,7 +7,7 @@ from .auth import encrypt_deterministic, encrypt_aes
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 bcrypt = Bcrypt()
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 # 유저 생성 API (관리자용)
 @admin_bp.route('/add_user', methods=['POST', 'OPTIONS'])
@@ -57,7 +57,7 @@ def create_user():
         # 이미 사용중인 이메일 확인
         sql_tb_user_select = "SELECT * FROM tb_user WHERE id = %s"
         cursor.execute(sql_tb_user_select, (id,))
-        logging.info(f"[SQL/SELECT] tb_user /add_user{sql_tb_user_select}")
+        logger.info(f"[SQL/SELECT] tb_user /add_user{sql_tb_user_select}")
         if cursor.fetchone():
             return jsonify({'message': '이미 사용 중인 이메일입니다.'}), 400
 
@@ -67,7 +67,7 @@ def create_user():
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s)"""
         values = (name, position, department, id, phone, hashed_password, role_id, status, first_login_yn, created_by, created_by)
         cursor.execute(sql_tb_user_insert, values)
-        logging.info(f"[SQL/INSERT] tb_user /add_user{sql_tb_user_insert}")
+        logger.info(f"[SQL/INSERT] tb_user /add_user{sql_tb_user_insert}")
 
         conn.commit()
         return jsonify({'message': '유저 생성 성공!'}), 201
@@ -156,7 +156,7 @@ def update_user():
             SET {set_clause} 
             WHERE id = %s AND is_delete_yn = 'N'"""
         cursor.execute(sql, tuple(values))
-        logging.info(f"[SQL/UPDATE] tb_user /update_user{sql}")
+        logger.info(f"[SQL/UPDATE] tb_user /update_user{sql}")
 
         conn.commit()
         return jsonify({'message': '유저 정보가 업데이트되었습니다.'}), 200
@@ -198,7 +198,7 @@ def delete_user(user_id):
             SET is_delete_yn = 'Y' 
             WHERE id = %s"""
         cursor.execute(sql, (user_id,))
-        logging.info(f"[SQL/UPDATE] tb_user /delete_user{sql}")
+        logger.info(f"[SQL/UPDATE] tb_user /delete_user{sql}")
 
         conn.commit()
         return jsonify({'message': '유저가 삭제되었습니다.'}), 200
@@ -263,7 +263,7 @@ def update_role_id():
             SET {set_clause} 
             WHERE id = %s AND is_delete_yn = 'N'"""
         cursor.execute(sql, tuple(values))
-        logging.info(f"[SQL/UPDATE] tb_user /update_role_id{sql}")
+        logger.info(f"[SQL/UPDATE] tb_user /update_role_id{sql}")
 
         conn.commit()
         return jsonify({'message': '유저 정보가 업데이트되었습니다.'}), 200
@@ -286,7 +286,7 @@ def get_roles():
             FROM tb_role 
             ORDER BY id"""
         cursor.execute(sql)
-        logging.info(f"[SQL/SELECT] tb_role /get_role_list{sql}")
+        logger.info(f"[SQL/SELECT] tb_role /get_role_list{sql}")
 
         roles = cursor.fetchall()
         return jsonify(roles), 200
@@ -309,7 +309,7 @@ def get_unique_departments():
             WHERE department IS NOT NULL AND department != '' 
             ORDER BY department"""
         cursor.execute(sql)
-        logging.info(f"[SQL/SELECT] tb_user /get_department_list{sql}")
+        logger.info(f"[SQL/SELECT] tb_user /get_department_list{sql}")
 
         departments = cursor.fetchall()
         return jsonify([d['department'] for d in departments]), 200
@@ -332,7 +332,7 @@ def get_unique_position():
             WHERE position IS NOT NULL AND position != '' 
             ORDER BY position"""
         cursor.execute(sql)
-        logging.info(f"[SQL/SELECT] tb_user /get_position_list{sql}")
+        logger.info(f"[SQL/SELECT] tb_user /get_position_list{sql}")
 
         positions = cursor.fetchall()
         return jsonify([p['position'] for p in positions]), 200
@@ -385,7 +385,7 @@ def update_status_admin():
             INSERT INTO tb_user_status_log (recorded_at, status_id, user_id, created_by)
             VALUES (NOW(3), %s, %s, %s)"""
         cursor.execute(sql, (new_status, target_user_id, requester_user_id))
-        logging.info(f"[SQL/INSERT] tb_user_status_log /update_status_admin{sql}")
+        logger.info(f"[SQL/INSERT] tb_user_status_log /update_status_admin{sql}")
 
 
         conn.commit()

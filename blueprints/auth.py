@@ -9,7 +9,7 @@ import jwt, base64, os, logging
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 bcrypt = Bcrypt()
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 # AES 키 (정확히 32 바이트로 설정)
 AES_KEY = os.environ.get("AES_SECRET_KEY", "Bumil-calendar-1234567890!@#$%^&*").ljust(32)[:32]
@@ -88,7 +88,7 @@ def signup():
         # 새 DB에서는 테이블명이 tb_user임
         sql_tb_user_select = "SELECT * FROM tb_user WHERE id = %s"
         cursor.execute(sql_tb_user_select, (id,))
-        logging.info(f"[SQL/SELECT] tb_user /signup{sql_tb_user_select}")
+        logger.info(f"[SQL/SELECT] tb_user /signup{sql_tb_user_select}")
 
         if cursor.fetchone():
             return jsonify({'message': '이미 사용 중인 이메일입니다.'}), 400
@@ -106,7 +106,7 @@ def signup():
         default_role_id = "USR_GENERAL"
         values = (name, position, department, id, phone, hashed_password, default_role_id)
         cursor.execute(sql, values)
-        logging.info(f"[SQL/INSERT] tb_user /signup{sql}")
+        logger.info(f"[SQL/INSERT] tb_user /signup{sql}")
 
         conn.commit()
         return jsonify({'message': '회원가입 성공!'}), 201
@@ -143,7 +143,7 @@ def login():
         sql_tb_user_select = """
         SELECT * FROM tb_user WHERE id = %s"""
         cursor.execute(sql_tb_user_select, (id,))
-        logging.info(f"[SQL/SELECT] tb_user /login{sql_tb_user_select}")
+        logger.info(f"[SQL/SELECT] tb_user /login{sql_tb_user_select}")
 
         user = cursor.fetchone()
 
@@ -207,7 +207,7 @@ def get_logged_in_user():
         sql_tb_user_select = """
             SELECT * FROM tb_user WHERE id = %s"""
         cursor.execute(sql_tb_user_select, (user_id,))
-        logging.info(f"[SQL/SELECT] tb_user /get_logged_in_user{sql_tb_user_select}")
+        logger.info(f"[SQL/SELECT] tb_user /get_logged_in_user{sql_tb_user_select}")
 
         user = cursor.fetchone()
 
@@ -278,7 +278,7 @@ def change_password():
             FROM tb_user 
             WHERE id = %s AND is_delete_yn = 'N'"""
         cursor.execute(sql_tb_user_select, (user_id,))
-        logging.info(f"[SQL/SELECT] tb_user /change_password{sql_tb_user_select}")
+        logger.info(f"[SQL/SELECT] tb_user /change_password{sql_tb_user_select}")
 
         user = cursor.fetchone()
         if not user:
@@ -297,7 +297,7 @@ def change_password():
             SET password = %s, first_login_yn = 'Y', updated_at = NOW(), updated_by = %s 
             WHERE id = %s"""
         cursor.execute(sql_tb_user_update, (new_hashed, payload.get('name', 'SYSTEM'), user_id))
-        logging.info(f"[SQL/UPDATE] tb_user /change_password{sql_tb_user_update}")
+        logger.info(f"[SQL/UPDATE] tb_user /change_password{sql_tb_user_update}")
 
         conn.commit()
         return jsonify({'message': '비밀번호가 성공적으로 변경되었습니다.'}), 200

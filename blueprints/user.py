@@ -5,8 +5,7 @@ from config import SECRET_KEY
 from .auth import decrypt_aes, decrypt_deterministic, encrypt_deterministic
 
 user_bp = Blueprint('user', __name__, url_prefix='/user')
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
 
 # 첫 로그인 사용자 목록 조회
 @user_bp.route('/get_pending_users', methods=['GET', 'OPTIONS'])
@@ -23,7 +22,7 @@ def get_pending_users():
             FROM tb_user 
             WHERE first_login_yn = 'N' AND is_delete_yn = 'N'"""
         cursor.execute(sql)
-        logging.info(f"[SQL/SELECT] tb_user /get_pending_users{sql}")
+        logger.info(f"[SQL/SELECT] tb_user /get_pending_users{sql}")
 
         pending_users = cursor.fetchall()
         
@@ -53,7 +52,7 @@ def get_users():
             WHERE tu.is_delete_yn = 'N'
             ORDER BY tu.name ASC"""
         cursor.execute(sql)
-        logging.info(f"[SQL/SELECT] tb_user, tb_status /get_users{sql}")
+        logger.info(f"[SQL/SELECT] tb_user, tb_status /get_users{sql}")
         
         users = cursor.fetchall()
         for user in users:
@@ -94,7 +93,7 @@ def get_user():
             FROM tb_user
             WHERE id = %s AND is_delete_yn = 'N'"""
         cursor.execute(sql, (user_id,))
-        logging.info(f"[SQL/SELECT] tb_user /get_user{sql}")
+        logger.info(f"[SQL/SELECT] tb_user /get_user{sql}")
 
         user_info = cursor.fetchone()
 
