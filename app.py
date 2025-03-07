@@ -1,5 +1,5 @@
 import logging
-from flask import Flask, request, send_from_directory, jsonify
+from flask import Flask, request, send_from_directory, jsonify, render_template
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from config import ALLOWED_ORIGINS
@@ -57,6 +57,11 @@ def after_request(response):
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     return response
+
+# 404 에러 처리 - React SPA를 위해 index.html 반환
+@app.errorhandler(404)
+def not_found(e):
+    return send_from_directory("build", "index.html"), 200
 
 # 블루프린트 등록
 app.register_blueprint(auth_bp)
