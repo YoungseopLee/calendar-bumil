@@ -44,6 +44,12 @@ const EmployeeList = () => {
   const navigate = useNavigate(); // 페이지 이동 훅
   const apiUrl = process.env.REACT_APP_API_URL; // API URL 환경 변수
 
+  const statusMap = {
+    파견: "DISPATCH",
+    본사: "HQ",
+    휴가: "LEAVE",
+    외근: "OUT",
+  };
   /**
    * 🔄 **1. 로그인된 사용자 정보 및 상태 목록 불러오기**
    * - 로그인한 사용자 정보 확인
@@ -267,8 +273,11 @@ const EmployeeList = () => {
           <input
             type="text"
             className="search-input"
-            placeholder={`검색어를 입력해주세요...`}
-            onChange={(e) => setSearchText(e.target.value.trim().toLowerCase())}
+            placeholder="검색어를 입력해주세요..."
+            onChange={(e) => {
+              let inputValue = e.target.value.trim();
+              setSearchText(statusMap[inputValue] || inputValue);
+            }}
             value={searchText}
           />
         </div>
