@@ -35,12 +35,9 @@ app.logger.addHandler(error_handler)
 
 # React 정적 파일 서빙 (index.html 없을 경우 404 처리)
 @app.route("/")
-def serve_react():
-    try:
-        return send_from_directory("build", "index.html")
-    except FileNotFoundError:
-        app.logger.error("React build 폴더에서 index.html을 찾을 수 없음!")
-        return jsonify({"error": "React build 폴더에 index.html이 없습니다."}), 404
+@app.route("/<path:path>")
+def serve_react(path=""):
+    return send_from_directory("build", "index.html")
 
 # API 동작 확인용 엔드포인트 추가
 @app.route("/health")
@@ -71,5 +68,5 @@ app.register_blueprint(status_bp)
 app.register_blueprint(admin_bp)
 
 # gunicorn 사용 시 주석 처리
-# if __name__ == "__main__":
-#     app.run(debug=False, host="0.0.0.0", port=5000)
+if __name__ == "__main__":
+    app.run(debug=False, host="0.0.0.0", port=5000)

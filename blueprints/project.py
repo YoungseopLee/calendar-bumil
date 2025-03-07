@@ -499,3 +499,65 @@ def get_user_and_projects():
             conn.close()
         except Exception:
             pass
+
+# tb_user와 tb_project_user 조회(여러 사용자를 한번에 조회)
+@project_bp.route('/get_users_and_projects', methods=['POST', 'OPTIONS'])
+def get_users_and_projects():
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'CORS preflight request success'})
+
+    data = request.get_json()
+    user_ids = data.get('user_ids')
+
+    if not user_ids or not isinstance(user_ids, list):
+        return jsonify({'message': 'user_ids 파라미터가 유효한 리스트 형식이 아닙니다.'}), 400
+
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+        cursor = conn.cursor(dictionary=True)
+
+        # ✅ 여러 사용자 정보 조회
+        format_strings = ','.join(['%s'] * len(user_ids))  # IN 절을 위한 포맷팅
+        cursor.execute(f"""
+            SELECT id, name, position, department, phone_number, role_id, status, is_delete_yn, first_login_yn
+            FROM tb_user
+            WHERE id IN ({format_strings}) AND is_delete_yn = 'N'
+        """, tuple(user_ids))
+        users = cursor.fetchall()
+
+        if not users:
+            return jsonify({'message': '사용자 정보를 찾을 수 없습니다.'}), 404
+
+        # ✅ 전화번호 복호화 처리
+        for user in users:
+            try:
+                user['phone_number'] = decrypt_aes(user['phone_number'])
+            except Exception as decrypt_error:
+                print(f"📛 Phone number 복호화 오류 ({user['id']}): {decrypt_error}")
+                user['phone_number'] = "복호화 실패"
+
+        # ✅ 여러 사용자에 대한 프로젝트 정보 조회
+        cursor.execute(f"""
+            SELECT tpu.*, p.project_name
+            FROM tb_project_user tpu
+            JOIN tb_project p ON tpu.project_code = p.project_code
+            WHERE tpu.user_id IN ({format_strings})
+        """, tuple(user_ids))
+        participants = cursor.fetchall()
+
+        return jsonify({
+            'users': users,
+            'participants': participants
+        }), 200
+
+    except Exception as e:
+        print(f"사용자 및 프로젝트 정보 조회 오류: {e}")
+        return jsonify({'message': '사용자 및 프로젝트 정보 조회 오류'}), 500
+    finally:
+        try:
+            cursor.close()
+            conn.close()
+        except Exception:
+            pass
