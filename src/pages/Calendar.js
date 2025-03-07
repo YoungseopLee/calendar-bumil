@@ -16,7 +16,6 @@ const Calendar = () => {
   const [users, setUsers] = useState([]); // 직원 목록
   const [statusList, setStatusList] = useState([]); // 상태 목록 (백엔드 CRUD 결과)
   const navigate = useNavigate();
-  const [allSchedule, setAllSchedule] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false);
 
   // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
@@ -61,6 +60,7 @@ const Calendar = () => {
     fetchUserSchedule(); // 전체 일정 가져오기
   }, []);
 
+  // 로그인한 사용자의 상태 가져오기
   const fetchStatusList = async () => {
     try {
       const response = await fetch(
@@ -73,7 +73,8 @@ const Calendar = () => {
       console.error("상태 목록 로딩 오류:", error);
     }
   };
-
+  
+  // 로그인한 사용자의 일정 가져오기
   const fetchUserSchedule = async () => {
     try {
       const response = await fetch(
@@ -82,7 +83,6 @@ const Calendar = () => {
       if (!response.ok) throw new Error("전체 일정을 불러오지 못했습니다.");
       const data = await response.json();
       console.log("전체일정: ", data.schedules);
-      setAllSchedule(data.schedules); // 전체 일정 저장
       const filteredUsersSchedule = data.schedules.filter(
         (schedule) => schedule.user_id === userId
       );
@@ -420,21 +420,6 @@ const Calendar = () => {
                   <div className="day-has-other-schedule"></div>
                 )}
                 <span className="day-number">{day}</span>
-
-                {/* {day &&
-                  userSchedule.some(
-                    (schedule) =>
-                      new Date(schedule.start_date).getDate() === day
-                  ) && (
-                    <div
-                      className={`status-circle ${getStatusClass(
-                        userSchedule.find(
-                          (schedule) =>
-                            new Date(schedule.start_date).getDate() === day
-                        )?.status
-                      )}`}
-                    ></div>
-                  )} */}
               </div>
             );
           })}
@@ -600,8 +585,6 @@ const Calendar = () => {
                       (a, b) => new Date(a.start_date) - new Date(b.start_date)
                     );
 
-                  console.log("filteredSchedules: ", filtered);
-
                   if (filtered.length === 0) {
                     return (
                       <li className="empty-schedule">
@@ -642,9 +625,6 @@ const Calendar = () => {
                             <FaTrash />
                           </button>
                         )}
-                        {/* <span> {formatDate(schedule.start_date)}</span>
-                        {"\u00A0"} ~ {"\u00A0"}
-                        <span> {formatDate(schedule.end_date)}</span> */}
                       </li>
                     );
                   });
