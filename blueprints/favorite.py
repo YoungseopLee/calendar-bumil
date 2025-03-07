@@ -1,10 +1,11 @@
 from flask import Blueprint, request, jsonify
-import jwt
+import jwt, logging
 from db import get_db_connection
 from config import SECRET_KEY
 from .auth import decrypt_aes, decrypt_deterministic, encrypt_deterministic  # 이메일 복호화 함수
 
 favorite_bp = Blueprint('favorite', __name__, url_prefix='/favorite')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 @favorite_bp.route('/toggle_favorite', methods=['POST', 'OPTIONS'])
 def toggle_favorite():
@@ -22,25 +23,27 @@ def toggle_favorite():
         cursor = conn.cursor()
 
         # 암호화된 ID를 사용하여 즐겨찾기 여부 확인
-        cursor.execute(
-            "SELECT * FROM tb_favorite WHERE user_id = %s AND favorite_user_id = %s",
-            (user_id, favorite_user_id)
-        )
+        sql_tb_favorite_select = """
+            SELECT * FROM tb_favorite 
+            WHERE user_id = %s AND favorite_user_id = %s"""
+        cursor.execute(sql_tb_favorite_select, (user_id, favorite_user_id))
+        logging.info(f"[SQL/SELECT] tb_favorite /toggle_favorite{sql_tb_favorite_select}")
+        
         favorite = cursor.fetchone()
         if favorite:
             # 이미 즐겨찾기 상태이면 삭제 (즐겨찾기 해제)
-            cursor.execute(
-                "DELETE FROM tb_favorite WHERE user_id = %s AND favorite_user_id = %s",
-                (user_id, favorite_user_id)
-            )
+            sql_tb_favorite_delete = "DELETE FROM tb_favorite WHERE user_id = %s AND favorite_user_id = %s"
+            cursor.execute(sql_tb_favorite_delete, (user_id, favorite_user_id))
+            logging.info(f"[SQL/DELETE] tb_favorite /toggle_favorite{sql_tb_favorite_delete}")
             conn.commit()
             response_message = '즐겨찾기가 삭제되었습니다.'
         else:
             # 즐겨찾기가 없으면 새로 추가
-            cursor.execute(
-                "INSERT INTO tb_favorite (user_id, favorite_user_id, is_favorite_yn) VALUES (%s, %s, 'y')",
-                (user_id, favorite_user_id)
-            )
+            sql_tb_favorite_insert = """
+                INSERT INTO tb_favorite (user_id, favorite_user_id, is_favorite_yn) 
+                VALUES (%s, %s, 'y')"""
+            cursor.execute(sql_tb_favorite_insert, (user_id, favorite_user_id))
+            logging.info(f"[SQL/INSERT] tb_favorite /toggle_favorite{sql_tb_favorite_insert}")
             conn.commit()
             response_message = '즐겨찾기가 추가되었습니다.'
         return jsonify({'message': response_message}), 200
@@ -68,12 +71,12 @@ def get_favorites():
         # 기존의 u.email 대신 u.id를 사용합니다.
         sql = """
         SELECT u.id, u.name, u.position, u.department, u.phone_number,
-            COALESCE(u.status, 'NULL') AS status
+        COALESCE(u.status, 'NULL') AS status
         FROM tb_favorite f
         JOIN tb_user u ON f.favorite_user_id = u.id
-        WHERE f.user_id = %s
-        """
+        WHERE f.user_id = %s"""
         cursor.execute(sql, (user_id,))
+        logging.info(f"[SQL/SELECT] tb_favorite, tb_user /get_favorites{sql}")
         favorites = cursor.fetchall()
 
         for fav in favorites:

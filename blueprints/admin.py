@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-import jwt
+import jwt, logging
 from flask_bcrypt import Bcrypt
 from db import get_db_connection
 from config import SECRET_KEY
@@ -7,6 +7,7 @@ from .auth import encrypt_deterministic, encrypt_aes
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 bcrypt = Bcrypt()
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # 유저 생성 API (관리자용)
 @admin_bp.route('/add_user', methods=['POST', 'OPTIONS'])
@@ -54,17 +55,20 @@ def create_user():
     cursor = conn.cursor()
     try:
         # 이미 사용중인 이메일 확인
-        cursor.execute("SELECT * FROM tb_user WHERE id = %s", (id,))
+        sql_tb_user_select = "SELECT * FROM tb_user WHERE id = %s"
+        cursor.execute(sql_tb_user_select, (id,))
+        logging.info(f"[SQL/SELECT] tb_user /add_user{sql_tb_user_select}")
         if cursor.fetchone():
             return jsonify({'message': '이미 사용 중인 이메일입니다.'}), 400
 
-        sql = """
+        sql_tb_user_insert = """
         INSERT INTO tb_user 
         (name, position, department, id, phone_number, password, role_id, status, first_login_yn, created_at, updated_at, created_by, updated_by)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s)
-        """
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s)"""
         values = (name, position, department, id, phone, hashed_password, role_id, status, first_login_yn, created_by, created_by)
-        cursor.execute(sql, values)
+        cursor.execute(sql_tb_user_insert, values)
+        logging.info(f"[SQL/INSERT] tb_user /add_user{sql_tb_user_insert}")
+
         conn.commit()
         return jsonify({'message': '유저 생성 성공!'}), 201
     except Exception as e:
@@ -147,8 +151,13 @@ def update_user():
         return jsonify({'message': '데이터베이스 연결 실패!'}), 500
     cursor = conn.cursor()
     try:
-        sql = f"UPDATE tb_user SET {set_clause} WHERE id = %s AND is_delete_yn = 'N'"
+        sql = f"""
+            UPDATE tb_user 
+            SET {set_clause} 
+            WHERE id = %s AND is_delete_yn = 'N'"""
         cursor.execute(sql, tuple(values))
+        logging.info(f"[SQL/UPDATE] tb_user /update_user{sql}")
+
         conn.commit()
         return jsonify({'message': '유저 정보가 업데이트되었습니다.'}), 200
     except Exception as e:
@@ -184,8 +193,13 @@ def delete_user(user_id):
         return jsonify({'message': '데이터베이스 연결 실패!'}), 500
     cursor = conn.cursor()
     try:
-        sql = "UPDATE tb_user SET is_delete_yn = 'Y' WHERE id = %s"
+        sql = """
+            UPDATE tb_user 
+            SET is_delete_yn = 'Y' 
+            WHERE id = %s"""
         cursor.execute(sql, (user_id,))
+        logging.info(f"[SQL/UPDATE] tb_user /delete_user{sql}")
+
         conn.commit()
         return jsonify({'message': '유저가 삭제되었습니다.'}), 200
     except Exception as e:
@@ -244,8 +258,13 @@ def update_role_id():
         return jsonify({'message': '데이터베이스 연결 실패!'}), 500
     cursor = conn.cursor()
     try:
-        sql = f"UPDATE tb_user SET {set_clause} WHERE id = %s AND is_delete_yn = 'N'"
+        sql = f"""
+            UPDATE tb_user 
+            SET {set_clause} 
+            WHERE id = %s AND is_delete_yn = 'N'"""
         cursor.execute(sql, tuple(values))
+        logging.info(f"[SQL/UPDATE] tb_user /update_role_id{sql}")
+
         conn.commit()
         return jsonify({'message': '유저 정보가 업데이트되었습니다.'}), 200
     except Exception as e:
@@ -262,7 +281,13 @@ def get_roles():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT id, comment FROM tb_role ORDER BY id")
+        sql = """
+            SELECT id, comment 
+            FROM tb_role 
+            ORDER BY id"""
+        cursor.execute(sql)
+        logging.info(f"[SQL/SELECT] tb_role /get_role_list{sql}")
+
         roles = cursor.fetchall()
         return jsonify(roles), 200
     except Exception as e:
@@ -278,7 +303,14 @@ def get_unique_departments():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT DISTINCT department FROM tb_user WHERE department IS NOT NULL AND department != '' ORDER BY department")
+        sql = """
+            SELECT DISTINCT department 
+            FROM tb_user 
+            WHERE department IS NOT NULL AND department != '' 
+            ORDER BY department"""
+        cursor.execute(sql)
+        logging.info(f"[SQL/SELECT] tb_user /get_department_list{sql}")
+
         departments = cursor.fetchall()
         return jsonify([d['department'] for d in departments]), 200
     except Exception as e:
@@ -294,7 +326,14 @@ def get_unique_position():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT DISTINCT position FROM tb_user WHERE position IS NOT NULL AND position != '' ORDER BY position")
+        sql =  """
+            SELECT DISTINCT 
+            position FROM tb_user 
+            WHERE position IS NOT NULL AND position != '' 
+            ORDER BY position"""
+        cursor.execute(sql)
+        logging.info(f"[SQL/SELECT] tb_user /get_position_list{sql}")
+
         positions = cursor.fetchall()
         return jsonify([p['position'] for p in positions]), 200
     except Exception as e:
@@ -317,11 +356,6 @@ def update_status_admin():
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
         requester_user_id = payload['user_id']
-        requester_role = payload.get('role_id')
-
-        # ✅ 디버깅 로그
-        print(f"🔑 요청자 ID: {requester_user_id}")
-        print(f"🔑 요청자 역할: {requester_role}")
 
         conn = get_db_connection()
         if conn is None:
@@ -332,10 +366,7 @@ def update_status_admin():
         new_status = data.get('status')
         target_user_id = data.get('user_id')
 
-        print(f"🎯 상태 변경 대상 ID: {target_user_id}")
-        print(f"🎯 새 상태: {new_status}")
-
-        # ✅ 필수 값 체크
+        # 필수 값 체크
         if not new_status:
             return jsonify({'message': '새 상태가 제공되지 않았습니다.'}), 400
         if not target_user_id:
@@ -346,14 +377,16 @@ def update_status_admin():
         if not user_info:
             return jsonify({'message': '사용자를 찾을 수 없습니다.'}), 404
 
-        # ✅ 상태 업데이트
+        # 상태 업데이트
         cursor.execute("UPDATE tb_user SET status = %s WHERE id = %s", (new_status, target_user_id))
 
-        # ✅ 변경 이력 기록
-        cursor.execute("""
+        # 변경 이력 기록
+        sql = """
             INSERT INTO tb_user_status_log (recorded_at, status_id, user_id, created_by)
-            VALUES (NOW(3), %s, %s, %s)
-        """, (new_status, target_user_id, requester_user_id))
+            VALUES (NOW(3), %s, %s, %s)"""
+        cursor.execute(sql, (new_status, target_user_id, requester_user_id))
+        logging.info(f"[SQL/INSERT] tb_user_status_log /update_status_admin{sql}")
+
 
         conn.commit()
         return jsonify({'message': '상태가 업데이트되었습니다.'}), 200

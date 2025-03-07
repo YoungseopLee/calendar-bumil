@@ -1,9 +1,10 @@
 from flask import Blueprint, request, jsonify
-import jwt
+import jwt, logging
 from db import get_db_connection
 from config import SECRET_KEY
 
 status_bp = Blueprint('status', __name__, url_prefix='/status')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # 전체 상태 목록 조회
 @status_bp.route('/get_all_status', methods=['GET', 'OPTIONS'])
@@ -15,7 +16,11 @@ def get_all_status():
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT id, comment FROM tb_status")
+        sql = """
+            SELECT id, comment FROM tb_status"""
+        cursor.execute(sql)
+        logging.info(f"[SQL/SELECT] tb_status /get_all_status{sql}")
+
         statuses = cursor.fetchall()
         return jsonify({'statuses': statuses}), 200
     except Exception as e:
@@ -37,7 +42,12 @@ def get_status_list():
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT id, comment FROM tb_status ORDER BY comment")
+        
+        sql = """
+            SELECT id, comment FROM tb_status ORDER BY comment"""
+        cursor.execute(sql)
+        logging.info(f"[SQL/SELECT] tb_status /get_status_list{sql}")
+
         statuses = cursor.fetchall()
         return jsonify({'statuses': statuses}), 200
     except Exception as e:
@@ -65,8 +75,13 @@ def get_users_status():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
         format_strings = ','.join(['%s'] * len(user_ids))
-        query = f"SELECT id, status FROM tb_user WHERE id IN ({format_strings})"
-        cursor.execute(query, tuple(user_ids))
+        sql = f"""
+            SELECT id, status 
+            FROM tb_user 
+            WHERE id IN ({format_strings})"""
+        cursor.execute(sql, tuple(user_ids))
+        logging.info(f"[SQL/SELECT] tb_user /get_users_status{sql}")
+        
         statuses = cursor.fetchall()
         statuses_dict = {user["id"]: user["status"] for user in statuses}
         return jsonify({'statuses': statuses_dict}), 200
@@ -95,7 +110,13 @@ def add_status():
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO tb_status (id, comment) VALUES (%s, %s)", (new_status, comment))
+        
+        sql = """
+            INSERT INTO tb_status (id, comment)
+            VALUES (%s, %s)"""
+        cursor.execute(sql, (new_status, comment))
+        logging.info(f"[SQL/INSERT] tb_status /add_status{sql}")
+        
         conn.commit()
         return jsonify({'message': '상태가 추가되었습니다.'}), 201
     except Exception as e:
@@ -126,16 +147,20 @@ def edit_status(status_id):
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
 
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM tb_status WHERE id = %s", (status_id,))
+        sql_select = """
+            SELECT * FROM tb_status WHERE id = %s"""
+        cursor.execute(sql_select, (status_id,))
+        logging.info(f"[SQL/SELECT] tb_status /edit_status{sql_select}")
+        
         existing_status = cursor.fetchone()
 
         if not existing_status:
             return jsonify({'message': '상태를 찾을 수 없습니다.'}), 404
+        
+        sql_update = "UPDATE tb_status SET comment = %s WHERE id = %s"
+        cursor.execute(sql_update, (new_comment, status_id))
+        logging.info(f"[SQL/UPDATE] tb_status /edit_status{sql_update}")
 
-        cursor.execute(
-            "UPDATE tb_status SET comment = %s WHERE id = %s",
-            (new_comment, status_id)
-        )
         conn.commit()
 
         return jsonify({'message': '상태가 성공적으로 수정되었습니다.'}), 200
@@ -161,7 +186,12 @@ def delete_status(status):
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM tb_status WHERE id = %s", (status,))
+
+        sql = """
+            DELETE FROM tb_status WHERE id = %s"""
+        cursor.execute(sql, (status,))
+        logging.info(f"[SQL/DELETE] tb_status /delete_status{sql}")
+
         conn.commit()
         return jsonify({'message': '상태가 삭제되었습니다.'}), 200
     except Exception as e:
@@ -199,16 +229,23 @@ def update_status():
         # role_id가 없으면 DB에서 조회
         if not requester_role:
             user_id = requester_user_id
-            cursor.execute("SELECT role_id FROM tb_user WHERE id = %s", (user_id,))
+            sql_role_select = """
+                SELECT role_id FROM tb_user WHERE id = %s"""
+            cursor.execute(sql_role_select, (user_id,))
             result = cursor.fetchone()
+            logging.info(f"[SQL/SELECT] tb_status /update_status{sql_role_select}")
+            
             requester_role = result.get('role_id') if result else None
 
         data = request.get_json()
         new_status = data.get('status')
         target_user_id = data.get('user_id', requester_user_id)
 
-        # ✅ **여기서 404 발생 가능성 있음**
-        cursor.execute("SELECT status FROM tb_user WHERE id = %s", (target_user_id,))
+        sql_status_select = """
+            SELECT status FROM tb_user WHERE id = %s"""
+        cursor.execute(sql_status_select, (target_user_id,))
+        logging.info(f"[SQL/SELECT] tb_status /update_status{sql_status_select}")
+
         user_info = cursor.fetchone()
         if not user_info:
             return jsonify({'message': '사용자를 찾을 수 없습니다.'}), 404
@@ -218,13 +255,17 @@ def update_status():
             return jsonify({'message': '상태가 변경되지 않았습니다.'}), 200
 
         # 상태 업데이트
-        cursor.execute("UPDATE tb_user SET status = %s WHERE id = %s", (new_status, target_user_id))
+        sql_status_update = """
+            UPDATE tb_user SET status = %s WHERE id = %s"""
+        cursor.execute(sql_status_update, (new_status, target_user_id))
+        logging.info(f"[SQL/UPDATE] tb_status /update_status{sql_status_update}")
 
         # 변경 이력 기록
-        cursor.execute("""
+        sql_status_log_insert = """
             INSERT INTO tb_user_status_log (recorded_at, status_id, user_id, created_by)
-            VALUES (NOW(3), %s, %s, %s)
-        """, (new_status, target_user_id, requester_user_id))
+            VALUES (NOW(3), %s, %s, %s)"""
+        cursor.execute(sql_status_log_insert, (new_status, target_user_id, requester_user_id))
+        logging.info(f"[SQL/INSERT] tb_user_status_log /update_status{sql_status_log_insert}")
 
         conn.commit()
         return jsonify({'message': '상태가 업데이트되었습니다.'}), 200

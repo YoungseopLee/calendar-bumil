@@ -1,11 +1,12 @@
 from flask import Blueprint, request, jsonify
-import jwt
+import jwt, logging
 from db import get_db_connection
 from config import SECRET_KEY
 from datetime import datetime
 from .auth import decrypt_deterministic, encrypt_deterministic, decrypt_aes
 
 project_bp = Blueprint('project', __name__, url_prefix='/project')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 def parse_date(date_str: str) -> str:
     try:
@@ -41,6 +42,8 @@ def get_all_project():
         ORDER BY p.created_at DESC
         """
         cursor.execute(sql)
+        logging.info(f"[SQL/SELECT] tb_project, tb_project_user /get_all_project{sql}")
+        
         projects = cursor.fetchall()
         
         for project in projects:
@@ -66,43 +69,44 @@ def get_all_project():
 def get_search_project():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
-    # ... (이전과 동일)
     try:
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
-        query = """
+        sql = """
         SELECT p.*, GROUP_CONCAT(pu.user_id) AS assigned_user_ids
         FROM tb_project p
-        LEFT JOIN tb_project_user pu ON p.project_code = pu.project_code AND pu.is_delete_yn = 'N'
-        WHERE p.is_delete_yn = 'N'
-        """
+        LEFT JOIN tb_project_user pu 
+        ON p.project_code = pu.project_code AND pu.is_delete_yn = 'N'
+        WHERE p.is_delete_yn = 'N'"""
         params = []
         # 조건 추가
         if request.args.get('Business_Start_Date'):
-            query += " AND p.business_start_date >= %s"
+            sql += " AND p.business_start_date >= %s"
             params.append(request.args.get('Business_Start_Date'))
         if request.args.get('Business_End_Date'):
-            query += " AND p.business_end_date <= %s"
+            sql += " AND p.business_end_date <= %s"
             params.append(request.args.get('Business_End_Date'))
         if request.args.get('Project_PM'):
-            query += " AND p.project_pm LIKE %s"
+            sql += " AND p.project_pm LIKE %s"
             params.append(f"%{request.args.get('Project_PM')}%")
         if request.args.get('Sales_Representative'):
-            query += " AND p.sales_representative LIKE %s"
+            sql += " AND p.sales_representative LIKE %s"
             params.append(f"%{request.args.get('Sales_Representative')}%")
         if request.args.get('Group_Name'):
-            query += " AND p.group_name LIKE %s"
+            sql += " AND p.group_name LIKE %s"
             params.append(f"%{request.args.get('Group_Name')}%")
         if request.args.get('Project_Code'):
-            query += " AND p.project_code LIKE %s"
+            sql += " AND p.project_code LIKE %s"
             params.append(f"%{request.args.get('Project_Code')}%")
         if request.args.get('Project_Name'):
-            query += " AND p.project_name LIKE %s"
+            sql += " AND p.project_name LIKE %s"
             params.append(f"%{request.args.get('Project_Name')}%")
-        query += " GROUP BY p.project_code"
-        cursor.execute(query, tuple(params))
+        sql += " GROUP BY p.project_code"
+        cursor.execute(sql, tuple(params))
+        logging.info(f"[SQL/SELECT] tb_project, tb_project_user /get_search_project{sql}")
+
         search_projects = cursor.fetchall()
         return jsonify({'projects': search_projects}), 200
     except Exception as e:
@@ -135,9 +139,9 @@ def get_project_details():
         sql_project = """
             SELECT *
             FROM tb_project
-            WHERE project_code = %s AND is_delete_yn = 'N'
-        """
+            WHERE project_code = %s AND is_delete_yn = 'N'"""
         cursor.execute(sql_project, (project_code,))
+        logging.info(f"[SQL/SELECT] tb_project /get_project_details{sql_project}")
         project = cursor.fetchone()
 
         if not project:
@@ -147,9 +151,9 @@ def get_project_details():
         sql_project_users = """
             SELECT *
             FROM tb_project_user
-            WHERE project_code = %s AND is_delete_yn = 'N'
-        """
+            WHERE project_code = %s AND is_delete_yn = 'N'"""
         cursor.execute(sql_project_users, (project_code,))
+        logging.info(f"[SQL/SELECT] tb_project_user /get_search_project{sql_project_users}")
         project_users = cursor.fetchall()
 
         # 프로젝트 정보에 참여자 정보를 추가 (원하는 키 이름으로 지정 가능: participants 또는 project_users)
@@ -228,9 +232,7 @@ def add_project():
         project_name, customer, supplier, person_in_charge, contact_number,
         sales_representative, project_pm, project_manager, business_details_and_notes, changes,
         group_name, is_delete_yn, created_at, updated_at, created_by, updated_by)
-        VALUES
-        (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'N', NOW(), NOW(), %s, %s)
-        """
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'N', NOW(), NOW(), %s, %s)"""
         values_project = (
             project_code, category, status, business_start_date, business_end_date,
             project_name, customer, supplier, person_in_charge, contact_number,
@@ -238,6 +240,7 @@ def add_project():
             group_name, created_by, created_by
         )
         cursor.execute(sql_project, values_project)
+        logging.info(f"[SQL/INSERT] tb_project /add_project{sql_project}")
 
         sql_project_user = """
         INSERT INTO tb_project_user
@@ -254,7 +257,7 @@ def add_project():
                 return jsonify({'message': '참여자 ID가 누락되었습니다.'}), 400
 
             cursor.execute(sql_project_user, (project_code, participant_id, start_date, end_date, current_project_yn, created_by, created_by))
-
+            logging.info(f"[SQL/INSERT] tb_project_user /add_project{sql_project_user}")
         conn.commit()
         return jsonify({'message': '프로젝트가 추가되었습니다.'}), 201
     except Exception as e:
@@ -324,10 +327,12 @@ def edit_project():
 
         # 기존 프로젝트 조회
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("""
+        sql_select_project = """
             SELECT project_code FROM tb_project
-            WHERE project_code = %s AND is_delete_yn = 'N'
-        """, (new_project_code,))
+            WHERE project_code = %s AND is_delete_yn = 'N'"""
+        cursor.execute(sql_select_project, (new_project_code,))
+        logging.info(f"[SQL/SELECT] tb_project /edit_project{sql_select_project}")
+
         old_project = cursor.fetchone()
         if not old_project:
             return jsonify({'message': '수정할 프로젝트를 찾을 수 없습니다.'}), 404
@@ -357,8 +362,7 @@ def edit_project():
             project_code = %s,
             updated_at = NOW(),
             updated_by = %s
-        WHERE project_code = %s
-        """
+        WHERE project_code = %s"""
         values_project = (
             category, status, business_start_date, business_end_date,
             project_name, customer, supplier, person_in_charge, contact_number,
@@ -368,6 +372,8 @@ def edit_project():
             old_project_code
         )
         cursor.execute(sql_project, values_project)
+        logging.info(f"[SQL/UPDATE] tb_project /edit_project{sql_project}")
+
         cursor.close()
 
         # tb_project_user 업데이트: 기존 참여자 논리 삭제 후 재등록
@@ -377,8 +383,7 @@ def edit_project():
         INSERT INTO tb_project_user
         (project_code, user_id, start_date, end_date, current_project_yn, is_delete_yn, created_at, updated_at, created_by, updated_by)
         VALUES
-        (%s, %s, %s, %s, %s, 'N', NOW(), NOW(), %s, %s)
-        """
+        (%s, %s, %s, %s, %s, 'N', NOW(), NOW(), %s, %s)"""
         
         for participant in participants:
             participant_user_id = participant.get("user_id") or participant.get("id")
@@ -398,6 +403,8 @@ def edit_project():
                 new_project_code, participant_user_id, participant_start_date, participant_end_date,
                 current_project_yn, updated_by, updated_by
             ))
+            logging.info(f"[SQL/INSERT] tb_project_user /edit_project{sql_project_user}")
+
         conn.commit()
 
         return jsonify({'message': '프로젝트가 수정되었습니다.'}), 200
@@ -424,8 +431,14 @@ def delete_project(project_code):
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
 
         cursor = conn.cursor()
-        cursor.execute("UPDATE tb_project SET is_delete_yn = 'Y', updated_at = NOW() WHERE project_code = %s", (project_code,))
-        cursor.execute("UPDATE tb_project_user SET is_delete_yn = 'Y', updated_at = NOW() WHERE project_code = %s", (project_code,))
+        sql_project = "UPDATE tb_project SET is_delete_yn = 'Y', updated_at = NOW() WHERE project_code = %s"
+        cursor.execute(sql_project, (project_code,))
+        logging.info(f"[SQL/UPDATE] tb_project /delete_project{sql_project}")
+
+        sql_project_user = "UPDATE tb_project_user SET is_delete_yn = 'Y', updated_at = NOW() WHERE project_code = %s"
+        cursor.execute(sql_project_user, (project_code,))
+        logging.info(f"[SQL/UPDATE] tb_project_user /delete_project{sql_project_user}")
+
         conn.commit()
         return jsonify({'message': '프로젝트가 삭제되었습니다.'}), 200
     except jwt.ExpiredSignatureError:
@@ -460,12 +473,14 @@ def get_user_and_projects():
         cursor = conn.cursor(dictionary=True)
 
         # tb_user 테이블에서 필요한 컬럼 조회
-        cursor.execute("""
+        sql = """
             SELECT id, name, position, department, phone_number, role_id, status, is_delete_yn, first_login_yn
             FROM tb_user
-            WHERE id = %s AND is_delete_yn = 'N'
-        """, (user_id,))
+            WHERE id = %s AND is_delete_yn = 'N'"""
+        cursor.execute(sql, (user_id,))
         user_info = cursor.fetchone()
+        logging.info(f"[SQL/SELECT] tb_user /get_user_and_projects{sql}")
+
         if not user_info:
             return jsonify({'message': '사용자 정보를 찾을 수 없습니다.'}), 404
 
@@ -477,12 +492,14 @@ def get_user_and_projects():
             user_info['phone_number'] = "복호화 실패"
 
         # tb_project_user와 tb_project 테이블을 조인하여 해당 사용자의 프로젝트 참여 정보 조회
-        cursor.execute("""
+        sql_project_and_project_user = """
             SELECT tpu.*, p.project_name
             FROM tb_project_user tpu
             JOIN tb_project p ON tpu.project_code = p.project_code
-            WHERE tpu.user_id = %s
-        """, (user_id,))
+            WHERE tpu.user_id = %s"""
+        cursor.execute(sql_project_and_project_user, (user_id,))
+        logging.info(f"[SQL/SELECT] tb_project, tb_project_user /get_user_and_projects{sql_project_and_project_user}")
+
         participants = cursor.fetchall()
 
         return jsonify({
@@ -520,11 +537,13 @@ def get_users_and_projects():
 
         # ✅ 여러 사용자 정보 조회
         format_strings = ','.join(['%s'] * len(user_ids))  # IN 절을 위한 포맷팅
-        cursor.execute(f"""
+        sql = f"""
             SELECT id, name, position, department, phone_number, role_id, status, is_delete_yn, first_login_yn
             FROM tb_user
-            WHERE id IN ({format_strings}) AND is_delete_yn = 'N'
-        """, tuple(user_ids))
+            WHERE id IN ({format_strings}) AND is_delete_yn = 'N'"""
+        cursor.execute(sql, tuple(user_ids))
+        logging.info(f"[SQL/SELECT] tb_user /get_users_and_projects{sql}")
+
         users = cursor.fetchall()
 
         if not users:
@@ -539,12 +558,14 @@ def get_users_and_projects():
                 user['phone_number'] = "복호화 실패"
 
         # ✅ 여러 사용자에 대한 프로젝트 정보 조회
-        cursor.execute(f"""
+        sql_project_and_project_user = f"""
             SELECT tpu.*, p.project_name
             FROM tb_project_user tpu
             JOIN tb_project p ON tpu.project_code = p.project_code
-            WHERE tpu.user_id IN ({format_strings})
-        """, tuple(user_ids))
+            WHERE tpu.user_id IN ({format_strings})"""
+        cursor.execute(sql_project_and_project_user, tuple(user_ids))
+        logging.info(f"[SQL/SELECT] tb_project, tb_project_user /get_users_and_projects{sql_project_and_project_user}")
+
         participants = cursor.fetchall()
 
         return jsonify({

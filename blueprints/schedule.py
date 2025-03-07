@@ -1,10 +1,11 @@
 from flask import Blueprint, request, jsonify
-import jwt
+import jwt, logging
 from db import get_db_connection
 from config import SECRET_KEY
 from .auth import decrypt_deterministic  # 이메일 복호화 함수
 
 schedule_bp = Blueprint('schedule', __name__, url_prefix='/schedule')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 @schedule_bp.route('/get_schedule', methods=['GET', 'OPTIONS'])
 def get_schedule():
@@ -18,11 +19,12 @@ def get_schedule():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
         sql = """
-        SELECT id, task, start_date, end_date, status
-        FROM tb_schedule
-        WHERE user_id = %s AND DATE(start_date) <= %s AND DATE(end_date) >= %s
-        """
+            SELECT id, task, start_date, end_date, status
+            FROM tb_schedule
+            WHERE user_id = %s AND DATE(start_date) <= %s AND DATE(end_date) >= %s"""
         cursor.execute(sql, (user_id, date, date))
+        logging.info(f"[SQL/SELECT] tb_schedule /get_schedule{sql}")
+
         schedules = cursor.fetchall()
         return jsonify({'schedules': schedules}), 200
     except Exception as e:
@@ -69,13 +71,14 @@ def get_other_users_schedule():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
         sql = """
-        SELECT s.id AS schedule_id, s.task, s.start_date, s.end_date, s.status, 
-              u.id AS user_id, u.name
-        FROM tb_schedule s
-        JOIN tb_user u ON s.user_id = u.id
-        WHERE DATE(s.start_date) <= %s AND DATE(s.end_date) >= %s
-        """
+            SELECT s.id AS schedule_id, s.task, s.start_date, s.end_date, s.status, u.id AS user_id, u.name
+            FROM tb_schedule s
+            JOIN tb_user u 
+            ON s.user_id = u.id
+            WHERE DATE(s.start_date) <= %s AND DATE(s.end_date) >= %s"""
         cursor.execute(sql, (date, date))
+        logging.info(f"[SQL/SELECT] tb_schedule, tb_user /get_other_users_schedule{sql}")
+
         schedules = cursor.fetchall()
         
         # 현재 사용자의 일정은 제외 (암호화된 ID끼리 직접 비교)
@@ -124,12 +127,13 @@ def add_schedule():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor()
         sql = """
-        INSERT INTO tb_schedule 
-        (user_id, start_date, end_date, task, status)
-        VALUES (%s, %s, %s, %s, %s)
-        """
+            INSERT INTO tb_schedule 
+            (user_id, start_date, end_date, task, status)
+            VALUES (%s, %s, %s, %s, %s)"""
         values = (user_id, start_date, end_date, task, status)
         cursor.execute(sql, values)
+        logging.info(f"[SQL/INSERT] tb_schedule /add-schedule{sql}")
+
         conn.commit()
         return jsonify({'message': '일정이 추가되었습니다.'}), 200
     except Exception as e:
@@ -172,18 +176,22 @@ def edit_schedule(schedule_id):
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor()
         
-        cursor.execute("SELECT user_id FROM tb_schedule WHERE id = %s", (schedule_id,))
+        sql_user_id_select = "SELECT user_id FROM tb_schedule WHERE id = %s"
+        cursor.execute(sql_user_id_select, (schedule_id,))
+        logging.info(f"[SQL/SELECT] tb_schedule /edit-schedule{sql_user_id_select}")
+
         schedule_owner = cursor.fetchone()
         if schedule_owner and schedule_owner[0] != user_id_from_token:
             return jsonify({'message': '일정을 수정할 권한이 없습니다.'}), 403
         
-        sql = """
-        UPDATE tb_schedule
-        SET start_date = %s, end_date = %s, task = %s, status = %s
-        WHERE id = %s
-        """
+        sql_schedule_update = """
+            UPDATE tb_schedule
+            SET start_date = %s, end_date = %s, task = %s, status = %s
+            WHERE id = %s"""
         values = (start_date, end_date, task, status, schedule_id)
-        cursor.execute(sql, values)
+        cursor.execute(sql_schedule_update, values)
+        logging.info(f"[SQL/UPDATE] tb_schedule /edit-schedule{sql_schedule_update}")
+
         conn.commit()
         return jsonify({'message': '일정이 수정되었습니다.'}), 200
     except jwt.ExpiredSignatureError:
@@ -222,18 +230,22 @@ def delete_schedule(schedule_id):
         cursor = conn.cursor()
 
         # 삭제하려는 일정의 user_id 가져오기
-        cursor.execute("SELECT user_id FROM tb_schedule WHERE id = %s", (schedule_id,))
-        schedule_owner = cursor.fetchone()
+        sql_user_id_select = """
+            SELECT user_id FROM tb_schedule WHERE id = %s"""
+        cursor.execute(sql_user_id_select, (schedule_id,))
+        logging.info(f"[SQL/SELECT] tb_schedule /delete-schedule{sql_user_id_select}")
 
-        # 🔹 디버깅 로그 추가
-        print(f"🔹 요청한 사용자 ID: {user_id}, 역할: {role_id}, 일정 소유자 ID: {schedule_owner}")
+        schedule_owner = cursor.fetchone()
 
         # 🔹 일정 소유자이거나 `AD_ADMIN`이면 삭제 가능
         if schedule_owner and (schedule_owner[0] != user_id and role_id != "AD_ADMIN"):
             return jsonify({'message': '일정을 삭제할 권한이 없습니다.'}), 403
 
         # 삭제 실행
-        cursor.execute("DELETE FROM tb_schedule WHERE id = %s", (schedule_id,))
+        sql_schedule_id_delete = "DELETE FROM tb_schedule WHERE id = %s"
+        cursor.execute(sql_schedule_id_delete, (schedule_id,))
+        logging.info(f"[SQL/DELETE] tb_schedule /delete-schedule{sql_schedule_id_delete}")
+
         conn.commit()
         return jsonify({'message': '일정이 삭제되었습니다.'}), 200
     except jwt.ExpiredSignatureError:
@@ -257,8 +269,11 @@ def get_all_schedule():
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
-        sql = "SELECT * FROM tb_schedule"
+        sql = """
+            SELECT * FROM tb_schedule"""
         cursor.execute(sql)
+        logging.info(f"[SQL/SELECT] tb_schedule /get_all_schedule{sql}")
+
         schedules = cursor.fetchall()
         return jsonify({'schedules': schedules}), 200
     except Exception as e:

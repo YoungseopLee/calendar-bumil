@@ -5,13 +5,11 @@ from datetime import datetime, timedelta, timezone
 from db import get_db_connection
 from config import SECRET_KEY
 from Cryptodome.Cipher import AES
-
-import jwt
-import base64
-import os
+import jwt, base64, os, logging
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 bcrypt = Bcrypt()
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 # AES 키 (정확히 32 바이트로 설정)
 AES_KEY = os.environ.get("AES_SECRET_KEY", "Bumil-calendar-1234567890!@#$%^&*").ljust(32)[:32]
@@ -62,6 +60,7 @@ def decrypt_deterministic(encrypted_data: str) -> str:
     return unpadded_bytes.decode('utf-8')
 
 # 회원가입 (AES 암호화 적용)
+# 현재 사용하지 않음.
 @auth_bp.route('/signup', methods=['POST', 'OPTIONS'])
 @cross_origin(supports_credentials=True)
 def signup():
@@ -87,7 +86,10 @@ def signup():
 
         cursor = conn.cursor()
         # 새 DB에서는 테이블명이 tb_user임
-        cursor.execute("SELECT * FROM tb_user WHERE id = %s", (id,))
+        sql_tb_user_select = "SELECT * FROM tb_user WHERE id = %s"
+        cursor.execute(sql_tb_user_select, (id,))
+        logging.info(f"[SQL/SELECT] tb_user /signup{sql_tb_user_select}")
+
         if cursor.fetchone():
             return jsonify({'message': '이미 사용 중인 이메일입니다.'}), 400
 
@@ -98,12 +100,14 @@ def signup():
         INSERT INTO tb_user 
         (name, position, department, id, phone_number, password, role_id, is_delete_yn, 
         , created_at, updated_at)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, 'N', 'N', NOW(), NOW())
-        """
+        VALUES (%s, %s, %s, %s, %s, %s, %s, 'N', 'N', NOW(), NOW())"""
+        
         # AD_ADMIN, PR_ADMIN, PR_MANAGER, USR_GENERAL
         default_role_id = "USR_GENERAL"
         values = (name, position, department, id, phone, hashed_password, default_role_id)
         cursor.execute(sql, values)
+        logging.info(f"[SQL/INSERT] tb_user /signup{sql}")
+
         conn.commit()
         return jsonify({'message': '회원가입 성공!'}), 201
     except Exception as e:
@@ -136,7 +140,11 @@ def login():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
 
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM tb_user WHERE id = %s", (id,))
+        sql_tb_user_select = """
+        SELECT * FROM tb_user WHERE id = %s"""
+        cursor.execute(sql_tb_user_select, (id,))
+        logging.info(f"[SQL/SELECT] tb_user /login{sql_tb_user_select}")
+
         user = cursor.fetchone()
 
         if not user:
@@ -196,7 +204,11 @@ def get_logged_in_user():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
 
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM tb_user WHERE id = %s", (user_id,))
+        sql_tb_user_select = """
+            SELECT * FROM tb_user WHERE id = %s"""
+        cursor.execute(sql_tb_user_select, (user_id,))
+        logging.info(f"[SQL/SELECT] tb_user /get_logged_in_user{sql_tb_user_select}")
+
         user = cursor.fetchone()
 
         if user:
@@ -261,7 +273,13 @@ def change_password():
     cursor = conn.cursor(dictionary=True)
     try:
         # 현재 유저의 비밀번호와 first_login_yn 확인
-        cursor.execute("SELECT password, first_login_yn FROM tb_user WHERE id = %s AND is_delete_yn = 'N'", (user_id,))
+        sql_tb_user_select = """
+            SELECT password, first_login_yn 
+            FROM tb_user 
+            WHERE id = %s AND is_delete_yn = 'N'"""
+        cursor.execute(sql_tb_user_select, (user_id,))
+        logging.info(f"[SQL/SELECT] tb_user /change_password{sql_tb_user_select}")
+
         user = cursor.fetchone()
         if not user:
             return jsonify({'message': '사용자를 찾을 수 없습니다.'}), 404
@@ -274,10 +292,13 @@ def change_password():
         new_hashed = bcrypt.generate_password_hash(new_password).decode('utf-8')
 
         # 비밀번호를 업데이트하고 first_login_yn을 'y'로 변경 (비밀번호 변경 완료)
-        cursor.execute(
-            "UPDATE tb_user SET password = %s, first_login_yn = 'Y', updated_at = NOW(), updated_by = %s WHERE id = %s",
-            (new_hashed, payload.get('name', 'SYSTEM'), user_id)
-        )
+        sql_tb_user_update = """
+            UPDATE tb_user 
+            SET password = %s, first_login_yn = 'Y', updated_at = NOW(), updated_by = %s 
+            WHERE id = %s"""
+        cursor.execute(sql_tb_user_update, (new_hashed, payload.get('name', 'SYSTEM'), user_id))
+        logging.info(f"[SQL/UPDATE] tb_user /change_password{sql_tb_user_update}")
+
         conn.commit()
         return jsonify({'message': '비밀번호가 성공적으로 변경되었습니다.'}), 200
     except Exception as e:
