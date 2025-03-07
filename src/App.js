@@ -12,7 +12,7 @@ import MyPage from "./pages/MyPage";
 import Department_view from "./pages/Department-view";
 import Profile from "./pages/Profile";
 import ProjectDetails from "./pages/ProjectDetails";
-import ProjectPage from "./pages/ProjectPage"; // 추가
+import ProjectPage from "./pages/ProjectPage";
 import ProjectEdit from "./pages/ProjectEdit";
 import ProjectCreate from "./pages/ProjectCreate";
 import ChangePWPage from "./pages/ChangePWPage";
@@ -20,6 +20,7 @@ import UserDetails from "./pages/UserDetails";
 import UserRolesManagement from "./pages/UserRolesManagement";
 import SituationControl from "./pages/SituationControl";
 import AddUserPage from "./pages/AddUserPage";
+import ResetUser from "./pages/ResetUser";
 
 function App() {
   return (
@@ -42,6 +43,8 @@ function App() {
           path="/user-roles-management"
           element={<UserRolesManagement />}
         />
+        {/* 어드민 페이지 */}
+        <Route path="/reset-user" element={<ResetUser />} />
         {/* 상태 CRUD 페이지 */}
         <Route path="/status-management" element={<StatusManagement />} />
         {/* 사원 페이지 */}
