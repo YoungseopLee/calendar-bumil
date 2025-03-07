@@ -7,6 +7,7 @@ from .auth import decrypt_deterministic, encrypt_deterministic, decrypt_aes
 
 project_bp = Blueprint('project', __name__, url_prefix='/project')
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 def parse_date(date_str: str) -> str:
     try:

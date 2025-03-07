@@ -6,6 +6,7 @@ from .auth import decrypt_aes, decrypt_deterministic, encrypt_deterministic  # ì
 
 favorite_bp = Blueprint('favorite', __name__, url_prefix='/favorite')
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 @favorite_bp.route('/toggle_favorite', methods=['POST', 'OPTIONS'])
 def toggle_favorite():

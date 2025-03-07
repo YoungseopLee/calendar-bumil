@@ -6,6 +6,7 @@ from .auth import decrypt_deterministic  # 이메일 복호화 함수
 
 schedule_bp = Blueprint('schedule', __name__, url_prefix='/schedule')
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 @schedule_bp.route('/get_schedule', methods=['GET', 'OPTIONS'])
 def get_schedule():

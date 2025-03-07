@@ -21,11 +21,11 @@ if not os.path.exists(LOG_DIR):
 # 로그 포맷 설정
 log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
-# STDOUT 로그 (도커 컨테이너에서도 출력됨)
+# STDOUT 로그 (터미널 출력)
 stdout_handler = logging.StreamHandler()
 stdout_handler.setFormatter(log_formatter)
 
-# 파일 로그 (컨테이너 내부 또는 로컬 환경에서도 정상 동작)
+# 파일 로그 (파일 저장)
 file_handler = logging.FileHandler(f"{LOG_DIR}/app.log")
 file_handler.setFormatter(log_formatter)
 
@@ -33,6 +33,12 @@ file_handler.setFormatter(log_formatter)
 app.logger.setLevel(logging.INFO)
 app.logger.addHandler(stdout_handler)
 app.logger.addHandler(file_handler)
+
+# werkzeug 기본 로그도 같이 보이도록 설정
+werkzeug_logger = logging.getLogger("werkzeug")
+werkzeug_logger.setLevel(logging.INFO)
+werkzeug_logger.addHandler(stdout_handler)
+werkzeug_logger.addHandler(file_handler)
 
 # 다른 모듈에서도 app.logger를 사용하도록 함
 logging.getLogger().addHandler(stdout_handler)

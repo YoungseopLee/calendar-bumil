@@ -6,6 +6,7 @@ from .auth import decrypt_aes, decrypt_deterministic, encrypt_deterministic
 
 user_bp = Blueprint('user', __name__, url_prefix='/user')
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 # 첫 로그인 사용자 목록 조회
 @user_bp.route('/get_pending_users', methods=['GET', 'OPTIONS'])

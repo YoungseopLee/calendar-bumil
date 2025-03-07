@@ -10,6 +10,7 @@ import jwt, base64, os, logging
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 bcrypt = Bcrypt()
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 # AES 키 (정확히 32 바이트로 설정)
 AES_KEY = os.environ.get("AES_SECRET_KEY", "Bumil-calendar-1234567890!@#$%^&*").ljust(32)[:32]

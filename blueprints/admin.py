@@ -8,6 +8,7 @@ from .auth import encrypt_deterministic, encrypt_aes
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 bcrypt = Bcrypt()
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 # 유저 생성 API (관리자용)
 @admin_bp.route('/add_user', methods=['POST', 'OPTIONS'])

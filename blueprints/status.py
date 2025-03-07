@@ -5,6 +5,7 @@ from config import SECRET_KEY
 
 status_bp = Blueprint('status', __name__, url_prefix='/status')
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 # 전체 상태 목록 조회
 @status_bp.route('/get_all_status', methods=['GET', 'OPTIONS'])
