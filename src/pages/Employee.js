@@ -210,8 +210,9 @@ const EmployeeList = () => {
   // 🔍 **검색 필터링 로직**
   const filterEmployees = (emp) => {
     if (!searchText) return true;
+    const mappedSearchText = statusMap[searchText] || searchText;
     const value = emp[searchField]?.toLowerCase() || "";
-    return value.includes(searchText);
+    return value.includes(mappedSearchText.toLowerCase());
   };
 
   // 부서 목록을 클릭했을 때 해당 부서의 상태를 토글하는 함수
@@ -275,8 +276,7 @@ const EmployeeList = () => {
             className="search-input"
             placeholder="검색어를 입력해주세요..."
             onChange={(e) => {
-              let inputValue = e.target.value.trim();
-              setSearchText(statusMap[inputValue] || inputValue);
+              setSearchText(e.target.value.trim());
             }}
             value={searchText}
           />
