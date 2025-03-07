@@ -28,7 +28,7 @@ const AddSchedule = () => {
 
   // ✅ 일정 관련 상태 관리
   const [startDate, setStartDate] = useState(""); // 시작 날짜
-  const [endDate, setEndDate] = useState(""); // 종료 날짜
+  const [endDate, setEndDate] = useState(""); // 종료 날짜 
   const [newTask, setNewTask] = useState(""); // 새로운 할 일
   const [status, setStatus] = useState("준비 중"); // 상태 (준비 중, 진행 중, 완료)
   const [tasks, setTasks] = useState([]); // 추가된 일정 목록
@@ -73,6 +73,28 @@ const AddSchedule = () => {
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
+  };
+
+  // ✅ 시작 날짜 변경 시 종료 날짜가 앞서는 경우 자동 조정
+  const handleStartDateChange = (e) => {
+    const newStartDate = e.target.value;
+    setStartDate(newStartDate);
+
+    // 🚀 자동 조정: 시작 날짜가 종료 날짜보다 뒤라면 종료 날짜도 같이 변경
+    if (endDate && new Date(newStartDate) > new Date(endDate)) {
+      setEndDate(newStartDate);
+    }
+  };
+
+  // ✅ 종료 날짜 변경 시 시작 날짜보다 앞서는 경우 자동 조정
+  const handleEndDateChange = (e) => {
+    const newEndDate = e.target.value;
+    setEndDate(newEndDate);
+
+    // 🚀 자동 조정: 종료 날짜가 시작 날짜보다 앞서면 시작 날짜도 같이 변경
+    if (startDate && new Date(newEndDate) < new Date(startDate)) {
+      setStartDate(newEndDate);
+    }
   };
 
   // ✅ 할 일 추가 버튼 클릭 시 실행되는 함수
@@ -148,7 +170,7 @@ const AddSchedule = () => {
                 type="date"
                 id="start-date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={handleStartDateChange}
                 className="add-schedule__date-input"
               />
             </div>
@@ -160,7 +182,7 @@ const AddSchedule = () => {
                 type="date"
                 id="end-date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                onChange={handleEndDateChange}
                 className="add-schedule__date-input"
               />
             </div>
