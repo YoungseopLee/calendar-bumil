@@ -12,15 +12,21 @@ from blueprints.admin import admin_bp
 import os, logging
 
 app = Flask(__name__, static_folder="build", static_url_path="/")
+
+# logs 디렉터리 생성 (없으면 자동 생성)
+LOG_DIR = "/app/logs" if os.getenv("DOCKER_ENV") else "logs"
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
+
 # 로그 포맷 설정
 log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
-# STDOUT (도커 컨테이너 로그에 출력됨)
+# STDOUT 로그 (도커 컨테이너에서도 출력됨)
 stdout_handler = logging.StreamHandler()
 stdout_handler.setFormatter(log_formatter)
 
-# 파일 로그 (컨테이너 내부에 로그 저장)
-file_handler = logging.FileHandler("/app/logs/app.log")
+# 파일 로그 (컨테이너 내부 또는 로컬 환경에서도 정상 동작)
+file_handler = logging.FileHandler(f"{LOG_DIR}/app.log")
 file_handler.setFormatter(log_formatter)
 
 # Flask의 기본 로거 설정
@@ -38,10 +44,6 @@ bcrypt.init_app(app)
 
 # CORS 설정
 CORS(app, supports_credentials=True, origins=ALLOWED_ORIGINS)
-
-# 로깅 설정
-if not os.path.exists("logs"):
-    os.makedirs("logs")
 
 access_handler = logging.FileHandler("logs/access.log")
 access_handler.setLevel(logging.INFO)
