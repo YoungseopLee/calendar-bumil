@@ -3,20 +3,42 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "./AddSchedule.css";
 
+/**
+ * 📌 AddSchedule - 새로운 일정을 추가하는 페이지
+ *
+ * ✅ 주요 기능:
+ *  - 사용자가 시작 및 종료 날짜를 선택하여 할 일을 추가할 수 있음
+ *  - 상태(준비 중, 진행 중, 완료)를 선택하여 할 일 관리 가능
+ *  - 서버와 연동하여 할 일을 저장 (POST /schedule/add-schedule)
+ *  - 일정 추가 후 캘린더 페이지로 이동
+ *
+ * ✅ UI(또는 Component) 구조:
+ *  - AddSchedule (메인 페이지)
+ *    ├── 날짜 입력 필드 (시작일, 종료일)
+ *    ├── 일정 입력 필드
+ *    ├── 상태 선택 드롭다운
+ *    ├── 추가하기 버튼
+ *    ├── 기존 일정 목록 표시
+ *    ├── 돌아가기 버튼
+ */
+
 const API_URL = process.env.REACT_APP_API_URL;
 
 const AddSchedule = () => {
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [newTask, setNewTask] = useState("");
-  const [status, setStatus] = useState("준비 중");
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+
+  // ✅ 일정 관련 상태 관리
+  const [startDate, setStartDate] = useState(""); // 시작 날짜
+  const [endDate, setEndDate] = useState(""); // 종료 날짜
+  const [newTask, setNewTask] = useState(""); // 새로운 할 일
+  const [status, setStatus] = useState("준비 중"); // 상태 (준비 중, 진행 중, 완료)
+  const [tasks, setTasks] = useState([]); // 추가된 일정 목록
+  const [loading, setLoading] = useState(false); // 로딩 상태
+  const [error, setError] = useState(""); // 오류 메시지
 
   const navigate = useNavigate();
   const location = useLocation();
 
+  // ✅ URL을 통해 전달된 선택된 날짜를 기본값으로 설정
   useEffect(() => {
     if (location.state && location.state.selectedDate) {
       const date = location.state.selectedDate;
@@ -26,6 +48,7 @@ const AddSchedule = () => {
     }
   }, [location.state]);
 
+  // ✅ 날짜 형식을 YYYY-MM-DD로 변환하는 함수
   const formatDateForInput = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -33,6 +56,7 @@ const AddSchedule = () => {
     return `${year}-${month}-${day}`;
   };
 
+  // ✅ 날짜 형식을 "YYYY년 MM월 DD일"로 변환하는 함수
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
@@ -41,7 +65,7 @@ const AddSchedule = () => {
     return `${year}년 ${month}월 ${day}일`;
   };
 
-  // 날짜를 YYYY-MM-DD 형식으로 변환하고 하루를 뺍니다.
+  // ✅ 날짜 형식을 변환하여 데이터베이스에 저장하기 전에 조정하는 함수
   const adjustDate = (dateString) => {
     const date = new Date(dateString);
     date.setDate(date.getDate()); // 데이터베이스에 저장하기 전에 하루를 뺍니다.
@@ -51,6 +75,7 @@ const AddSchedule = () => {
     return `${year}-${month}-${day}`;
   };
 
+  // ✅ 할 일 추가 버튼 클릭 시 실행되는 함수
   const handleAddTask = async () => {
     if (newTask.trim() && startDate && endDate) {
       setLoading(true);
@@ -103,6 +128,7 @@ const AddSchedule = () => {
     }
   };
 
+  // ✅ 돌아가기 버튼 클릭 시 실행되는 함수
   const handleBack = () => {
     navigate("/calendar");
   };
@@ -112,6 +138,7 @@ const AddSchedule = () => {
       <div className="add-schedule-page">
         <div className="add-schedule">
           <h1></h1>
+          {/* ✅ 날짜 입력 필드 */}
           <div className="add-schedule__date-container">
             <div className="add-schedule__date-field">
               <label htmlFor="start-date" className="add-schedule__date-label">
@@ -138,7 +165,7 @@ const AddSchedule = () => {
               />
             </div>
           </div>
-
+          {/* ✅ 일정 입력 필드 및 상태 선택 */}
           <div className="add-schedule__todo-container">
             <h2 className="add-schedule__todo-title">일정 입력</h2>
             <div className="add-schedule__todo-fields">
@@ -167,7 +194,7 @@ const AddSchedule = () => {
                 </select>
               </div>
             </div>
-
+            {/* ✅ 추가 및 뒤로가기 버튼 */}
             <div className="add-schedule__button-container">
               <button onClick={handleAddTask} className="add-schedule__button">
                 {loading ? "로딩 중..." : "추가하기"}
@@ -184,7 +211,7 @@ const AddSchedule = () => {
               <div className="add-schedule__error-message">{error}</div>
             )}
           </div>
-
+          {/* ✅ 기존 일정 목록 표시 */}
           <div className="add-schedule__todo-list">
             <ul>
               {tasks.map((task, index) => (
