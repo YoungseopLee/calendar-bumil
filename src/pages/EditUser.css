@@ -1,0 +1,67 @@
+/* 유저 수정 페이지 전체 레이아웃 */
+.edit-user-container {
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 제목 */
+.edit-user-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* 입력 폼 스타일 */
+.edit-user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.edit-user-form label {
+  font-weight: bold;
+}
+
+.edit-user-form input,
+.edit-user-form select {
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* 버튼 스타일 */
+.edit-user-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.edit-user-save-button {
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.edit-user-save-button:hover {
+  background-color: #0056b3;
+}
+
+.edit-user-cancel-button {
+  padding: 8px 12px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.edit-user-cancel-button:hover {
+  background-color: #c0392b;
+}

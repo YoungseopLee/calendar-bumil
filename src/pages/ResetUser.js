@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import "./ResetUser.css";
 
-const ResetUser= () => {
+const ResetUser = () => {
   const [employees, setEmployees] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [searchField, setSearchField] = useState("name");
@@ -29,7 +29,6 @@ const ResetUser= () => {
       navigate("/");
       return;
     }
-
   }, []);
 
   // 로그인한 사용자 정보 API 호출
@@ -65,7 +64,6 @@ const ResetUser= () => {
     navigate("/");
   };
 
-
   // ✅ 사용자 데이터 가져오기
   useEffect(() => {
     fetchEmployees();
@@ -74,7 +72,8 @@ const ResetUser= () => {
   const fetchEmployees = async () => {
     try {
       const response = await fetch(`${apiUrl}/user/get_users`);
-      if (!response.ok) throw new Error("사용자 데이터를 가져오는 데 실패했습니다.");
+      if (!response.ok)
+        throw new Error("사용자 데이터를 가져오는 데 실패했습니다.");
 
       const data = await response.json();
       setEmployees(data.users);
@@ -102,7 +101,7 @@ const ResetUser= () => {
         body: JSON.stringify({
           id: employeeId,
           password: newPassword,
-          first_login_yn: "N", // ✅ 첫 로그인 여부 초기화  
+          first_login_yn: "N", // ✅ 첫 로그인 여부 초기화
         }),
       });
 
@@ -110,7 +109,6 @@ const ResetUser= () => {
 
       console.log("비밀번호 초기화 성공:", employeeId, newPassword);
       alert("✅ 비밀번호가 성공적으로 초기화되었습니다!");
-
     } catch (error) {
       console.error("비밀번호 초기화 오류:", error);
       console.log("Token:", localStorage.getItem("token"));
@@ -171,7 +169,9 @@ const ResetUser= () => {
           ].map((role) => (
             <button
               key={role.id}
-              className={`role-toggle-button ${activeRoleFilter === role.id ? "active" : ""}`}
+              className={`role-toggle-button ${
+                activeRoleFilter === role.id ? "active" : ""
+              }`}
               onClick={() => handleRoleFilter(role.id)}
             >
               {role.label}
@@ -186,7 +186,6 @@ const ResetUser= () => {
           <span className="index-item">초기화</span>
         </div>
 
-
         {/* ✅ 사용자 목록 */}
         <ul className="employee-list">
           {employees.filter(filterEmployees).map((employee) => (
@@ -195,8 +194,12 @@ const ResetUser= () => {
               <span className="employee-position">{employee.position}</span>
               <button
                 className="reset-button"
-                onClick={() => handleResetPassword(employee.id, employee.phone_number)}
-              >초기화</button>
+                onClick={() =>
+                  handleResetPassword(employee.id, employee.phone_number)
+                }
+              >
+                초기화
+              </button>
             </li>
           ))}
         </ul>

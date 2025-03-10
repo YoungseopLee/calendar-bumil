@@ -100,7 +100,7 @@ def create_user():
         conn.close()
 
 # 유저 정보 수정 API (날짜 관련 컬럼 제외)
-@admin_bp.route('/update_user', methods=['PUT', 'OPTIONS'])
+@admin_bp.route('/edit_user', methods=['PUT', 'OPTIONS'])
 def update_user():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'}), 200
@@ -189,7 +189,7 @@ def update_user():
 
 
 # 유저 삭제 API (논리 삭제)
-@admin_bp.route('/delete_user/<int:user_id>', methods=['DELETE', 'OPTIONS'])
+@admin_bp.route('/delete_user/<string:user_id>', methods=['DELETE', 'OPTIONS'])
 def delete_user(user_id):
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'}), 200

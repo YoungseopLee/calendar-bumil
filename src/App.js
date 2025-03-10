@@ -21,6 +21,8 @@ import UserRolesManagement from "./pages/UserRolesManagement";
 import SituationControl from "./pages/SituationControl";
 import AddUserPage from "./pages/AddUserPage";
 import ResetUser from "./pages/ResetUser";
+import ManageUser from "./pages/ManageUser";
+import EditUser from "./pages/EditUser";
 
 function App() {
   return (
@@ -30,6 +32,10 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         {/* 유저 생성 페이지 */}
         <Route path="/add-user" element={<AddUserPage />} />
+        {/* 사용자 관리 페이지 */}
+        <Route path="/manage-user" element={<ManageUser />} />
+        {/* 사용자 정보 수정 페이지 */}
+        <Route path="/edit-user" element={<EditUser />} />
         {/* 회원가입 페이지 */}
         <Route path="/signup" element={<SignupPage />} />
         {/* Calendar 페이지 */}

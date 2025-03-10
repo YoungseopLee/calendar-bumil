@@ -75,6 +75,11 @@ const Manager = () => {
   };
 
   // 유저 추가 페이지 이동
+  const goToEditUserPage = () => {
+    navigate("/manage-user");
+  };
+
+  // 유저 비밀번호 초기화 페이지 이동
   const goToResetUserPage = () => {
     navigate("/reset-user");
   };
@@ -102,6 +107,12 @@ const Manager = () => {
           <div className="manager-card" onClick={goToAddUserPage}>
             <h2>유저 추가</h2>
             <p>유저를 추가할 수 있습니다.</p>
+            <button className="manage-button">이동</button>
+          </div>
+
+          <div className="manager-card" onClick={goToEditUserPage}>
+            <h2>유저 수정 및 삭제</h2>
+            <p>특정 유저의 정보를 수정 및 삭제를 할 수 있습니다.</p>
             <button className="manage-button">이동</button>
           </div>
 
