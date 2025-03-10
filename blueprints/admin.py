@@ -46,21 +46,40 @@ def create_user():
     password = data.get('password')
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
     role_id = data.get('role_id')
-    # status와 first_login_yn은 선택 사항 (미제공시 기본값 사용)
-    status = data.get('status')  # 예: null 혹은 '휴가', '파견' 등
     first_login_yn = data.get('first_login_yn', 'N')
 
     conn = get_db_connection()
     if conn is None:
         return jsonify({'message': '데이터베이스 연결 실패!'}), 500
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
+
     try:
         # 이미 사용중인 이메일 확인
         sql_tb_user_select = "SELECT * FROM tb_user WHERE id = %s"
         cursor.execute(sql_tb_user_select, (id,))
-        logger.info(f"[SQL/SELECT] tb_user /add_user{sql_tb_user_select}")
+        logger.info(f"[SQL/SELECT] tb_user /add_user {sql_tb_user_select}")
         if cursor.fetchone():
             return jsonify({'message': '이미 사용 중인 이메일입니다.'}), 400
+
+        # ✅ HQ 상태가 존재하는지 확인
+        sql_check_hq = "SELECT id FROM tb_status WHERE id = 'HQ' LIMIT 1"
+        cursor.execute(sql_check_hq)
+        hq_status = cursor.fetchone()
+
+        if hq_status:
+            default_status_id = "HQ"
+        else:
+            # ✅ HQ가 없다면, tb_status에서 가장 첫 번째 상태 값을 가져옴
+            sql_default_status = "SELECT id FROM tb_status ORDER BY id LIMIT 1"
+            cursor.execute(sql_default_status)
+            default_status = cursor.fetchone()
+            default_status_id = default_status["id"] if default_status else None
+
+        # 사용자가 `status`를 전달하지 않으면 자동으로 기본 상태 값 사용
+        status = data.get('status', default_status_id)
+
+        if not status:
+            return jsonify({'message': '기본 상태 값이 설정되지 않았습니다. tb_status 테이블을 확인하세요.'}), 500
 
         sql_tb_user_insert = """
         INSERT INTO tb_user 
@@ -68,7 +87,7 @@ def create_user():
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s)"""
         values = (name, position, department, id, phone, hashed_password, role_id, status, first_login_yn, created_by, created_by)
         cursor.execute(sql_tb_user_insert, values)
-        logger.info(f"[SQL/INSERT] tb_user /add_user{sql_tb_user_insert}")
+        logger.info(f"[SQL/INSERT] tb_user /add_user {sql_tb_user_insert}")
 
         conn.commit()
         return jsonify({'message': '유저 생성 성공!'}), 201
@@ -79,7 +98,6 @@ def create_user():
     finally:
         cursor.close()
         conn.close()
-
 
 # 유저 정보 수정 API (날짜 관련 컬럼 제외)
 @admin_bp.route('/update_user', methods=['PUT', 'OPTIONS'])
