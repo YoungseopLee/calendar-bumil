@@ -49,23 +49,24 @@ const AddUserPage = () => {
         const deptRes = await fetch(
           `${process.env.REACT_APP_API_URL}/admin/get_department_list`
         );
-        const posRes = await fetch(
-          `${process.env.REACT_APP_API_URL}/admin/get_position_list`
-        );
+        // 직급 관련 주석 처리(tb_user에 존재하지 않는 직급은 표시되지 않는 문제가 있음)
+        // const posRes = await fetch(
+        //   `${process.env.REACT_APP_API_URL}/admin/get_position_list`
+        // );
         const roleRes = await fetch(
           `${process.env.REACT_APP_API_URL}/admin/get_role_list`
         );
 
         const deptData = await deptRes.json();
-        const posData = await posRes.json();
+        // const posData = await posRes.json();
         const roleData = await roleRes.json();
 
         console.log("부서 데이터:", deptData);
-        console.log("직급 데이터:", posData);
+        // console.log("직급 데이터:", posData);
         console.log("권한 데이터:", roleData);
 
         setDepartments(Array.isArray(deptData) ? deptData : []);
-        setPositions(Array.isArray(posData) ? posData : []);
+        // setPositions(Array.isArray(posData) ? posData : []);
         setRoles(Array.isArray(roleData) ? roleData : []);
       } catch (error) {
         console.error("데이터 불러오기 오류:", error);
@@ -135,6 +136,21 @@ const AddUserPage = () => {
     }
   };
 
+  const positionOrder = [
+    "어드민",
+    "대표이사",
+    "부사장",
+    "본부장",
+    "이사",
+    "상무",
+    "팀장",
+    "부장",
+    "차장",
+    "과장",
+    "대리",
+    "주임",
+  ];
+
   return (
     <div className="user-add-body">
       <Sidebar />
@@ -186,7 +202,7 @@ const AddUserPage = () => {
               required
             >
               <option value="">직급을 선택하세요</option>
-              {positions.map((pos, index) => (
+              {positionOrder.map((pos, index) => (
                 <option key={index} value={pos}>
                   {pos}
                 </option>
