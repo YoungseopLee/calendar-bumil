@@ -259,7 +259,7 @@ const EmployeeList = () => {
         </div>
 
         {/* 🔍 검색 UI */}
-        <div className="search-container">
+        <div className="employee-search-container">
           <select
             className="search-dropdown"
             value={searchField}

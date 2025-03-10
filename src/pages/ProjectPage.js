@@ -71,14 +71,13 @@ const ProjectPage = () => {
     fetchUserRole();
   }, [apiUrl]);
 
-
   // 🔹 [2] 사용자 목록 조회
   useEffect(() => {
-
     const fetchUsers = async () => {
       try {
         const response = await fetch(`${apiUrl}/user/get_users`);
-        if (!response.ok) throw new Error("사용자 데이터를 불러오지 못했습니다.");
+        if (!response.ok)
+          throw new Error("사용자 데이터를 불러오지 못했습니다.");
         const data = await response.json();
         setUsers(data.users);
 
@@ -102,7 +101,8 @@ const ProjectPage = () => {
     const fetchProjects = async () => {
       try {
         const response = await fetch(`${apiUrl}/project/get_all_project`);
-        if (!response.ok) throw new Error("프로젝트 데이터를 불러오지 못했습니다.");
+        if (!response.ok)
+          throw new Error("프로젝트 데이터를 불러오지 못했습니다.");
         const data = await response.json();
         if (!data.projects) return;
 
@@ -157,24 +157,22 @@ const ProjectPage = () => {
     const filterStart = appliedStart ? new Date(appliedStart) : null;
     const filterEnd = appliedEnd ? new Date(appliedEnd) : null;
 
-
     const matchesSearch =
       searchCategory === "projectName"
         ? project.name.includes(searchQuery)
         : searchCategory === "code"
-          ? project.code.includes(searchQuery)
-          : searchCategory === "allParticipants"
-            ? project.owner.includes(searchQuery) ||
-            project.pm.includes(searchQuery) ||
-            project.participantNames.some((name) => name.includes(searchQuery))
-            : searchCategory === "salesRep"
-              ? project.owner.includes(searchQuery)
-              : searchCategory === "projectPM"
-                ? project.pm.includes(searchQuery)
-                : searchCategory === "participants"
-                  ? project.participantNames.some((name) => name.includes(searchQuery))
-                  : false;
-
+        ? project.code.includes(searchQuery)
+        : searchCategory === "allParticipants"
+        ? project.owner.includes(searchQuery) ||
+          project.pm.includes(searchQuery) ||
+          project.participantNames.some((name) => name.includes(searchQuery))
+        : searchCategory === "salesRep"
+        ? project.owner.includes(searchQuery)
+        : searchCategory === "projectPM"
+        ? project.pm.includes(searchQuery)
+        : searchCategory === "participants"
+        ? project.participantNames.some((name) => name.includes(searchQuery))
+        : false;
 
     const matchesStatus =
       selectedStatus.length === 0 || selectedStatus.includes(project.status);
@@ -191,14 +189,16 @@ const ProjectPage = () => {
     <div className="project-page">
       <Sidebar />
       {/* ✅ ADMIN 권한만 프로젝트 추가 버튼 표시 */}
-      {roleId && ["AD_ADMIN", "PR_ADMIN"].includes(roleId) && <AddProjectButton />}
+      {roleId && ["AD_ADMIN", "PR_ADMIN"].includes(roleId) && (
+        <AddProjectButton />
+      )}
       <div className="content">
         <div className="projectPage-box">
           <div className="fixed-header">
             <h1 className="title">프로젝트 목록</h1>
 
             {/* 🔍 검색 필터 */}
-            <div className="search-container">
+            <div className="project-search-container">
               <select
                 className="search-category"
                 value={searchCategory}
@@ -264,7 +264,9 @@ const ProjectPage = () => {
               {["제안", "수행", "실주종료"].map((status) => (
                 <button
                   key={status}
-                  className={`status-toggle ${selectedStatus.includes(status) ? "active" : ""}`}
+                  className={`status-toggle ${
+                    selectedStatus.includes(status) ? "active" : ""
+                  }`}
                   onClick={() => handleStatusClick(status)}
                 >
                   {status}
@@ -282,7 +284,6 @@ const ProjectPage = () => {
         </div>
       </div>
     </div>
-
   );
 };
 

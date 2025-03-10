@@ -1,275 +1,272 @@
 /* ✅ 전체 페이지 컨테이너 */
 .project-page {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-    padding-bottom: 10px;
-    background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding-bottom: 10px;
+  background-color: #f8f9fa;
 }
 
 /* ✅ 프로젝트 목록 영역 */
 .content {
-    width: 100%;
-    max-width: 100vw;
-    /* padding: 20px; */
-    /* padding-left: 20px; */
+  width: 100%;
+  max-width: 768px;
+  /* padding: 20px; */
+  /* padding-left: 20px; */
 }
 
 /* ✅ 프로젝트 카드 컨테이너 */
 .projectPage-box {
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* ✅ 필터 컨테이너 */
 .filter-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: nowrap;
-    gap: 8px;
-    margin-bottom: 15px;
-    max-width: 700px;
-    width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 8px;
+  margin-bottom: 15px;
+  max-width: 768px;
+  width: 100%;
 }
 
 /* ✅ 날짜 필터 스타일 */
 .date-filter {
-    flex-grow: 1;
-    padding: 6px;
-    font-size: 14px;
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    text-align: center;
-    min-width: 120px;
+  flex-grow: 1;
+  padding: 6px;
+  font-size: 14px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  text-align: center;
+  min-width: 120px;
 }
 
 /* ✅ 날짜 구분선 (~) */
 .date-separator {
-    font-size: 18px;
-    font-weight: bold;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 /* ✅ 검색 버튼 */
 .filter-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    width: 28px;
-    height: 30px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  width: 28px;
+  height: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .filter-button:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 /* ✅ 토글 버튼 컨테이너 */
 .status-toggle-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 15px;
-    max-width: 700px;
-    width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  max-width: 768px;
+  width: 100%;
 }
 
 /* ✅ 개별 토글 버튼 */
 .status-toggle {
-    flex-grow: 1;
-    padding: 8px 16px;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: bold;
-    background-color: white;
-    transition: all 0.2s ease-in-out;
-    min-width: 90px;
-    text-align: center;
+  flex-grow: 1;
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  background-color: white;
+  transition: all 0.2s ease-in-out;
+  min-width: 90px;
+  text-align: center;
 }
 
 .status-toggle.active {
-    background-color: #007bff;
-    color: white;
-    border-color: #0056b3;
+  background-color: #007bff;
+  color: white;
+  border-color: #0056b3;
 }
 
 /* ✅ 검색 컨테이너 */
-.search-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: nowrap;
-    gap: 6px;
-    margin-bottom: 15px;
-    max-width: 700px;
-    width: 100%;
+.project-search-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 6px;
+  margin-bottom: 15px;
+  max-width: 768px;
+  width: 100%;
 }
 
 /* ✅ 검색 기준 선택 드롭다운 */
 .search-category {
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    cursor: pointer;
-    min-width: 120px;
-    height: 40px;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  min-width: 120px;
+  height: 40px;
 }
 
 /* ✅ 검색 입력 필드 */
 .search-input {
-    flex-grow: 1;
-    padding: 6px 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    height: 40px;
-    text-align: left;
-    margin-bottom: 0;
+  flex-grow: 1;
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  height: 40px;
+  text-align: left;
+  margin-bottom: 0;
 }
 
 /* ✅ 반응형 처리: 갤럭시 폴드 (~280px) */
 @media screen and (max-width: 280px) {
+  .content,
+  .projectPage-box {
+    max-width: 100%;
+    padding: 15px;
+  }
 
-    .content,
-    .projectPage-box {
-        max-width: 100%;
-        padding: 15px;
-    }
+  /* 📌 280px 이하에서는 세로 정렬 */
+  .filter-container,
+  .status-toggle-container,
+  .project-search-container {
+    flex-direction: column;
+    max-width: 100%;
+  }
 
-    /* 📌 280px 이하에서는 세로 정렬 */
-    .filter-container,
-    .status-toggle-container,
-    .search-container {
-        flex-direction: column;
-        max-width: 100%;
-    }
+  .date-filter,
+  .search-input,
+  .search-category {
+    width: 80%;
+  }
 
-    .date-filter,
-    .search-input,
-    .search-category {
-        width: 80%;
-    }
+  .status-toggle {
+    width: 100%;
+  }
 
-    .status-toggle {
-        width: 100%;
-    }
-
-    .filter-button {
-        width: 100%;
-    }
+  .filter-button {
+    width: 100%;
+  }
 }
-
 
 /* ✅ 반응형 처리: 폭이 415px 이하일 때 검색 입력 필드 너비 조정 */
 @media screen and (max-width: 415px) {
-    .search-container {
-        flex-wrap: wrap; /* 요소가 넘칠 경우 줄바꿈 가능하도록 설정 */
-        justify-content: center; /* 중앙 정렬 */
-        gap: 4px;
-    }
+  .project-search-container {
+    flex-wrap: wrap; /* 요소가 넘칠 경우 줄바꿈 가능하도록 설정 */
+    justify-content: center; /* 중앙 정렬 */
+    gap: 4px;
+  }
 
-    .search-category {
-        min-width: 100px; /* 드롭다운 최소 크기 유지 */
-    }
+  .search-category {
+    min-width: 100px; /* 드롭다운 최소 크기 유지 */
+  }
 
-    .search-input {
-        flex-grow: unset; /* 기존 `flex-grow` 제거 */
-        width: 60%; /* 줄어든 너비 설정 */
-        min-width: 120px; /* 너무 좁아지는 것 방지 */
-    }
+  .search-input {
+    flex-grow: unset; /* 기존 `flex-grow` 제거 */
+    width: 60%; /* 줄어든 너비 설정 */
+    min-width: 120px; /* 너무 좁아지는 것 방지 */
+  }
 
-    .filter-button {
-        width: 30px;
-    }
+  .filter-button {
+    width: 30px;
+  }
 }
 
 /* ✅ 반응형 처리: 아이폰 13 (~390px) */
 @media screen and (max-width: 390px) {
+  .content,
+  .projectPage-box {
+    max-width: 100%;
+    padding: 10px;
+  }
 
-    .content,
-    .projectPage-box {
-        max-width: 100%;
-        padding: 10px;
-    }
+  /* ✅ 390px 이하에서도 가로 배치 유지 */
+  .project-search-container,
+  .filter-container,
+  .status-toggle-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 
-    /* ✅ 390px 이하에서도 가로 배치 유지 */
-    .search-container,
-    .filter-container,
-    .status-toggle-container {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
+  .status-toggle {
+    font-size: 12px;
+    flex-grow: 1;
+  }
 
-    .status-toggle {
-        font-size: 12px;
-        flex-grow: 1;
-    }
+  .filter-button {
+    width: 40px;
+  }
 
-    .filter-button {
-        width: 40px;
-    }
-
-    .date-filter,
-    .search-input,
-    .search-category {
-        width: auto;
-        min-width: 100px;
-    }
+  .date-filter,
+  .search-input,
+  .search-category {
+    width: auto;
+    min-width: 100px;
+  }
 }
 
 /* ✅ 고정 헤더 스타일 */
 .fixed-header {
-    position: sticky;
-    top: 0;
-    background-color: white;
-    /* 배경색 */
-    padding: 10px 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    /* 그림자 효과 */
-    margin-top: 15px;
-    margin-bottom: 15px;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  /* 배경색 */
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* 그림자 효과 */
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 /* ✅ 타이틀 스타일 */
 .fixed-header .title {
-    margin: 0;
-    padding: 10px 0;
-    font-size: 20px;
-    text-align: center;
+  margin: 0;
+  padding: 10px 0;
+  font-size: 20px;
+  text-align: center;
 }
 
 /* ✅ 검색 필터 컨테이너 */
-.search-container,
+.project-search-container,
 .filter-container,
 .status-toggle-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 5px;
-    padding: 5px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 5px;
+  padding: 5px 0;
 
-    /* 각 컨테이너를 중앙으로 정렬 */
-    margin-left: auto;
-    margin-right: auto;
+  /* 각 컨테이너를 중앙으로 정렬 */
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* ✅ 사이드바가 열릴 때 고정된 헤더 가리지 않도록 */
 .sidebar {
-    z-index: 1200;
-    /* 고정된 헤더보다 위에 표시 */
+  z-index: 1200;
+  /* 고정된 헤더보다 위에 표시 */
 }
