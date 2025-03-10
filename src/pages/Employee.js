@@ -379,15 +379,8 @@ const EmployeeList = () => {
                             </select>
                           ) : (
                             <span className="status-dropdown2">
-                              {employee.status === "DISPATCH"
-                                ? "파견"
-                                : employee.status === "HQ"
-                                ? "본사"
-                                : employee.status === "LEAVE"
-                                ? "휴가"
-                                : employee.status === "OUT"
-                                ? "외근"
-                                : employee.status}
+                              {statusList.find((s) => s.id === employee.status)
+                                ?.comment || "알 수 없음"}
                             </span>
                           )}
                         </li>
