@@ -113,7 +113,6 @@ body {
   background-color: #fccc89; /* 오렌지 색으로 선택된 날짜 강조 */
   color: white;
   font-weight: bold;
-  border: 2px solid rgb(255, 200, 0);
 }
 
 .calendar-day:nth-child(7n) {

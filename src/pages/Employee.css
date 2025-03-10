@@ -136,7 +136,8 @@
 
 .employee-name {
   color: #333;
-  margin-right: 5px;
+  margin-right: 6px;
+  margin-left: 6px;
 }
 
 .employee-position {
