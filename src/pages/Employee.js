@@ -320,7 +320,7 @@ const EmployeeList = () => {
                       <span className="department-title">
                         {/* 화살표 표시 */}
                         <span className="arrow">
-                          {openDepartments[department] ? "▲" : "▼"}
+                          {openDepartments[department] ? "▼" : "▶"}
                         </span>
                         {department}
                       </span>
