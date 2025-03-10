@@ -300,96 +300,104 @@ const EmployeeList = () => {
                   filterEmployees
                 )
               )
-            ).map((department) => {
-              const departmentEmployees = groupByDepartment(
-                (showFavorites ? favoriteEmployees : employees).filter(
-                  filterEmployees
-                )
-              )[department];
-              console.log("render department: ", departmentEmployees);
+            )
+              .sort((a, b) => a.localeCompare(b)) // 부서명을 오름차순 정렬
+              .map((department) => {
+                const departmentEmployees = groupByDepartment(
+                  (showFavorites ? favoriteEmployees : employees).filter(
+                    filterEmployees
+                  )
+                )[department];
+                console.log("render department: ", departmentEmployees);
 
-              return (
-                <div key={department}>
-                  {/* 부서명 클릭 시 열고 닫을 수 있도록 토글 */}
-                  <div
-                    className="department-header"
-                    onClick={() => toggleDepartment(department)}
-                  >
-                    <span className="department-title">
-                      {/* 화살표 표시 */}
-                      <span className="arrow">
-                        {openDepartments[department] ? "▲" : "▼"}
+                return (
+                  <div key={department}>
+                    {/* 부서명 클릭 시 열고 닫을 수 있도록 토글 */}
+                    <div
+                      className="department-header"
+                      onClick={() => toggleDepartment(department)}
+                    >
+                      <span className="department-title">
+                        {/* 화살표 표시 */}
+                        <span className="arrow">
+                          {openDepartments[department] ? "▲" : "▼"}
+                        </span>
+                        {department}
                       </span>
-                      {department}
-                    </span>
-                  </div>
-
-                  {/* 부서별 직원 목록 렌더링 */}
-                  {openDepartments[department] && (
-                    <div className="department-employee-list">
-                      {departmentEmployees.map((employee) => (
-                        <li
-                          key={employee.id}
-                          className="employee-item2"
-                          onClick={() =>
-                            navigate(`/user-details?user_id=${employee.id}`)
-                          }
-                        >
-                          {/* ⭐ 즐겨찾기 토글 */}
-                          <span
-                            className={`favorite-icon ${
-                              favoriteEmployees.some(
-                                (fav) => fav.id === employee.id
-                              )
-                                ? ""
-                                : "not-favorite"
-                            }`}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              toggleFavorite(employee.id);
-                            }}
-                          >
-                            ★
-                          </span>
-
-                          {/* 🔠 사원 정보 */}
-                          <span className="employee-name">{employee.name}</span>
-                          <span className="employee-position">
-                            {employee.position}
-                          </span>
-
-                          {/* 🔄 관리자 전용 상태 변경 드롭다운 */}
-                          {userRole === "AD_ADMIN" ? (
-                            <select
-                              className="status-dropdown"
-                              value={employee.status || ""}
-                              onClick={(e) => e.stopPropagation()}
-                              onChange={(e) =>
-                                handleStatusChange(employee.id, e.target.value)
-                              }
-                            >
-                              {statusList.map((status, index) => (
-                                <option
-                                  key={`${status.comment}-${index}`}
-                                  value={status.id}
-                                >
-                                  {status.comment}
-                                </option>
-                              ))}
-                            </select>
-                          ) : (
-                            <span className="status-dropdown2">
-                              {statusList.find((s) => s.id === employee.status)
-                                ?.comment || "알 수 없음"}
-                            </span>
-                          )}
-                        </li>
-                      ))}
                     </div>
-                  )}
-                </div>
-              );
-            })}
+
+                    {/* 부서별 직원 목록 렌더링 */}
+                    {openDepartments[department] && (
+                      <div className="department-employee-list">
+                        {departmentEmployees.map((employee) => (
+                          <li
+                            key={employee.id}
+                            className="employee-item2"
+                            onClick={() =>
+                              navigate(`/user-details?user_id=${employee.id}`)
+                            }
+                          >
+                            {/* ⭐ 즐겨찾기 토글 */}
+                            <span
+                              className={`favorite-icon ${
+                                favoriteEmployees.some(
+                                  (fav) => fav.id === employee.id
+                                )
+                                  ? ""
+                                  : "not-favorite"
+                              }`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFavorite(employee.id);
+                              }}
+                            >
+                              ★
+                            </span>
+
+                            {/* 🔠 사원 정보 */}
+                            <span className="employee-name">
+                              {employee.name}
+                            </span>
+                            <span className="employee-position">
+                              {employee.position}
+                            </span>
+
+                            {/* 🔄 관리자 전용 상태 변경 드롭다운 */}
+                            {userRole === "AD_ADMIN" ? (
+                              <select
+                                className="status-dropdown"
+                                value={employee.status || ""}
+                                onClick={(e) => e.stopPropagation()}
+                                onChange={(e) =>
+                                  handleStatusChange(
+                                    employee.id,
+                                    e.target.value
+                                  )
+                                }
+                              >
+                                {statusList.map((status, index) => (
+                                  <option
+                                    key={`${status.comment}-${index}`}
+                                    value={status.id}
+                                  >
+                                    {status.comment}
+                                  </option>
+                                ))}
+                              </select>
+                            ) : (
+                              <span className="status-dropdown2">
+                                {statusList.find(
+                                  (s) => s.id === employee.status
+                                )?.comment || "알 수 없음"}
+                              </span>
+                            )}
+                          </li>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
           </ul>
         </div>
       </div>
