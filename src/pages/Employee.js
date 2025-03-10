@@ -30,6 +30,7 @@ const EmployeeList = () => {
   const [favoriteEmployees, setFavoriteEmployees] = useState([]); // 즐겨찾기 목록
   const [statusList, setStatusList] = useState([]); // 상태 목록 (근무 중, 휴가 등)
   const [openDepartments, setOpenDepartments] = useState({});
+  const [departmentList, setDepartmentList] = useState([]);
 
   const [loggedInUserId, setLoggedInUserId] = useState(null); // 로그인된 사용자 ID
   const [userRole, setUserRole] = useState(null); // 로그인된 사용자 역할 (AD_ADMIN, USR_GENERAL 등)
@@ -44,12 +45,10 @@ const EmployeeList = () => {
   const navigate = useNavigate(); // 페이지 이동 훅
   const apiUrl = process.env.REACT_APP_API_URL; // API URL 환경 변수
 
-  const statusMap = {
-    파견: "DISPATCH",
-    본사: "HQ",
-    휴가: "LEAVE",
-    외근: "OUT",
-  };
+  const statusMap = statusList.reduce((acc, { comment, id }) => {
+    acc[comment] = id;  // comment를 키로, id를 값으로 설정
+    return acc;
+  }, {});
   /**
    * 🔄 **1. 로그인된 사용자 정보 및 상태 목록 불러오기**
    * - 로그인한 사용자 정보 확인
@@ -143,6 +142,11 @@ const EmployeeList = () => {
 
       const data = await response.json();
       setEmployees(data.users);
+
+      const departments = Array.from(
+        new Set(data.users.map((user) => user.department || "기타"))
+      );
+      setDepartmentList(departments);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -223,6 +227,18 @@ const EmployeeList = () => {
     }));
   };
 
+  const seeAllDepartments = () => {
+    setOpenDepartments((prev) => {
+      const allOpen = departmentList.every((department) => prev[department]); // 모든 부서가 열려 있는지 확인
+
+      const updatedDepartments = {};
+      departmentList.forEach((department) => {
+        updatedDepartments[department] = !allOpen; // 모든 부서를 열거나 닫음
+      });
+      return updatedDepartments;
+    });
+  };
+
   // ⏳ **로딩 및 에러 처리**
   if (loading) return <p>데이터를 불러오는 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
@@ -291,7 +307,19 @@ const EmployeeList = () => {
             <span className="index-item">직급</span>
             <span className="index-item">상태</span>
           </div>
-
+          {/* 부서 모두 열기/닫기 */}
+          <div className="department-header" onClick={seeAllDepartments}>
+            <span>
+              <span className="arrow">
+                {departmentList.every(
+                  (department) => openDepartments[department]
+                )
+                  ? "▼"
+                  : "▶"}
+              </span>
+              범일정보
+            </span>
+          </div>
           {/* 👥 사원 목록 렌더링 */}
           <ul className="employee-list">
             {Object.keys(
@@ -308,7 +336,6 @@ const EmployeeList = () => {
                     filterEmployees
                   )
                 )[department];
-                console.log("render department: ", departmentEmployees);
 
                 return (
                   <div key={department}>
@@ -317,7 +344,7 @@ const EmployeeList = () => {
                       className="department-header"
                       onClick={() => toggleDepartment(department)}
                     >
-                      <span className="department-title">
+                      <span  className="sub-department">
                         {/* 화살표 표시 */}
                         <span className="arrow">
                           {openDepartments[department] ? "▼" : "▶"}

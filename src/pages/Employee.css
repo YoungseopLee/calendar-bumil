@@ -301,8 +301,8 @@
   align-items: center;
   font-size: 18px;
   font-weight: bold;
-  color: #333;
-  padding: 5px 10px;
+  color: #333;  
+  padding: 2px 10px;
   border-radius: 5px;
   cursor: pointer;
 }
@@ -345,4 +345,9 @@
 
 .back-button:hover {
   background-color: #0056b3;
+}
+
+.sub-department {
+  margin-left: 8px;
+  padding: 5px 0;
 }
