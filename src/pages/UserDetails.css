@@ -39,8 +39,16 @@
 .userdetail-icon-name-section {
   display: flex;
   align-items: center; /* 세로 정렬 */
-  justify-content: flex-start; /* 왼쪽 정렬 */
+  justify-content: space-between; /* 변경: 양끝 정렬로 수정 */
+  width: 100%; /* 추가: 전체 너비를 사용하도록 설정 */
   gap: 10px; /* 아이콘과 이름 사이의 간격 */
+}
+
+/* 왼쪽 섹션(아이콘과 이름을 감싸는 새로운 div) */
+.userdetail-left-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 /* 프로필 아이콘 스타일 */
@@ -80,6 +88,28 @@
   margin-left: 0; /* 왼쪽 정렬 */
   margin-right: 0; /* 오른쪽 여백 제거 */
   width: 100%; /* 너비를 100%로 설정 */
+}
+
+/* 본인 정보 수정 버튼 */
+.userdetail-edit-button {
+  float: right;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  margin: 10px;
+}
+
+.userdetail-edit-button:hover {
+  background-color: #0056b3;
+}
+
+.userdetail-edit-button:active {
+  transform: translateY(1px);
 }
 
 /* 정보 스타일 */

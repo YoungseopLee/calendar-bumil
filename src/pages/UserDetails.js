@@ -26,6 +26,7 @@ const UserDetails = () => {
   const location = useLocation();
 
   const user_id = new URLSearchParams(location.search).get("user_id");
+  const loggedInUser = JSON.parse(localStorage.getItem("user")); // 본인 정보 수정을 위해 로그인한 유저의 정보 가져오기
 
   // 사용자 정보 가져오기
   useEffect(() => {
@@ -162,6 +163,7 @@ const UserDetails = () => {
     return <div className="userdetail-container">로딩 중...</div>;
   //유저가 로딩되지 않을 때 로딩 중 표시 로직이 꼬이는 경우가 있어 !user 추가함
   if (error) return <div className="userdetail-container">{error}</div>;
+
   const ChartView = ({ filteredProjects }) => {
     return (
       <div className="project-chart">
@@ -265,15 +267,22 @@ const UserDetails = () => {
       </header>
       <div className="userdetail-container">
         <div className="userdetail-icon-name-section">
-          {/* 프로필 아이콘 추가 */}
-          <div className="userdetail-icon-section">
-            <FaUserCircle className="user-icon" />
+          <div className="userdetail-left-section">
+            {/* 프로필 아이콘 추가 */}
+            <div className="userdetail-icon-section">
+              <FaUserCircle className="user-icon" />
+            </div>
+
+            {/* 사용자 이름 */}
+            <div className="userdetail-name-section">
+              <h2>{user.name}</h2>
+            </div>
           </div>
 
-          {/* 사용자 이름 */}
-          <div className="userdetail-name-section">
-            <h2>{user.name}</h2>
-          </div>
+          {/* 본인 정보 수정 버튼(id가 같지 않으면 안뜸) */}
+          {loggedInUser.id === user.id && (
+            <button className="userdetail-edit-button" onClick={() => navigate('/change-my-details')}>내 정보 수정</button>
+          )}
         </div>
 
         {/* 사용자 정보 */}
