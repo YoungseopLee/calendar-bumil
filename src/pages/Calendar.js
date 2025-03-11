@@ -42,8 +42,10 @@ const Calendar = () => {
 
         const uniqueDepartments = [
           ...new Set(usersData.users.map((user) => user.department)),
-        ];
-        console.log("부서: ", uniqueDepartments);
+        ]
+          .filter(Boolean) // 빈 값 제거
+          .sort((a, b) => a.localeCompare(b, "ko-KR")); // 한글 정렬
+
         setDepartments(uniqueDepartments);
       } catch (error) {
         console.error("데이터 로딩 오류:", error);
@@ -524,20 +526,10 @@ const Calendar = () => {
               </div>
 
               <div className="schedule-section">
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    width: "100%",
-                  }}
-                >
+                <div className="schedule-section-inner">
                   <h4 style={{ margin: 0 }}>전체 일정</h4>
-                  {"\u00A0 "}
-                  {/* 제목의 기본 마진을 제거 */}
-                  {/* 부서별 보기 버튼 */}
                   <select
-                    className="department-dropdown"
+                    className="department-view-dropdown"
                     value={selectedDepartment}
                     onChange={(e) => setSelectedDepartment(e.target.value)}
                   >

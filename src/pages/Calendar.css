@@ -179,6 +179,13 @@ body {
   white-space: nowrap;
 }
 
+.schedule-section-inner {
+  display: "flex";
+  justify-content: "space-between";
+  align-items: "center";
+  width: "100%";
+}
+
 .schedule-list {
   padding: 0;
   list-style: none;
@@ -390,10 +397,11 @@ body {
 }
 
 .department-view-dropdown {
-  display: block;
+  display: flex;
+  margin-top: 10px;
   clear: both;
   width: 100%;
-  padding: 10px;
+  padding: 0.5em;
   margin-bottom: 15px;
   border-radius: 5px;
   border: 1px solid #ccc;
