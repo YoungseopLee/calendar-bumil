@@ -136,6 +136,13 @@ const UserRolesManagement = () => {
     return value.includes(searchText.toLowerCase());
   };
 
+  // 검색 필드 한글 매핑
+  const searchFieldLabelMap = {
+    name: "이름",
+    position: "직급",
+    department: "부서",
+  };
+
   return (
     <div className="user-roles-page">
       <Sidebar />
@@ -158,7 +165,7 @@ const UserRolesManagement = () => {
           <input
             type="text"
             className="user-roles-search-input"
-            placeholder={`검색할 ${searchField} 입력...`}
+            placeholder={`${searchFieldLabelMap[searchField]}를 입력하세요.`}
             onChange={(e) => setSearchText(e.target.value.trim())}
             value={searchText}
           />
@@ -169,7 +176,7 @@ const UserRolesManagement = () => {
           {[
             { id: "AD_ADMIN", label: "어드민" },
             { id: "PR_ADMIN", label: "프로젝트 관리자" },
-            { id: "PR_MANAGER", label: "PM" },
+            { id: "PR_MANAGER", label: "프로젝트 매니저" },
             { id: "USR_GENERAL", label: "유저" },
           ].map((role) => (
             <button
@@ -206,7 +213,7 @@ const UserRolesManagement = () => {
               >
                 <option value="AD_ADMIN">어드민</option>
                 <option value="PR_ADMIN">프로젝트 관리자</option>
-                <option value="PR_MANAGER">PM</option>
+                <option value="PR_MANAGER">프로젝트 매니저</option>
                 <option value="USR_GENERAL">유저</option>
               </select>
             </li>
