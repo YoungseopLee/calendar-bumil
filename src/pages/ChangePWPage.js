@@ -12,6 +12,7 @@ const ChangePWPage = () => {
   const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
+  const loggedInUser = JSON.parse(localStorage.getItem("user")); // 본인 정보 수정을 위해 로그인한 유저의 정보 가져오기
 
   const validateForm = () => {
     let newErrors = {};
@@ -76,7 +77,11 @@ const ChangePWPage = () => {
   return (
     <div className="changepw-body">
       <div className="changepw-container">
-        <h2>최초 비밀번호 변경 페이지</h2>
+        <h2>
+          {loggedInUser.first_login_yn === "Y"
+            ? "비밀번호 변경 페이지"
+            : "최초 비밀번호 변경 페이지"}
+        </h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group-changepw">
             <label htmlFor="old_password">현재 비밀번호</label>

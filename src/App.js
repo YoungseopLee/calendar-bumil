@@ -23,6 +23,7 @@ import AddUserPage from "./pages/AddUserPage";
 import ResetUser from "./pages/ResetUser";
 import ManageUser from "./pages/ManageUser";
 import EditUser from "./pages/EditUser";
+import ChangeMyDetails from "./pages/ChangeMyDetails"; 
 
 function App() {
   return (
@@ -36,6 +37,8 @@ function App() {
         <Route path="/manage-user" element={<ManageUser />} />
         {/* 사용자 정보 수정 페이지 */}
         <Route path="/edit-user/:userId" element={<EditUser />} />
+        {/* 내정보 수정 페이지 */}
+        <Route path="/change-my-details" element={<ChangeMyDetails />} />
         {/* 회원가입 페이지 */}
         <Route path="/signup" element={<SignupPage />} />
         {/* Calendar 페이지 */}

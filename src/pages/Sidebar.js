@@ -7,9 +7,11 @@ const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
+  const [userid, setUserid] = useState(null); // 마이페이지 구현을 위한 유저 아이디 State 
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
+    setUserid(user.id); //userid에 로컬스토리지의 로그인한 유저의 아이디인 user.id 저장
     if (user && user.role_id === "AD_ADMIN") {
       setIsAdmin(true);
     } else {
@@ -63,7 +65,7 @@ const Sidebar = () => {
               <Link to="/employee">직원</Link>
             </li>
             <li>
-              <Link to="/mypage">내 정보</Link>
+              <Link to={`/user-details?user_id=${userid}`}>내 정보</Link>
             </li>
             <li>
               <Link to="/situation_control">현황 관리</Link>
