@@ -94,13 +94,13 @@ const Manager = () => {
         <div className="card-container">
           <div className="manager-card" onClick={goToStatusManagement}>
             <h2>상태 관리</h2>
-            <p>사원의 근무 상태를 관리할 수 있습니다.</p>
+            <p>유저의 상태 리스트 항목을 관리할 수 있습니다.</p>
             <button className="manage-button">이동</button>
           </div>
 
           <div className="manager-card" onClick={goToRoleManagement}>
             <h2>역할 관리</h2>
-            <p>사원의 역할 (관리자, 일반 사용자 등)을 관리할 수 있습니다.</p>
+            <p>유저의 역할 (관리자, 일반 사용자 등)을 관리할 수 있습니다.</p>
             <button className="manage-button">이동</button>
           </div>
 
@@ -111,7 +111,7 @@ const Manager = () => {
           </div>
 
           <div className="manager-card" onClick={goToEditUserPage}>
-            <h2>유저 수정 및 삭제</h2>
+            <h2>유저 관리</h2>
             <p>특정 유저의 정보를 수정 및 삭제를 할 수 있습니다.</p>
             <button className="manage-button">이동</button>
           </div>

@@ -100,7 +100,7 @@ def create_user():
         conn.close()
 
 # 유저 정보 수정 API (날짜 관련 컬럼 제외)
-@admin_bp.route('/edit_user', methods=['PUT', 'OPTIONS'])
+@admin_bp.route('/update_user', methods=['PUT', 'OPTIONS'])
 def update_user():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'}), 200

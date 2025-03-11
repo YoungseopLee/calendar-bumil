@@ -22,20 +22,20 @@
   color: #333333;
 }
 
-.form-group {
+.user-add-form-group {
   margin-bottom: 15px;
   width: 100%; /* 모든 입력 필드 동일한 너비 */
 }
 
-.form-group label {
+.user-add-form-group label {
   display: block;
   margin-bottom: 8px;
   font-size: 14px;
   color: #555555;
 }
 
-.form-group input,
-.form-group select {
+.user-add-form-group input,
+.user-add-form-group select {
   width: 100%;
   padding: 12px;
   font-size: 14px;
@@ -44,8 +44,8 @@
   box-sizing: border-box; /* 패딩 포함한 크기 유지 */
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.user-add-form-group input:focus,
+.user-add-form-group select:focus {
   outline: none;
   border-color: #007bff;
 }
@@ -58,8 +58,8 @@
 }
 
 /* 버튼 스타일 */
-.user-add-button,
-.cancel-button {
+.user-add-submit-button,
+.user-add-cancel-button {
   flex: 1; /* 동일한 크기로 버튼 정렬 */
   padding: 12px;
   font-size: 16px;
@@ -70,31 +70,31 @@
   transition: background-color 0.3s ease;
 }
 
-.user-add-button {
+.user-add-submit-button {
   background-color: #007bff;
 }
 
-.cancel-button {
+.user-add-cancel-button {
   background-color: #6c757d;
 }
 
-.user-add-button:hover {
+.user-add-submit-button:hover {
   background-color: #0056b3;
 }
 
-.cancel-button:hover {
+.user-add-cancel-button:hover {
   background-color: #5a6268;
 }
 
 /* 메시지 */
-.message {
+.user-add-message {
   text-align: center;
   margin-top: 15px;
   font-size: 14px;
   color: red;
 }
 
-.error {
+.user-add-error {
   color: red;
   font-size: 12px;
   margin-top: 5px;

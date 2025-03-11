@@ -29,7 +29,6 @@ const UserRolesManagement = () => {
       navigate("/");
       return;
     }
-
   }, []);
 
   // 로그인한 사용자 정보 API 호출
@@ -65,7 +64,6 @@ const UserRolesManagement = () => {
     navigate("/");
   };
 
-
   // ✅ 사용자 데이터 가져오기
   useEffect(() => {
     fetchEmployees();
@@ -74,7 +72,8 @@ const UserRolesManagement = () => {
   const fetchEmployees = async () => {
     try {
       const response = await fetch(`${apiUrl}/user/get_users`);
-      if (!response.ok) throw new Error("사용자 데이터를 가져오는 데 실패했습니다.");
+      if (!response.ok)
+        throw new Error("사용자 데이터를 가져오는 데 실패했습니다.");
 
       const data = await response.json();
       setEmployees(data.users);
@@ -103,7 +102,6 @@ const UserRolesManagement = () => {
       console.log("역할 변경 성공:", employeeId, newRoleId);
       alert("✅ 역할이 성공적으로 변경되었습니다!");
 
-
       // 🔥 즉시 상태 반영
       setEmployees((prevEmployees) =>
         prevEmployees.map((emp) =>
@@ -113,7 +111,12 @@ const UserRolesManagement = () => {
     } catch (error) {
       console.error("역할 변경 오류:", error);
       console.log("Token:", localStorage.getItem("token"));
-      console.log("Sending request with ID:", employeeId, "New Role:", newRoleId);
+      console.log(
+        "Sending request with ID:",
+        employeeId,
+        "New Role:",
+        newRoleId
+      );
 
       alert("❌ 역할 변경에 실패했습니다. 다시 시도해주세요.");
     }
@@ -137,13 +140,13 @@ const UserRolesManagement = () => {
     <div className="user-roles-page">
       <Sidebar />
 
-      <div className="box">
+      <div className="user-roles-box">
         <h2 className="title">사용자 역할 관리</h2>
 
         {/* 🔍 검색 필터 */}
-        <div className="search-container">
+        <div className="user-roles-search-container">
           <select
-            className="search-dropdown"
+            className="user-roles-search-dropdown"
             value={searchField}
             onChange={(e) => setSearchField(e.target.value)}
           >
@@ -154,7 +157,7 @@ const UserRolesManagement = () => {
 
           <input
             type="text"
-            className="search-input"
+            className="user-roles-search-input"
             placeholder={`검색할 ${searchField} 입력...`}
             onChange={(e) => setSearchText(e.target.value.trim())}
             value={searchText}
@@ -171,7 +174,9 @@ const UserRolesManagement = () => {
           ].map((role) => (
             <button
               key={role.id}
-              className={`role-toggle-button ${activeRoleFilter === role.id ? "active" : ""}`}
+              className={`role-toggle-button ${
+                activeRoleFilter === role.id ? "active" : ""
+              }`}
               onClick={() => handleRoleFilter(role.id)}
             >
               {role.label}
@@ -180,25 +185,23 @@ const UserRolesManagement = () => {
         </div>
 
         {/* ✅ 인덱스 헤더 바 추가 */}
-        <div className="employee-index-bar">
-          <span className="index-item">이름</span>
-          <span className="index-item">직급</span>
-          <span className="index-item">권한</span>
+        <div className="user-roles-employee-index-bar">
+          <span className="user-roles-index-item">이름</span>
+          <span className="user-roles-index-item">직급</span>
+          <span className="user-roles-index-item">권한</span>
         </div>
 
-
         {/* ✅ 사용자 목록 */}
-        <ul className="employee-list">
+        <ul className="user-roles-employee-list">
           {employees.filter(filterEmployees).map((employee) => (
-            <li key={employee.id} className="employee-item">
-              <span className="employee-name">{employee.name}</span>
-              <span className="employee-position">{employee.position}</span>
+            <li key={employee.id} className="user-roles-employee-item">
+              <span className="user-roles-column">{employee.name}</span>
+              <span className="user-roles-column">{employee.position}</span>
 
               {/* ✅ 역할 변경 드롭다운 */}
               <select
-                className="role-dropdown"
+                className="user-roles-role-dropdown"
                 value={employee.role_id}
-
                 onChange={(e) => handleRoleChange(employee.id, e.target.value)}
               >
                 <option value="AD_ADMIN">어드민</option>

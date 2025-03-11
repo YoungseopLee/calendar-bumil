@@ -117,9 +117,11 @@ const ResetUser = () => {
     }
   };
 
-  // ✅ 역할 필터링 로직
-  const handleRoleFilter = (roleId) => {
-    setActiveRoleFilter((prev) => (prev === roleId ? null : roleId)); // ✅ 동일 역할 클릭 시 전체 보기
+  // 검색 필드 한글 매핑
+  const searchFieldLabelMap = {
+    name: "이름",
+    position: "직급",
+    department: "부서",
   };
 
   // ✅ 검색 및 필터링
@@ -132,77 +134,59 @@ const ResetUser = () => {
   };
 
   return (
-    <div className="user-roles-page">
+    <div className="user-reset-page">
       <Sidebar />
 
-      <div className="box">
-        <h2 className="title">사용자 비밀번호 초기화</h2>
-
-        {/* 🔍 검색 필터 */}
-        <div className="search-container">
-          <select
-            className="search-dropdown"
-            value={searchField}
-            onChange={(e) => setSearchField(e.target.value)}
-          >
-            <option value="name">이름</option>
-            <option value="position">직급</option>
-            <option value="department">부서</option>
-          </select>
-
-          <input
-            type="text"
-            className="search-input"
-            placeholder={`검색할 ${searchField} 입력...`}
-            onChange={(e) => setSearchText(e.target.value.trim())}
-            value={searchText}
-          />
-        </div>
-
-        {/* ✅ 권한별 필터 토글 버튼 */}
-        <div className="role-toggle-container">
-          {[
-            { id: "AD_ADMIN", label: "어드민" },
-            { id: "PR_ADMIN", label: "프로젝트 관리자" },
-            { id: "PR_MANAGER", label: "PM" },
-            { id: "USR_GENERAL", label: "유저" },
-          ].map((role) => (
-            <button
-              key={role.id}
-              className={`role-toggle-button ${
-                activeRoleFilter === role.id ? "active" : ""
-              }`}
-              onClick={() => handleRoleFilter(role.id)}
+      <div className="user-reset-box">
+        <div className="user-reset-employee-container">
+          <h2 className="user-reset-title">사용자 비밀번호 초기화</h2>
+          {/* 🔍 검색 필터 */}
+          <div className="user-reset-search-container">
+            <select
+              className="user-reset-search-dropdown"
+              value={searchField}
+              onChange={(e) => setSearchField(e.target.value)}
             >
-              {role.label}
-            </button>
-          ))}
-        </div>
+              <option value="name">이름</option>
+              <option value="position">직급</option>
+              <option value="department">부서</option>
+            </select>
 
-        {/* ✅ 인덱스 헤더 바 추가 */}
-        <div className="employee-index-bar">
-          <span className="index-item">이름</span>
-          <span className="index-item">직급</span>
-          <span className="index-item">초기화</span>
-        </div>
+            <input
+              type="text"
+              className="user-reset-search-input"
+              placeholder={`${searchFieldLabelMap[searchField]}를 입력하세요.`}
+              onChange={(e) => setSearchText(e.target.value.trim())}
+              value={searchText}
+            />
+          </div>
+          {/* ✅ 인덱스 헤더 바 추가 */}
+          <div className="user-reset-employee-index-bar">
+            <span className="user-reset-index-item">이름</span>
+            <span className="user-reset-index-item">직급</span>
+            <span className="user-reset-index-item">초기화</span>
+          </div>
 
-        {/* ✅ 사용자 목록 */}
-        <ul className="employee-list">
-          {employees.filter(filterEmployees).map((employee) => (
-            <li key={employee.id} className="employee-item">
-              <span className="employee-name">{employee.name}</span>
-              <span className="employee-position">{employee.position}</span>
-              <button
-                className="reset-button"
-                onClick={() =>
-                  handleResetPassword(employee.id, employee.phone_number)
-                }
-              >
-                초기화
-              </button>
-            </li>
-          ))}
-        </ul>
+          {/* ✅ 사용자 목록 */}
+          <ul className="user-reset-employee-list">
+            {employees.filter(filterEmployees).map((employee) => (
+              <li key={employee.id} className="user-reset-employee-item">
+                <span className="user-reset-column">{employee.name}</span>
+                <span className="user-reset-column">{employee.position}</span>
+                <div className="user-reset-action-buttons">
+                  <button
+                    className="user-reset-button"
+                    onClick={() =>
+                      handleResetPassword(employee.id, employee.phone_number)
+                    }
+                  >
+                    초기화
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );

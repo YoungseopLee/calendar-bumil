@@ -14,7 +14,6 @@ const AddUserPage = () => {
   });
 
   const [departments, setDepartments] = useState([]);
-  const [positions, setPositions] = useState([]);
   const [roles, setRoles] = useState([]);
   const [signupStatus, setSignupStatus] = useState("");
   const [generatedPassword, setGeneratedPassword] = useState(""); // ✅ 초기 비밀번호 표시용
@@ -157,7 +156,7 @@ const AddUserPage = () => {
       <div className="user-add-container">
         <h2>신규 사원 추가</h2>
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
+          <div className="user-add-form-group">
             <label>이메일 (아이디)</label>
             <input
               type="email"
@@ -167,7 +166,7 @@ const AddUserPage = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="user-add-form-group">
             <label>이름</label>
             <input
               type="text"
@@ -177,7 +176,7 @@ const AddUserPage = () => {
               required
             />
           </div>
-          <div className="form-group">
+          <div className="user-add-form-group">
             <label>부서</label>
             <select
               name="department"
@@ -193,7 +192,7 @@ const AddUserPage = () => {
               ))}
             </select>
           </div>
-          <div className="form-group">
+          <div className="user-add-form-group">
             <label>직급</label>
             <select
               name="position"
@@ -209,7 +208,7 @@ const AddUserPage = () => {
               ))}
             </select>
           </div>
-          <div className="form-group">
+          <div className="user-add-form-group">
             <label>전화번호</label>
             <input
               type="tel"
@@ -221,11 +220,11 @@ const AddUserPage = () => {
           </div>
           {/* ✅ 초기 비밀번호 안내 메시지 추가 */}
           {generatedPassword && (
-            <p className="password-hint">
+            <p className="user-add-password-hint">
               초기 비밀번호: <strong>{generatedPassword}</strong>
             </p>
           )}
-          <div className="form-group">
+          <div className="user-add-form-group">
             <label>권한</label>
             <select
               name="role_id"
@@ -242,19 +241,19 @@ const AddUserPage = () => {
           </div>
 
           <div className="user-add-button-container">
-            <button type="submit" className="user-add-button">
+            <button type="submit" className="user-add-submit-button">
               추가하기
             </button>
             <button
               type="button"
-              className="cancel-button"
+              className="user-add-cancel-button"
               onClick={() => window.history.back()}
             >
               돌아가기
             </button>
           </div>
         </form>
-        {signupStatus && <p className="message">{signupStatus}</p>}
+        {signupStatus && <p className="user-add-message">{signupStatus}</p>}
       </div>
     </div>
   );

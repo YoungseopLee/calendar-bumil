@@ -35,7 +35,7 @@ function App() {
         {/* 사용자 관리 페이지 */}
         <Route path="/manage-user" element={<ManageUser />} />
         {/* 사용자 정보 수정 페이지 */}
-        <Route path="/edit-user" element={<EditUser />} />
+        <Route path="/edit-user/:userId" element={<EditUser />} />
         {/* 회원가입 페이지 */}
         <Route path="/signup" element={<SignupPage />} />
         {/* Calendar 페이지 */}

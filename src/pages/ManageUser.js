@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css"; // 기본 스타일
 import "./ManageUser.css";
 
 const ManageUser = () => {
@@ -172,33 +174,31 @@ const ManageUser = () => {
   return (
     <div className="manage-user-page">
       <Sidebar />
-
       <div className="manage-user-box">
-        <h2 className="manage-user-title">사용자 관리</h2>
-
-        {/* 🔍 검색 필터 */}
-        <div className="manage-user-search-container">
-          <select
-            className="manage-user-search-dropdown"
-            value={searchField}
-            onChange={(e) => setSearchField(e.target.value)}
-          >
-            <option value="name">이름</option>
-            <option value="position">직급</option>
-            <option value="department">부서</option>
-          </select>
-
-          <input
-            type="text"
-            className="manage-user-search-input"
-            placeholder={`${searchFieldLabelMap[searchField]}를 입력하세요.`}
-            onChange={(e) => setSearchText(e.target.value.trim())}
-            value={searchText}
-          />
-        </div>
-
-        {/* 유저 목록 */}
         <div className="manage-user-list-container">
+          <h2 className="manage-user-title">유저 관리</h2>
+          {/* 🔍 검색 필터 */}
+          <div className="manage-user-search-container">
+            <select
+              className="manage-user-search-dropdown"
+              value={searchField}
+              onChange={(e) => setSearchField(e.target.value)}
+            >
+              <option value="name">이름</option>
+              <option value="position">직급</option>
+              <option value="department">부서</option>
+            </select>
+
+            <input
+              type="text"
+              className="manage-user-search-input"
+              placeholder={`${searchFieldLabelMap[searchField]}를 입력하세요.`}
+              onChange={(e) => setSearchText(e.target.value.trim())}
+              value={searchText}
+            />
+          </div>
+
+          {/* 유저 목록 */}
           <div className="manage-user-index-bar">
             <span className="manage-user-index-item">이름</span>
             <span className="manage-user-index-item">직급</span>
@@ -211,18 +211,23 @@ const ManageUser = () => {
               <li key={employee.id} className="manage-user-item">
                 <span className="manage-user-column">{employee.name}</span>
                 <span className="manage-user-column">{employee.position}</span>
-                <span className="manage-user-column">
-                  {employee.department}
-                </span>
-
+                <Tippy content={employee.department}>
+                  <span className="manage-user-column">
+                    {employee.department.length > 15
+                      ? `${employee.department.substring(0, 15)}...`
+                      : employee.department}
+                  </span>
+                </Tippy>
                 <div className="manage-user-column manage-user-action-buttons">
                   <button
                     className="manage-user-edit-button"
-                    onClick={() => navigate(`/edit-user/${employee.id}`)}
+                    onClick={() => {
+                      const encodedId = encodeURIComponent(btoa(employee.id)); // URL 인코딩
+                      navigate(`/edit-user/${encodedId}`);
+                    }}
                   >
                     수정
                   </button>
-
                   <button
                     className="manage-user-delete-button"
                     onClick={() => handleDeleteUser(employee.id)}
