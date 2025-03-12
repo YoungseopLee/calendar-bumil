@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import "./NoticeList.css";
+import "./NoticeCreate.css";
 
 /**
-  * 📌  NoticeList - 공지사항 목록을 보여주는 컴포넌트
+  * 📌  NoticeCreate - 공지사항 생성을 위한 컴포넌트
   * 
   * ✅ 주요 기능:
-  * - 공지사항 목록 조회 (GET /notice/get_all_notice)
+  * - 공지사항 생성 (POST /notice/create_notice)
   * 
   * 
   * ✅ UI (또는 Component) 구조:
-  * - NoticeList (공지사항 목록)
+  * - NoticeCreate (공지사항 생성)
   * 
 */
 
-const NoticeList = () => {
-  const [notices, setNotices] = useState([]); // 공지사항 목록
+const NoticeCreate = () => {
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태
   const [error, setError] = useState(null); // 에러 메세지
 
@@ -26,7 +25,17 @@ const NoticeList = () => {
   // 로그인한 사용자 정보 (localStorage에서 불러옴)
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // 🔄 **1. 로그인한 사용자 정보 확인**
+  /**
+   * ✅ 프로젝트 생성 폼의 상태 관리
+   * - 초기값 설정 (배열 형태 필드 포함)
+   */
+  const [formData, setFormData] = useState({
+    title: "",
+    content: "",
+    user_id: user.id,
+  });
+
+  // 🔄 **1. 로그인한 사용자 정보 확인 및 권한 체크**
   useEffect(() => {
     fetchLoggedInUser();
     if (!user) {
@@ -34,11 +43,17 @@ const NoticeList = () => {
       navigate("/");
       return;
     }
+    // ✅ 어드민, PR 권한 체크
+    if (user.role_id !== "AD_ADMIN" && user.role_id !== "PR_ADMIN") {
+      alert("관리자 권한이 없습니다.");
+      navigate("/");
+      return;
+    }
   }, []);
 
   // 🔄 ** 2. 공지사항 목록 조회 **
   useEffect(() => {
-    fetchNotices();
+    //fetchNotices();
   }, []); 
 
   // ✅ 현재 로그인한 사용자의 정보를 API에서 가져옴
@@ -77,36 +92,48 @@ const NoticeList = () => {
     navigate("/");
   };
 
-  // ✅ 공지사항 목록 조회 API 호출
-  const fetchNotices = async () => {
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!formData.title || !formData.content) {
+      setError("⚠️ 필수 입력값을 모두 입력해주세요.");
+      return;
+    }
+    createNotice();
+  };
+
+  // ✅ 공지사항 생성 API 호출
+  const createNotice = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${apiUrl}/notice/get_notice_list`, {  // URL 수정
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`,  // 토큰 추가
-          "Content-Type": "application/json"
-        }
-      });
-      
-      // 응답 확인을 위한 로깅
-      console.log('Response status:', response.status);
-      const responseData = await response.text();
-      console.log('Response data:', responseData);
-  
-      if (!response.ok) {
-        throw new Error("공지사항 목록을 불러오지 못했습니다.");
+      if (!token) {
+        throw new Error("로그인이 필요합니다.");
       }
-  
-      const data = JSON.parse(responseData);
-      setNotices(data.notices);
+
+      const response = await fetch(`${apiUrl}/notice/create_notice`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+      if (!response.ok) {
+        throw new Error("공지사항 생성을 실패했습니다.");
+        }
+      alert("✅ 공지사항이 성공적으로 생성되었습니다!");
+      navigate("/notice");
     } catch (err) {
-      console.error("Error fetching notices:", err);
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }
   
   // ✅ 로딩 중 또는 에러 시 화면에 표시할 메세지
   if (loading) return <p>데이터를 불러오는 중...</p>;
@@ -116,22 +143,35 @@ const NoticeList = () => {
     <div className="app">
       <Sidebar />
       <div className="notice-container">
-        <h2 className="notice-title">공지사항</h2>
-        {user.role_id === "AD_ADMIN" && (
-          <button onClick={() => navigate("/notice-create")}>공지사항 작성</button>
-        )}
-        <div className="notice-list">
-          {notices.map((notice) => (
-            <div key={notice.notice_id} className="notice-item">
-              <h3 className="notice-title">{notice.title}</h3>
-            </div>
-          ))}
-        </div>
+        <h2 className="notice-title">공지사항 생성</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="title">제목</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="content">내용</label>
+            <textarea
+              id="content"
+              name="content"
+              value={formData.content}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button type="submit">공지사항 생성</button>
+        </form>
       </div>
-
     </div>
 
   );
 }
 
-export default NoticeList;
+export default NoticeCreate;
