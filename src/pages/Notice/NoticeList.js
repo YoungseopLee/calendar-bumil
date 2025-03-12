@@ -2,18 +2,19 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import "./NoticeList.css";
+import { Link } from "react-router-dom";
 
 /**
-  * 📌  NoticeList - 공지사항 목록을 보여주는 컴포넌트
-  * 
-  * ✅ 주요 기능:
-  * - 공지사항 목록 조회 (GET /notice/get_all_notice)
-  * 
-  * 
-  * ✅ UI (또는 Component) 구조:
-  * - NoticeList (공지사항 목록)
-  * 
-*/
+ * 📌  NoticeList - 공지사항 목록을 보여주는 컴포넌트
+ *
+ * ✅ 주요 기능:
+ * - 공지사항 목록 조회 (GET /notice/get_all_notice)
+ *
+ *
+ * ✅ UI (또는 Component) 구조:
+ * - NoticeList (공지사항 목록)
+ *
+ */
 
 const NoticeList = () => {
   const [notices, setNotices] = useState([]); // 공지사항 목록
@@ -39,7 +40,7 @@ const NoticeList = () => {
   // 🔄 ** 2. 공지사항 목록 조회 **
   useEffect(() => {
     fetchNotices();
-  }, []); 
+  }, []);
 
   // ✅ 현재 로그인한 사용자의 정보를 API에서 가져옴
   // ✅ 사용자 정보가 없거나 세션이 만료되었을 경우 자동 로그아웃 처리
@@ -52,7 +53,7 @@ const NoticeList = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      
+
       if (response.status === 401) {
         handleLogout();
         return;
@@ -81,23 +82,24 @@ const NoticeList = () => {
   const fetchNotices = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`${apiUrl}/notice/get_notice_list`, {  // URL 수정
+      const response = await fetch(`${apiUrl}/notice/get_notice_list`, {
+        // URL 수정
         method: "GET",
         headers: {
-          "Authorization": `Bearer ${token}`,  // 토큰 추가
-          "Content-Type": "application/json"
-        }
+          Authorization: `Bearer ${token}`, // 토큰 추가
+          "Content-Type": "application/json",
+        },
       });
-      
+
       // 응답 확인을 위한 로깅
-      console.log('Response status:', response.status);
+      console.log("Response status:", response.status);
       const responseData = await response.text();
-      console.log('Response data:', responseData);
-  
+      console.log("Response data:", responseData);
+
       if (!response.ok) {
         throw new Error("공지사항 목록을 불러오지 못했습니다.");
       }
-  
+
       const data = JSON.parse(responseData);
       setNotices(data.notices);
     } catch (err) {
@@ -107,7 +109,7 @@ const NoticeList = () => {
       setLoading(false);
     }
   };
-  
+
   // ✅ 로딩 중 또는 에러 시 화면에 표시할 메세지
   if (loading) return <p>데이터를 불러오는 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
@@ -118,20 +120,22 @@ const NoticeList = () => {
       <div className="notice-container">
         <h2 className="notice-title">공지사항</h2>
         {user.role_id === "AD_ADMIN" && (
-          <button onClick={() => navigate("/notice-create")}>공지사항 작성</button>
+          <button onClick={() => navigate("/notice-create")}>
+            공지사항 작성
+          </button>
         )}
         <div className="notice-list">
           {notices.map((notice) => (
-            <div key={notice.notice_id} className="notice-item">
-              <h3 className="notice-title">{notice.title}</h3>
+            <div key={notice.id} className="notice-item">
+              <Link to={`/notice-details`} className="notice-title">
+                {notice.title}
+              </Link>
             </div>
           ))}
         </div>
       </div>
-
     </div>
-
   );
-}
+};
 
 export default NoticeList;

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./NoticeDetails.css";
 import Sidebar from "../components/Sidebar";
+import { useParams } from 'react-router-dom';
 
 const NoticeDetails = () => {
   const [loading, setLoading] = useState(false); // 데이터 로딩 상태
@@ -9,6 +10,8 @@ const NoticeDetails = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
+
+  const { id } = useParams();
 
   // 로그인한 사용자 정보 (localStorage에서 불러옴)
   const user = JSON.parse(localStorage.getItem("user"));
@@ -37,7 +40,7 @@ const NoticeDetails = () => {
     }
 
     // ✅ 어드민, PR 권한 체크
-    if (user.role_id !== "AD_ADMIN" && user.role_id !== "PR_ADMIN") {
+    if (user.role_id !== "AD_ADMIN") {
       alert("관리자 권한이 없습니다.");
       navigate("/");
       return;
@@ -99,17 +102,17 @@ const NoticeDetails = () => {
   return (
     <div>
       <Sidebar />
-      <div className="notice-container">
-        <span className="notice-notice">공지사항</span>
-        <h1 className="notice-title">{notice.title}</h1>
-        <div className="notice-meta">
-          <div className="notice-date">
+      <div className="notice-detail-container">
+        <span className="notice-detail-notice">공지사항</span>
+        <h1 className="notice-detail-title">{notice.title}</h1>
+        <div className="notice-detail-meta">
+          <div className="notice-detail-date">
             <span>{notice.date}</span>
           </div>
           <span>{notice.author}</span>
         </div>
 
-        <div className="notice-content">{notice.content}</div>
+        <div className="notice-detail-content">{notice.content}</div>
         <div>
           목록으로
         </div>

@@ -1,23 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import "./NoticeCreate.css";
 
 /**
-  * 📌  NoticeCreate - 공지사항 생성을 위한 컴포넌트
-  * 
-  * ✅ 주요 기능:
-  * - 공지사항 생성 (POST /notice/create_notice)
-  * 
-  * 
-  * ✅ UI (또는 Component) 구조:
-  * - NoticeCreate (공지사항 생성)
-  * 
-*/
+ * 📌  NoticeCreate - 공지사항 생성을 위한 컴포넌트
+ *
+ * ✅ 주요 기능:
+ * - 공지사항 생성 (POST /notice/create_notice)
+ *
+ *
+ * ✅ UI (또는 Component) 구조:
+ * - NoticeCreate (공지사항 생성)
+ *
+ */
 
 const NoticeCreate = () => {
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태
   const [error, setError] = useState(null); // 에러 메세지
+  const [content, setContent] = useState("");
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
@@ -44,7 +47,7 @@ const NoticeCreate = () => {
       return;
     }
     // ✅ 어드민, PR 권한 체크
-    if (user.role_id !== "AD_ADMIN" && user.role_id !== "PR_ADMIN") {
+    if (user.role_id !== "AD_ADMIN") {
       alert("관리자 권한이 없습니다.");
       navigate("/");
       return;
@@ -54,7 +57,7 @@ const NoticeCreate = () => {
   // 🔄 ** 2. 공지사항 목록 조회 **
   useEffect(() => {
     //fetchNotices();
-  }, []); 
+  }, []);
 
   // ✅ 현재 로그인한 사용자의 정보를 API에서 가져옴
   // ✅ 사용자 정보가 없거나 세션이 만료되었을 경우 자동 로그아웃 처리
@@ -67,7 +70,7 @@ const NoticeCreate = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      
+
       if (response.status === 401) {
         handleLogout();
         return;
@@ -92,14 +95,17 @@ const NoticeCreate = () => {
     navigate("/");
   };
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (value, name) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setError(null);
-
+    console.log("공지사항 제목, 내용:", formData.title, formData.content);
     if (!formData.title || !formData.content) {
       setError("⚠️ 필수 입력값을 모두 입력해주세요.");
       return;
@@ -125,53 +131,67 @@ const NoticeCreate = () => {
       });
       if (!response.ok) {
         throw new Error("공지사항 생성을 실패했습니다.");
-        }
+      }
       alert("✅ 공지사항이 성공적으로 생성되었습니다!");
-      navigate("/notice");
+      navigate("/notice-list");
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
-  }
-  
+  };
+
+  const modules = {
+    toolbar: [
+      [{ 'header': '1'}, { 'header': '2'}, { 'font': [] }],
+      [{ 'size': ['small', 'normal', 'large', 'huge'] }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'align': [] }],
+      ['bold', 'italic', 'underline'],
+      ['link'],
+    ],
+  };
+
+  const formats = [
+    'header', 'font', 'size', 'list', 'align', 'bold', 'italic', 'underline', 'link',
+  ];
+
   // ✅ 로딩 중 또는 에러 시 화면에 표시할 메세지
   if (loading) return <p>데이터를 불러오는 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
 
   return (
-    <div className="app">
+    <div>
       <Sidebar />
-      <div className="notice-container">
-        <h2 className="notice-title">공지사항 생성</h2>
+      <div className="notice-create-container">
+        <h2>공지사항 생성</h2>
+
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
+          <div className="notice-create-form-group">
             <label htmlFor="title">제목</label>
             <input
               type="text"
               id="title"
               name="title"
-              value={formData.title}
-              onChange={handleChange}
+              onChange={(e) => handleChange(e.target.value, e.target.name)}
               required
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="content">내용</label>
-            <textarea
-              id="content"
-              name="content"
-              value={formData.content}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <button type="submit">공지사항 생성</button>
+          <ReactQuill
+            value={formData.content}
+            onChange={(value) => handleChange(value, "content")}
+            modules={modules}
+            formats={formats}
+            theme="snow"
+            style={{ height: "250px" }}
+          />
+          <button className="notice-create-button" type="submit">
+            공지사항 생성
+          </button>
         </form>
       </div>
     </div>
-
   );
-}
+};
 
 export default NoticeCreate;
