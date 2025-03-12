@@ -85,6 +85,10 @@ function App() {
           path="/notice-list"
           element={<Modules.NoticeModule.NoticeList />}
         />
+        <Route
+          path="/notice-details"
+          element={<Modules.NoticeModule.NoticeDetails />}
+        />
       </Routes>
     </Router>
   );

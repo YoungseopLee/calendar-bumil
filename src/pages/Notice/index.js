@@ -1,7 +1,8 @@
 import NoticeList from "./NoticeList";
-
+import NoticeDetails from "./NoticeDetails";
 const NoticeModule = {
-    NoticeList
+  NoticeList,
+  NoticeDetails,
 };
 
 export default NoticeModule;
