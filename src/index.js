@@ -11,7 +11,7 @@ import EmployeeModule from "./pages/employee";
 import ProfileModule from "./pages/profile";
 import ProjectModule from "./pages/project";
 import SituationControlModule from "./pages/situation_control";
-import NoticeModule from "./pages/Notice";
+import NoticeModule from "./pages/notice";
 
 const Modules = {
   Admin,

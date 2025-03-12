@@ -212,7 +212,8 @@ def log_login():
 
         cursor = conn.cursor()
         login_time = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]  # 밀리초 포함
-        sql_insert_log = "INSERT INTO tb_user_login_log (login_at, user_id, ip_address) VALUES (%s, %s, %s)"
+        sql_insert_log = """
+        INSERT INTO tb_user_login_log (login_at, user_id, ip_address) VALUES (%s, %s, %s)"""
         cursor.execute(sql_insert_log, (login_time, user_id, login_ip))
         conn.commit()
 
@@ -222,6 +223,41 @@ def log_login():
     except Exception as e:
         print(f"로그인 기록 저장 오류: {e}")
         return jsonify({'message': '로그인 기록 저장 실패!'}), 500
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
+
+# 로그인 기록 조회 API
+@auth_bp.route('/get_login_logs', methods=['GET'])
+@cross_origin(supports_credentials=True)
+def get_login_logs():
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+
+        cursor = conn.cursor(dictionary=True)
+        
+        # 로그인 기록 조회 쿼리
+        sql_select_logs = """
+        SELECT log.login_at, log.user_id, log.ip_address, user.name, user.department
+        FROM tb_user_login_log log
+        JOIN tb_user user ON log.user_id = user.id
+        ORDER BY log.login_at DESC"""
+        cursor.execute(sql_select_logs)
+        logs = cursor.fetchall()
+
+        logger.info(f"[SQL/SELECT] tb_user_login_log {sql_select_logs}")
+
+        return jsonify({'message': '로그인 기록 조회 성공', 'logs': logs}), 200
+
+    except Exception as e:
+        print(f"로그인 기록 조회 오류: {e}")
+        return jsonify({'message': '로그인 기록 조회 실패!'}), 500
     finally:
         if cursor is not None:
             cursor.close()
