@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./NoticeDetails.css";
-
-
+import Sidebar from "../components/Sidebar";
 
 const NoticeDetails = () => {
   const [loading, setLoading] = useState(false); // 데이터 로딩 상태
@@ -13,6 +12,20 @@ const NoticeDetails = () => {
 
   // 로그인한 사용자 정보 (localStorage에서 불러옴)
   const user = JSON.parse(localStorage.getItem("user"));
+
+  const notice = {
+    id: "01",
+    title: "비상연락망(25.3월 기준) 전달_사업지원팀 수정",
+    author: "배효진",
+    date: "2025-03-11 10:40",
+    readCount: 25,
+    content: `안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준)
+     재공지드립니다.\n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준
+     ) 재공지드립니다.\n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준) 
+      재공지드립니다.\n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준) 재공지드
+      립니다.\n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준) 재공지드립니다.\
+      n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준) 재공지드립니다.\n\n감사합니다.`,
+  };
 
   // 🔄 **1. 로그인한 사용자 정보 확인 및 권한 체크**
   useEffect(() => {
@@ -65,30 +78,44 @@ const NoticeDetails = () => {
     navigate("/");
   };
 
-//   const fetchNotices = async () => {
-//     try {
-//       const response = await fetch(`${apiUrl}/notice/get_all_notice`);
-//       if (!response.ok) {
-//         throw new Error("공지사항 목록을 불러오지 못했습니다.");
-//       }
-//       const data = await response.json();
-//     } catch (err) {
-//       setError(err.message);
-//     } finally {
-//       setLoading(false);
-//     }
-//   }
-  
+  //   const fetchNotices = async () => {
+  //     try {
+  //       const response = await fetch(`${apiUrl}/notice/get_all_notice`);
+  //       if (!response.ok) {
+  //         throw new Error("공지사항 목록을 불러오지 못했습니다.");
+  //       }
+  //       const data = await response.json();
+  //     } catch (err) {
+  //       setError(err.message);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
 
   // ✅ 로딩 중 또는 에러 시 화면에 표시할 메세지
   if (loading) return <p>데이터를 불러오는 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
-  
+
   return (
-    <div className=" notice-list">
-      <h1>공지사항 상세페이지</h1>
+    <div>
+      <Sidebar />
+      <div className="notice-container">
+        <span className="notice-notice">공지사항</span>
+        <h1 className="notice-title">{notice.title}</h1>
+        <div className="notice-meta">
+          <div className="notice-date">
+            <span>{notice.date}</span>
+          </div>
+          <span>{notice.author}</span>
+        </div>
+
+        <div className="notice-content">{notice.content}</div>
+        <div>
+          목록으로
+        </div>
+      </div>
     </div>
   );
-}
+};
 
 export default NoticeDetails;
