@@ -8,8 +8,26 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # 공지사항 목록 조회 (삭제되지 않은 공지만)
-@notice_bp.route('/get_notice_list', methods=['GET'])
+@notice_bp.route('/get_notice_list', methods=['GET', 'OPTIONS'])
 def get_notices():
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'CORS preflight request success'}), 200
+
+    # 토큰 검증
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'message': '토큰이 없습니다.'}), 401
+    token = token.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        user_id = payload.get('user_id')
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': '토큰이 만료되었습니다.'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
+    except Exception as e:
+        return jsonify({'message': '토큰 검증 오류'}), 401
+
     conn = get_db_connection()
     if conn is None:
         return jsonify({'message': '데이터베이스 연결 실패!'}), 500
@@ -33,8 +51,26 @@ def get_notices():
         conn.close()
 
 # 특정 공지사항 조회 (삭제되지 않은 공지만)
-@notice_bp.route('/get_notice/<int:notice_id>', methods=['GET'])
+@notice_bp.route('/get_notice/<int:notice_id>', methods=['GET', 'OPTIONS'])
 def get_notice(notice_id):
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'CORS preflight request success'}), 200
+
+    # 토큰 검증
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'message': '토큰이 없습니다.'}), 401
+    token = token.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        user_id = payload.get('user_id')
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': '토큰이 만료되었습니다.'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
+    except Exception as e:
+        return jsonify({'message': '토큰 검증 오류'}), 401
+
     conn = get_db_connection()
     if conn is None:
         return jsonify({'message': '데이터베이스 연결 실패!'}), 500
@@ -59,8 +95,26 @@ def get_notice(notice_id):
         conn.close()
 
 # 공지사항 생성
-@notice_bp.route('/create_notice', methods=['POST'])
+@notice_bp.route('/create_notice', methods=['POST', 'OPTIONS'])
 def create_notice():
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'CORS preflight request success'}), 200
+
+    # 토큰 검증
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'message': '토큰이 없습니다.'}), 401
+    token = token.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        user_id = payload.get('user_id')
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': '토큰이 만료되었습니다.'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
+    except Exception as e:
+        return jsonify({'message': '토큰 검증 오류'}), 401
+
     conn = get_db_connection()
     if conn is None:
         return jsonify({'message': '데이터베이스 연결 실패!'}), 500
@@ -93,8 +147,26 @@ def create_notice():
         conn.close()
 
 # 공지사항 수정
-@notice_bp.route('/update_notice/<int:notice_id>', methods=['PUT'])
+@notice_bp.route('/update_notice/<int:notice_id>', methods=['PUT', 'OPTIONS'])
 def update_notice(notice_id):
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'CORS preflight request success'}), 200
+
+    # 토큰 검증
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'message': '토큰이 없습니다.'}), 401
+    token = token.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        user_id = payload.get('user_id')
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': '토큰이 만료되었습니다.'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
+    except Exception as e:
+        return jsonify({'message': '토큰 검증 오류'}), 401
+
     conn = get_db_connection()
     if conn is None:
         return jsonify({'message': '데이터베이스 연결 실패!'}), 500
@@ -129,8 +201,26 @@ def update_notice(notice_id):
         conn.close()
 
 # 공지사항 삭제 (논리 삭제)
-@notice_bp.route('/delete_notice/<int:notice_id>', methods=['DELETE'])
+@notice_bp.route('/delete_notice/<int:notice_id>', methods=['DELETE', 'OPTIONS'])
 def delete_notice(notice_id):
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'CORS preflight request success'}), 200
+
+    # 토큰 검증
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'message': '토큰이 없습니다.'}), 401
+    token = token.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        user_id = payload.get('user_id')
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': '토큰이 만료되었습니다.'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
+    except Exception as e:
+        return jsonify({'message': '토큰 검증 오류'}), 401
+
     conn = get_db_connection()
     if conn is None:
         return jsonify({'message': '데이터베이스 연결 실패!'}), 500
@@ -160,8 +250,26 @@ def delete_notice(notice_id):
         conn.close()
 
 # 공지사항 복구
-@notice_bp.route('/restore_notice/<int:notice_id>', methods=['PUT'])
+@notice_bp.route('/restore_notice/<int:notice_id>', methods=['PUT', 'OPTIONS'])
 def restore_notice(notice_id):
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'CORS preflight request success'}), 200
+
+    # 토큰 검증
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'message': '토큰이 없습니다.'}), 401
+    token = token.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        user_id = payload.get('user_id')
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': '토큰이 만료되었습니다.'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
+    except Exception as e:
+        return jsonify({'message': '토큰 검증 오류'}), 401
+
     conn = get_db_connection()
     if conn is None:
         return jsonify({'message': '데이터베이스 연결 실패!'}), 500
