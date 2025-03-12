@@ -60,6 +60,12 @@ def decrypt_deterministic(encrypted_data: str) -> str:
     unpadded_bytes = unpad(decrypted_bytes)
     return unpadded_bytes.decode('utf-8')
 
+# 클라이언트 IP 주소 가져오기
+def get_client_ip():
+    if request.headers.get('X-Forwarded-For'):
+        return request.headers.get('X-Forwarded-For').split(',')[0]
+    return request.remote_addr
+
 # 회원가입 (AES 암호화 적용)
 # 현재 사용하지 않음.
 @auth_bp.route('/signup', methods=['POST', 'OPTIONS'])
@@ -120,6 +126,7 @@ def signup():
         if conn is not None:
             conn.close()
 
+# 로그인 API
 @auth_bp.route('/login', methods=['POST', 'OPTIONS'])
 @cross_origin(supports_credentials=True)
 def login():
@@ -179,6 +186,42 @@ def login():
     except Exception as e:
         print(f"로그인 중 오류 발생: {e}")
         return jsonify({'message': '로그인 실패!'}), 500
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
+
+# 로그인 기록 저장 API
+@auth_bp.route('/log_login', methods=['POST'])
+@cross_origin(supports_credentials=True)
+def log_login():
+    conn = None
+    cursor = None
+    try:
+        data = request.get_json() or {}
+        user_id = data.get('user_id')
+        login_ip = get_client_ip()
+
+        if not user_id:
+            return jsonify({'message': 'user_id가 필요합니다.'}), 400
+
+        conn = get_db_connection()
+        if conn is None:
+            return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+
+        cursor = conn.cursor()
+        login_time = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]  # 밀리초 포함
+        sql_insert_log = "INSERT INTO tb_user_login_log (login_at, user_id, ip_address) VALUES (%s, %s, %s)"
+        cursor.execute(sql_insert_log, (login_time, user_id, login_ip))
+        conn.commit()
+
+        logger.info(f"[SQL/INSERT] tb_user_login_log {sql_insert_log}")
+        return jsonify({'message': '로그인 기록이 저장되었습니다.'}), 201
+
+    except Exception as e:
+        print(f"로그인 기록 저장 오류: {e}")
+        return jsonify({'message': '로그인 기록 저장 실패!'}), 500
     finally:
         if cursor is not None:
             cursor.close()

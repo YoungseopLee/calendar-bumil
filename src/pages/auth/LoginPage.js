@@ -10,7 +10,7 @@ import "./LoginPage.css";
  *  - 로그인된 사용자 정보 불러오기 (GET /auth/get_logged_in_user)
  *  - 아이디 저장 & 자동 로그인 기능 지원
  *  - 최초 로그인 여부 확인 후 라우팅 처리
- * 
+ *
  * ✅ UI(또는 Component) 구조:
  *  - LoginPage (메인 페이지)
  *    ├── 로그인 입력 필드 (아이디, 비밀번호)
@@ -24,8 +24,8 @@ const LoginPage = () => {
   const [password, setPassword] = useState(""); // 사용자 비밀번호
   const [rememberMe, setRememberMe] = useState(false); // 아이디 저장 여부
   const [autoLogin, setAutoLogin] = useState(false); // 자동 로그인 여부
-  const [message, setMessage] = useState(""); // 로그인 메세지 (성공, 실패) 
-  
+  const [message, setMessage] = useState(""); // 로그인 메세지 (성공, 실패)
+
   const navigate = useNavigate(); // 페이지 이동을 위한 네비게이션
   const apiUrl = process.env.REACT_APP_API_URL; // API URL 환경변수
 
@@ -71,7 +71,7 @@ const LoginPage = () => {
    */
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setMessage(""); 
+    setMessage("");
 
     try {
       const response = await fetch(`${apiUrl}/auth/login`, {
@@ -116,6 +116,16 @@ const LoginPage = () => {
         } else {
           localStorage.removeItem("autoLogin");
         }
+
+        // ✅ 별도의 API로 로그인 기록을 남기는 경우
+        await fetch(`${apiUrl}/auth/log_login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${data.token}`,
+          },
+          body: JSON.stringify({ user_id: id }),
+        });
 
         // ✅ 최초 로그인 여부 확인 후 페이지 이동
         if (data.user.first_login_yn === "Y") {
