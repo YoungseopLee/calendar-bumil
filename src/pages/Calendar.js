@@ -617,16 +617,18 @@ const Calendar = () => {
                             </span>
                           </div>
                           <div className="button-group">
-                            <button
-                              className="delete-button icon-button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteSchedule(schedule.id);
-                              }}
-                              title="삭제"
-                            >
-                              <FaTrash />
-                            </button>
+                            {isAdmin && (
+                              <button
+                                className="delete-button icon-button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteSchedule(schedule.id);
+                                }}
+                                title="삭제"
+                              >
+                                <FaTrash />
+                              </button>
+                            )}
                           </div>
                         </li>
                       );
