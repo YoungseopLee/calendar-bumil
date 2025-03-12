@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiMenu } from "react-icons/fi"; // ✅ 햄버거 아이콘
+import { FiMenu } from "react-icons/fi";
 import {
   FaCalendarAlt,
   FaClipboardList,
@@ -10,11 +10,12 @@ import {
   FaTools,
   FaUserShield,
   FaSignOutAlt,
-} from "react-icons/fa"; // ✅ 추가 아이콘
+} from "react-icons/fa";
 import "./Sidebar.css";
 
 const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(window.innerWidth > 1024);
+  const [isTablet, setIsTablet] = useState(window.innerWidth <= 1024);
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const [userid, setUserid] = useState(null);
@@ -23,10 +24,31 @@ const Sidebar = () => {
     const user = JSON.parse(localStorage.getItem("user"));
     setUserid(user?.id);
     setIsAdmin(user?.role_id === "AD_ADMIN");
+
+    // 반응형 화면 크기 체크
+    const handleResize = () => {
+      if (window.innerWidth > 1024) {
+        setIsOpen(true); // 데스크탑에서는 항상 열림
+        setIsTablet(false);
+      } else if (window.innerWidth > 768) {
+        setIsOpen(false); // 태블릿에서는 아이콘만 보이도록
+        setIsTablet(true);
+      } else {
+        setIsOpen(false); // 모바일에서는 닫기
+        setIsTablet(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
-  const closeSidebar = () => setIsOpen(false);
+  const closeSidebar = () => {
+    if (window.innerWidth <= 768) {
+      setIsOpen(false);
+    }
+  };
 
   const handleManagerClick = (e) => {
     e.preventDefault();
@@ -45,60 +67,61 @@ const Sidebar = () => {
 
   return (
     <div className="app-body">
-      {/* ✅ 햄버거 버튼 */}
-      <button className="hamburger-btn" onClick={toggleSidebar}>
-        <FiMenu size={28} color="#333" />
-      </button>
+      {/* 모바일에서만 햄버거 버튼 보이기 */}
+      {window.innerWidth <= 1024 && (
+        <button className="hamburger-btn" onClick={toggleSidebar}>
+          <FiMenu size={28} color="#333" />
+        </button>
+      )}
 
-      {/* ✅ 오버레이 (사이드바 외부 클릭 시 닫힘) */}
-      {isOpen && <div className="overlay" onClick={closeSidebar}></div>}
-
-      {/* ✅ 사이드바 */}
+      {/* 사이드바 */}
       <div className={`sidebar ${isOpen ? "open" : ""}`}>
         <ul className="menu">
           <li>
             <Link to="/calendar">
-              <FaCalendarAlt className="menu-icon" /> 달력
+              <FaCalendarAlt className="menu-icon" /> {!isTablet && "달력"}
             </Link>
           </li>
           <li>
             <Link to="/notice-list">
-              <FaClipboardList className="menu-icon" /> 공지사항
+              <FaClipboardList className="menu-icon" />{" "}
+              {!isTablet && "공지사항"}
             </Link>
           </li>
           <li>
             <Link to="/projects">
-              <FaProjectDiagram className="menu-icon" /> 프로젝트
+              <FaProjectDiagram className="menu-icon" />{" "}
+              {!isTablet && "프로젝트"}
             </Link>
           </li>
           <li>
             <Link to="/employee">
-              <FaUsers className="menu-icon" /> 직원
+              <FaUsers className="menu-icon" /> {!isTablet && "직원"}
             </Link>
           </li>
           <li>
             <Link to={`/user-details?user_id=${userid}`}>
-              <FaUser className="menu-icon" /> 내 정보
+              <FaUser className="menu-icon" /> {!isTablet && "내 정보"}
             </Link>
           </li>
           <li>
             <Link to="/situation_control">
-              <FaTools className="menu-icon" /> 현황 관리
+              <FaTools className="menu-icon" /> {!isTablet && "현황 관리"}
             </Link>
           </li>
           {isAdmin && (
             <li>
               <a href="#" onClick={handleManagerClick}>
-                <FaUserShield className="menu-icon" /> 관리자
+                <FaUserShield className="menu-icon" /> {!isTablet && "관리자"}
               </a>
             </li>
           )}
         </ul>
 
-        {/* ✅ 로그아웃 버튼 */}
+        {/* 로그아웃 버튼 */}
         <div className="logout-section">
           <Link to="/" onClick={handleLogout} className="logout-link">
-            로그아웃
+            <FaSignOutAlt className="menu-icon" /> {!isTablet && "로그아웃"}
           </Link>
         </div>
       </div>
