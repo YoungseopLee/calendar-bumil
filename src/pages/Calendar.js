@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
 import "./Calendar.css";
 
 const Calendar = () => {
@@ -500,7 +502,9 @@ const Calendar = () => {
                                 ),
                               }}
                             ></span>
-                            <span className="task-name">{schedule.task}</span>
+                            <Tippy content={schedule.task} placement="top">
+                              <span className="task-name">{schedule.task}</span>
+                            </Tippy>
                           </div>
                           <div className="button-group">
                             <button
@@ -549,7 +553,6 @@ const Calendar = () => {
                       );
                     }
 
-                    // 1. 선택한 부서의 사용자 ID 필터링
                     const departmentUserIds = users
                       .filter(
                         (user) =>
@@ -558,19 +561,16 @@ const Calendar = () => {
                       )
                       .map((user) => user.id);
 
-                    // 2. 선택한 날짜에 포함되는 일정 필터링
                     const filtered = otherUsersSchedule
                       .filter((schedule) => {
                         const startDate = new Date(schedule.start_date);
                         const endDate = new Date(schedule.end_date);
                         const selected = new Date(selectedDate);
 
-                        // 년, 월, 일만 비교하기 위해 시간을 00:00:00으로 설정
                         startDate.setHours(0, 0, 0, 0);
                         endDate.setHours(0, 0, 0, 0);
                         selected.setHours(0, 0, 0, 0);
 
-                        // 년, 월, 일만 비교
                         return (
                           departmentUserIds.includes(schedule.user_id) &&
                           selected >= startDate &&
@@ -593,35 +593,41 @@ const Calendar = () => {
                     return filtered.map((schedule) => {
                       const user = users.find((u) => u.id === schedule.user_id);
                       const userName = user ? user.name : "알 수 없음";
-                      const formatDate = (dateString) =>
-                        new Date(dateString)
-                          .toISOString()
-                          .slice(2, 10)
-                          .replace(/-/g, ".");
 
                       return (
                         <li
                           key={schedule.id}
-                          className="schedule-item"
-                          style={{ position: "relative", cursor: "pointer" }}
+                          className="schedule-item other-user-schedule"
+                          onClick={() => handleScheduleClick(schedule)}
                         >
-                          <span
-                            className="status-icon"
-                            style={{
-                              backgroundColor: getStatusClass(schedule.status),
-                            }}
-                          ></span>
-                          {userName} {": \u00A0"}
-                          <span className="task-name-two">{schedule.task}</span>
-                          {isAdmin && (
+                          <div className="schedule-content">
+                            <span
+                              className={`status-icon ${getStatusClass(
+                                schedule.status
+                              )}`}
+                            ></span>
+                            <Tippy
+                              content={`${userName} - ${schedule.task}`}
+                              placement="top"
+                            >
+                              <span className="task-name">{schedule.task}</span>
+                            </Tippy>
+                            <span className="schedule-user-name">
+                              {userName}
+                            </span>
+                          </div>
+                          <div className="button-group">
                             <button
                               className="delete-button icon-button"
-                              onClick={() => handleDeleteSchedule(schedule.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteSchedule(schedule.id);
+                              }}
                               title="삭제"
                             >
                               <FaTrash />
                             </button>
-                          )}
+                          </div>
                         </li>
                       );
                     });
