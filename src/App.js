@@ -79,6 +79,12 @@ function App() {
           path="/situation_control"
           element={<Modules.SituationControlModule.SituationControl />}
         />
+
+        {/* ===== Notice ===== */}
+        <Route
+          path="/notice-list"
+          element={<Modules.NoticeModule.NoticeList />}
+        />
       </Routes>
     </Router>
   );
