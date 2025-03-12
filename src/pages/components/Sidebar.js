@@ -55,11 +55,14 @@ const Sidebar = () => {
       {isOpen && (
         <div className="sidebar">
           <ul className="menu">
-            <li>
-              <Link to="/projects">프로젝트</Link>
+          <li>
+              <Link to="/calendar">달력</Link>
             </li>
             <li>
-              <Link to="/calendar">달력</Link>
+              <Link to="/notice-list">공지사항</Link>
+            </li>
+            <li>
+              <Link to="/projects">프로젝트</Link>
             </li>
             <li>
               <Link to="/employee">직원</Link>
