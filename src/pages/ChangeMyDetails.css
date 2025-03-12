@@ -1,70 +1,81 @@
-.user-edit-body {
+.change-user-edit-body {
   font-family: Arial, sans-serif;
   background-color: #ffffff;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  max-width: 400px;
   height: 100vh;
-  margin: 0;
+  margin: 0 auto;
 }
 
-.user-edit-container {
+.change-user-edit-container {
   background-color: #ffffff;
   border-radius: 8px;
-  max-width: 400px;
+  width: 100%;
   padding: 20px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-.user-edit-container h2 {
+.change-user-edit-container h2 {
   text-align: center;
   margin-bottom: 20px;
   color: #333333;
 }
 
-.user-edit-form-group {
+.change-user-edit-form-group {
   margin-bottom: 15px;
-  width: 100%; /* 모든 입력 필드 동일한 너비 */
+  width: 100%;
 }
 
-.user-edit-form-group label {
+.change-user-edit-form-group label {
   display: block;
   margin-bottom: 8px;
   font-size: 14px;
-  color: #555555;
+  font-weight: bolder;
+  color: black;
 }
 
-.user-edit-form-group input,
-.user-edit-form-group select {
+.change-user-edit-form-group input,
+.change-user-edit-form-group select,
+.change-user-info-text {
   width: 100%;
-  padding: 12px;
   font-size: 14px;
   border: 1px solid #cccccc;
   border-radius: 4px;
-  box-sizing: border-box; /* 패딩 포함한 크기 유지 */
+  box-sizing: border-box;
 }
 
-.user-edit-form-group input:focus,
-.user-edit-form-group select:focus {
+.change-user-edit-form-group input:focus,
+.change-user-edit-form-group select:focus {
   outline: none;
   border-color: #007bff;
 }
 
+.change-user-info-text {
+  border: none;
+  background-color: transparent;
+  padding-left: 10px;
+  color: #000;
+}
+
+.change-user-phone-input {
+  padding: 10px;
+}
+
 /* 버튼 컨테이너 */
-.user-edit-button-container {
+.change-user-edit-button-container,
+.change-user-change-pw-container {
   display: flex;
-  gap: 10px; /* 버튼 간격 유지 */
-  width: 100%;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 /* 버튼 스타일 */
-.user-edit-submit-button,
-.user-edit-cancel-button,
-.user-change-pw-button {
-  flex: 1; /* 동일한 크기로 버튼 정렬 */
+.change-user-edit-submit-button,
+.change-user-edit-cancel-button {
+  flex: 1;
   padding: 12px;
-  margin:5px;
   font-size: 16px;
   color: #ffffff;
   border: none;
@@ -73,19 +84,38 @@
   transition: background-color 0.3s ease;
 }
 
-.user-edit-submit-button,
-.user-change-pw-button {
+.change-user-change-pw-button {
+  flex: 1;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.change-user-change-pw-button {
+  background-color: #22c55e;
+}
+
+.change-user-change-pw-button:hover {
+  background-color: #16a34a;
+}
+
+.change-user-edit-submit-button {
   background-color: #007bff;
 }
 
-.user-edit-cancel-button {
-  background-color: #6c757d;
-}
-
-.user-edit-submit-button:hover {
+.change-user-edit-submit-button:hover {
   background-color: #0056b3;
 }
 
-.user-edit-cancel-button:hover {
+.change-user-edit-cancel-button {
+  background-color: #6c757d;
+}
+
+.change-user-edit-cancel-button:hover {
   background-color: #5a6268;
 }

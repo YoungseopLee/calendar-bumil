@@ -45,21 +45,6 @@ const ChangeMyDetails = () => {
     }
   };
 
-  const positionOrder = [
-    "어드민",
-    "대표이사",
-    "부사장",
-    "본부장",
-    "이사",
-    "상무",
-    "팀장",
-    "부장",
-    "차장",
-    "과장",
-    "대리",
-    "주임",
-  ];
-
   // 유저 데이터 불러오기 함수
   const fetchFormData = async (decodedId) => {
     if (!decodedId) return;
@@ -143,44 +128,54 @@ const ChangeMyDetails = () => {
   };
 
   return (
-    <div className="user-edit-body">
+    <div className="change-user-edit-body">
       <Sidebar />
-      <div className="user-edit-container">
-        <h2 className="user-edit-title">내 정보 변경</h2>
+      <div className="change-user-edit-container">
+        <h2 className="change-user-edit-title">내 정보 변경</h2>
         <form onSubmit={handleSubmit}>
-          <div className="user-edit-form-group">
+          <div className="change-user-edit-form-group">
             <label>이름</label>
-            <div className="user-info-text">{loggedInUser.name}</div>
+            <div className="change-user-info-text">{loggedInUser.name}</div>
           </div>
-          <div className="user-edit-form-group">
+          <div className="change-user-edit-form-group">
             <label>부서</label>
-            <div className="user-info-text">{loggedInUser.department}</div>
+            <div className="change-user-info-text">
+              {loggedInUser.department}
+            </div>
           </div>
-          <div className="user-edit-form-group">
+          <div className="change-user-edit-form-group">
             <label>직급</label>
-            <div className="user-info-text">{loggedInUser.position}</div>
+            <div className="change-user-info-text">{loggedInUser.position}</div>
           </div>
-          <div className="user-edit-form-group">
+          <div className="change-user-edit-form-group">
             <label>전화번호</label>
             <input
               type="tel"
               name="phone"
+              className="change-user-phone-input"
               value={formData.phone}
               onChange={handleChange}
               required
             />
           </div>
-          <button type="button" className="user-change-pw-button" onClick={() => navigate("/change-pw")}>비밀번호 변경 페이지로 이동</button>
-          <div className="user-edit-button-container">
-            <button type="submit" className="user-edit-submit-button">
-              내 정보 수정
+          <button
+            type="button"
+            className="change-user-change-pw-button"
+            onClick={() => navigate("/change-pw")}
+          >
+            비밀번호 변경
+          </button>
+
+          <div className="change-user-edit-button-container">
+            <button type="submit" className="change-user-edit-submit-button">
+              저장
             </button>
             <button
               type="button"
-              className="user-edit-cancel-button"
+              className="change-user-edit-cancel-button"
               onClick={() => window.history.back()}
             >
-              돌아가기
+              취소
             </button>
           </div>
         </form>
