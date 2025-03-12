@@ -15,7 +15,10 @@ import "./Sidebar.css";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(window.innerWidth > 1024);
-  const [isTablet, setIsTablet] = useState(window.innerWidth <= 1024);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isTablet, setIsTablet] = useState(
+    window.innerWidth > 768 && window.innerWidth <= 1024
+  );
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const [userid, setUserid] = useState(null);
@@ -25,16 +28,19 @@ const Sidebar = () => {
     setUserid(user?.id);
     setIsAdmin(user?.role_id === "AD_ADMIN");
 
-    // 반응형 화면 크기 체크
+    // 화면 크기 변경 감지
     const handleResize = () => {
       if (window.innerWidth > 1024) {
-        setIsOpen(true); // 데스크탑에서는 항상 열림
+        setIsOpen(true);
+        setIsMobile(false);
         setIsTablet(false);
       } else if (window.innerWidth > 768) {
-        setIsOpen(false); // 태블릿에서는 아이콘만 보이도록
+        setIsOpen(false);
+        setIsMobile(false);
         setIsTablet(true);
       } else {
-        setIsOpen(false); // 모바일에서는 닫기
+        setIsOpen(false);
+        setIsMobile(true);
         setIsTablet(false);
       }
     };
@@ -45,9 +51,7 @@ const Sidebar = () => {
 
   const toggleSidebar = () => setIsOpen(!isOpen);
   const closeSidebar = () => {
-    if (window.innerWidth <= 768) {
-      setIsOpen(false);
-    }
+    if (isMobile) setIsOpen(false);
   };
 
   const handleManagerClick = (e) => {
@@ -66,16 +70,23 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="app-body">
-      {/* 모바일에서만 햄버거 버튼 보이기 */}
-      {window.innerWidth <= 1024 && (
+    <div className={`app-body ${isOpen ? "sidebar-open" : ""}`}>
+      {/* 모바일 & 태블릿에서 햄버거 버튼 보이기 */}
+      {isMobile && (
         <button className="hamburger-btn" onClick={toggleSidebar}>
           <FiMenu size={28} color="#333" />
         </button>
       )}
 
+      {/* 오버레이 (모바일에서만 적용) */}
+      {isMobile && isOpen && (
+        <div className="overlay" onClick={closeSidebar}></div>
+      )}
+
       {/* 사이드바 */}
-      <div className={`sidebar ${isOpen ? "open" : ""}`}>
+      <div
+        className={`sidebar ${isOpen ? "open" : isTablet ? "collapsed" : ""}`}
+      >
         <ul className="menu">
           <li>
             <Link to="/calendar">
