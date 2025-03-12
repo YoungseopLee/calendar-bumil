@@ -193,9 +193,27 @@ def login():
             conn.close()
 
 # 로그인 기록 저장 API
-@auth_bp.route('/log_login', methods=['POST'])
+@auth_bp.route('/log_login', methods=['POST', 'OPTIONS'])
 @cross_origin(supports_credentials=True)
 def log_login():
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'CORS preflight request success'}), 200
+
+    # 토큰 검증
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'message': '토큰이 없습니다.'}), 401
+    token = token.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        user_id = payload.get('user_id')
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': '토큰이 만료되었습니다.'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
+    except Exception as e:
+        return jsonify({'message': '토큰 검증 오류'}), 401
+    
     conn = None
     cursor = None
     try:
@@ -230,9 +248,27 @@ def log_login():
             conn.close()
 
 # 로그인 기록 조회 API
-@auth_bp.route('/get_login_logs', methods=['GET'])
+@auth_bp.route('/get_login_logs', methods=['GET', 'OPTIONS'])
 @cross_origin(supports_credentials=True)
 def get_login_logs():
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'CORS preflight request success'}), 200
+
+    # 토큰 검증
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'message': '토큰이 없습니다.'}), 401
+    token = token.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        user_id = payload.get('user_id')
+    except jwt.ExpiredSignatureError:
+        return jsonify({'message': '토큰이 만료되었습니다.'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
+    except Exception as e:
+        return jsonify({'message': '토큰 검증 오류'}), 401
+
     conn = None
     cursor = None
     try:
