@@ -9,6 +9,7 @@ from blueprints.favorite import favorite_bp
 from blueprints.project import project_bp
 from blueprints.status import status_bp
 from blueprints.admin import admin_bp
+from blueprints.notice import notice_bp
 import os, logging
 
 app = Flask(__name__, static_folder="build", static_url_path="/")
@@ -99,6 +100,7 @@ app.register_blueprint(favorite_bp)
 app.register_blueprint(project_bp)
 app.register_blueprint(status_bp)
 app.register_blueprint(admin_bp)
+app.register_blueprint(notice_bp)
 
 # gunicorn 사용 시 주석 처리
 if __name__ == "__main__":
