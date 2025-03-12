@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
 from db import get_db_connection
 from datetime import datetime, timezone
-import logging
+from config import SECRET_KEY
+import logging, jwt
 
 notice_bp = Blueprint('notice', __name__, url_prefix='/notice')
 logger = logging.getLogger(__name__)
