@@ -84,6 +84,11 @@ const Manager = () => {
     navigate("/reset-user");
   };
 
+  // 유저 비밀번호 초기화 페이지 이동
+  const goToLoginLogPage = () => {
+    navigate("/login_log");
+  };
+
   return (
     <div className="manager-page">
       <Sidebar />
@@ -119,6 +124,12 @@ const Manager = () => {
           <div className="manager-card" onClick={goToResetUserPage}>
             <h2>유저 비밀번호 초기화</h2>
             <p>특정 유저의 비밀번호를 초기화할 수 있습니다.</p>
+            <button className="manage-button">이동</button>
+          </div>
+
+          <div className="manager-card" onClick={goToLoginLogPage}>
+            <h2>로그인 로그 조회</h2>
+            <p>유저의 로그인 로그를 조회할 수 있는 페이지입니다.</p>
             <button className="manage-button">이동</button>
           </div>
         </div>
