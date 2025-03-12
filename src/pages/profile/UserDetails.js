@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Sidebar from "../pages/Sidebar";
-import BackButton from "./BackButton";
+import Sidebar from "../components/Sidebar";
+import BackButton from "../components/BackButton";
 import "./UserDetails.css";
 import {
   FaPhone,
@@ -281,7 +281,12 @@ const UserDetails = () => {
 
           {/* 본인 정보 수정 버튼(id가 같지 않으면 안뜸) */}
           {loggedInUser.id === user.id && (
-            <button className="userdetail-edit-button" onClick={() => navigate('/change-my-details')}>내 정보 수정</button>
+            <button
+              className="userdetail-edit-button"
+              onClick={() => navigate("/change-my-details")}
+            >
+              내 정보 수정
+            </button>
           )}
         </div>
 

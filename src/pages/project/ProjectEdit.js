@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import Sidebar from "../components/Sidebar";
 import Select from "react-select";
 import "./ProjectEdit.css";
 
@@ -20,7 +20,7 @@ import "./ProjectEdit.css";
  *    ├── 참여자 추가/제거 UI
  */
 
- // 날짜를 "YYYY-MM-DD" 형식으로 변환하는 유틸리티 함수
+// 날짜를 "YYYY-MM-DD" 형식으로 변환하는 유틸리티 함수
 const formatDate = (dateString) => {
   if (!dateString) return "";
   const date = new Date(dateString);
@@ -144,7 +144,6 @@ const ProjectEdit = () => {
       setLoading(false);
     }
   };
-
 
   // ✅ 현재 로그인한 사용자의 정보를 API에서 가져옴
   // ✅ 사용자 정보가 없거나 세션이 만료되었을 경우 자동 로그아웃 처리
@@ -351,7 +350,7 @@ const ProjectEdit = () => {
     }
   };
 
-  // 참여자 추가 
+  // 참여자 추가
   const handleAddParticipant = () => {
     if (!selectedUser) {
       alert("추가할 참여자를 선택하세요.");

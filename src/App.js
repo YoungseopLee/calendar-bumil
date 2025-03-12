@@ -1,85 +1,84 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
-import Calendar from "./pages/Calendar";
-import Manager from "./pages/Manager";
-import StatusManagement from "./pages/StatusManagement";
-import AddSchedule from "./pages/AddSchedule";
-import Employee from "./pages/Employee";
-import EditSchedule from "./pages/EditSchedule";
-import MyPage from "./pages/MyPage";
-import Department_view from "./pages/Department-view";
-import Profile from "./pages/Profile";
-import ProjectDetails from "./pages/ProjectDetails";
-import ProjectPage from "./pages/ProjectPage";
-import ProjectEdit from "./pages/ProjectEdit";
-import ProjectCreate from "./pages/ProjectCreate";
-import ChangePWPage from "./pages/ChangePWPage";
-import UserDetails from "./pages/UserDetails";
-import UserRolesManagement from "./pages/UserRolesManagement";
-import SituationControl from "./pages/SituationControl";
-import AddUserPage from "./pages/AddUserPage";
-import ResetUser from "./pages/ResetUser";
-import ManageUser from "./pages/ManageUser";
-import EditUser from "./pages/EditUser";
-import ChangeMyDetails from "./pages/ChangeMyDetails"; 
+import Modules from "./index";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* 로그인 페이지 */}
-        <Route path="/" element={<LoginPage />} />
-        {/* 유저 생성 페이지 */}
-        <Route path="/add-user" element={<AddUserPage />} />
-        {/* 사용자 관리 페이지 */}
-        <Route path="/manage-user" element={<ManageUser />} />
-        {/* 사용자 정보 수정 페이지 */}
-        <Route path="/edit-user/:userId" element={<EditUser />} />
-        {/* 내정보 수정 페이지 */}
-        <Route path="/change-my-details" element={<ChangeMyDetails />} />
-        {/* 회원가입 페이지 */}
-        <Route path="/signup" element={<SignupPage />} />
-        {/* Calendar 페이지 */}
-        <Route path="/calendar" element={<Calendar />} />
-        {/* 일정 추가 페이지 */}
-        <Route path="/add-schedule" element={<AddSchedule />} />
-        {/* 어드민 페이지 */}
-        <Route path="/manager" element={<Manager />} />
-        {/* 유저의 권한을 변경하는 페이지 (UserRolesManagement)*/}
+        {/* ===== Admin ===== */}
+        <Route path="/add-user" element={<Modules.Admin.AddUserPage />} />
+        <Route path="/manage-user" element={<Modules.Admin.ManageUser />} />
+        <Route path="/edit-user/:userId" element={<Modules.Admin.EditUser />} />
+        <Route path="/manager" element={<Modules.Admin.Manager />} />
         <Route
           path="/user-roles-management"
-          element={<UserRolesManagement />}
+          element={<Modules.Admin.UserRolesManagement />}
         />
-        {/* 어드민 페이지 */}
-        <Route path="/reset-user" element={<ResetUser />} />
-        {/* 상태 CRUD 페이지 */}
-        <Route path="/status-management" element={<StatusManagement />} />
-        {/* 사원 페이지 */}
-        <Route path="/employee" element={<Employee />} />
-        {/* 일정 수정 페이지 */}
-        <Route path="/edit-schedule/:scheduleId" element={<EditSchedule />} />
-        {/* 마이페이지 */}
-        <Route path="/mypage" element={<MyPage />} />
-        {/* 프로필 페이지 */}
-        <Route path="/profile" element={<Profile />} />
-        {/* 부서별 일정보기 페이지 */}
-        <Route path="/department-view" element={<Department_view />} />
-        {/* 프로젝트 페이지 */}
-        <Route path="/projects" element={<ProjectPage />} />
-        {/* 프로젝트 상세 페이지 */}
-        <Route path="/project-details" element={<ProjectDetails />} />
-        {/* 프로젝트 상세-수정 페이지 */}
-        <Route path="/project-edit" element={<ProjectEdit />} />
-        {/* 프로젝트 생성 */}
-        <Route path="/add-project" element={<ProjectCreate />} />
-        {/* 비밀번호 변경 페이지 */}
-        <Route path="/change-pw" element={<ChangePWPage />} />
-        {/* 사원원 상세 페이지 */}
-        <Route path="/user-details" element={<UserDetails />} />
-        {/* 현황 관리 페이지 */}
-        <Route path="/situation_control" element={<SituationControl />} />
+        <Route path="/reset-user" element={<Modules.Admin.ResetUser />} />
+        <Route
+          path="/status-management"
+          element={<Modules.Admin.StatusManagement />}
+        />
+
+        {/* ===== Auth ===== */}
+        <Route path="/" element={<Modules.Auth.LoginPage />} />
+        <Route path="/signup" element={<Modules.Auth.SignupPage />} />
+        <Route path="/change-pw" element={<Modules.Auth.ChangePWPage />} />
+
+        {/* ===== Calendar ===== */}
+        <Route path="/calendar" element={<Modules.CalendarModule.Calendar />} />
+        <Route
+          path="/add-schedule"
+          element={<Modules.CalendarModule.AddSchedule />}
+        />
+        <Route
+          path="/department-view"
+          element={<Modules.CalendarModule.Department_view />}
+        />
+        <Route
+          path="/edit-schedule/:scheduleId"
+          element={<Modules.CalendarModule.EditSchedule />}
+        />
+
+        {/* ===== Employee ===== */}
+        <Route path="/employee" element={<Modules.EmployeeModule.Employee />} />
+
+        {/* ===== Profile ===== */}
+        <Route
+          path="/change-my-details"
+          element={<Modules.ProfileModule.ChangeMyDetails />}
+        />
+        <Route path="/mypage" element={<Modules.ProfileModule.MyPage />} />
+        <Route path="/profile" element={<Modules.ProfileModule.Profile />} />
+        <Route
+          path="/user-details"
+          element={<Modules.ProfileModule.UserDetails />}
+        />
+
+        {/* ===== Project ===== */}
+        <Route
+          path="/projects"
+          element={<Modules.ProjectModule.ProjectPage />}
+        />
+        <Route
+          path="/project-details"
+          element={<Modules.ProjectModule.ProjectDetails />}
+        />
+        <Route
+          path="/project-edit"
+          element={<Modules.ProjectModule.ProjectEdit />}
+        />
+        <Route
+          path="/add-project"
+          element={<Modules.ProjectModule.ProjectCreate />}
+        />
+
+        {/* ===== SituationControl ===== */}
+        <Route
+          path="/situation_control"
+          element={<Modules.SituationControlModule.SituationControl />}
+        />
       </Routes>
     </Router>
   );

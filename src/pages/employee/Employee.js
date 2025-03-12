@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Employee.css";
-import Sidebar from "./Sidebar";
-import BackButton from "./BackButton";
+import Sidebar from "../components/Sidebar";
+import BackButton from "../components/BackButton";
 import { useNavigate } from "react-router-dom";
 
 /**
@@ -46,7 +46,7 @@ const EmployeeList = () => {
   const apiUrl = process.env.REACT_APP_API_URL; // API URL 환경 변수
 
   const statusMap = statusList.reduce((acc, { comment, id }) => {
-    acc[comment] = id;  // comment를 키로, id를 값으로 설정
+    acc[comment] = id; // comment를 키로, id를 값으로 설정
     return acc;
   }, {});
   /**
@@ -344,7 +344,7 @@ const EmployeeList = () => {
                       className="department-header"
                       onClick={() => toggleDepartment(department)}
                     >
-                      <span  className="sub-department">
+                      <span className="sub-department">
                         {/* 화살표 표시 */}
                         <span className="arrow">
                           {openDepartments[department] ? "▼" : "▶"}

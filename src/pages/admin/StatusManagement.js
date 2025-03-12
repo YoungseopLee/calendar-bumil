@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import Sidebar from "../components/Sidebar";
 import "./StatusManagement.css";
 
 const StatusManagement = () => {

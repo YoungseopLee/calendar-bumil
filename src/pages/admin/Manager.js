@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Manager.css";
-import Sidebar from "./Sidebar";
+import Sidebar from "../components/Sidebar";
 
 const Manager = () => {
   const navigate = useNavigate();

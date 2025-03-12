@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import Sidebar from "../components/Sidebar";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import Tippy from "@tippyjs/react";

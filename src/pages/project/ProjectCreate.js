@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import Sidebar from "../components/Sidebar";
 import "./ProjectCreate.css";
 import ParticipantSelection from "./ParticipantSelection";
 
@@ -27,8 +27,8 @@ const ProjectCreate = () => {
 
   // ✅ 로그인한 사용자 정보 확인 (로컬 스토리지에서 가져오기)
   const user = JSON.parse(localStorage.getItem("user"));
-  
-    /**
+
+  /**
    * ✅ 컴포넌트 마운트 시 실행
    * - 로그인된 사용자 정보 확인
    * - 관리 권한이 없는 경우 접근 차단
@@ -47,7 +47,6 @@ const ProjectCreate = () => {
       navigate("/");
       return;
     }
-    
   }, []);
 
   // 로그인한 사용자 정보 API 호출
@@ -83,8 +82,6 @@ const ProjectCreate = () => {
     navigate("/");
   };
 
-
-
   /**
    * ✅ 프로젝트 생성 폼의 상태 관리
    * - 초기값 설정 (배열 형태 필드 포함)
@@ -106,7 +103,7 @@ const ProjectCreate = () => {
     business_details_and_notes: "",
     changes: "",
     group_name: "",
-    participants: [], 
+    participants: [],
   });
 
   const [error, setError] = useState(null);
@@ -124,7 +121,7 @@ const ProjectCreate = () => {
     }));
   };
 
-    /**
+  /**
    * ✅ 프로젝트 생성 요청 핸들러
    * - 필수 입력값 검증 후 API 호출 (POST /project/add_project)
    * - 참여자 데이터를 백엔드에서 요구하는 형식으로 변환 후 전송
@@ -132,7 +129,7 @@ const ProjectCreate = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-  
+
     // ✅ 필수 입력값 확인
     if (
       !formData.project_code ||
@@ -146,28 +143,28 @@ const ProjectCreate = () => {
       setError("⚠️ 필수 입력값을 모두 입력해주세요.");
       return;
     }
-  
+
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("로그인이 필요합니다.");
       }
-  
+
       // ✅ 참여자 데이터를 사용할 API 형식으로 변환
       const participants = formData.participants.map((p) => ({
         id: p.id,
         start_date: p.participant_start_date || formData.business_start_date,
-        end_date: p.participant_end_date || formData.business_end_date
+        end_date: p.participant_end_date || formData.business_end_date,
       }));
-  
+
       // ✅ 전송할 데이터 구조
       const payload = {
         ...formData,
-        participants,  // 전체 참여자 정보 포함
+        participants, // 전체 참여자 정보 포함
       };
-  
+
       console.log("📤 전송된 데이터:", JSON.stringify(payload, null, 2)); // 디버깅용 출력
-  
+
       const response = await fetch(`${apiUrl}/project/add_project`, {
         method: "POST",
         headers: {
@@ -176,12 +173,14 @@ const ProjectCreate = () => {
         },
         body: JSON.stringify(payload),
       });
-  
+
       if (!response.ok) {
         const errorMessage = await response.json();
-        throw new Error(errorMessage.message || "프로젝트 생성에 실패했습니다.");
+        throw new Error(
+          errorMessage.message || "프로젝트 생성에 실패했습니다."
+        );
       }
-  
+
       alert("✅ 프로젝트가 성공적으로 생성되었습니다!");
       navigate("/projects");
     } catch (error) {
@@ -213,18 +212,37 @@ const ProjectCreate = () => {
           ].map(([label, name]) => (
             <div className="form-row" key={name}>
               <label>{label}:</label>
-              <input type="text" name={name} value={formData[name]} onChange={handleChange} />
+              <input
+                type="text"
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+              />
             </div>
           ))}
 
           {/* ✅ 카테고리 및 상태 */}
           {[
-            ["카테고리", "category", ["구축 인프라", "구축 SW", "유지보수 인프라", "유지보수 SW", "연구과제"]],
+            [
+              "카테고리",
+              "category",
+              [
+                "구축 인프라",
+                "구축 SW",
+                "유지보수 인프라",
+                "유지보수 SW",
+                "연구과제",
+              ],
+            ],
             ["상태", "status", ["제안", "수행", "실주종료"]],
           ].map(([label, name, options]) => (
             <div className="form-row" key={name}>
               <label>{label}:</label>
-              <select name={name} value={formData[name]} onChange={handleChange}>
+              <select
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+              >
                 <option value="">선택하세요</option>
                 {options.map((opt) => (
                   <option key={opt} value={opt}>
@@ -239,21 +257,37 @@ const ProjectCreate = () => {
           <div className="form-row">
             <label>사업 기간:</label>
             <div className="date-container">
-              <input type="date" name="business_start_date" value={formData.business_start_date} onChange={handleChange} required />
+              <input
+                type="date"
+                name="business_start_date"
+                value={formData.business_start_date}
+                onChange={handleChange}
+                required
+              />
               <span className="date-separator">~</span>
-              <input type="date" name="business_end_date" value={formData.business_end_date} onChange={handleChange} required />
+              <input
+                type="date"
+                name="business_end_date"
+                value={formData.business_end_date}
+                onChange={handleChange}
+                required
+              />
             </div>
           </div>
 
           {/* ✅ 사업 내용 */}
           <div className="form-row">
             <label>사업 내용 및 특이사항:</label>
-            <textarea name="business_details_and_notes" value={formData.business_details_and_notes} onChange={handleChange} />
+            <textarea
+              name="business_details_and_notes"
+              value={formData.business_details_and_notes}
+              onChange={handleChange}
+            />
           </div>
-          
+
           {/* ✅ 참여자 선택 컴포넌트 */}
           <ParticipantSelection
-            participants={formData.participants}  // ✅ formData.participants를 직접 전달
+            participants={formData.participants} // ✅ formData.participants를 직접 전달
             setParticipants={setParticipants}
             projectStartDate={formData.business_start_date}
             projectEndDate={formData.business_end_date}
@@ -261,8 +295,16 @@ const ProjectCreate = () => {
 
           {/* ✅ 프로젝트 생성 & 취소 버튼 복원 */}
           <div className="button-container">
-            <button type="submit" className="save-button">프로젝트 생성</button>
-            <button type="button" className="cancel-button" onClick={() => navigate("/projects")}>취소</button>
+            <button type="submit" className="save-button">
+              프로젝트 생성
+            </button>
+            <button
+              type="button"
+              className="cancel-button"
+              onClick={() => navigate("/projects")}
+            >
+              취소
+            </button>
           </div>
         </form>
       </div>

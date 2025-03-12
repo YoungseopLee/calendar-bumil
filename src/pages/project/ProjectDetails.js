@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import Sidebar from "../components/Sidebar";
 import "./ProjectDetails.css";
 
 /**
@@ -10,7 +10,7 @@ import "./ProjectDetails.css";
  *  - 특정 프로젝트 코드(project_code)에 대한 상세 정보 조회
  *  - 프로젝트 참여자 목록 표시
  *  - 로그인한 사용자 정보 확인 후 권한에 따라 프로젝트 수정 버튼 표시
- * 
+ *
  * ✅ UI(또는 Component) 구조:
  *  - ProjectDetails (메인 페이지)
  *    ├── Sidebar (사이드바)
@@ -168,8 +168,8 @@ const ProjectDetails = () => {
   // ✅ 날짜 형식 변환 함수 (YYYY-MM-DD)
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    if (isNaN(date)) return dateString; 
-    return date.toISOString().split("T")[0]; 
+    if (isNaN(date)) return dateString;
+    return date.toISOString().split("T")[0];
   };
 
   // ✅ 프로젝트 상세 정보 테이블 컴포넌트

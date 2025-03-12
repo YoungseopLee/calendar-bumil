@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
+import Sidebar from "../components/Sidebar";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css"; // 기본 스타일
 import "./ManageUser.css";

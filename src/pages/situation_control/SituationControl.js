@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Sidebar from "../pages/Sidebar";
-import BackButton from "./BackButton";
+import Sidebar from "../components/Sidebar";
+import BackButton from "../components/BackButton";
 import "./SituationControl.css";
 import { FaSearch } from "react-icons/fa";
 

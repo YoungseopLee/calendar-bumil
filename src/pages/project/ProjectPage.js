@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import ProjectList from "./ProjectList";
-import Sidebar from "./Sidebar";
+import Sidebar from "../components/Sidebar";
 import AddProjectButton from "./AddProjectButton";
 import "./ProjectPage.css";
 

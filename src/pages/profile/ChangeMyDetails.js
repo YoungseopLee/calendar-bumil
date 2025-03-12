@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import "./EditUser.css";
-import Sidebar from "./Sidebar";
+import "./ChangeMyDetails.css";
+import Sidebar from "../components/Sidebar";
 
-const EditUser = () => {
-  const { userId } = useParams();
+const ChangeMyDetails = () => {
   const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL;
 
-  // decodedUserId를 state로 저장
-  const [decodedUserId, setDecodedUserId] = useState(null);
-  const [departments, setDepartments] = useState([]);
-  const [roles, setRoles] = useState([]);
-  const [positions, setPositions] = useState([]);
   const [formData, setFormData] = useState({
     username: "",
     position: "",
@@ -21,44 +15,18 @@ const EditUser = () => {
     role_id: "",
   });
 
+  const loggedInUser = JSON.parse(localStorage.getItem("user")); // 본인 정보 수정을 위해 로그인한 유저의 정보 가져오기
+
   // useEffect에서 userId를 디코딩 후 state에 저장
   useEffect(() => {
     try {
-      const decoded = atob(decodeURIComponent(userId)); // Base64 디코딩 + URL 디코딩
-      setDecodedUserId(decoded);
-      fetchFormData(decoded); // 디코딩된 userId로 데이터 불러오기
+      console.log("loggedinUser : ", loggedInUser);
+      fetchFormData(loggedInUser.id); // 디코딩된 userId로 데이터 불러오기
     } catch (error) {
       console.error("잘못된 userId:", error);
       alert("잘못된 사용자 ID입니다.");
-      navigate("/manage-user"); // 잘못된 경우 목록 페이지로 이동
+      navigate(`/user-details?user_id=${loggedInUser.id}`); // 잘못된 경우 목록 페이지로 이동
     }
-  }, [userId]); // userId가 변경될 때 실행
-
-  useEffect(() => {
-    // API 호출
-    const fetchData = async () => {
-      try {
-        const deptRes = await fetch(
-          `${process.env.REACT_APP_API_URL}/admin/get_department_list`
-        );
-        const roleRes = await fetch(
-          `${process.env.REACT_APP_API_URL}/admin/get_role_list`
-        );
-
-        const deptData = await deptRes.json();
-        const roleData = await roleRes.json();
-
-        console.log("부서 데이터:", deptData);
-        console.log("권한 데이터:", roleData);
-
-        setDepartments(Array.isArray(deptData) ? deptData : []);
-        setRoles(Array.isArray(roleData) ? roleData : []);
-      } catch (error) {
-        console.error("데이터 불러오기 오류:", error);
-      }
-    };
-
-    fetchData();
   }, []);
 
   // 전화번호 입력 시 자동으로 '-' 추가
@@ -76,21 +44,6 @@ const EditUser = () => {
       )}-${onlyNumbers.slice(7, 11)}`;
     }
   };
-
-  const positionOrder = [
-    "어드민",
-    "대표이사",
-    "부사장",
-    "본부장",
-    "이사",
-    "상무",
-    "팀장",
-    "부장",
-    "차장",
-    "과장",
-    "대리",
-    "주임",
-  ];
 
   // 유저 데이터 불러오기 함수
   const fetchFormData = async (decodedId) => {
@@ -152,7 +105,7 @@ const EditUser = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: decodedUserId,
+          id: loggedInUser.id,
           username: formData.username,
           position: formData.position,
           department: formData.department,
@@ -167,7 +120,7 @@ const EditUser = () => {
       }
 
       alert("✅ 유저 정보가 성공적으로 수정되었습니다!");
-      navigate("/manage-user");
+      navigate(`/user-details?user_id=${loggedInUser.id}`);
     } catch (error) {
       console.error("유저 수정 오류:", error);
       alert(`❌ 유저 수정에 실패했습니다. 오류: ${error.message}`);
@@ -175,89 +128,54 @@ const EditUser = () => {
   };
 
   return (
-    <div className="user-edit-body">
+    <div className="change-user-edit-body">
       <Sidebar />
-      <div className="user-edit-container">
-        <h2 className="user-edit-title">유저 정보 변경</h2>
+      <div className="change-user-edit-container">
+        <h2 className="change-user-edit-title">내 정보 변경</h2>
         <form onSubmit={handleSubmit}>
-          <div className="user-edit-form-group">
+          <div className="change-user-edit-form-group">
             <label>이름</label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-            />
+            <div className="change-user-info-text">{loggedInUser.name}</div>
           </div>
-          <div className="user-edit-form-group">
+          <div className="change-user-edit-form-group">
             <label>부서</label>
-            <select
-              name="department"
-              value={formData.department}
-              onChange={handleChange}
-              required
-            >
-              <option value="">부서를 선택하세요</option>
-              {departments.map((dept, index) => (
-                <option key={index} value={dept}>
-                  {dept}
-                </option>
-              ))}
-            </select>
+            <div className="change-user-info-text">
+              {loggedInUser.department}
+            </div>
           </div>
-          <div className="user-edit-form-group">
+          <div className="change-user-edit-form-group">
             <label>직급</label>
-            <select
-              name="position"
-              value={formData.position}
-              onChange={handleChange}
-              required
-            >
-              <option value="">직급을 선택하세요</option>
-              {positionOrder.map((pos, index) => (
-                <option key={index} value={pos}>
-                  {pos}
-                </option>
-              ))}
-            </select>
+            <div className="change-user-info-text">{loggedInUser.position}</div>
           </div>
-          <div className="user-edit-form-group">
+          <div className="change-user-edit-form-group">
             <label>전화번호</label>
             <input
               type="tel"
               name="phone"
+              className="change-user-phone-input"
               value={formData.phone}
               onChange={handleChange}
               required
             />
           </div>
-          <div className="user-edit-form-group">
-            <label>권한</label>
-            <select
-              name="role_id"
-              value={formData.role_id}
-              onChange={handleChange}
-            >
-              <option value="">권한을 선택하세요</option>
-              {roles.map((role, index) => (
-                <option key={index} value={role.id}>
-                  {role.comment} ({role.id})
-                </option>
-              ))}
-            </select>
-          </div>
+          <button
+            type="button"
+            className="change-user-change-pw-button"
+            onClick={() => navigate("/change-pw")}
+          >
+            비밀번호 변경
+          </button>
 
-          <div className="user-edit-button-container">
-            <button type="submit" className="user-edit-submit-button">
-              수정하기
+          <div className="change-user-edit-button-container">
+            <button type="submit" className="change-user-edit-submit-button">
+              저장
             </button>
             <button
               type="button"
-              className="user-edit-cancel-button"
+              className="change-user-edit-cancel-button"
               onClick={() => window.history.back()}
             >
-              돌아가기
+              취소
             </button>
           </div>
         </form>
@@ -266,4 +184,4 @@ const EditUser = () => {
   );
 };
 
-export default EditUser;
+export default ChangeMyDetails;

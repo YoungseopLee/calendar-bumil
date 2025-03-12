@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "./Sidebar";
+import Sidebar from "../Sidebar";
 import "./Manager.css";
-import BackButton from "./BackButton";
+import BackButton from "../components/BackButton";
 
 const Manager = () => {
   const [pendingUsers, setPendingUsers] = useState([]);

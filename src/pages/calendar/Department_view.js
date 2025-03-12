@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "./Sidebar";
-import BackButton from "./BackButton";
+import Sidebar from "../components/Sidebar";
+import BackButton from "../components/BackButton";
 import "./Calendar.css";
 
 const Department_view = () => {

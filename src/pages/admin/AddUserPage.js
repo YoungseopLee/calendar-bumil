@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Sidebar from "./Sidebar";
+import Sidebar from "../components/Sidebar";
 import "./AddUserPage.css"; // 스타일 파일 추가
 
 const AddUserPage = () => {
