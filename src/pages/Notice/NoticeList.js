@@ -110,28 +110,52 @@ const NoticeList = () => {
     }
   };
 
+  // 날짜 포맷팅 함수 추가
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   // ✅ 로딩 중 또는 에러 시 화면에 표시할 메세지
   if (loading) return <p>데이터를 불러오는 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
 
   return (
-    <div className="app">
+    <div className="notice-list-app">
       <Sidebar />
-      <div className="notice-container">
-        <h2 className="notice-title">공지사항</h2>
-        {user.role_id === "AD_ADMIN" && (
-          <button onClick={() => navigate("/notice-create")}>
-            공지사항 작성
-          </button>
-        )}
-        <div className="notice-list">
-          {notices.map((notice) => (
-            <div key={notice.id} className="notice-item">
-              <Link to={`/notice-details`} className="notice-title">
-                {notice.title}
-              </Link>
+      <div className="notice-list-container">
+        <div className="notice-header">
+          <h2 className="notice-list-title">공지사항</h2>
+          {user.role_id === "AD_ADMIN" && (
+            <button onClick={() => navigate("/notice-create")}>
+              ✏️ 공지사항 작성
+            </button>
+          )}
+        </div>
+        <div className="notice-list-list">
+          {notices.length === 0 ? (
+            <div className="notice-list-empty">
+              등록된 공지사항이 없습니다.
             </div>
-          ))}
+          ) : (
+            notices.map((notice) => (
+              <div key={notice.id} className="notice-list-item">
+                <Link to={`/notice-details/${notice.id}`}>
+                  {notice.title}
+                </Link>
+                <div className="notice-list-info">
+                  <span className="notice-list-author">{notice.created_by || '관리자'}</span>
+                  <span className="notice-list-date">
+                    {formatDate(notice.created_at)}
+                  </span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
