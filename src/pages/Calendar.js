@@ -490,7 +490,7 @@ const Calendar = () => {
                       return (
                         <li
                           key={schedule.id}
-                          className="schedule-item"
+                          className="schedule-item has-buttons"
                           onClick={() => handleScheduleClick(schedule)}
                         >
                           <div className="schedule-content">
@@ -597,7 +597,9 @@ const Calendar = () => {
                       return (
                         <li
                           key={schedule.id}
-                          className="schedule-item other-user-schedule"
+                          className={`schedule-item other-user-schedule ${
+                            isAdmin ? "has-buttons" : "no-buttons"
+                          }`}
                           onClick={() => handleScheduleClick(schedule)}
                         >
                           <div className="schedule-content">
