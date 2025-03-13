@@ -54,7 +54,6 @@ const ParticipantSelection = ({ participants, setParticipants, projectStartDate,
         console.error("❌ 사용자 데이터를 불러오지 못했습니다.", error);
       }
     };
-
     fetchUsers();
   }, [apiUrl]); // ✅ `apiUrl`이 변경될 경우 재실행
 

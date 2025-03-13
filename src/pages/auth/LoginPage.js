@@ -18,7 +18,7 @@ import "./LoginPage.css";
  *    ├── 로그인 버튼
  *    ├── 회원가입 링크
  */
-
+  
 const LoginPage = () => {
   const [id, setId] = useState(""); // 사용자 아이디(이메일)
   const [password, setPassword] = useState(""); // 사용자 비밀번호
