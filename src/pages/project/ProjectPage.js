@@ -3,6 +3,7 @@ import { FaSearch } from "react-icons/fa";
 import ProjectList from "./ProjectList";
 import Sidebar from "../components/Sidebar";
 import AddProjectButton from "./AddProjectButton";
+import ScrollToTopButton from "../components/ScrollToTopButton";
 import "./ProjectPage.css";
 
 /**
@@ -46,7 +47,7 @@ const ProjectPage = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          console.error("❌ 로그인 토큰이 없습니다.");
+          //console.error("❌ 로그인 토큰이 없습니다.");
           return;
         }
 
@@ -61,10 +62,10 @@ const ProjectPage = () => {
           const data = await response.json();
           setRoleId(data.user?.role_id || "");
         } else {
-          console.error("❌ 사용자 정보를 불러오지 못했습니다.");
+          //.error("❌ 사용자 정보를 불러오지 못했습니다.");
         }
       } catch (error) {
-        console.error("🚨 사용자 정보 로딩 오류:", error);
+        //console.error("🚨 사용자 정보 로딩 오류:", error);
       }
     };
 
@@ -89,7 +90,7 @@ const ProjectPage = () => {
 
         setUserIdToNameMap(idToNameMapping);
       } catch (err) {
-        console.error("사용자 목록 불러오기 오류:", err);
+        //.error("사용자 목록 불러오기 오류:", err);
       }
     };
 
@@ -124,7 +125,7 @@ const ProjectPage = () => {
 
         setProjects(transformedProjects);
       } catch (error) {
-        console.error("🚨 프로젝트 데이터 로딩 오류:", error);
+        //console.error("🚨 프로젝트 데이터 로딩 오류:", error);
       }
     };
 
@@ -275,6 +276,10 @@ const ProjectPage = () => {
             </div>
           </div>
 
+          <div className="scroll-top-container">
+            <ScrollToTopButton />
+          </div>
+          
           {/* 필터링 된 프로젝트 목록 */}
           {filteredProjects.length > 0 ? (
             <ProjectList projects={filteredProjects} />
