@@ -35,7 +35,7 @@ function App() {
         />
         <Route
           path="/department-view"
-          element={<Modules.CalendarModule.Department_view />}
+          element={<Modules.CalendarModule.DepartmentView />}
         />
         <Route
           path="/edit-schedule/:scheduleId"

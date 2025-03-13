@@ -42,8 +42,8 @@ const NoticeList = () => {
     fetchNotices();
   }, []);
 
-  // ✅ 현재 로그인한 사용자의 정보를 API에서 가져옴
-  // ✅ 사용자 정보가 없거나 세션이 만료되었을 경우 자동 로그아웃 처리
+  // 현재 로그인한 사용자의 정보를 API에서 가져옴
+  // 사용자 정보가 없거나 세션이 만료되었을 경우 자동 로그아웃 처리
   const fetchLoggedInUser = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -70,7 +70,7 @@ const NoticeList = () => {
     }
   };
 
-  // ✅ 로그아웃 함수 - 세션이 만료되었을 경우 사용자 정보를 삭제하고 로그인 페이지로 이동
+  // 로그아웃 함수 - 세션이 만료되었을 경우 사용자 정보를 삭제하고 로그인 페이지로 이동
   const handleLogout = () => {
     alert("세션이 만료되었습니다. 다시 로그인해주세요.");
     localStorage.removeItem("token");
@@ -78,33 +78,29 @@ const NoticeList = () => {
     navigate("/");
   };
 
-  // ✅ 공지사항 목록 조회 API 호출
+  // 공지사항 목록 조회 API 호출
   const fetchNotices = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem("token");
       const response = await fetch(`${apiUrl}/notice/get_notice_list`, {
-        // URL 수정
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`, // 토큰 추가
+          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
-
-      // 응답 확인을 위한 로깅
-      console.log("Response status:", response.status);
-      const responseData = await response.text();
-      console.log("Response data:", responseData);
 
       if (!response.ok) {
         throw new Error("공지사항 목록을 불러오지 못했습니다.");
       }
 
-      const data = JSON.parse(responseData);
+      const data = await response.json();
+      console.log("get_notice_list: ", data);
       setNotices(data.notices);
     } catch (err) {
-      console.error("Error fetching notices:", err);
-      setError(err.message);
+      console.error("공지사항 목록 조회 오류:", err);
+      setError("공지사항을 불러오는 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
@@ -113,14 +109,17 @@ const NoticeList = () => {
   // 날짜 포맷팅 함수 추가
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return date.toLocaleString("ko-KR", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     });
   };
 
-  // ✅ 로딩 중 또는 에러 시 화면에 표시할 메세지
+  // 로딩 중 또는 에러 시 화면에 표시할 메세지
   if (loading) return <p>데이터를 불러오는 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
 
@@ -130,25 +129,21 @@ const NoticeList = () => {
       <div className="notice-list-container">
         <div className="notice-header">
           <h2 className="notice-list-title">공지사항</h2>
-          {user.role_id === "AD_ADMIN" && (
-            <button onClick={() => navigate("/notice-create")}>
-              ✏️ 공지사항 작성
-            </button>
+          {user?.role_id === "AD_ADMIN" && (
+            <button onClick={() => navigate("/notice-create")}>작성하기</button>
           )}
         </div>
         <div className="notice-list-list">
           {notices.length === 0 ? (
-            <div className="notice-list-empty">
-              등록된 공지사항이 없습니다.
-            </div>
+            <div className="notice-list-empty">등록된 공지사항이 없습니다.</div>
           ) : (
             notices.map((notice) => (
               <div key={notice.id} className="notice-list-item">
-                <Link to={`/notice-details/${notice.id}`}>
-                  {notice.title}
-                </Link>
+                <Link to={`/notice/${notice.id}`}>{notice.title}</Link>
                 <div className="notice-list-info">
-                  <span className="notice-list-author">{notice.created_by || '관리자'}</span>
+                  <span className="notice-list-author">
+                    {notice.created_by_name || "관리자"}
+                  </span>
                   <span className="notice-list-date">
                     {formatDate(notice.created_at)}
                   </span>

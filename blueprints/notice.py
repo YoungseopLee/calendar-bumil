@@ -26,7 +26,7 @@ def get_notices():
         return jsonify({'message': '토큰이 만료되었습니다.'}), 401
     except jwt.InvalidTokenError:
         return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
-    except Exception as e:
+    except Exception:
         return jsonify({'message': '토큰 검증 오류'}), 401
 
     conn = get_db_connection()
@@ -35,18 +35,19 @@ def get_notices():
 
     cursor = conn.cursor(dictionary=True)
     try:
+        # 작성자 이름을 함께 조회하도록 수정
         sql = """
-        SELECT * FROM tb_notice 
-        WHERE is_delete_yn = 'N' 
-        ORDER BY created_at DESC"""
+        SELECT n.*, u.name AS created_by_name
+        FROM tb_notice n
+        LEFT JOIN tb_user u ON n.user_id = u.id
+        WHERE n.is_delete_yn = 'N'
+        ORDER BY n.created_at DESC"""
         cursor.execute(sql)
-        logger.info(f"[SQL/SELECT] {sql}")
-        
+
         notices = cursor.fetchall()
         return jsonify({'notices': notices}), 200
     except Exception as e:
-        logger.error(f"공지사항 조회 오류: {e}")
-        return jsonify({'message': '공지사항 조회 실패!'}), 500
+        return jsonify({'message': f'공지사항 조회 실패: {str(e)}'}), 500
     finally:
         cursor.close()
         conn.close()
@@ -113,39 +114,47 @@ def create_notice():
         return jsonify({'message': '토큰이 만료되었습니다.'}), 401
     except jwt.InvalidTokenError:
         return jsonify({'message': '유효하지 않은 토큰입니다.'}), 401
-    except Exception as e:
+    except Exception:
         return jsonify({'message': '토큰 검증 오류'}), 401
 
     conn = get_db_connection()
     if conn is None:
         return jsonify({'message': '데이터베이스 연결 실패!'}), 500
 
-    data = request.get_json()
-    title = data.get('title')
-    content = data.get('content')
-    user_id = data.get('user_id', None)
-    created_by = data.get('created_by', 'SYSTEM')
+    cursor = conn.cursor(dictionary=True)
 
-    if not title or not content:
-        return jsonify({'message': '제목과 내용을 입력해야 합니다.'}), 400
-
-    cursor = conn.cursor()
     try:
+        # 작성자의 이름 가져오기
+        cursor.execute("SELECT name FROM tb_user WHERE id = %s", (user_id,))
+        user_data = cursor.fetchone()
+        if not user_data:
+            return jsonify({'message': '사용자를 찾을 수 없습니다.'}), 404
+
+        created_by = user_data["name"]  # 실제 작성자 이름
+
+        data = request.get_json()
+        title = data.get('title')
+        content = data.get('content')
+
+        if not title or not content:
+            return jsonify({'message': '제목과 내용을 입력해야 합니다.'}), 400
+
+        # 공지사항 생성 시 작성자 이름 저장
         sql = """
-        INSERT INTO tb_notice 
-        (title, content, user_id, created_by, updated_by)
+        INSERT INTO tb_notice (title, content, user_id, created_by, updated_by)
         VALUES (%s, %s, %s, %s, %s)"""
         cursor.execute(sql, (title, content, user_id, created_by, created_by))
         conn.commit()
-        logger.info(f"[SQL/INSERT] {sql} | PARAMS: ({title}, {content}, {user_id}, {created_by}, {created_by})")
 
         return jsonify({'message': '공지사항이 성공적으로 등록되었습니다.'}), 201
+
     except Exception as e:
-        logger.error(f"공지사항 등록 오류: {e}")
-        return jsonify({'message': '공지사항 등록 실패!'}), 500
+        conn.rollback()
+        return jsonify({'message': f'공지사항 등록 실패: {str(e)}'}), 500
     finally:
         cursor.close()
         conn.close()
+
 
 # 공지사항 수정
 @notice_bp.route('/update_notice/<int:notice_id>', methods=['PUT', 'OPTIONS'])
