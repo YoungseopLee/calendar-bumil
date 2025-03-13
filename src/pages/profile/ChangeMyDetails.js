@@ -28,7 +28,7 @@ const ChangeMyDetails = () => {
       navigate(`/user-details?user_id=${loggedInUser.id}`); // 잘못된 경우 목록 페이지로 이동
     }
   }, []);
-
+  
   // 전화번호 입력 시 자동으로 '-' 추가
   const formatPhoneNumber = (value) => {
     const onlyNumbers = value.replace(/\D/g, ""); // 숫자만 남기기
