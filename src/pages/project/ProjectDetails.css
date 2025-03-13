@@ -1,5 +1,27 @@
+/* 전체 페이지 */
+.project-details-app-body {
+  display: flex; /* 🌟 사이드바와 컨텐츠를 나란히 배치 */
+  width: 100%;
+  min-height: 100vh; /* 전체 화면 높이 차지 */
+  background: white;
+}
+
+/* 사이드바 고정 */
+.project-details-sidebar {
+  flex-shrink: 0;
+}
+
+/* 메인 컨텐츠 (사이드바 옆에 위치) */
+.project-details-main {
+  flex-grow: 1;
+  max-width: 768px; /* 기존 제한 유지 */
+  margin: auto;
+  padding: 20px;
+  overflow-y: auto; /* 🌟 내용이 많으면 스크롤 가능 */
+}
+
 /* ✅ 프로젝트 상세 정보 컨테이너 */
-.project-container {
+.project-details-container {
   width: 100%; /* 전체 너비 */
   max-width: 600px; /* 최대 너비 설정 */
   background: white; /* 배경색 */
@@ -10,7 +32,7 @@
 }
 
 /* ✅ 프로젝트 상세 정보 제목 */
-.project-title2 {
+.project-details-title2 {
   margin-left: 55px; /* 왼쪽 여백 */
   float: left; /* 왼쪽 정렬 */
   font-size: 18px; /* 폰트 크기 */
@@ -20,7 +42,7 @@
 }
 
 /* ✅ 프로젝트 수정 버튼 */
-.EditProjectButton {
+.project-details-EditProjectButton {
   margin-right: 10px; /* 오른쪽 여백 */
   background-color: #007bff; /* 배경색 (파란색) */
   color: white; /* 글자 색상 (흰색) */
@@ -33,7 +55,7 @@
 }
 
 /* ✅ 프로젝트 목록 버튼 */
-.project-list-button {
+.project-details-list-button {
   margin-right: 10px; /* 오른쪽 여백 */
   background-color: #007bff; /* 배경색 (파란색) */
   color: white; /* 글자 색상 */
@@ -46,7 +68,7 @@
 }
 
 /* ✅ 프로젝트 수정 저장 버튼 */
-.edit-save-button {
+.project-details-edit-save-button {
   margin: 10px; /* 바깥 여백 */
   background-color: #007bff; /* 배경색 (파란색) */
   color: white; /* 글자 색상 */
@@ -59,7 +81,7 @@
 }
 
 /* ✅ 프로젝트 수정 취소 버튼 */
-.edit-cancel-button {
+.project-details-edit-cancel-button {
   margin: 10px; /* 바깥 여백 */
   background-color: #dc3545; /* 배경색 (빨간색) */
   color: white; /* 글자 색상 */
@@ -72,7 +94,7 @@
 }
 
 /* ✅ 프로젝트 삭제 버튼 */
-.edit-delete-button {
+.project-details-edit-delete-button {
   margin: 10px; /* 바깥 여백 */
   margin-left: 10px; /* 왼쪽 여백 */
   background-color: #ff5a5a; /* 배경색 (밝은 빨간색) */
@@ -86,7 +108,7 @@
 }
 
 /* ✅ 버튼을 감싸는 컨테이너 */
-.edit-button-container {
+.project-details-edit-button-container {
   display: flex; /* 가로 정렬 */
   justify-content: space-between; /* 좌우 끝으로 정렬 */
   align-items: center; /* 수직 중앙 정렬 */
@@ -95,7 +117,7 @@
 }
 
 /* ✅ 섹션 제목 스타일 */
-.section-title {
+.project-details-section-title {
   float: left; /* 왼쪽 정렬 */
   font-size: 16px; /* 폰트 크기 */
   font-weight: bold; /* 글자 굵게 */
@@ -104,46 +126,47 @@
 }
 
 /* ✅ 프로젝트 정보 테이블 */
-.project-table {
+.project-details-table {
   width: 100%; /* 전체 너비 */
   border-collapse: collapse; /* 테두리 겹침 제거 */
 }
 
 /* ✅ 테이블 헤더 및 데이터 셀 스타일 */
-.project-table th, .project-table td {
+.project-details-table th,
+.project-details-table td {
   border: 1px solid #ddd; /* 테두리 색상 */
   padding: 10px; /* 내부 여백 */
   text-align: left; /* 텍스트 왼쪽 정렬 */
 }
 
 /* ✅ 테이블 헤더 스타일 */
-.project-table th {
+.project-details-table th {
   background: #f8f8f8; /* 배경색 */
   font-weight: bold; /* 글자 굵게 */
   width: 30%; /* 헤더 너비 */
 }
 
 /* ✅ 날짜 입력 필드 컨테이너 */
-.project-table datebox {
+.project-details-table datebox {
   display: flex; /* 가로 정렬 */
   align-items: center; /* 수직 중앙 정렬 */
   gap: 10px; /* 요소 간격 */
 }
 
 /* ✅ 테이블의 짝수 행 배경색 변경 */
-.project-table tr:nth-child(even) td {
+.project-details-table tr:nth-child(even) td {
   background: #f9f9f9;
 }
 
 /* ✅ 날짜 입력 필드 스타일 */
-.project-table input[type="date"] {
+.project-details-able input[type="date"] {
   line-height: 40px;
   display: inline-block;
 }
 
 /* ✅ 테이블 내 입력 필드 및 텍스트 영역 스타일 */
-.project-table input,
-.project-table textarea {
+.project-details-table input,
+.project-details-table textarea {
   width: 90%; /* 너비 */
   padding: 8px; /* 내부 여백 */
   font-size: 1em; /* 폰트 크기 */
@@ -155,14 +178,14 @@
 }
 
 /* ✅ 입력 필드 포커스 효과 */
-.project-table input:focus,
-.project-table textarea:focus {
+.project-details-table input:focus,
+.project-details-table textarea:focus {
   border-color: #007bff; /* 테두리 색상 변경 (파란색) */
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* 그림자 효과 */
   outline: none; /* 기본 아웃라인 제거 */
 }
 
 /* ✅ 폼 섹션 */
-.form-section {
+.project-details-form-section {
   margin-left: 10px; /* 왼쪽 여백 */
 }

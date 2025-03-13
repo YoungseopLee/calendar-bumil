@@ -175,7 +175,7 @@ const ProjectDetails = () => {
   // ✅ 프로젝트 상세 정보 테이블 컴포넌트
   const ProjectTable = ({ project }) => {
     return (
-      <table className="project-table">
+      <table className="project-details-table">
         <tbody>
           {Object.entries(fieldMappings) // 필드 매핑 순서대로 반복
             .filter(([key]) => key in project) // 필드 매핑에 있는 요소만 표시
@@ -229,7 +229,7 @@ const ProjectDetails = () => {
     });
 
     return (
-      <table className="project-table">
+      <table className="project-details-table">
         <thead>
           <tr>
             <th>이름</th>
@@ -262,25 +262,27 @@ const ProjectDetails = () => {
   };
 
   return (
-    <div className="app">
-      {/* <button>
-        뒤로가기
-      </button> */}
-      <Sidebar />
-      <div className="project-container">
-        <div className="edit-button-container">
-          <h2 className="project-title2">프로젝트 상세정보(품의서)</h2>
+    <div className="project-details-app-body">
+      <div className="project-details-sidebar">
+        <Sidebar />
+      </div>
+      <div className="project-details-container">
+        <div className="project-details-edit-button-container">
+          <h2 className="project-details-title2">프로젝트 상세정보(품의서)</h2>
           <button
             onClick={() => navigate("/projects")}
-            className="project-list-button"
+            className="project-details-list-button"
           >
             목록
           </button>
         </div>
-        <div className="edit-button-container">
-          <h3 className="section-title">🔹 사업개요</h3>
+        <div className="project-details-edit-button-container">
+          <h3 className="project-details-section-title">🔹 사업개요</h3>
           {user.roleId != "USR_GENERAL" && ( //로그인 유저의 roleId를 보고 수정 버튼 표시 판정
-            <button onClick={handleEditClick} className="EditProjectButton">
+            <button
+              onClick={handleEditClick}
+              className="project-details-EditProjectButton"
+            >
               프로젝트 수정
             </button>
           )}
@@ -292,7 +294,9 @@ const ProjectDetails = () => {
           <p>데이터를 불러오는 중...</p>
         )}
 
-        <h3 className="section-title">🔹 인력&nbsp;&nbsp;&nbsp;</h3>
+        <h3 className="project-details-section-title">
+          🔹 인력&nbsp;&nbsp;&nbsp;
+        </h3>
         <Projectuserstable
           project_users={Project?.project_users}
           employees={employees}
