@@ -159,7 +159,6 @@
 
 /* 프로젝트 테이블 스타일 */
 .project-user-table {
-  table-layout: fixed; /* 각 열의 너비를 고정 */
   width: 100%; /* 테이블 너비를 100%로 설정 */
   border-collapse: collapse; /* 테이블 경계선 겹침 방지 */
   margin-top: 20px; /* 테이블 상단 여백 */
@@ -175,14 +174,43 @@
   width: 8.33%; /* 열 너비를 고정 */
 }
 
+/* 테이블 헤더 스타일 */
 .project-user-table th {
-  background-color: #f2f2f2; /* 테이블 헤더 배경색 */
-  color: #333; /* 테이블 헤더 텍스트 색상 */
+  background-color: #f2f2f2;
+  color: #333;
+  font-weight: bold;
+  text-align: center;
+  padding: 12px;
+  font-size: 16px;
 }
 
+/* 테이블 셀 스타일 */
 .project-user-table td {
-  background-color: #fff; /* 테이블 셀 배경색 */
-  color: #333; /* 테이블 셀 텍스트 색상 */
+  background-color: #fff;
+  color: #333;
+  font-size: 14px; /* 모든 셀에 동일한 폰트 크기 적용 */
+  text-align: center; /* 중앙 정렬 */
+  padding: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+/* 프로젝트명 스타일 */
+.user-details-project-name {
+  display: flex;
+  text-align: center;
+  justify-content: flex-start;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 툴팁 스타일 */
+.tippy-box {
+  font-size: 1em;
 }
 
 /* 연도 선택 바 */

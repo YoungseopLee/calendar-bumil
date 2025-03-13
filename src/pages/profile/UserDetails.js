@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import BackButton from "../components/BackButton";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
 import "./UserDetails.css";
 import {
   FaPhone,
@@ -19,7 +21,7 @@ const UserDetails = () => {
   const [statusList, setStatusList] = useState([]);
   const [error, setError] = useState(null);
   const [year, setYear] = useState(new Date().getFullYear());
-  const [isTableView, setIsTableView] = useState(false); // ✅ 추가: 표 형태 전환 상태
+  const [isTableView, setIsTableView] = useState(false); // 추가: 표 형태 전환 상태
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
@@ -225,7 +227,7 @@ const UserDetails = () => {
   };
 
   const TableView = ({ filteredProjects }) => {
-    const navigate = useNavigate(); // ✅ 네비게이션 훅 사용
+    const navigate = useNavigate(); // 네비게이션 훅 사용
 
     return (
       <table className="project-user-table">
@@ -241,14 +243,22 @@ const UserDetails = () => {
             <tr key={project.id}>
               <td
                 onClick={(event) => {
-                  event.stopPropagation(); // ✅ 부모 요소의 클릭 이벤트 방지
+                  event.stopPropagation(); // 부모 요소의 클릭 이벤트 방지
                   navigate(
                     `/project-details?project_code=${project.project_code}`
                   );
                 }}
-                style={{ cursor: "pointer" }} // ✅ 마우스 커서 변경 (클릭 가능한 요소임을 강조) // ✅ 클릭 가능한 스타일 적용
+                style={{ cursor: "pointer" }} // 마우스 커서 변경 (클릭 가능한 요소임을 강조) // ✅ 클릭 가능한 스타일 적용
               >
-                {project.project_name}
+                <Tippy
+                  content={project.project_name}
+                  placement="top"
+                  theme="light"
+                >
+                  <span className="user-details-project-name">
+                    {project.project_name}
+                  </span>
+                </Tippy>
               </td>
               <td>{new Date(project.start_date).toLocaleDateString()}</td>
               <td>{new Date(project.end_date).toLocaleDateString()}</td>
@@ -347,7 +357,7 @@ const UserDetails = () => {
             ▶
           </button>
         </div>
-        {/* ✅ 차트 방식 or 표 방식 선택 */}
+        {/* 차트 방식 or 표 방식 선택 */}
         {/* 차트와 표를 조건에 따라 표시 */}
         {isTableView ? (
           <TableView filteredProjects={filteredProjects} />
