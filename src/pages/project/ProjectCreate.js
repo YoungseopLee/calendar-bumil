@@ -189,124 +189,126 @@ const ProjectCreate = () => {
   };
 
   return (
-    <div className="app">
-      <Sidebar />
-      <div className="project-create-container">
-        <h2 className="title">프로젝트 생성</h2>
-        {error && <p className="error-message">⚠️ {error}</p>}
+    <div className="project-create-app-body">
+      <div className="project-create-sidebar">
+        <Sidebar />
+        <div className="project-create-container">
+          <h2 className="project-create-title">프로젝트 생성</h2>
+          {error && <p className="project-create-error-message">⚠️ {error}</p>}
 
-        <form onSubmit={handleSubmit} className="project-form">
-          {/* ✅ 텍스트 입력 필드 */}
-          {[
-            ["프로젝트 코드", "project_code"],
-            ["프로젝트명", "project_name"],
-            ["고객", "customer"],
-            ["공급처", "supplier"],
-            ["담당자", "person_in_charge"],
-            ["연락처", "contact_number"],
-            ["영업대표", "sales_representative"],
-            ["PM", "project_pm"],
-            ["프로젝트 관리자", "project_manager"],
-            ["변경사항", "changes"],
-            ["그룹명", "group_name"],
-          ].map(([label, name]) => (
-            <div className="form-row" key={name}>
-              <label>{label}:</label>
-              <input
-                type="text"
-                name={name}
-                value={formData[name]}
-                onChange={handleChange}
-              />
-            </div>
-          ))}
+          <form onSubmit={handleSubmit} className="project-create-form">
+            {/* ✅ 텍스트 입력 필드 */}
+            {[
+              ["프로젝트 코드", "project_code"],
+              ["프로젝트명", "project_name"],
+              ["고객", "customer"],
+              ["공급처", "supplier"],
+              ["담당자", "person_in_charge"],
+              ["연락처", "contact_number"],
+              ["영업대표", "sales_representative"],
+              ["PM", "project_pm"],
+              ["프로젝트 관리자", "project_manager"],
+              ["변경사항", "changes"],
+              ["그룹명", "group_name"],
+            ].map(([label, name]) => (
+              <div className="project-create-form-row" key={name}>
+                <label>{label}:</label>
+                <input
+                  type="text"
+                  name={name}
+                  value={formData[name]}
+                  onChange={handleChange}
+                />
+              </div>
+            ))}
 
-          {/* ✅ 카테고리 및 상태 */}
-          {[
-            [
-              "카테고리",
-              "category",
+            {/* ✅ 카테고리 및 상태 */}
+            {[
               [
-                "구축 인프라",
-                "구축 SW",
-                "유지보수 인프라",
-                "유지보수 SW",
-                "연구과제",
+                "카테고리",
+                "category",
+                [
+                  "구축 인프라",
+                  "구축 SW",
+                  "유지보수 인프라",
+                  "유지보수 SW",
+                  "연구과제",
+                ],
               ],
-            ],
-            ["상태", "status", ["제안", "수행", "실주종료"]],
-          ].map(([label, name, options]) => (
-            <div className="form-row" key={name}>
-              <label>{label}:</label>
-              <select
-                name={name}
-                value={formData[name]}
-                onChange={handleChange}
-              >
-                <option value="">선택하세요</option>
-                {options.map((opt) => (
-                  <option key={opt} value={opt}>
-                    {opt}
-                  </option>
-                ))}
-              </select>
-            </div>
-          ))}
+              ["상태", "status", ["제안", "수행", "실주종료"]],
+            ].map(([label, name, options]) => (
+              <div className="project-create-form-row" key={name}>
+                <label>{label}:</label>
+                <select
+                  name={name}
+                  value={formData[name]}
+                  onChange={handleChange}
+                >
+                  <option value="">선택하세요</option>
+                  {options.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ))}
 
-          {/* ✅ 사업 기간 */}
-          <div className="form-row">
-            <label>사업 기간:</label>
-            <div className="date-container">
-              <input
-                type="date"
-                name="business_start_date"
-                value={formData.business_start_date}
+            {/* ✅ 사업 기간 */}
+            <div className="project-create-form-row">
+              <label>사업 기간:</label>
+              <div className="project-create-date-container">
+                <input
+                  type="date"
+                  name="business_start_date"
+                  value={formData.business_start_date}
+                  onChange={handleChange}
+                  required
+                />
+                <span className="project-create-date-separator">~</span>
+                <input
+                  type="date"
+                  name="business_end_date"
+                  value={formData.business_end_date}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+            </div>
+
+            {/* ✅ 사업 내용 */}
+            <div className="project-create-form-row">
+              <label>사업 내용 및 특이사항:</label>
+              <textarea
+                name="business_details_and_notes"
+                value={formData.business_details_and_notes}
                 onChange={handleChange}
-                required
-              />
-              <span className="date-separator">~</span>
-              <input
-                type="date"
-                name="business_end_date"
-                value={formData.business_end_date}
-                onChange={handleChange}
-                required
               />
             </div>
-          </div>
 
-          {/* ✅ 사업 내용 */}
-          <div className="form-row">
-            <label>사업 내용 및 특이사항:</label>
-            <textarea
-              name="business_details_and_notes"
-              value={formData.business_details_and_notes}
-              onChange={handleChange}
+            {/* ✅ 참여자 선택 컴포넌트 */}
+            <ParticipantSelection
+              participants={formData.participants} // ✅ formData.participants를 직접 전달
+              setParticipants={setParticipants}
+              projectStartDate={formData.business_start_date}
+              projectEndDate={formData.business_end_date}
             />
-          </div>
 
-          {/* ✅ 참여자 선택 컴포넌트 */}
-          <ParticipantSelection
-            participants={formData.participants} // ✅ formData.participants를 직접 전달
-            setParticipants={setParticipants}
-            projectStartDate={formData.business_start_date}
-            projectEndDate={formData.business_end_date}
-          />
-
-          {/* ✅ 프로젝트 생성 & 취소 버튼 복원 */}
-          <div className="button-container">
-            <button type="submit" className="save-button">
-              프로젝트 생성
-            </button>
-            <button
-              type="button"
-              className="cancel-button"
-              onClick={() => navigate("/projects")}
-            >
-              취소
-            </button>
-          </div>
-        </form>
+            {/* ✅ 프로젝트 생성 & 취소 버튼 복원 */}
+            <div className="project-create-button-container">
+              <button type="submit" className="project-create-save-button">
+                프로젝트 생성
+              </button>
+              <button
+                type="button"
+                className="project-create-cancel-button"
+                onClick={() => navigate("/projects")}
+              >
+                취소
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
