@@ -89,7 +89,7 @@ const ProjectEdit = () => {
 
   // 🔄 **3. 직원 목록이 업데이트될 때 참여 가능한 사용자 목록 갱신**
   useEffect(() => {
-    console.log("Employees 업데이트됨:", employees);
+    // console.log("Employees 업데이트됨:", employees);
     // 이미 할당된 유저 ID 목록(Set으로 변환)
     const assignedIds = new Set(
       Project?.assigned_user_ids
@@ -109,7 +109,7 @@ const ProjectEdit = () => {
 
   // 🔄 **4. users가 변경될 때 로그 출력**
   useEffect(() => {
-    console.log("users 업데이트됨:", users);
+    // console.log("users 업데이트됨:", users);
   }, [users]);
 
   // 🔄 **5. 직원 목록 가져오기**
@@ -136,7 +136,7 @@ const ProjectEdit = () => {
         throw new Error("프로젝트 상세정보를 불러오지 못했습니다.");
       }
       const data = await response.json();
-      console.log("project response : ", data);
+      // console.log("project response : ", data);
       setProject(data.project);
     } catch (err) {
       setError(err.message);
@@ -248,7 +248,7 @@ const ProjectEdit = () => {
     });
 
     return (
-      <table className="project-table">
+      <table className="project-edit-table">
         <thead>
           <tr>
             <th>이름</th>
@@ -264,7 +264,7 @@ const ProjectEdit = () => {
               <td>{participant.name}</td>
               <td>
                 <input
-                  className="datebox"
+                  className="project-edit-datebox"
                   type="date"
                   value={formatDate(participant.start_date)}
                   onMouseDown={(e) => e.stopPropagation()} // 포커스 유지
@@ -279,7 +279,7 @@ const ProjectEdit = () => {
               </td>
               <td>
                 <input
-                  className="datebox"
+                  className="project-edit-datebox"
                   type="date"
                   value={formatDate(participant.end_date)}
                   onMouseDown={(e) => e.stopPropagation()} // 포커스 유지
@@ -295,7 +295,7 @@ const ProjectEdit = () => {
               <td>{participant.comment}</td>
               <td>
                 <button
-                  className="remove-button"
+                  className="project-edit-remove-button"
                   onClick={() => handleRemoveParticipant(participant.id)}
                 >
                   ❌
@@ -325,7 +325,7 @@ const ProjectEdit = () => {
         })),
       };
 
-      console.log("저장할 데이터:", JSON.stringify(projectToSave, null, 2));
+      // console.log("저장할 데이터:", JSON.stringify(projectToSave, null, 2));
 
       const response = await fetch(`${apiUrl}/project/edit_project`, {
         method: "POST",
@@ -420,7 +420,7 @@ const ProjectEdit = () => {
       }
 
       const data = await response.json();
-      console.log(data.message);
+      // console.log(data.message);
       alert(data.message);
       navigate("/projects");
     } catch (err) {
@@ -430,103 +430,109 @@ const ProjectEdit = () => {
   };
 
   return (
-    <div className="app">
-      <Sidebar />
-      <div className="project-container">
-        <div className="edit-button-container">
-          <h2 className="project-title2">프로젝트 상세정보(품의서)</h2>
-          <button
-            onClick={() => navigate("/projects")}
-            className="project-list-button"
-          >
-            목록
-          </button>
-        </div>
-        <div className="edit-button-container">
-          <h3 className="section-title">🔹 사업개요</h3>
-        </div>
-
-        <table className="project-table">
-          <tbody>
-            {Object.entries(fieldMappings).map(([key, label]) =>
-              Project && Project[key] !== undefined ? (
-                <tr key={key}>
-                  <th>{label}</th>
-                  <td>
-                    {key === "project_code" ? (
-                      <span>{Project[key]}</span>
-                    ) : key === "business_start_date" ||
-                      key === "business_end_date" ? (
-                      <input
-                        className="datebox"
-                        type="date"
-                        value={formatDate(Project[key])}
-                        onChange={(e) => handleChange(key, e.target.value)}
-                      />
-                    ) : (
-                      <textarea
-                        value={Project[key]}
-                        onChange={(e) => handleChange(key, e.target.value)}
-                        rows="4"
-                      />
-                    )}
-                  </td>
-                </tr>
-              ) : null
-            )}
-          </tbody>
-        </table>
-
-        <h3 className="section-title">🔹 인력&nbsp;&nbsp;&nbsp;</h3>
-        <Projectuserstable
-          project_users={Project?.project_users}
-          employees={employees}
-        />
-
-        <div className="form-section">
-          <h3>👥 프로젝트 참여자 추가</h3>
-          <div className="participant-container">
-            <Select
-              className="react-select-container"
-              classNamePrefix="react-select"
-              options={users}
-              value={selectedUser}
-              onChange={setSelectedUser}
-              isSearchable={true}
-              placeholder="참여자 선택"
-            />
+    <div className="project-edit-app-body">
+      <div className="project-edit-sidebar">
+        <Sidebar />
+      </div>
+      <div className="project-edit-main">
+        <div className="project-edit-container">
+          <div className="project-edit-button-container">
+            <h2 className="project-edit-title2">프로젝트 상세정보(품의서)</h2>
             <button
-              type="button"
-              className="add-button"
-              onClick={handleAddParticipant}
+              onClick={() => navigate("/projects")}
+              className="project-edit-list-button"
             >
-              +
+              목록
             </button>
           </div>
+          <div className="project-edit-button-container">
+            <h3 className="section-title">🔹 사업개요</h3>
+          </div>
+
+          <table className="project-edit-table">
+            <tbody>
+              {Object.entries(fieldMappings).map(([key, label]) =>
+                Project && Project[key] !== undefined ? (
+                  <tr key={key}>
+                    <th>{label}</th>
+                    <td>
+                      {key === "project_code" ? (
+                        <span>{Project[key]}</span>
+                      ) : key === "business_start_date" ||
+                        key === "business_end_date" ? (
+                        <input
+                          className="datebox"
+                          type="date"
+                          value={formatDate(Project[key])}
+                          onChange={(e) => handleChange(key, e.target.value)}
+                        />
+                      ) : (
+                        <textarea
+                          value={Project[key]}
+                          onChange={(e) => handleChange(key, e.target.value)}
+                          rows="4"
+                        />
+                      )}
+                    </td>
+                  </tr>
+                ) : null
+              )}
+            </tbody>
+          </table>
+
+          <h3 className="project-edit-section-title">
+            🔹 인력&nbsp;&nbsp;&nbsp;
+          </h3>
+          <Projectuserstable
+            project_users={Project?.project_users}
+            employees={employees}
+          />
+
+          <div className="project-edit-form-section">
+            <h3>👥 프로젝트 참여자 추가</h3>
+            <div className="project-edit-participant-container">
+              <Select
+                className="project-edit-react-select-container"
+                classNamePrefix="react-select"
+                options={users}
+                value={selectedUser}
+                onChange={setSelectedUser}
+                isSearchable={true}
+                placeholder="참여자 선택"
+              />
+              <button
+                type="button"
+                className="add-button"
+                onClick={handleAddParticipant}
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          {message && <p className="message">{message}</p>}
+
+          <button onClick={handleSave} className="project-edit-save-button">
+            저장
+          </button>
+          <button
+            type="button"
+            className="project-edit-cancel-button"
+            onClick={() =>
+              navigate(`/project-details?project_code=${Project.project_code}`)
+            }
+          >
+            취소
+          </button>
+          <button
+            className="project-edit-delete-button"
+            onClick={() => deleteProject(Project.project_code)}
+            disabled={loading}
+          >
+            {loading ? "삭제 중..." : "프로젝트 삭제"}
+          </button>
+          {error && <p style={{ color: "red" }}>{error}</p>}
         </div>
-
-        {message && <p className="message">{message}</p>}
-
-        <button onClick={handleSave} className="edit-save-button">
-          저장
-        </button>
-        <button
-          type="button"
-          className="edit-cancel-button"
-          onClick={() =>
-            navigate(`/project-details?project_code=${Project.project_code}`)
-          }
-        >
-          취소
-        </button>
-        <button
-          className="edit-delete-button"
-          onClick={() => deleteProject(Project.project_code)}
-          disabled={loading}
-        >
-          {loading ? "삭제 중..." : "프로젝트 삭제"}
-        </button>
-        {error && <p style={{ color: "red" }}>{error}</p>}
       </div>
     </div>
   );
