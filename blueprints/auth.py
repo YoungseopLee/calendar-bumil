@@ -148,10 +148,9 @@ def login():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
 
         cursor = conn.cursor(dictionary=True)
-        sql_tb_user_select = """
-        SELECT * FROM tb_user WHERE id = %s"""
+        sql_tb_user_select = "SELECT id, name, role_id, password FROM tb_user WHERE id = %s"
         cursor.execute(sql_tb_user_select, (id,))
-        logger.info(f"[SQL/SELECT] tb_user /login{sql_tb_user_select}")
+        logger.info(f"[SQL/SELECT] tb_user /login {sql_tb_user_select}")
 
         user = cursor.fetchone()
 
@@ -161,27 +160,16 @@ def login():
         if not bcrypt.check_password_hash(user['password'], password):
             return jsonify({'message': '잘못된 비밀번호!'}), 401
 
-        # JWT 생성
+        # JWT 토큰
         payload = {
-            'user_id': user['id'],
+            'id': user['id'],
             'name': user['name'],
             'role_id': user['role_id'],
-            # 토큰 기간 2주 (임시방편, 수정필요)
-            'exp': datetime.now(timezone.utc) + timedelta(weeks=2)
+            'exp': datetime.now(timezone.utc) + timedelta(weeks=2)  # 토큰 만료 2주
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
-        user_data = {
-            'id': user['id'],
-            'name': user['name'],
-            'position': user['position'],
-            'department': user['department'],
-            'phone_number': decrypt_aes(user['phone_number']),
-            'status': user.get('status', ''),
-            'first_login_yn': user.get('first_login_yn', 'Y')
-        }
-
-        return jsonify({'message': '로그인 성공!', 'user': user_data, 'token': token}), 200
+        return jsonify({'message': '로그인 성공!', 'token': token}), 200
 
     except Exception as e:
         print(f"로그인 중 오류 발생: {e}")
@@ -191,6 +179,7 @@ def login():
             cursor.close()
         if conn is not None:
             conn.close()
+
 
 # 로그인 기록 저장 API
 @auth_bp.route('/log_login', methods=['POST', 'OPTIONS'])
@@ -312,30 +301,23 @@ def get_logged_in_user():
     token = token.split(" ")[1]
 
     try:
+        # JWT 토큰에서 사용자 정보 가져오기
         payload = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-        user_id = payload['user_id']
-        
+        user_id = payload['id']
+
         conn = get_db_connection()
         if conn is None:
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
 
         cursor = conn.cursor(dictionary=True)
         sql_tb_user_select = """
-            SELECT * FROM tb_user WHERE id = %s"""
+        SELECT * FROM tb_user WHERE id = %s"""
         cursor.execute(sql_tb_user_select, (user_id,))
-        logger.info(f"[SQL/SELECT] tb_user /get_logged_in_user{sql_tb_user_select}")
+        logger.info(f"[SQL/SELECT] tb_user /get_logged_in_user {sql_tb_user_select}")
 
         user = cursor.fetchone()
 
         if user:
-            try:
-                user['id'] = user['id']
-                user['name'] = user['name']
-                user['phone_number'] = decrypt_aes(user['phone_number'])
-            except Exception as decryption_error:
-                print(f"복호화 오류: {decryption_error}")
-                return jsonify({'message': '사용자 정보 복호화 실패'}), 500
-
             return jsonify({'user': user}), 200
         else:
             return jsonify({'message': '사용자 정보를 찾을 수 없습니다.'}), 404
@@ -353,6 +335,7 @@ def get_logged_in_user():
             conn.close()
         except Exception:
             pass
+
 
 # 비밀번호 변경 API
 @auth_bp.route('/change_password', methods=['PUT', 'OPTIONS'])
