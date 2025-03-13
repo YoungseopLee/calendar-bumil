@@ -1,3 +1,5 @@
+import { navigate } from "gatsby";
+
 export const fetchLoggedInUser = async (apiUrl, handleLogout, setLoading) => {
     try {
       const token = localStorage.getItem("token");
@@ -27,3 +29,11 @@ export const fetchLoggedInUser = async (apiUrl, handleLogout, setLoading) => {
       return null;
     }
   };
+
+export const handleLogout = () => {
+  alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  navigate("/");
+};
+
