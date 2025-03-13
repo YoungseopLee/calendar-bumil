@@ -20,7 +20,6 @@ import "./NoticeCreate.css";
 const NoticeCreate = () => {
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태
   const [error, setError] = useState(null); // 에러 메세지
-  const [content, setContent] = useState("");
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
