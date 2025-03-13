@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "./AddSchedule.css";
+import { useAuth } from "../../utils/useAuth";
 
 /**
  * 📌 AddSchedule - 새로운 일정을 추가하는 페이지
@@ -37,6 +38,19 @@ const AddSchedule = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [user, setUser] = useState(null);
+  const { getUserInfo } = useAuth();
+
+  // 로그인한 사용자 정보 가져오기 (api로 가져오기)
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userInfo = await getUserInfo();
+      setUser(userInfo);
+      setLoading(false);  // 로딩 완료
+    };  
+    fetchUserInfo();
+  }, []);
 
   // ✅ URL을 통해 전달된 선택된 날짜를 기본값으로 설정
   useEffect(() => {
@@ -103,11 +117,10 @@ const AddSchedule = () => {
       setLoading(true);
       setError("");
 
-      // `localStorage`에서 `user` 정보를 가져옵니다.
-      const user = JSON.parse(localStorage.getItem("user"));
+      // `localStorage`에서 `token` 정보를 가져옵니다.
       const token = localStorage.getItem("token");
 
-      if (!user || !token) {
+      if (!token) {
         alert("로그인 상태가 아닙니다.");
         setLoading(false);
         return;

@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ChangePWPage.css";
-
+import { useAuth } from "../../utils/useAuth";
 const ChangePWPage = () => {
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중) 
   const [formData, setFormData] = useState({
     old_password: "", //현재 비밀번호
     new_password: "", //변경할 비밀번호
@@ -12,7 +13,18 @@ const ChangePWPage = () => {
   const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
-  const loggedInUser = JSON.parse(localStorage.getItem("user")); // 본인 정보 수정을 위해 로그인한 유저의 정보 가져오기
+  const [user, setUser] = useState(null);
+  const { getUserInfo } = useAuth();
+
+  // 로그인한 사용자 정보 가져오기 (api로 가져오기)
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userInfo = await getUserInfo();
+      setUser(userInfo);
+      setLoading(false);  // 로딩 완료
+    };
+    fetchUserInfo();
+  }, []);
 
   const validateForm = () => {
     let newErrors = {};
@@ -74,11 +86,13 @@ const ChangePWPage = () => {
     }
   };
 
+  if (loading) return <div className="userdetail-container">로딩 중...</div>;
+
   return (
     <div className="changepw-body">
       <div className="changepw-container">
         <h2>
-          {loggedInUser.first_login_yn === "Y"
+          {user.first_login_yn === "Y"
             ? "비밀번호 변경 페이지"
             : "최초 비밀번호 변경 페이지"}
         </h2>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import { useAuth } from "../../utils/useAuth";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import Tippy from "@tippyjs/react";
@@ -8,6 +9,7 @@ import "tippy.js/dist/tippy.css";
 import "./Calendar.css";
 
 const Calendar = () => {
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중) 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [userSchedule, setUserSchedule] = useState([]);
@@ -18,19 +20,30 @@ const Calendar = () => {
   const [users, setUsers] = useState([]); // 직원 목록
   const [statusList, setStatusList] = useState([]); // 상태 목록 (백엔드 CRUD 결과)
   const navigate = useNavigate();
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [user, setUser] = useState(null);
+  const { getUserInfo } = useAuth();
 
-  // 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
-  const user = JSON.parse(localStorage.getItem("user"));
-  const userId = user.id;
+  // 로그인한 사용자 정보 가져오기 (api로 가져오기)
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userInfo = await getUserInfo();
+      setUser(userInfo);
+      setLoading(false);  // 로딩 완료
+    };  
+    fetchUserInfo();
+  }, []);
+
   // 로그인 및 부서 데이터 가져오기
   useEffect(() => {
     const fetchData = async () => {
-      if (!user) {
-        alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
-        navigate("/");
-        return;
-      }
+      if (!user) return; // 사용자 정보가 없으면 아무것도 안보여줌(로딩되면 보여줌)
+
+      // 오늘 날짜 선택
+      const today = new Date();
+      setSelectedDate(today);
+      handleDateClick(today.getDate());
+
+      setUserStatus(user.status); // 사용자의 현재 상태 설정
 
       try {
         // 1. 부서 및 사용자 정보 가져오기
@@ -53,16 +66,11 @@ const Calendar = () => {
         console.error("데이터 로딩 오류:", error);
       }
     };
-    if (user.role_id === "AD_ADMIN") {
-      console.log("관리자: ", user.id);
-      setIsAdmin(true);
-    }
-
-    fetchData();
-    fetchLoggedInUser(); // 사용자 상태 업데이트
+    
+    fetchData(); //부서 데이터 가져오기
     fetchStatusList(); // 상태 목록 가져오기
     fetchUserSchedule(); // 전체 일정 가져오기
-  }, []);
+  }, [user]);
 
   // 로그인한 사용자의 상태 가져오기
   const fetchStatusList = async () => {
@@ -88,13 +96,13 @@ const Calendar = () => {
       const data = await response.json();
       console.log("전체일정: ", data.schedules);
       const filteredUsersSchedule = data.schedules.filter(
-        (schedule) => schedule.user_id === userId
+        (schedule) => schedule.user_id === user.id
       );
       setUserSchedule(filteredUsersSchedule);
       console.log("내일정: ", filteredUsersSchedule);
       // 내 일정을 제외한 다른 사용자의 일정을 필터링
       const filteredOtherUsersSchedule = data.schedules.filter(
-        (schedule) => schedule.user_id !== userId
+        (schedule) => schedule.user_id !== user.id
       );
 
       // 다른 유저들의 일정 상태 업데이트
@@ -176,11 +184,10 @@ const Calendar = () => {
   // 일정 삭제
   const handleDeleteSchedule = async (scheduleId) => {
     const token = localStorage.getItem("token");
-    const user = JSON.parse(localStorage.getItem("user"));
 
-    if (!token || !user) {
+    if (!token) {
       alert(
-        "❌ 인증 토큰이 없거나 사용자 정보가 없습니다. 다시 로그인해주세요."
+        "❌ 인증 토큰이 없습니다. 다시 로그인해주세요."
       );
       return;
     }
@@ -244,7 +251,6 @@ const Calendar = () => {
       }
       if (response.ok) {
         alert("상태가 변경되었습니다.");
-        fetchLoggedInUser();
       } else {
         alert("상태 변경에 실패했습니다.");
       }
@@ -257,38 +263,7 @@ const Calendar = () => {
   const handleLogout = () => {
     alert("세션이 만료되었습니다. 다시 로그인해주세요.");
     localStorage.removeItem("token");
-    localStorage.removeItem("user");
     navigate("/");
-  };
-
-  // 로그인한 사용자 정보를 다시 가져오는 함수
-  const fetchLoggedInUser = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/auth/get_logged_in_user`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (response.status === 401) {
-        handleLogout();
-        return;
-      }
-      if (response.ok) {
-        const data = await response.json();
-        const status = data.user.status || "";
-        setUserStatus(status);
-        localStorage.setItem("user", JSON.stringify(data.user));
-      } else {
-        console.error("사용자 정보 불러오기 실패");
-      }
-    } catch (error) {
-      console.error("로그인 사용자 정보 불러오기 실패:", error);
-    }
   };
 
   // 오늘 날짜와 비교하여 색을 구분하기 위한 함수
@@ -324,6 +299,8 @@ const Calendar = () => {
         return ""; // 기본값
     }
   };
+
+  if (loading) return <div className="userdetail-container">로딩 중...</div>;
 
   return (
     <div>
@@ -598,7 +575,7 @@ const Calendar = () => {
                         <li
                           key={schedule.id}
                           className={`schedule-item other-user-schedule ${
-                            isAdmin ? "has-buttons" : "no-buttons"
+                            user.role_id === "AD_ADMIN" ? "has-buttons" : "no-buttons"
                           }`}
                           onClick={() => handleScheduleClick(schedule)}
                         >
@@ -619,7 +596,7 @@ const Calendar = () => {
                             </span>
                           </div>
                           <div className="button-group">
-                            {isAdmin && (
+                            {user.role_id === "AD_ADMIN" && (
                               <button
                                 className="delete-button icon-button"
                                 onClick={(e) => {

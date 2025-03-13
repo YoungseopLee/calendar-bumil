@@ -41,7 +41,7 @@ const EditSchedule = () => {
     setEndDate(addOneDay(schedule.end_date));
 
     setStatus(schedule.status || "진행 중");
-  }, [schedule, navigate]);
+  }, [schedule, navigate]); 
 
   const handleSubmit = async (event) => {
     event.preventDefault();
