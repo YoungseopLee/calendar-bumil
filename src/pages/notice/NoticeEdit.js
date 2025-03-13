@@ -235,8 +235,8 @@ const NoticeEdit = () => {
           className="notice-edit-cancel-button"
           onClick={() => navigate("/notice-list")}
         >
-            취소
-          </button>
+          취소
+        </button>
       </div>
     </div>
   );

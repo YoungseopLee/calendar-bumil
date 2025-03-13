@@ -184,6 +184,12 @@ const NoticeCreate = () => {
             공지사항 생성
           </button>
         </form>
+        <button
+          className="notice-edit-cancel-button"
+          onClick={() => navigate("/notice-list")}
+        >
+          취소
+        </button>
       </div>
     </div>
   );

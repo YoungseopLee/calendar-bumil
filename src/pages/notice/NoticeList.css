@@ -4,6 +4,8 @@
   min-height: 100vh;
   background-color: #f5f7f9;
   justify-content: center;
+  padding: 0px; /* 좌우 여백을 추가해 화면 넘어가지 않도록 설정 */
+  box-sizing: border-box; /* padding이 너비에 포함되도록 설정 */
 }
 
 .notice-list-container {
@@ -13,6 +15,8 @@
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow-x: hidden; /* 수평 스크롤 방지 */
+  box-sizing: border-box; /* padding이 너비에 포함되도록 설정 */
 }
 
 /* 헤더 영역 스타일 수정 */
@@ -20,8 +24,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
+  padding-bottom: 2rem;
   border-bottom: 2px solid #f0f0f0;
   position: relative;
 }
@@ -36,7 +39,7 @@
 .notice-list-container button {
   position: absolute;
   right: 0;
-  padding: 0.8rem 1.5rem;
+  padding: 10px;
   background-color: #007bff;
   color: white;
   border: none;
@@ -49,7 +52,6 @@
 .notice-list-container button:hover {
   background-color: #0056b3;
 }
-
 
 
 .notice-list-item {
@@ -65,11 +67,14 @@
 }
 
 .notice-list-item a {
-  flex: 1;
+  flex: 3;
   color: #333;
   text-decoration: none;
   font-size: 1rem;
-  padding: 0 1rem;
+  padding-right: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .notice-list-item a:hover {
@@ -80,21 +85,22 @@
 .notice-list-info {
   display: flex;
   align-items: center;
-  gap: 2rem;
-  padding-right: 1rem;
+  gap: 1rem;
   color: #666;
   font-size: 0.9rem;
+  flex: 1;  /* 제목과 분리된 작성자 + 날짜 영역 */
 }
 
 .notice-list-date {
   color: #888;
-  min-width: 100px;
   text-align: center;
+  flex: 1; /* 20% */
 }
 
 .notice-list-author {
-  min-width: 100px;
+  min-width: 40px;
   text-align: center;
+  flex: 1; /* 20% */
 }
 
 .notice-list-empty {
@@ -122,7 +128,6 @@
 
   .notice-list-date,
   .notice-list-author {
-    min-width: 80px;
     font-size: 0.8rem;
   }
 }
