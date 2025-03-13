@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./NoticeDetails.css";
 import Sidebar from "../components/Sidebar";
-import { useParams } from 'react-router-dom';
+import { useParams } from "react-router-dom";
 
 const NoticeDetails = () => {
-  const [loading, setLoading] = useState(false); // 데이터 로딩 상태
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태
   const [error, setError] = useState(null); // 에러 메세지
+  const [notice, setNotice] = useState(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const NoticeDetails = () => {
   // 로그인한 사용자 정보 (localStorage에서 불러옴)
   const user = JSON.parse(localStorage.getItem("user"));
 
-  const notice = {
+  const notice2 = {
     id: "01",
     title: "비상연락망(25.3월 기준) 전달_사업지원팀 수정",
     author: "배효진",
@@ -24,7 +25,7 @@ const NoticeDetails = () => {
     readCount: 25,
     content: `안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준)
      재공지드립니다.\n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준
-     ) 재공지드립니다.\n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준) 
+     ) 재공지드립니다.\n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준)
       재공지드립니다.\n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준) 재공지드
       립니다.\n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준) 재공지드립니다.\
       n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준) 재공지드립니다.\n\n감사합니다.`,
@@ -45,6 +46,7 @@ const NoticeDetails = () => {
       navigate("/");
       return;
     }
+    fetchNotices();
   }, []);
 
   // ✅ 현재 로그인한 사용자의 정보를 API에서 가져옴
@@ -81,19 +83,30 @@ const NoticeDetails = () => {
     navigate("/");
   };
 
-  //   const fetchNotices = async () => {
-  //     try {
-  //       const response = await fetch(`${apiUrl}/notice/get_all_notice`);
-  //       if (!response.ok) {
-  //         throw new Error("공지사항 목록을 불러오지 못했습니다.");
-  //       }
-  //       const data = await response.json();
-  //     } catch (err) {
-  //       setError(err.message);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   }
+  const fetchNotices = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${apiUrl}/get_notice/${id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("공지사항을 불러오지 못했습니다.");
+      }
+      const data = await response.json();
+      console.log("data: ", data.notice);
+      setNotice(data.notice);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // ✅ 로딩 중 또는 에러 시 화면에 표시할 메세지
   if (loading) return <p>데이터를 불러오는 중...</p>;
@@ -104,18 +117,16 @@ const NoticeDetails = () => {
       <Sidebar />
       <div className="notice-detail-container">
         <span className="notice-detail-notice">공지사항</span>
-        <h1 className="notice-detail-title">{notice.title}</h1>
+        <h1 className="notice-detail-title">{notice2.title}</h1>
         <div className="notice-detail-meta">
           <div className="notice-detail-date">
-            <span>{notice.date}</span>
+            <span>{notice2.date}</span>
           </div>
-          <span>{notice.author}</span>
+          <span>{notice2.author}</span>
         </div>
 
         <div className="notice-detail-content">{notice.content}</div>
-        <div>
-          목록으로
-        </div>
+        <div>목록으로</div>
       </div>
     </div>
   );

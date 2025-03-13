@@ -87,7 +87,7 @@ function App() {
           element={<Modules.NoticeModule.NoticeList />}
         />
         <Route
-          path="/notice-details"
+          path="/notice-details/:id"
           element={<Modules.NoticeModule.NoticeDetails />}
         />
         <Route

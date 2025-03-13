@@ -139,7 +139,7 @@ const NoticeList = () => {
           ) : (
             notices.map((notice) => (
               <div key={notice.id} className="notice-list-item">
-                <Link to={`/notice/${notice.id}`}>{notice.title}</Link>
+                <Link to={`/notice-details/${notice.id}`}>{notice.title}</Link>
                 <div className="notice-list-info">
                   <span className="notice-list-author">
                     {notice.created_by_name || "관리자"}
