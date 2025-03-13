@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import "./NoticeDetails.css";
 import Sidebar from "../components/Sidebar";
 import { useParams } from "react-router-dom";
+import { FaArrowLeft } from "react-icons/fa";
+
 
 const NoticeDetails = () => {
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태
@@ -16,20 +18,6 @@ const NoticeDetails = () => {
 
   // 로그인한 사용자 정보 (localStorage에서 불러옴)
   const user = JSON.parse(localStorage.getItem("user"));
-
-  const notice2 = {
-    id: "01",
-    title: "비상연락망(25.3월 기준) 전달_사업지원팀 수정",
-    author: "배효진",
-    date: "2025-03-11 10:40",
-    readCount: 25,
-    content: `안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준)
-     재공지드립니다.\n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준
-     ) 재공지드립니다.\n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준)
-      재공지드립니다.\n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준) 재공지드
-      립니다.\n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준) 재공지드립니다.\
-      n\n감사합니다.안녕하십니까, 경영지원실 배효진입니다.\n\n비상연락망(25.3월 기준) 재공지드립니다.\n\n감사합니다.`,
-  };
 
   // 🔄 **1. 로그인한 사용자 정보 확인 및 권한 체크**
   useEffect(() => {
@@ -87,7 +75,7 @@ const NoticeDetails = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await fetch(`${apiUrl}/get_notice/${id}`, {
+      const response = await fetch(`${apiUrl}/notice/get_notice/${id}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -116,17 +104,37 @@ const NoticeDetails = () => {
     <div>
       <Sidebar />
       <div className="notice-detail-container">
-        <span className="notice-detail-notice">공지사항</span>
-        <h1 className="notice-detail-title">{notice2.title}</h1>
+        <span className="notice-detail-notice" onClick={() => navigate("/notice-list")}>공지사항</span>
+        <h1 className="notice-detail-title">{notice.title}</h1>
         <div className="notice-detail-meta">
           <div className="notice-detail-date">
-            <span>{notice2.date}</span>
+            <span>
+              {new Date(notice.created_at).toLocaleString("ko-KR", {
+                timeZone: "Asia/Seoul",
+              })}
+            </span>
           </div>
-          <span>{notice2.author}</span>
+          <span>{notice.created_by}</span>
         </div>
 
-        <div className="notice-detail-content">{notice.content}</div>
-        <div>목록으로</div>
+        <div
+          className="notice-detail-content"
+          dangerouslySetInnerHTML={{ __html: notice.content }}
+        ></div>
+        <div style={{ display: "flex", alignItems: "center", gap: "3px",cursor: "pointer" }}>
+          <FaArrowLeft style={{ position: "relative", top: "0px" }}
+          onClick={() => navigate("/notice-list")}/>
+          <span
+            style={{
+              fontFamily: "Arial, sans-serif",
+              fontSize: "16px",
+              fontWeight: "bold",
+            }}
+            onClick={() => navigate("/notice-list")}
+          >
+            목록으로
+          </span>
+        </div>
       </div>
     </div>
   );
