@@ -187,8 +187,10 @@ const ProjectPage = () => {
   });
 
   return (
-    <div className="project-page">
-      <Sidebar />
+    <div className="project-page-app-body">
+      <div className="project-page-sidebar">
+        <Sidebar />
+      </div>
       {/* ✅ ADMIN 권한만 프로젝트 추가 버튼 표시 */}
       {roleId && ["AD_ADMIN", "PR_ADMIN"].includes(roleId) && (
         <AddProjectButton />
