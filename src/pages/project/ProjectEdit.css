@@ -186,3 +186,41 @@
   border-radius: 50%;
   transition: background-color 0.3s ease;
 }
+
+.project-edit-remove-button {
+  border: none;
+  background-color: white;
+}
+
+/* 드롭다운과 버튼을 가로 정렬 */
+.project-edit-participant-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+/* 참여자 선택 드롭다운 */
+.project-edit-react-select-dropdown {
+  width: 100%;
+  flex-shrink: 1;
+}
+
+.project-edit-add-button {
+  width: 100%;
+  flex-shrink: 2;
+  padding: 10px;
+  background-color: #10c966;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.project-edit-add-button:hover {
+  background-color: #0fa85a;
+}

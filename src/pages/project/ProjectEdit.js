@@ -480,9 +480,7 @@ const ProjectEdit = () => {
             </tbody>
           </table>
 
-          <h3 className="project-edit-section-title">
-            🔹 인력&nbsp;&nbsp;&nbsp;
-          </h3>
+          <h3 className="project-edit-section-title">🔹 인력</h3>
           <Projectuserstable
             project_users={Project?.project_users}
             employees={employees}
@@ -492,7 +490,7 @@ const ProjectEdit = () => {
             <h3>👥 프로젝트 참여자 추가</h3>
             <div className="project-edit-participant-container">
               <Select
-                className="project-edit-react-select-container"
+                className="project-edit-react-select-dropdown"
                 classNamePrefix="react-select"
                 options={users}
                 value={selectedUser}
@@ -502,10 +500,10 @@ const ProjectEdit = () => {
               />
               <button
                 type="button"
-                className="add-button"
+                className="project-edit-add-button"
                 onClick={handleAddParticipant}
               >
-                +
+                프로젝트에 추가
               </button>
             </div>
           </div>
