@@ -136,7 +136,6 @@ const ResetUser = () => {
   return (
     <div className="user-reset-page">
       <Sidebar />
-
       <div className="user-reset-box">
         <div className="user-reset-employee-container">
           <h2 className="user-reset-title">사용자 비밀번호 초기화</h2>

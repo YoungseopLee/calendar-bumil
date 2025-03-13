@@ -4,9 +4,9 @@
   width: 100%;
   max-width: 600px;
   margin: auto;
+  margin-top: 50px;
+  padding: 20px;
   background: #fff;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
-  padding: 1vh 1vw;
 }
 
 /* ✅ 콘텐츠 박스 스타일 */
