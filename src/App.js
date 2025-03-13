@@ -94,6 +94,10 @@ function App() {
           path="/notice-create"
           element={<Modules.NoticeModule.NoticeCreate />}
         />
+        <Route
+          path="/notice-edit/:id"
+          element={<Modules.NoticeModule.NoticeEdit />}
+        />
       </Routes>
     </Router>
   );

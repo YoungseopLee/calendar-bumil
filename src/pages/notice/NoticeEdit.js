@@ -1,43 +1,28 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import "./NoticeCreate.css";
+import "./NoticeEdit.css";
 
-/**
- * 📌  NoticeCreate - 공지사항 생성을 위한 컴포넌트
- *
- * ✅ 주요 기능:
- * - 공지사항 생성 (POST /notice/create_notice)
- *
- *
- * ✅ UI (또는 Component) 구조:
- * - NoticeCreate (공지사항 생성)
- *
- */
-
-const NoticeCreate = () => {
+const NoticeEdit = () => {
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태
   const [error, setError] = useState(null); // 에러 메세지
+
+  const [notice, setNotice] = useState(null);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
-  // 로그인한 사용자 정보 (localStorage에서 불러옴)
   const user = JSON.parse(localStorage.getItem("user"));
+  const { id } = useParams();
 
-  /**
-   * ✅ 프로젝트 생성 폼의 상태 관리
-   * - 초기값 설정 (배열 형태 필드 포함)
-   */
   const [formData, setFormData] = useState({
     title: "",
     content: "",
     user_id: user.id,
   });
 
-  // 🔄 **1. 로그인한 사용자 정보 확인 및 권한 체크**
   useEffect(() => {
     fetchLoggedInUser();
     if (!user) {
@@ -51,11 +36,19 @@ const NoticeCreate = () => {
       navigate("/");
       return;
     }
+    fetchNotices();
   }, []);
 
+  useEffect(() => {
+    if (notice) {
+      setFormData({
+        title: notice.title,
+        content: notice.content,
+        user_id: user.id,
+      });
+    }
+  }, [notice, user.id]);
 
-  // ✅ 현재 로그인한 사용자의 정보를 API에서 가져옴
-  // ✅ 사용자 정보가 없거나 세션이 만료되었을 경우 자동 로그아웃 처리
   const fetchLoggedInUser = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -82,12 +75,36 @@ const NoticeCreate = () => {
     }
   };
 
-  // ✅ 로그아웃 함수 - 세션이 만료되었을 경우 사용자 정보를 삭제하고 로그인 페이지로 이동
   const handleLogout = () => {
     alert("세션이 만료되었습니다. 다시 로그인해주세요.");
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/");
+  };
+
+  const fetchNotices = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${apiUrl}/notice/get_notice/${id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("공지사항을 불러오지 못했습니다.");
+      }
+      const data = await response.json();
+      console.log("data: ", data.notice);
+      setNotice(data.notice);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (value, name) => {
@@ -105,10 +122,32 @@ const NoticeCreate = () => {
       setError("⚠️ 필수 입력값을 모두 입력해주세요.");
       return;
     }
-    createNotice();
+    updateNotice();
   };
 
-  // ✅ 공지사항 생성 API 호출
+  const updateNotice = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`${apiUrl}/notice/update_notice/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+      if (!response.ok) {
+        throw new Error("공지사항 수정을 실패했습니다.");
+      }
+      alert("✅ 공지사항이 성공적으로 수정되었습니다!");
+      navigate("/notice-list");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const createNotice = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -138,20 +177,27 @@ const NoticeCreate = () => {
 
   const modules = {
     toolbar: [
-      [{ 'header': '1'}, { 'header': '2'}, { 'font': [] }],
-      [{ 'size': ['small', 'normal', 'large', 'huge'] }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'align': [] }],
-      ['bold', 'italic', 'underline'],
-      ['link'],
+      [{ header: "1" }, { header: "2" }, { font: [] }],
+      [{ size: ["small", "normal", "large", "huge"] }],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ align: [] }],
+      ["bold", "italic", "underline"],
+      ["link"],
     ],
   };
 
   const formats = [
-    'header', 'font', 'size', 'list', 'align', 'bold', 'italic', 'underline', 'link',
+    "header",
+    "font",
+    "size",
+    "list",
+    "align",
+    "bold",
+    "italic",
+    "underline",
+    "link",
   ];
 
-  // ✅ 로딩 중 또는 에러 시 화면에 표시할 메세지
   if (loading) return <p>데이터를 불러오는 중...</p>;
   if (error) return <p>오류 발생: {error}</p>;
 
@@ -159,7 +205,7 @@ const NoticeCreate = () => {
     <div>
       <Sidebar />
       <div className="notice-create-container">
-        <h2>공지사항 생성</h2>
+        <h2>공지사항 수정</h2>
 
         <form onSubmit={handleSubmit}>
           <div className="notice-create-form-group">
@@ -168,6 +214,7 @@ const NoticeCreate = () => {
               type="text"
               id="title"
               name="title"
+              value={formData.title}
               onChange={(e) => handleChange(e.target.value, e.target.name)}
               required
             />
@@ -181,12 +228,18 @@ const NoticeCreate = () => {
             style={{ height: "250px" }}
           />
           <button className="notice-create-button" type="submit">
-            공지사항 생성
+            공지사항 수정
           </button>
         </form>
+        <button
+          className="notice-edit-cancel-button"
+          onClick={() => navigate("/notice-list")}
+        >
+            취소
+          </button>
       </div>
     </div>
   );
 };
 
-export default NoticeCreate;
+export default NoticeEdit;

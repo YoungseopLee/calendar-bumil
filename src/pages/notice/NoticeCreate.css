@@ -9,6 +9,10 @@
   min-height: 500px;
 }
 
+.notice-create-container h2 {
+  margin-top: 28px;
+}
+
 .notice-create-form-group {
   margin-bottom: 15px; /* 아래 여백 */
 }
