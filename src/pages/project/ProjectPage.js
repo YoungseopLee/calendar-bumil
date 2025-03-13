@@ -193,15 +193,15 @@ const ProjectPage = () => {
       {roleId && ["AD_ADMIN", "PR_ADMIN"].includes(roleId) && (
         <AddProjectButton />
       )}
-      <div className="content">
-        <div className="projectPage-box">
-          <div className="fixed-header">
-            <h1 className="title">프로젝트 목록</h1>
+      <div className="project-page-content">
+        <div className="project-page-box">
+          <div className="project-page-fixed-header">
+            <h1 className="project-page-title">프로젝트 목록</h1>
 
             {/* 🔍 검색 필터 */}
-            <div className="project-search-container">
+            <div className="project-page-search-container">
               <select
-                className="search-category"
+                className="project-page-search-category"
                 value={searchCategory}
                 onChange={(e) => setSearchCategory(e.target.value)}
               >
@@ -214,21 +214,24 @@ const ProjectPage = () => {
               </select>
               <input
                 type="text"
-                className="search-input"
+                className="project-page-search-input"
                 placeholder="검색어 입력"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <button className="filter-button" onClick={applyFilters}>
+              <button
+                className="project-page-filter-button"
+                onClick={applyFilters}
+              >
                 <FaSearch />
               </button>
             </div>
 
             {/* 📅 날짜 필터 */}
-            <div className="filter-container">
+            <div className="project-page-filter-container">
               <input
                 type="date"
-                className="date-filter"
+                className="project-page-date-filter"
                 value={startFilter}
                 onChange={(e) => {
                   const newStart = e.target.value;
@@ -243,7 +246,7 @@ const ProjectPage = () => {
 
               <input
                 type="date"
-                className="date-filter"
+                className="project-page-date-filter"
                 value={endFilter}
                 onChange={(e) => {
                   const newEnd = e.target.value;
@@ -255,17 +258,20 @@ const ProjectPage = () => {
                   }
                 }}
               />
-              <button className="filter-button" onClick={applyFilters}>
+              <button
+                className="project-page-filter-button"
+                onClick={applyFilters}
+              >
                 <FaSearch />
               </button>
             </div>
 
             {/* 상태 필터 */}
-            <div className="status-toggle-container">
+            <div className="project-page-status-toggle-container">
               {["제안", "수행", "실주종료"].map((status) => (
                 <button
                   key={status}
-                  className={`status-toggle ${
+                  className={`project-page-status-toggle ${
                     selectedStatus.includes(status) ? "active" : ""
                   }`}
                   onClick={() => handleStatusClick(status)}
@@ -276,15 +282,15 @@ const ProjectPage = () => {
             </div>
           </div>
 
-          <div className="scroll-top-container">
+          <div className="project-page-scroll-top-container">
             <ScrollToTopButton />
           </div>
-          
+
           {/* 필터링 된 프로젝트 목록 */}
           {filteredProjects.length > 0 ? (
             <ProjectList projects={filteredProjects} />
           ) : (
-            <p className="no-results">검색 결과가 없습니다.</p>
+            <p className="project-page-no-results">검색 결과가 없습니다.</p>
           )}
         </div>
       </div>
