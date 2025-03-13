@@ -67,10 +67,10 @@ const ProjectCreate = () => {
         const data = await response.json();
         localStorage.setItem("user", JSON.stringify(data.user));
       } else {
-        console.error("사용자 정보 불러오기 실패");
+        //console.error("사용자 정보 불러오기 실패");
       }
     } catch (error) {
-      console.error("로그인 사용자 정보 불러오기 실패:", error);
+      //console.error("로그인 사용자 정보 불러오기 실패:", error);
     }
   };
 
@@ -163,7 +163,7 @@ const ProjectCreate = () => {
         participants, // 전체 참여자 정보 포함
       };
 
-      console.log("📤 전송된 데이터:", JSON.stringify(payload, null, 2)); // 디버깅용 출력
+      //console.log("📤 전송된 데이터:", JSON.stringify(payload, null, 2)); // 디버깅용 출력
 
       const response = await fetch(`${apiUrl}/project/add_project`, {
         method: "POST",
