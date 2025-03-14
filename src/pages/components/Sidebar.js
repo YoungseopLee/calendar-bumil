@@ -12,27 +12,14 @@ import {
   FaSignOutAlt,
 } from "react-icons/fa";
 import "./Sidebar.css";
-import { useAuth } from "../../utils/useAuth";
 
-const Sidebar = () => {
+const Sidebar = ({ user = {id: "", name: "", position: "", department: "", role_id: ""} }) => {
   const [isOpen, setIsOpen] = useState(window.innerWidth > 1024);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isTablet, setIsTablet] = useState(
     window.innerWidth > 768 && window.innerWidth <= 1024
   );
   const navigate = useNavigate();
-
-  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
-  const { getUserInfo } = useAuth();
-
-  // 로그인한 사용자 정보 가져오기 (api로 가져오기)
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      const userInfo = await getUserInfo();
-      setUser(userInfo);
-    };  
-    fetchUserInfo();
-  }, []);
 
   useEffect(() => {
 
@@ -64,7 +51,7 @@ const Sidebar = () => {
 
   const handleManagerClick = (e) => {
     e.preventDefault();
-    if (user.role_id === "AD_ADMIN") {
+    if (user?.role_id === "AD_ADMIN") {
       navigate("/manager");
     } else {
       alert("관리자만 접근 가능한 페이지입니다.");
@@ -74,6 +61,12 @@ const Sidebar = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/");
+  };
+
+  const handleMyInfoClick = (e) => {
+    e.preventDefault();
+    navigate(`/user-details?user_id=${user?.id}`, { replace: true });
+    closeSidebar();
   };
 
   return (
@@ -118,16 +111,16 @@ const Sidebar = () => {
             </Link>
           </li>
           <li>
-            <Link to={`/user-details?user_id=${user.id}`}>
+            <a href="#" onClick={handleMyInfoClick}>
               <FaUser className="menu-icon" /> {!isTablet && "내 정보"}
-            </Link>
+            </a>
           </li>
           <li>
             <Link to="/situation_control">
               <FaTools className="menu-icon" /> {!isTablet && "현황 관리"}
             </Link>
           </li>
-          {user.role_id === "AD_ADMIN" && (
+          {user?.role_id === "AD_ADMIN" && (
             <li>
               <a href="#" onClick={handleManagerClick}>
                 <FaUserShield className="menu-icon" /> {!isTablet && "관리자"}

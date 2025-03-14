@@ -37,7 +37,6 @@ const Calendar = () => {
         // 1. 사용자 정보 가져오기
         const userInfo = await fetchUserInfo();
         
-
         // 2. 오늘 날짜 설정
         const today = new Date();
         setSelectedDate(today);

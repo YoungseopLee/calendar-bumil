@@ -100,7 +100,8 @@ const LoginPage = () => {
 
         if (userResponse.ok) {
           const userData = await userResponse.json();
-          localStorage.setItem("user", JSON.stringify(userData.user)); // ✅ 최신 사용자 정보 저장
+          //localStorage.setItem("user", JSON.stringify(userData.user)); // ✅ 최신 사용자 정보 저장
+          localStorage.removeItem("user");
         }
 
         // ✅ 아이디 저장 여부 처리
