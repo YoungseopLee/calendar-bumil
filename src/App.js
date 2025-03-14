@@ -20,7 +20,11 @@ function App() {
           path="/status-management"
           element={<Modules.Admin.StatusManagement />}
         />
-        <Route path="/login_log" element={<Modules.Admin.LoginLogPage />} />
+        <Route path="/login-log" element={<Modules.Admin.LoginLogPage />} />
+        <Route
+          path="/manage-department"
+          element={<Modules.Admin.ManageDepartment />}
+        />
 
         {/* ===== Auth ===== */}
         <Route path="/" element={<Modules.Auth.LoginPage />} />
