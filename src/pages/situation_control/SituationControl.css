@@ -12,8 +12,10 @@
 }
 
 .title {
-  font-size: 1.4em;
-  margin-bottom: 30px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 40px;
+  text-align: center;
   color: #333;
 }
 
