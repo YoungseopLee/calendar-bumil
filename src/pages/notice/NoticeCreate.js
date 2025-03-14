@@ -138,18 +138,20 @@ const NoticeCreate = () => {
 
   const modules = {
     toolbar: [
-      [{ 'header': '1'}, { 'header': '2'}, { 'font': [] }],
-      [{ 'size': ['small', 'normal', 'large', 'huge'] }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+      [{ 'size': ['small', false, 'large', 'huge'] }],
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
       [{ 'align': [] }],
       ['bold', 'italic', 'underline'],
       ['link'],
     ],
   };
-
+  
   const formats = [
     'header', 'font', 'size', 'list', 'align', 'bold', 'italic', 'underline', 'link',
   ];
+  
+  
 
   // ✅ 로딩 중 또는 에러 시 화면에 표시할 메세지
   if (loading) return <p>데이터를 불러오는 중...</p>;

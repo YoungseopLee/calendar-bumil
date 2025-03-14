@@ -178,7 +178,7 @@ const NoticeEdit = () => {
   const modules = {
     toolbar: [
       [{ header: "1" }, { header: "2" }, { font: [] }],
-      [{ size: ["small", "normal", "large", "huge"] }],
+      [{ size: ["small", false, "large", "huge"] }],
       [{ list: "ordered" }, { list: "bullet" }],
       [{ align: [] }],
       ["bold", "italic", "underline"],
