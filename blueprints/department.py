@@ -33,7 +33,7 @@ def get_department_list():
 
     cursor = conn.cursor(dictionary=True)
     try:
-        sql = "SELECT * FROM tb_department"
+        sql = "SELECT * FROM tb_department ORDER BY dpr_nm desc"
         cursor.execute(sql)
         departments = cursor.fetchall()
         logger.info(f"[SQL/SELECT] {sql})")
