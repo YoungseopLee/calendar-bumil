@@ -50,7 +50,7 @@ const UserDetails = () => {
 
         ]);
       } catch (error) {
-        console.error("데이터 로딩 오류:", error);
+        //console.error("데이터 로딩 오류:", error);
       }
       setLoading(false); // 로딩 완료
     };
@@ -144,7 +144,7 @@ const UserDetails = () => {
         const data = await response.json();
         setStatusList(data.statuses); // [{ id: 1, comment: "HQ" }, ...]
       } catch (err) {
-        console.error("상태 목록 오류:", err);
+       //console.error("상태 목록 오류:", err);
       } 
     };
 
