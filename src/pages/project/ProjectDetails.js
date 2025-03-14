@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import "./ProjectDetails.css";
+import { useAuth } from "../../utils/useAuth";
 
 /**
  * 📌 ProjectDetails - 프로젝트 상세 정보를 조회하는 페이지
@@ -33,9 +34,6 @@ const ProjectDetails = () => {
   // ✅ URL에서 project_code 가져오기
   const projectCode = new URLSearchParams(location.search).get("project_code");
 
-  // ✅ 로그인한 사용자 정보 가져오기 (localStorage에서 가져오기)
-  const user = JSON.parse(localStorage.getItem("user"));
-
   // ✅ 필드 매핑(표시해야 할 프로젝트 요소가 추가되면 여기서 매핑해줘야 함, 그래야 표에 표시됨)
   const fieldMappings = {
     project_code: "프로젝트 코드",
@@ -53,16 +51,31 @@ const ProjectDetails = () => {
     changes: "비고",
   };
 
-  // ✅ 사용자 로그인 확인
-  useEffect(() => {
-    fetchLoggedInUser();
+  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const { getUserInfo, checkAuth, handleLogout } = useAuth();
 
-    if (!user) {
-      alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
-      navigate("/");
-      return;
-    }
+  // 전체 데이터 가져오기
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        // 1. 사용자 정보 가져오기
+        await fetchUserInfo();
+
+      } catch (error) {
+        console.error("데이터 로딩 오류:", error);
+      }
+      setLoading(false); // 로딩 완료
+    };
+
+    fetchAllData();
   }, []);
+
+  // 로그인한 사용자 정보 가져오는 함수
+  const fetchUserInfo = async () => {
+    const userInfo = await getUserInfo();
+    setUser(userInfo);
+    return userInfo;
+  };
 
   // ✅ 프로젝트 코드가 변경될 때 마다 fetchProjectDetails실행
   useEffect(() => {
@@ -81,14 +94,6 @@ const ProjectDetails = () => {
     fetchEmployees();
   }, []);
 
-  // ✅ 로그아웃 처리 함수
-  const handleLogout = () => {
-    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
-  };
-
   // ✅ 프로젝트 상세정보 조회 API 호출
   const fetchProjectDetails = async () => {
     setLoading(true);
@@ -106,36 +111,6 @@ const ProjectDetails = () => {
       setError(err.message);
     } finally {
       setLoading(false);
-    }
-  };
-
-  // ✅ 로그인한 사용자 정보 가져오기
-  const fetchLoggedInUser = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/auth/get_logged_in_user`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.status === 401) {
-        handleLogout(); // 401 응답 시 자동 로그아웃 처리
-        return;
-      }
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("user", JSON.stringify(data.user)); // 최신 상태 업데이트
-      } else {
-        //console.error("사용자 정보 불러오기 실패");
-      }
-    } catch (error) {
-      //console.error("로그인 사용자 정보 불러오기 실패:", error);
     }
   };
 
@@ -264,7 +239,7 @@ const ProjectDetails = () => {
   return (
     <div className="project-details-app-body">
       <div className="project-details-sidebar">
-        <Sidebar />
+        <Sidebar user={user}/>
       </div>
       <div className="project-details-container">
         <div className="project-details-edit-button-container">
@@ -278,7 +253,7 @@ const ProjectDetails = () => {
         </div>
         <div className="project-details-edit-button-container">
           <h3 className="project-details-section-title">🔹 사업개요</h3>
-          {user.roleId != "USR_GENERAL" && ( //로그인 유저의 roleId를 보고 수정 버튼 표시 판정
+          {user?.role_id != "USR_GENERAL" && ( //로그인 유저의 roleId를 보고 수정 버튼 표시 판정
             <button
               onClick={handleEditClick}
               className="project-details-EditProjectButton"
