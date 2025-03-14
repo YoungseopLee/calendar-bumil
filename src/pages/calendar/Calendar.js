@@ -6,10 +6,11 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
+import { followCursor } from "tippy.js";
 import "./Calendar.css";
 
 const Calendar = () => {
-  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중) 
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중)
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [userSchedule, setUserSchedule] = useState([]);
@@ -20,7 +21,13 @@ const Calendar = () => {
   const [users, setUsers] = useState([]); // 직원 목록
   const [statusList, setStatusList] = useState([]); // 상태 목록 (백엔드 CRUD 결과)
   const navigate = useNavigate();
-  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    position: "",
+    department: "",
+    role_id: "",
+  }); //로그인한 사용자 정보
   const { getUserInfo } = useAuth();
 
   // 전체 데이터 가져오기
@@ -33,50 +40,48 @@ const Calendar = () => {
         // 2. 오늘 날짜 설정
         const today = new Date();
         setSelectedDate(today);
-        setUserStatus(userInfo?.status);  // user.status 대신 userInfo.status 사용
-  
+        setUserStatus(userInfo?.status); // user.status 대신 userInfo.status 사용
+
         // 3. 모든 데이터 병렬로 가져오기
         await Promise.all([
           fetchUsersAndDepartments(),
           fetchStatusList(),
-          fetchUserSchedule(userInfo?.id)
+          fetchUserSchedule(userInfo?.id),
         ]);
-        
       } catch (error) {
         console.error("데이터 로딩 오류:", error);
       }
-      setLoading(false);  // 로딩 완료
+      setLoading(false); // 로딩 완료
     };
-    
+
     fetchAllData();
   }, []);
 
-// 로그인한 사용자 정보 가져오는 함수
-const fetchUserInfo = async () => {
-  const userInfo = await getUserInfo();
-  setUser(userInfo);
-  return userInfo;
-};
+  // 로그인한 사용자 정보 가져오는 함수
+  const fetchUserInfo = async () => {
+    const userInfo = await getUserInfo();
+    setUser(userInfo);
+    return userInfo;
+  };
 
-// 부서 및 사용자 정보 가져오는 함수
-const fetchUsersAndDepartments = async () => {
-  try {
-    const usersResponse = await fetch(
-      `${process.env.REACT_APP_API_URL}/user/get_users`
-    );
-    if (!usersResponse.ok)
-      throw new Error("직원 목록을 불러오지 못했습니다.");
-    const usersData = await usersResponse.json();
-    setUsers(usersData.users);
+  // 부서 및 사용자 정보 가져오는 함수
+  const fetchUsersAndDepartments = async () => {
+    try {
+      const usersResponse = await fetch(
+        `${process.env.REACT_APP_API_URL}/user/get_users`
+      );
+      if (!usersResponse.ok)
+        throw new Error("직원 목록을 불러오지 못했습니다.");
+      const usersData = await usersResponse.json();
+      setUsers(usersData.users);
 
-    const uniqueDepartments = [
-      ...new Set(usersData.users.map((user) => user.department)),
-    ]
-      .filter(Boolean)
-      .sort((a, b) => a.localeCompare(b, "ko-KR"));
+      const uniqueDepartments = [
+        ...new Set(usersData.users.map((user) => user.department)),
+      ]
+        .filter(Boolean)
+        .sort((a, b) => a.localeCompare(b, "ko-KR"));
 
-    setDepartments(uniqueDepartments);
-
+      setDepartments(uniqueDepartments);
     } catch (error) {
       console.error("데이터 로딩 오류:", error);
     }
@@ -117,7 +122,6 @@ const fetchUsersAndDepartments = async () => {
 
       // 다른 유저들의 일정 상태 업데이트
       setOtherUsersSchedule(filteredOtherUsersSchedule);
-
     } catch (error) {
       console.error("전체 일정 로딩 오류:", error);
     }
@@ -196,9 +200,7 @@ const fetchUsersAndDepartments = async () => {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      alert(
-        "❌ 인증 토큰이 없습니다. 다시 로그인해주세요."
-      );
+      alert("❌ 인증 토큰이 없습니다. 다시 로그인해주세요.");
       return;
     }
 
@@ -314,7 +316,7 @@ const fetchUsersAndDepartments = async () => {
 
   return (
     <div>
-      <Sidebar user={user}/>
+      <Sidebar user={user} />
       <div className="calendar-parent">
         <div className="calendar">
           {/* 사용자 상태 변경 UI */}
@@ -489,7 +491,21 @@ const fetchUsersAndDepartments = async () => {
                                 ),
                               }}
                             ></span>
-                            <Tippy content={schedule.task} placement="top">
+                            <Tippy
+                              content={schedule.task}
+                              placement="top"
+                              plugins={[followCursor]}
+                              followCursor="horizontal"
+                              arrow={true}
+                              popperOptions={{
+                                modifiers: [
+                                  {
+                                    name: "preventOverflow",
+                                    options: { boundary: "window" },
+                                  },
+                                ],
+                              }}
+                            >
                               <span className="task-name">{schedule.task}</span>
                             </Tippy>
                           </div>
@@ -578,14 +594,20 @@ const fetchUsersAndDepartments = async () => {
                     }
 
                     return filtered.map((schedule) => {
-                      const scheduleUser = users.find((u) => u.id === schedule.user_id);
-                      const userName = scheduleUser ? scheduleUser.name : "알 수 없음";
+                      const scheduleUser = users.find(
+                        (u) => u.id === schedule.user_id
+                      );
+                      const userName = scheduleUser
+                        ? scheduleUser.name
+                        : "알 수 없음";
 
                       return (
                         <li
                           key={schedule.id}
                           className={`schedule-item other-user-schedule ${
-                            user.role_id === "AD_ADMIN" ? "has-buttons" : "no-buttons"
+                            user.role_id === "AD_ADMIN"
+                              ? "has-buttons"
+                              : "no-buttons"
                           }`}
                           onClick={() => handleScheduleClick(schedule)}
                         >
@@ -598,6 +620,17 @@ const fetchUsersAndDepartments = async () => {
                             <Tippy
                               content={`${userName} - ${schedule.task}`}
                               placement="top"
+                              plugins={[followCursor]}
+                              followCursor="horizontal"
+                              arrow={true}
+                              popperOptions={{
+                                modifiers: [
+                                  {
+                                    name: "preventOverflow",
+                                    options: { boundary: "window" },
+                                  },
+                                ],
+                              }}
                             >
                               <span className="task-name">{schedule.task}</span>
                             </Tippy>

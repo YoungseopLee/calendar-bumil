@@ -4,6 +4,7 @@ import Sidebar from "../components/Sidebar";
 import BackButton from "../components/BackButton";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
+import { followCursor } from "tippy.js";
 import "./UserDetails.css";
 import {
   FaPhone,
@@ -253,7 +254,17 @@ const UserDetails = () => {
                 <Tippy
                   content={project.project_name}
                   placement="top"
-                  theme="light"
+                  plugins={[followCursor]}
+                  followCursor="horizontal"
+                  arrow={true}
+                  popperOptions={{
+                    modifiers: [
+                      {
+                        name: "preventOverflow",
+                        options: { boundary: "window" },
+                      },
+                    ],
+                  }}
                 >
                   <span className="user-details-project-name">
                     {project.project_name}

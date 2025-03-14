@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
+import { followCursor } from "tippy.js";
 import "./NoticeList.css";
 import { Link } from "react-router-dom";
 
@@ -145,10 +146,17 @@ const NoticeList = () => {
                 <Tippy
                   content={notice.title}
                   placement="top"
-                  followCursor={true}
-                  interactive={true}
+                  plugins={[followCursor]}
+                  followCursor="horizontal"
                   arrow={true}
-                  boundary="window"
+                  popperOptions={{
+                    modifiers: [
+                      {
+                        name: "preventOverflow",
+                        options: { boundary: "window" },
+                      },
+                    ],
+                  }}
                 >
                   <Link to={`/notice-details/${notice.id}`}>
                     {notice.title}

@@ -662,21 +662,21 @@ const SituationControls = () => {
             <tr key={project.id}>
               <td
                 onClick={(event) => {
-                  event.stopPropagation(); // ✅ 부모 요소의 클릭 이벤트 방지
+                  event.stopPropagation(); // 부모 요소의 클릭 이벤트 방지
                   navigate(`/user-details?user_id=${project.user_id}`);
                 }}
-                style={{ cursor: "pointer" }} // ✅ 마우스 커서 변경 (클릭 가능한 요소임을 강조) // ✅ 클릭 가능한 스타일 적용
+                style={{ cursor: "pointer" }} // 마우스 커서 변경 (클릭 가능한 요소임을 강조) // ✅ 클릭 가능한 스타일 적용
               >
                 {getUserName(project.user_id)}
               </td>
               <td
                 onClick={(event) => {
-                  event.stopPropagation(); // ✅ 부모 요소의 클릭 이벤트 방지
+                  event.stopPropagation(); // 부모 요소의 클릭 이벤트 방지
                   navigate(
                     `/project-details?project_code=${project.project_code}`
                   );
                 }}
-                style={{ cursor: "pointer" }} // ✅ 마우스 커서 변경 (클릭 가능한 요소임을 강조) // ✅ 클릭 가능한 스타일 적용
+                style={{ cursor: "pointer" }} // 마우스 커서 변경 (클릭 가능한 요소임을 강조) // ✅ 클릭 가능한 스타일 적용
               >
                 {project.project_name}
               </td>
@@ -708,7 +708,7 @@ const SituationControls = () => {
           <h3 className="search-project-category">프로젝트 명</h3>
           <input
             type="text"
-            className="search-input"
+            className="SituationControl-search-input"
             placeholder="검색어 입력"
             value={searchQueryProject}
             onChange={(e) => setSearchQueryProject(e.target.value)}
@@ -729,7 +729,11 @@ const SituationControls = () => {
         <div className="selected-projects">
           {selectedProjects.map((proj) => (
             <div key={proj.project_code} className="selected-project-box">
-              <span className="project-name">{proj.project_name}</span>
+              <span className="project-name">
+                {proj.project_name.length > 20
+                  ? proj.project_name.slice(0, 20) + "..."
+                  : proj.project_name}
+              </span>
               <button
                 className="remove-project"
                 onClick={() => handleRemoveProject(proj.project_code)}
@@ -744,7 +748,7 @@ const SituationControls = () => {
           <h3 className="search-user-category">참가자 이름</h3>
           <input
             type="text"
-            className="search-input"
+            className="SituationControl-search-input"
             placeholder="검색어 입력"
             value={searchQueryUser}
             onChange={(e) => setSearchQueryUser(e.target.value)}

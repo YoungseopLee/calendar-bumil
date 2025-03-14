@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
+import { followCursor } from "tippy.js";
 import "./LoginLogPage.css";
 import { useAuth } from "../../utils/useAuth";
 
@@ -15,8 +16,14 @@ const LoginLogPage = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
 
-  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중) 
-  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중)
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    position: "",
+    department: "",
+    role_id: "",
+  }); //로그인한 사용자 정보
   const { getUserInfo, checkAuth, handleLogout } = useAuth();
 
   // 로그인한 사용자 정보 가져오기 및 권한 확인 후 권한 없으면 로그아웃 시키기
@@ -25,7 +32,7 @@ const LoginLogPage = () => {
       const userInfo = await getUserInfo();
       setUser(userInfo);
       console.log("로그인한 사용자 정보: ", userInfo);
-      
+
       const isAuthorized = checkAuth(userInfo?.role_id, ["AD_ADMIN"]); // 권한 확인하고 맞으면 true, 아니면 false 반환
       if (!isAuthorized) {
         console.error("관리자 권한이 없습니다.");
@@ -33,7 +40,7 @@ const LoginLogPage = () => {
         return;
       }
       setLoading(false); // 로딩 완료
-    };  
+    };
     fetchUserInfo();
   }, []);
 
@@ -155,17 +162,59 @@ const LoginLogPage = () => {
               <span className="login-log-column login-time">
                 {formatKSTDate(log.login_at)}
               </span>
-              <Tippy content={log.user_id}>
+              <Tippy
+                content={log.user_id}
+                placement="top"
+                plugins={[followCursor]}
+                followCursor="horizontal"
+                arrow={true}
+                popperOptions={{
+                  modifiers: [
+                    {
+                      name: "preventOverflow",
+                      options: { boundary: "window" },
+                    },
+                  ],
+                }}
+              >
                 <span className="login-log-column login-truncate">
                   {log.user_id}
                 </span>
               </Tippy>
-              <Tippy content={log.name}>
+              <Tippy
+                content={log.name}
+                placement="top"
+                plugins={[followCursor]}
+                followCursor="horizontal"
+                arrow={true}
+                popperOptions={{
+                  modifiers: [
+                    {
+                      name: "preventOverflow",
+                      options: { boundary: "window" },
+                    },
+                  ],
+                }}
+              >
                 <span className="login-log-column login-truncate">
                   {log.name}
                 </span>
               </Tippy>
-              <Tippy content={log.ip_address}>
+              <Tippy
+                content={log.ip_address}
+                placement="top"
+                plugins={[followCursor]}
+                followCursor="horizontal"
+                arrow={true}
+                popperOptions={{
+                  modifiers: [
+                    {
+                      name: "preventOverflow",
+                      options: { boundary: "window" },
+                    },
+                  ],
+                }}
+              >
                 <span className="login-log-column login-truncate">
                   {log.ip_address}
                 </span>

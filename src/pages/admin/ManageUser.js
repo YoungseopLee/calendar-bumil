@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css"; // 기본 스타일
+import "tippy.js/dist/tippy.css";
+import { followCursor } from "tippy.js";
 import "./ManageUser.css";
 import { useAuth } from "../../utils/useAuth";
 
@@ -13,8 +14,14 @@ const ManageUser = () => {
 
   const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL;
-  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중) 
-  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중)
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    position: "",
+    department: "",
+    role_id: "",
+  }); //로그인한 사용자 정보
   const { getUserInfo, checkAuth, handleLogout } = useAuth();
 
   // 로그인한 사용자 정보 가져오기 및 권한 확인 후 권한 없으면 로그아웃 시키기
@@ -23,7 +30,7 @@ const ManageUser = () => {
       const userInfo = await getUserInfo();
       setUser(userInfo);
       console.log("로그인한 사용자 정보: ", userInfo);
-      
+
       const isAuthorized = checkAuth(userInfo?.role_id, ["AD_ADMIN"]); // 권한 확인하고 맞으면 true, 아니면 false 반환
       if (!isAuthorized) {
         console.error("관리자 권한이 없습니다.");
@@ -31,7 +38,7 @@ const ManageUser = () => {
         return;
       }
       setLoading(false); // 로딩 완료
-    };  
+    };
     fetchUserInfo();
   }, []);
 
@@ -194,7 +201,21 @@ const ManageUser = () => {
               <li key={employee.id} className="manage-user-item">
                 <span className="manage-user-column">{employee.name}</span>
                 <span className="manage-user-column">{employee.position}</span>
-                <Tippy content={employee.department}>
+                <Tippy
+                  content={employee.department}
+                  placement="top"
+                  plugins={[followCursor]}
+                  followCursor="horizontal"
+                  arrow={true}
+                  popperOptions={{
+                    modifiers: [
+                      {
+                        name: "preventOverflow",
+                        options: { boundary: "window" },
+                      },
+                    ],
+                  }}
+                >
                   <span className="manage-user-column">
                     {employee.department.length > 15
                       ? `${employee.department.substring(0, 15)}...`
