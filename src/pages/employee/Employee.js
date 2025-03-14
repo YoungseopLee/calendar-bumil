@@ -3,7 +3,7 @@ import "./Employee.css";
 import Sidebar from "../components/Sidebar";
 import BackButton from "../components/BackButton";
 import { useNavigate } from "react-router-dom";
-
+import { useAuth } from "../../utils/useAuth";
 /**
  * 📌 EmployeeList - 사원 목록을 조회하고 필터링하는 페이지
  *
@@ -32,8 +32,8 @@ const EmployeeList = () => {
   const [openDepartments, setOpenDepartments] = useState({});
   const [departmentList, setDepartmentList] = useState([]);
 
-  const [loggedInUserId, setLoggedInUserId] = useState(null); // 로그인된 사용자 ID
-  const [userRole, setUserRole] = useState(null); // 로그인된 사용자 역할 (AD_ADMIN, USR_GENERAL 등)
+  //const [loggedInUserId, setLoggedInUserId] = useState(null); // 로그인된 사용자 ID
+  //const [userRole, setUserRole] = useState(null); // 로그인된 사용자 역할 (AD_ADMIN, USR_GENERAL 등)
 
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태
   const [error, setError] = useState(null); // 에러 메시지
@@ -49,51 +49,44 @@ const EmployeeList = () => {
     acc[comment] = id; // comment를 키로, id를 값으로 설정
     return acc;
   }, {});
-  /**
-   * 🔄 **1. 로그인된 사용자 정보 및 상태 목록 불러오기**
-   * - 로그인한 사용자 정보 확인
-   * - 사용자 ID 및 역할 저장
-   * - 상태 목록 불러오기 (근무 중, 휴가 등)
-   */
+
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    position: "",
+    department: "",
+    role_id: "",
+  }); //로그인한 사용자 정보
+  const { getUserInfo, checkAuth, handleLogout } = useAuth();
+
+  // 전체 데이터 가져오기
   useEffect(() => {
-    const fetchInitialData = async () => {
+    const fetchAllData = async () => {
       try {
-        // 로그인한 사용자 정보 불러오기
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("사용자 인증 정보가 없습니다.");
+        // 1. 사용자 정보 가져오기
+        const userInfo = await fetchUserInfo();
 
-        const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (!response.ok)
-          throw new Error("로그인 사용자 정보를 가져오는 데 실패했습니다.");
-        const data = await response.json();
-
-        setLoggedInUserId(data.user.id); // 사용자 ID 저장
-        setUserRole(data.user.role_id); // 사용자 역할 저장
-        await fetchStatusList(); // 상태 목록 불러오기
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        // 2. 모든 데이터 병렬로 가져오기
+        await Promise.all([
+          fetchFavorites(userInfo.id), // 즐겨찾기 목록
+          fetchEmployees(), // 사원 목록
+          fetchStatusList(), // 상태 목록
+        ]);
+      } catch (error) {
+        console.error("데이터 로딩 오류:", error);
       }
+      setLoading(false); // 로딩 완료
     };
 
-    fetchInitialData();
+    fetchAllData();
   }, []);
 
-  /**
-   * 🔄 **2. 사원 및 즐겨찾기 목록 불러오기**
-   * - 로그인된 사용자 ID가 있을 경우 실행
-   */
-  useEffect(() => {
-    if (loggedInUserId) {
-      fetchFavorites(loggedInUserId); // 즐겨찾기 목록
-      fetchEmployees(); // 사원 목록
-    }
-  }, [loggedInUserId]);
+  // 로그인한 사용자 정보 가져오는 함수
+  const fetchUserInfo = async () => {
+    const userInfo = await getUserInfo();
+    setUser(userInfo);
+    return userInfo;
+  };
 
   // 🏷️ **상태 목록 가져오기 (근무 중, 휴가 등)**
   const fetchStatusList = async () => {
@@ -156,7 +149,7 @@ const EmployeeList = () => {
 
   // ⭐ **즐겨찾기 추가/삭제 (토글)**
   const toggleFavorite = async (employeeId) => {
-    if (!loggedInUserId) return;
+    if (!user.id) return;
 
     try {
       const response = await fetch(`${apiUrl}/favorite/toggle_favorite`, {
@@ -166,14 +159,14 @@ const EmployeeList = () => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
-          user_id: loggedInUserId,
+          user_id: user.id,
           favorite_user_id: employeeId,
         }),
       });
 
       if (!response.ok) throw new Error("즐겨찾기 상태 업데이트 실패");
 
-      fetchFavorites(loggedInUserId); // 즐겨찾기 목록 새로고침
+      fetchFavorites(user.id); // 즐겨찾기 목록 새로고침
     } catch (error) {
       setError(error.message);
     }
@@ -203,7 +196,7 @@ const EmployeeList = () => {
 
       // ✅ 즐겨찾기 목록도 새로고침
       if (showFavorites) {
-        fetchFavorites(loggedInUserId);
+        fetchFavorites(user.id);
       }
     } catch (error) {
       alert("❌ 상태 변경에 실패했습니다!");
@@ -239,10 +232,6 @@ const EmployeeList = () => {
     });
   };
 
-  // ⏳ **로딩 및 에러 처리**
-  if (loading) return <p>데이터를 불러오는 중...</p>;
-  if (error) return <p>오류 발생: {error}</p>;
-
   // 직원들을 부서별로 그룹화하는 함수
   const groupByDepartment = (employees) => {
     return employees.reduce((acc, employee) => {
@@ -255,10 +244,14 @@ const EmployeeList = () => {
     }, {});
   };
 
+  // ⏳ **로딩 및 에러 처리**
+  if (loading) return <p>데이터를 불러오는 중...</p>;
+  if (error) return <p>오류 발생: {error}</p>;
+
   // 📋 **UI 구성 (사원 목록 렌더링)**
   return (
     <div className="app">
-      <Sidebar />
+      <Sidebar user={user} />
       <BackButton />
 
       <div className="box">
@@ -390,7 +383,7 @@ const EmployeeList = () => {
                             </span>
 
                             {/* 🔄 관리자 전용 상태 변경 드롭다운 */}
-                            {userRole === "AD_ADMIN" ? (
+                            {user.role_id === "AD_ADMIN" ? (
                               <select
                                 className="status-dropdown"
                                 value={employee.status || ""}
