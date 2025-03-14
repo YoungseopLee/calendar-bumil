@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Select from "react-select";
 import "./ProjectEdit.css";
+import { useAuth } from "../../utils/useAuth";
 
 /**
  * 📌 ProjectEdit - 프로젝트 수정 페이지
@@ -37,15 +38,13 @@ const ProjectEdit = () => {
   const [selectedUser, setSelectedUser] = useState(null); // 새로 추가할 유저 선택
   const [users, setUsers] = useState([]); // 참여 가능한 유저 목록
 
+
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
   const location = useLocation();
 
   // 현재 페이지 URL 에서 프로젝트 코드 가져오기
   const projectCode = new URLSearchParams(location.search).get("project_code");
-
-  // 로그인한 사용자 정보 (localStorage에서 불러옴)
-  const user = JSON.parse(localStorage.getItem("user"));
 
   // 프로젝트 필드 매핑 (UI에서 표시할 필드명 설정)
   const fieldMappings = {
@@ -64,21 +63,42 @@ const ProjectEdit = () => {
     changes: "비고",
   };
 
-  // 🔄 **1. 로그인한 사용자 정보 확인 및 권한 체크**
+  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const { getUserInfo, checkAuth, handleLogout } = useAuth();
+  
+  // 전체 데이터 가져오기
   useEffect(() => {
-    fetchLoggedInUser();
-    if (!user) {
-      alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
-      navigate("/");
-      return;
-    }
+    const fetchAllData = async () => {
+      try {
+        // 1. 사용자 정보 가져오기
+        const userInfo = await fetchUserInfo();
 
-    if (user.role_id !== "AD_ADMIN" && user.role_id !== "PR_ADMIN") {
-      alert("관리자 권한이 없습니다.");
-      navigate("/");
-      return;
-    }
+        // 2. 모든 데이터 병렬로 가져오기
+        await Promise.all([
+          fetchEmployees(),
+        ]);
+              
+        const isAuthorized = checkAuth(userInfo?.role_id, ["AD_ADMIN"]); // 권한 확인하고 맞으면 true, 아니면 false 반환
+        if (!isAuthorized) {
+          console.error("관리자 권한이 없습니다.");
+          handleLogout();
+          return;
+        }
+      } catch (error) {
+        console.error("데이터 로딩 오류:", error);
+      }
+      setLoading(false); // 로딩 완료
+    };
+
+    fetchAllData();
   }, []);
+
+  // 로그인한 사용자 정보 가져오는 함수
+  const fetchUserInfo = async () => {
+    const userInfo = await getUserInfo();
+    setUser(userInfo);
+    return userInfo;
+  };
 
   // 🔄 **2. 프로젝트 코드가 변경되면 상세 정보 가져오기**
   useEffect(() => {
@@ -114,16 +134,8 @@ const ProjectEdit = () => {
 
   // 🔄 **5. 직원 목록 가져오기**
   useEffect(() => {
-    fetchEmployees();
+    
   }, []);
-
-  // ✅ 로그아웃 함수 - 세션이 만료되었을 경우 사용자 정보를 삭제하고 로그인 페이지로 이동
-  const handleLogout = () => {
-    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
-  };
 
   // ✅ 프로젝트 상세정보 API 호출
   const fetchProjectDetails = async () => {
@@ -142,32 +154,6 @@ const ProjectEdit = () => {
       setError(err.message);
     } finally {
       setLoading(false);
-    }
-  };
-
-  // ✅ 현재 로그인한 사용자의 정보를 API에서 가져옴
-  // ✅ 사용자 정보가 없거나 세션이 만료되었을 경우 자동 로그아웃 처리
-  const fetchLoggedInUser = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.status === 401) {
-        handleLogout();
-        return;
-      }
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("user", JSON.stringify(data.user));
-      } else {
-        //console.error("사용자 정보 불러오기 실패");
-      }
-    } catch (error) {
-      //console.error("로그인 사용자 정보 불러오기 실패:", error);
     }
   };
 

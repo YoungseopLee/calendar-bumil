@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import "./ProjectCreate.css";
 import ParticipantSelection from "./ParticipantSelection";
+import { useAuth } from "../../utils/useAuth";
 
 /**
  * 📌 ProjectCreate - 프로젝트를 생성하는 페이지
@@ -25,61 +26,44 @@ const ProjectCreate = () => {
   const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL || "http://3.38.20.237";
 
-  // ✅ 로그인한 사용자 정보 확인 (로컬 스토리지에서 가져오기)
-  const user = JSON.parse(localStorage.getItem("user"));
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    position: "",
+    department: "",
+    role_id: "",
+  }); //로그인한 사용자 정보
+  const { getUserInfo, checkAuth, handleLogout } = useAuth();
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태
 
-  /**
-   * ✅ 컴포넌트 마운트 시 실행
-   * - 로그인된 사용자 정보 확인
-   * - 관리 권한이 없는 경우 접근 차단
-   */
+  // 로그인한 사용자 정보 가져오기 및 권한 확인 후 권한 없으면 로그아웃 시키기
   useEffect(() => {
-    fetchLoggedInUser();
-    if (!user) {
-      alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
-      navigate("/");
-      return;
-    }
+    const fetchAllData = async () => {
+      try {
+        // 1. 사용자 정보 가져오기
+        const userInfo = await fetchUserInfo();
+        
+        const isAuthorized = checkAuth(userInfo?.role_id, ["AD_ADMIN", "PR_ADMIN"]); // 권한 확인하고 맞으면 true, 아니면 false 반환
+        if (!isAuthorized) {
+          console.error("관리자 권한이 없습니다.");
+          handleLogout();
+          return;
+        }
 
-    // 권한 체크
-    if (user.role_id !== "AD_ADMIN" && user.role_id !== "PR_ADMIN") {
-      alert("관리자 권한이 없습니다.");
-      navigate("/");
-      return;
-    }
+      } catch (error) {
+        console.error("데이터 로딩 오류:", error);
+      }
+      setLoading(false); // 로딩 완료
+    };
+
+    fetchAllData();
   }, []);
 
-  // 로그인한 사용자 정보 API 호출
-  const fetchLoggedInUser = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.status === 401) {
-        handleLogout();
-        return;
-      }
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("user", JSON.stringify(data.user));
-      } else {
-        //console.error("사용자 정보 불러오기 실패");
-      }
-    } catch (error) {
-      //console.error("로그인 사용자 정보 불러오기 실패:", error);
-    }
-  };
-
-  // 로그아웃 함수
-  const handleLogout = () => {
-    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
+  // 로그인한 사용자 정보 가져오는 함수
+  const fetchUserInfo = async () => {
+    const userInfo = await getUserInfo();
+    setUser(userInfo);
+    return userInfo;
   };
 
   /**
@@ -188,10 +172,12 @@ const ProjectCreate = () => {
     }
   };
 
+  if (loading) return <p>데이터를 불러오는 중...</p>;
+
   return (
     <div className="project-create-app-body">
       <div className="project-create-sidebar">
-        <Sidebar />
+        <Sidebar user={user}/>
         <div className="project-create-container">
           <h2 className="project-create-title">프로젝트 생성</h2>
           {error && <p className="project-create-error-message">⚠️ {error}</p>}

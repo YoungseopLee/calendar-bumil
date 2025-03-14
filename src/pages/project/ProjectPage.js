@@ -5,7 +5,7 @@ import Sidebar from "../components/Sidebar";
 import AddProjectButton from "./AddProjectButton";
 import ScrollToTopButton from "../components/ScrollToTopButton";
 import "./ProjectPage.css";
-
+import { useAuth } from "../../utils/useAuth";
 /**
  * 📌 ProjectPage - 프로젝트 목록을 조회하고 필터링하는 페이지
  *
@@ -40,40 +40,37 @@ const ProjectPage = () => {
 
   // 환경 변수에서 API URL 가져오기
   const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const { getUserInfo, checkAuth, handleLogout } = useAuth();
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태
 
-  // 🔹 [1] 사용자 권한 조회
+  // 전체 데이터 가져오기
   useEffect(() => {
-    const fetchUserRole = async () => {
+    const fetchAllData = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          //console.error("❌ 로그인 토큰이 없습니다.");
-          return;
-        }
+        // 1. 사용자 정보 가져오기
+        const userInfo = await fetchUserInfo();
 
-        const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        // 2. 사용자 목록 가져오기
+        await fetchUsers();
 
-        if (response.ok) {
-          const data = await response.json();
-          setRoleId(data.user?.role_id || "");
-        } else {
-          //.error("❌ 사용자 정보를 불러오지 못했습니다.");
-        }
       } catch (error) {
-        //console.error("🚨 사용자 정보 로딩 오류:", error);
+        console.error("데이터 로딩 오류:", error);
       }
+      setLoading(false); // 로딩 완료
     };
 
-    fetchUserRole();
-  }, [apiUrl]);
+    fetchAllData();
+  }, []);
+
+  // 로그인한 사용자 정보 가져오는 함수
+  const fetchUserInfo = async () => {
+    const userInfo = await getUserInfo();
+    setUser(userInfo);
+    return userInfo;
+  };
 
   // 🔹 [2] 사용자 목록 조회
-  useEffect(() => {
     const fetchUsers = async () => {
       try {
         const response = await fetch(`${apiUrl}/user/get_users`);
@@ -93,9 +90,6 @@ const ProjectPage = () => {
         //.error("사용자 목록 불러오기 오류:", err);
       }
     };
-
-    fetchUsers();
-  }, [apiUrl]);
 
   // 🔹 [3] 프로젝트 목록 조회
   useEffect(() => {
@@ -186,13 +180,15 @@ const ProjectPage = () => {
     );
   });
 
+  if (loading) return <p>데이터를 불러오는 중...</p>;
+
   return (
     <div className="project-page-app-body">
       <div className="project-page-sidebar">
-        <Sidebar />
+        <Sidebar user={user}/>
       </div>
       {/* ✅ ADMIN 권한만 프로젝트 추가 버튼 표시 */}
-      {roleId && ["AD_ADMIN", "PR_ADMIN"].includes(roleId) && (
+      {user?.role_id && ["AD_ADMIN", "PR_ADMIN"].includes(user?.role_id) && (
         <AddProjectButton />
       )}
       <div className="project-page-content">
