@@ -655,7 +655,7 @@ const SituationControls = () => {
     <div className="SituationControl-page">
       <h1 className="title">프로젝트 현황관리</h1>
       <header className="SituationControl-header">
-        <Sidebar />
+        <Sidebar user={user}/>
         <BackButton />
       </header>
       <div className="SituationControl-search-container">
