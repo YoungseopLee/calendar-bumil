@@ -4,7 +4,7 @@ import Sidebar from "../components/Sidebar";
 import BackButton from "../components/BackButton";
 import "./SituationControl.css";
 import { FaSearch } from "react-icons/fa";
-
+import { useAuth } from "../../utils/useAuth";
 /**
  * 📌 SituationControlPage
  * - 프로젝트와 사용자 목록을 불러오고,
@@ -73,56 +73,38 @@ const SituationControls = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate(); // 페이지 이동을 위한 react-router-dom 훅
 
-  // 로컬 스토리지에서 로그인한 사용자 정보 가져오기
-  const user = JSON.parse(localStorage.getItem("user"));
   const location = useLocation(); // 현재 위치 정보를 위한 react-router-dom 훅
 
-  // ===== 컴포넌트 초기 마운트 시 로그인 사용자 체크 =====
-  useEffect(() => {
-    fetchLoggedInUser(); // 로그인한 사용자 정보 가져오기
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    position: "",
+    department: "",
+    role_id: "",
+  }); //로그인한 사용자 정보
+  const { getUserInfo } = useAuth();
 
-    // 로그인 정보가 없으면 로그인 페이지로 리다이렉트
-    if (!user) {
-      alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
-      navigate("/");
-      return;
-    }
+  // 전체 데이터 가져오기
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        // 1. 사용자 정보 가져오기
+        const userInfo = await fetchUserInfo();
+        
+      } catch (error) {
+        console.error("데이터 로딩 오류:", error);
+      }
+      setLoading(false); // 로딩 완료
+    };
+
+    fetchAllData();
   }, []);
 
-  // ===== API 함수: 로그인한 사용자 정보 가져오기 =====
-  const fetchLoggedInUser = async () => {
-    try {
-      const token = localStorage.getItem("token"); // 인증 토큰 가져오기
-      const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`, // 인증 헤더 설정
-        },
-      });
-
-      // 401 오류면 로그아웃 처리
-      if (response.status === 401) {
-        handleLogout();
-        return;
-      }
-
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("user", JSON.stringify(data.user)); // 최신 사용자 정보 로컬 스토리지에 저장
-      } else {
-        console.error("사용자 정보 불러오기 실패");
-      }
-    } catch (error) {
-      console.error("로그인 사용자 정보 불러오기 실패:", error);
-    }
-  };
-
-  // ===== 로그아웃 처리 함수 =====
-  const handleLogout = () => {
-    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-    localStorage.removeItem("token"); // 토큰 제거
-    localStorage.removeItem("user"); // 사용자 정보 제거
-    navigate("/"); // 로그인 페이지로 이동
+  // 로그인한 사용자 정보 가져오는 함수
+  const fetchUserInfo = async () => {
+    const userInfo = await getUserInfo();
+    setUser(userInfo);
+    return userInfo;
   };
 
   // ===== API 호출: 사용자 목록과 프로젝트 목록 가져오기 =====
@@ -155,23 +137,6 @@ const SituationControls = () => {
     fetchUsersAndProjects(); // 사용자 목록 가져오기
   }, [location.pathname]); // 페이지 이동 시마다 데이터 새로 불러오기
 
-  // ===== 디버깅용 useEffect: 상태 변경 로깅 =====
-  useEffect(() => {
-    console.log("projects: ", projects);
-  }, [projects]);
-
-  useEffect(() => {
-    console.log("users: ", users);
-  }, [users]);
-
-  useEffect(() => {
-    console.log("selectedProjects: ", selectedProjects);
-  }, [selectedProjects]);
-
-  useEffect(() => {
-    console.log("selectedUsers: ", selectedUsers);
-  }, [selectedUsers]);
-
   // ===== API 호출: 선택된 사용자들(effectiveUsers)의 프로젝트 데이터 가져오기 =====
   useEffect(() => {
     const fetchUserProjectData = async () => {
@@ -183,17 +148,14 @@ const SituationControls = () => {
       }
 
       if (effectiveUsers.length === 0) {
-        console.log("❌ effectiveUsers가 비어 있어서 요청을 보내지 않음.");
+        //console.log("❌ effectiveUsers가 비어 있어서 요청을 보내지 않음.");
         setUserProjects([]);
         setLoading(false);
         return;
       }
       // 아무것도 선택되지 않았을 때는 모든 유저 정보를 effectiveUsers에 설정했으므로
       // 그대로 진행하면 모든 프로젝트가 로드됨
-      console.log(
-        "🔄 effectiveUsers 요청:",
-        effectiveUsers.map((u) => u.id)
-      );
+      //console.log("🔄 effectiveUsers 요청:",effectiveUsers.map((u) => u.id));
 
       try {
         const response = await fetch(
@@ -219,7 +181,7 @@ const SituationControls = () => {
 
         const data = await response.json();
         setUserProjects(data.participants || []);
-        console.log("✅ allProjects : ", data.participants);
+        //console.log("✅ allProjects : ", data.participants);
       } catch (err) {
         setError(err.message);
       } finally {

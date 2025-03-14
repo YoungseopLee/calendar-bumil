@@ -8,6 +8,7 @@ import "./NoticeList.css";
 import { Link } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import { IoSearchOutline } from "react-icons/io5";
+import { useAuth } from "../../utils/useAuth";
 
 /**
  * 📌  NoticeList - 공지사항 목록을 보여주는 컴포넌트
@@ -35,59 +36,41 @@ const NoticeList = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
 
-  // 로그인한 사용자 정보 (localStorage에서 불러옴)
-  const user = JSON.parse(localStorage.getItem("user"));
+  //로그인한 사용자 정보
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    position: "",
+    department: "",
+    role_id: "",
+  }); //로그인한 사용자 정보
+  const { getUserInfo } = useAuth();
 
-  // 🔄 **1. 로그인한 사용자 정보 확인**
+  // 전체 데이터 가져오기
   useEffect(() => {
-    fetchLoggedInUser();
-    if (!user) {
-      alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
-      navigate("/");
-      return;
-    }
+    const fetchAllData = async () => {
+      try {
+        // 1. 사용자 정보 가져오기
+        const userInfo = await fetchUserInfo();
+        
+        //2. 공지사항 가져오기
+        await fetchNotices();
+      } catch (error) {
+        console.error("데이터 로딩 오류:", error);
+      }
+      setLoading(false); // 로딩 완료
+    };
+
+    fetchAllData();
   }, []);
 
-  // 🔄 ** 2. 공지사항 목록 조회 **
-  useEffect(() => {
-    fetchNotices();
-  }, []);
-
-  // 현재 로그인한 사용자의 정보를 API에서 가져옴
-  // 사용자 정보가 없거나 세션이 만료되었을 경우 자동 로그아웃 처리
-  const fetchLoggedInUser = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.status === 401) {
-        handleLogout();
-        return;
-      }
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("user", JSON.stringify(data.user));
-        setLoading(false);
-      } else {
-        console.error("사용자 정보 불러오기 실패");
-      }
-    } catch (error) {
-      console.error("로그인 사용자 정보 불러오기 실패:", error);
-    }
+  // 로그인한 사용자 정보 가져오는 함수
+  const fetchUserInfo = async () => {
+    const userInfo = await getUserInfo();
+    setUser(userInfo);
+    return userInfo;
   };
 
-  // 로그아웃 함수 - 세션이 만료되었을 경우 사용자 정보를 삭제하고 로그인 페이지로 이동
-  const handleLogout = () => {
-    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
-  };
 
   // 공지사항 목록 조회 API 호출
   const fetchNotices = async () => {
@@ -173,7 +156,7 @@ const NoticeList = () => {
 
   return (
     <div className="notice-list-app">
-      <Sidebar />
+      <Sidebar user={user}/>
       <div className="notice-list-container">
         <div className="notice-header">
           <h1 className="notice-list-title">공지사항</h1>
