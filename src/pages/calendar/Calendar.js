@@ -186,7 +186,7 @@ const Calendar = () => {
   };
 
   const handleScheduleClick = (schedule) => {
-    console.log("선택된 일정:", schedule);
+    //console.log("선택된 일정:", schedule);
     // 여기에 일정 클릭 시 수행할 동작을 추가
   };
 
@@ -207,8 +207,8 @@ const Calendar = () => {
     const isConfirmed = window.confirm("정말 삭제하시겠습니까?");
     if (!isConfirmed) return;
 
-    console.log("🔹 삭제 요청 전송:", scheduleId);
-    console.log("🔹 Authorization 헤더:", `Bearer ${token}`);
+    //console.log("🔹 삭제 요청 전송:", scheduleId);
+    //console.log("🔹 Authorization 헤더:", `Bearer ${token}`);
 
     try {
       const response = await fetch(
@@ -223,7 +223,7 @@ const Calendar = () => {
       );
 
       const data = await response.json();
-      console.log("🔹 삭제 응답:", response.status, data);
+      //console.log("🔹 삭제 응답:", response.status, data);
 
       if (response.ok) {
         alert("✅ 일정이 삭제되었습니다.");

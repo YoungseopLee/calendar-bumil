@@ -70,8 +70,8 @@ const EditUser = () => {
         const deptData = await deptRes.json();
         const roleData = await roleRes.json();
 
-        console.log("부서 데이터:", deptData);
-        console.log("권한 데이터:", roleData);
+        //console.log("부서 데이터:", deptData);
+        //console.log("권한 데이터:", roleData);
 
         setDepartments(Array.isArray(deptData) ? deptData : []);
         setRoles(Array.isArray(roleData) ? roleData : []);
