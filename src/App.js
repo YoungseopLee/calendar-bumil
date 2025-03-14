@@ -34,10 +34,6 @@ function App() {
           element={<Modules.CalendarModule.AddSchedule />}
         />
         <Route
-          path="/department-view"
-          element={<Modules.CalendarModule.DepartmentView />}
-        />
-        <Route
           path="/edit-schedule/:scheduleId"
           element={<Modules.CalendarModule.EditSchedule />}
         />
@@ -50,8 +46,6 @@ function App() {
           path="/change-my-details"
           element={<Modules.ProfileModule.ChangeMyDetails />}
         />
-        <Route path="/mypage" element={<Modules.ProfileModule.MyPage />} />
-        <Route path="/profile" element={<Modules.ProfileModule.Profile />} />
         <Route
           path="/user-details"
           element={<Modules.ProfileModule.UserDetails />}
