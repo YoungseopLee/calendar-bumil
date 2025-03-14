@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./EditUser.css";
 import Sidebar from "../components/Sidebar";
+import { useAuth } from "../../utils/useAuth";
 
 const EditUser = () => {
   const { userId } = useParams();
@@ -20,6 +21,28 @@ const EditUser = () => {
     phone: "",
     role_id: "",
   });
+
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중) 
+  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const { getUserInfo, checkAuth, handleLogout } = useAuth();
+
+  // 로그인한 사용자 정보 가져오기 및 권한 확인 후 권한 없으면 로그아웃 시키기
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userInfo = await getUserInfo();
+      setUser(userInfo);
+      console.log("로그인한 사용자 정보: ", userInfo);
+      
+      const isAuthorized = checkAuth(userInfo?.role_id, ["AD_ADMIN"]); // 권한 확인하고 맞으면 true, 아니면 false 반환
+      if (!isAuthorized) {
+        console.error("관리자 권한이 없습니다.");
+        handleLogout();
+        return;
+      }
+      setLoading(false); // 로딩 완료
+    };  
+    fetchUserInfo();
+  }, []);
 
   // useEffect에서 userId를 디코딩 후 state에 저장
   useEffect(() => {
@@ -174,9 +197,13 @@ const EditUser = () => {
     }
   };
 
+  if (loading) {
+    return <div>로딩 중...</div>;
+  }
+
   return (
     <div className="user-edit-body">
-      <Sidebar />
+      <Sidebar user={user} />
       <div className="user-edit-container">
         <h2 className="user-edit-title">유저 정보 변경</h2>
         <form onSubmit={handleSubmit}>
