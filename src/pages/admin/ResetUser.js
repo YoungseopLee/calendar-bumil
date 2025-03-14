@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import "./ResetUser.css";
+import { useAuth } from "../../utils/useAuth";
 
 const ResetUser = () => {
   const [employees, setEmployees] = useState([]);
@@ -9,60 +10,29 @@ const ResetUser = () => {
   const [searchField, setSearchField] = useState("name");
   const [activeRoleFilter, setActiveRoleFilter] = useState(null); // ✅ 선택된 역할 필터
 
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중) 
+  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const { getUserInfo, checkAuth, handleLogout } = useAuth();
 
-  // 로그인한 사용자 정보 (localStorage에 저장된 최신 정보)
-  const user = JSON.parse(localStorage.getItem("user"));
   const apiUrl = process.env.REACT_APP_API_URL;
 
-  // 로그인한 사용자 정보 최신화 및 어드민 여부 체크
+  // 로그인한 사용자 정보 가져오기 및 권한 확인 후 권한 없으면 로그아웃 시키기
   useEffect(() => {
-    fetchLoggedInUser();
-    if (!user) {
-      alert("로그인된 사용자 정보가 없습니다. 로그인해주세요.");
-      navigate("/");
-      return;
-    }
-
-    if (user.role_id !== "AD_ADMIN") {
-      alert("관리자 권한이 없습니다.");
-      navigate("/");
-      return;
-    }
-  }, []);
-
-  // 로그인한 사용자 정보 API 호출
-  const fetchLoggedInUser = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.status === 401) {
+    const fetchUserInfo = async () => {
+      const userInfo = await getUserInfo();
+      setUser(userInfo);
+      console.log("로그인한 사용자 정보: ", userInfo);
+      
+      const isAuthorized = checkAuth(userInfo?.role_id, ["AD_ADMIN"]); // 권한 확인하고 맞으면 true, 아니면 false 반환
+      if (!isAuthorized) {
+        console.error("관리자 권한이 없습니다.");
         handleLogout();
         return;
       }
-      if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem("user", JSON.stringify(data.user));
-      } else {
-        console.error("사용자 정보 불러오기 실패");
-      }
-    } catch (error) {
-      console.error("로그인 사용자 정보 불러오기 실패:", error);
-    }
-  };
-
-  // 로그아웃 함수
-  const handleLogout = () => {
-    alert("세션이 만료되었습니다. 다시 로그인해주세요.");
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
-  };
+      setLoading(false); // 로딩 완료
+    };  
+    fetchUserInfo();
+  }, []);
 
   // ✅ 사용자 데이터 가져오기
   useEffect(() => {
@@ -133,9 +103,13 @@ const ResetUser = () => {
     return value.includes(searchText.toLowerCase());
   };
 
+  if (loading) {
+    return <div>로딩 중...</div>;
+  }
+
   return (
     <div className="user-reset-page">
-      <Sidebar />
+      <Sidebar user={user} />
       <div className="user-reset-box">
         <div className="user-reset-employee-container">
           <h2 className="user-reset-title">사용자 비밀번호 초기화</h2>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import "./AddUserPage.css"; // 스타일 파일 추가
+import { useAuth } from "../../utils/useAuth";
 
 const AddUserPage = () => {
   const [formData, setFormData] = useState({
@@ -17,6 +18,28 @@ const AddUserPage = () => {
   const [roles, setRoles] = useState([]);
   const [signupStatus, setSignupStatus] = useState("");
   const [generatedPassword, setGeneratedPassword] = useState(""); // ✅ 초기 비밀번호 표시용
+
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중) 
+  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const { getUserInfo, checkAuth, handleLogout } = useAuth();
+
+  // 로그인한 사용자 정보 가져오기 및 권한 확인 후 권한 없으면 로그아웃 시키기
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userInfo = await getUserInfo();
+      setUser(userInfo);
+      console.log("로그인한 사용자 정보: ", userInfo);
+      
+      const isAuthorized = checkAuth(userInfo?.role_id, ["AD_ADMIN"]); // 권한 확인하고 맞으면 true, 아니면 false 반환
+      if (!isAuthorized) {
+        console.error("관리자 권한이 없습니다.");
+        handleLogout();
+        return;
+      }
+      setLoading(false); // 로딩 완료
+    };  
+    fetchUserInfo();
+  }, []);
 
   // 전화번호 입력 시 자동으로 '-' 추가
   const formatPhoneNumber = (value) => {
@@ -150,9 +173,13 @@ const AddUserPage = () => {
     "주임",
   ];
 
+  if (loading) {
+    return <div>로딩 중...</div>;
+  }
+
   return (
     <div className="user-add-body">
-      <Sidebar />
+      <Sidebar user={user} />
       <div className="user-add-container">
         <h2>신규 사원 추가</h2>
         <form onSubmit={handleSubmit}>
