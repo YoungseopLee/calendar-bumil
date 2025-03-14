@@ -11,6 +11,12 @@
   margin-top: 50px; /*사이드바를 위한 상단 여백*/
 }
 
+.title {
+  font-size: 1.4em;
+  margin-bottom: 30px;
+  color: #333;
+}
+
 /* ✅ 검색 컨테이너 */
 .SituationControl-search-container {
   display: flex;
