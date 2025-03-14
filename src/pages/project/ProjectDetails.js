@@ -73,7 +73,7 @@ const ProjectDetails = () => {
 
   // ✅ 프로젝트 코드가 변경될 때마다 상세 정보 조회
   useEffect(() => {
-    console.log("Employees 업데이트됨:", employees);
+    //console.log("Employees 업데이트됨:", employees);
   }, [employees]); // Project가 변경될 때마다 실행
 
   // ✅ 프로젝트 참여 인원 목록 불러오기
@@ -100,7 +100,7 @@ const ProjectDetails = () => {
         throw new Error("프로젝트 상세정보를 불러오지 못했습니다.");
       }
       const data = await response.json();
-      console.log("project response : ", data);
+      //console.log("project response : ", data);
       setProject(data.project);
     } catch (err) {
       setError(err.message);
@@ -132,10 +132,10 @@ const ProjectDetails = () => {
         const data = await response.json();
         localStorage.setItem("user", JSON.stringify(data.user)); // 최신 상태 업데이트
       } else {
-        console.error("사용자 정보 불러오기 실패");
+        //console.error("사용자 정보 불러오기 실패");
       }
     } catch (error) {
-      console.error("로그인 사용자 정보 불러오기 실패:", error);
+      //console.error("로그인 사용자 정보 불러오기 실패:", error);
     }
   };
 
@@ -148,7 +148,7 @@ const ProjectDetails = () => {
 
       const data = await response.json();
       setEmployees(data.users);
-      console.log("fetchEmployees");
+      //console.log("fetchEmployees");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -199,7 +199,7 @@ const ProjectDetails = () => {
 
   // ✅ 프로젝트 참여 인력 목록 테이블 컴포넌트
   const Projectuserstable = ({ project_users, employees }) => {
-    console.log("project_users : ", project_users);
+    //console.log("project_users : ", project_users);
     if (!project_users || project_users.length === 0) {
       return <p>참여 인원이 없습니다.</p>;
     }
@@ -209,7 +209,7 @@ const ProjectDetails = () => {
       ? project_users
       : project_users.split(",").map((id) => ({ id: id.trim() })); // 문자열이면 쉼표 기준으로 나눔
 
-    console.log("participants : ", participants);
+    //console.log("participants : ", participants);
 
     // employees 데이터에서 user 정보 찾아 매칭
     const matchedParticipants = participants.map((participant) => {

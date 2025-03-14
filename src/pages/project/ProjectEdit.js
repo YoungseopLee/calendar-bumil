@@ -164,10 +164,10 @@ const ProjectEdit = () => {
         const data = await response.json();
         localStorage.setItem("user", JSON.stringify(data.user));
       } else {
-        console.error("사용자 정보 불러오기 실패");
+        //console.error("사용자 정보 불러오기 실패");
       }
     } catch (error) {
-      console.error("로그인 사용자 정보 불러오기 실패:", error);
+      //console.error("로그인 사용자 정보 불러오기 실패:", error);
     }
   };
 
@@ -338,7 +338,7 @@ const ProjectEdit = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Save error response:", errorData);
+        //console.error("Save error response:", errorData);
         throw new Error("프로젝트 업데이트 실패");
       }
 
@@ -346,7 +346,7 @@ const ProjectEdit = () => {
       navigate(`/project-details?project_code=${projectCode}`);
     } catch (err) {
       setMessage("저장 중 오류 발생: " + err.message);
-      console.error("HandleSave error:", err);
+      //console.error("HandleSave error:", err);
     }
   };
 
@@ -420,11 +420,11 @@ const ProjectEdit = () => {
       }
 
       const data = await response.json();
-      // console.log(data.message);
+      //console.log(data.message);
       alert(data.message);
       navigate("/projects");
     } catch (err) {
-      console.error("Error:", err);
+      //console.error("Error:", err);
       alert("프로젝트 삭제에 실패했습니다. 다시 시도해주세요.");
     }
   };
