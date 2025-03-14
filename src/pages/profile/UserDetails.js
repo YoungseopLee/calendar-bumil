@@ -14,9 +14,10 @@ import {
   FaBuilding,
   FaUserCircle,
 } from "react-icons/fa"; // 아이콘 추가
+import { useAuth } from "../../utils/useAuth";
 
 const UserDetails = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); // 이 페이지에서만 프로필 유저 정보
   const [userprojects, setUserProjects] = useState([]); // 유저의 프로젝트 데이터 추가
   const [loading, setLoading] = useState(true);
   const [statusList, setStatusList] = useState([]);
@@ -29,106 +30,124 @@ const UserDetails = () => {
   const location = useLocation();
 
   const user_id = new URLSearchParams(location.search).get("user_id");
-  const loggedInUser = JSON.parse(localStorage.getItem("user")); // 본인 정보 수정을 위해 로그인한 유저의 정보 가져오기
+  const [loggedInUser, setLoggedInUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const { getUserInfo, checkAuth, handleLogout } = useAuth();
 
-  // 사용자 정보 가져오기
+  // 로그인한 사용자 정보 가져오기 및 권한 확인 후 권한 없으면 로그아웃 시키기
+  // 다른 함수에선 다 User 이지만, 여기선 겹치기 때문에 loggedInUser 사용
+  // 디테일 페이지에서 내정보 페이지로 가면 다시 표시할 수 있도록 user_id를 의존성으로 사용
   useEffect(() => {
-    const fetchUserData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("로그인이 필요합니다.");
-        setLoading(false);
-        return;
-      }
-
+    const fetchAllData = async () => {
       try {
-        // 사용자 정보 가져오기
-        const userResponse = await fetch(
-          `${apiUrl}/user/get_user?user_id=${user_id}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        // 1. 사용자 정보 가져오기
+        const userInfo = await fetchLoggedInUserInfo();
 
-        if (!userResponse.ok) {
-          const errData = await userResponse.json();
-          throw new Error(
-            errData.message || "사용자 정보를 가져오는 데 실패했습니다."
-          );
-        }
+        // 2. 모든 데이터 병렬로 가져오기
+        await Promise.all([
+          fetchUserData(), // 사용자 정보
+          fetchUserProjectData(), // 사용자 프로젝트 정보
+          fetchStatusList(), // 상태 목록   
 
-        const userData = await userResponse.json();
-        setUser(userData.user);
-        console.log("userData : ", userData);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+        ]);
+      } catch (error) {
+        console.error("데이터 로딩 오류:", error);
       }
+      setLoading(false); // 로딩 완료
     };
-    fetchUserData();
+    fetchAllData();
   }, [user_id]);
 
-  // 사용자가 참여한 프로젝트 데이터 가져오기
-  useEffect(() => {
-    const fetchUserProjectData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("로그인이 필요합니다.");
-        setLoading(false);
-        return;
-      }
+  // 로그인한 사용자 정보 가져오는 함수
+  const fetchLoggedInUserInfo = async () => {
+    const userInfo = await getUserInfo();
+    setLoggedInUser(userInfo);
+    return userInfo;
+  };
 
-      try {
-        // 사용자 정보 가져오기
-        const userResponse = await fetch(
-          `${apiUrl}/project/get_user_and_projects?user_id=${user_id}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+  // 프로필 정보 가져오는 함수
+  const fetchUserData = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("로그인이 필요합니다.");
+      setLoading(false);
+      return;
+    }
 
-        if (!userResponse.ok) {
-          const errData = await userResponse.json();
-          throw new Error(
-            errData.message || "사용자 정보를 가져오는 데 실패했습니다."
-          );
+    try {
+      // 사용자 정보 가져오기
+      const userResponse = await fetch(
+        `${apiUrl}/user/get_user?user_id=${user_id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
 
-        const userprojectData = await userResponse.json();
-        setUserProjects(userprojectData.participants);
-        console.log("userprojectData : ", userprojectData);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+      if (!userResponse.ok) {
+        const errData = await userResponse.json();
+        throw new Error(
+          errData.message || "사용자 정보를 가져오는 데 실패했습니다."
+        );
       }
-    };
-    fetchUserProjectData();
-  }, [user_id, apiUrl]);
 
-  useEffect(() => {
-    const fetchStatusList = async () => {
-      try {
-        const response = await fetch(`${apiUrl}/status/get_status_list`);
+      const userData = await userResponse.json();
+      setUser(userData.user);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  // 사용자가 참여한 프로젝트 데이터 가져오는 함수
+  const fetchUserProjectData = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("로그인이 필요합니다.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // 사용자 정보 가져오기
+      const userResponse = await fetch(
+        `${apiUrl}/project/get_user_and_projects?user_id=${user_id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!userResponse.ok) {
+        const errData = await userResponse.json();
+        throw new Error(
+          errData.message || "사용자 정보를 가져오는 데 실패했습니다."
+        );
+      }
+
+      const userprojectData = await userResponse.json();
+      setUserProjects(userprojectData.participants);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  // 상태 목록 가져오는 함수
+  const fetchStatusList = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/status/get_status_list`);
         if (!response.ok) throw new Error("상태 목록을 가져오지 못했습니다.");
         const data = await response.json();
         setStatusList(data.statuses); // [{ id: 1, comment: "HQ" }, ...]
       } catch (err) {
         console.error("상태 목록 오류:", err);
-      }
+      } 
     };
 
-    fetchStatusList();
-  }, [apiUrl]);
 
   const getStatusComment = (statusId) => {
     const statusObj = statusList.find((s) => s.id === statusId);
@@ -162,9 +181,7 @@ const UserDetails = () => {
     );
   });
 
-  if (loading || !user)
-    return <div className="userdetail-container">로딩 중...</div>;
-  //유저가 로딩되지 않을 때 로딩 중 표시 로직이 꼬이는 경우가 있어 !user 추가함
+  if (loading) return <div className="userdetail-container">로딩 중...</div>;
   if (error) return <div className="userdetail-container">{error}</div>;
 
   const ChartView = ({ filteredProjects }) => {
@@ -283,7 +300,7 @@ const UserDetails = () => {
   return (
     <div className="userdetail-page">
       <header className="userdetail-header">
-        <Sidebar />
+        <Sidebar user={loggedInUser} />
         <BackButton />
       </header>
       <div className="userdetail-container">

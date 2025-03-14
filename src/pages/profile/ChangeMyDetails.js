@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./ChangeMyDetails.css";
 import Sidebar from "../components/Sidebar";
+import { useAuth } from "../../utils/useAuth";
 
 const ChangeMyDetails = () => {
   const navigate = useNavigate();
@@ -15,20 +16,35 @@ const ChangeMyDetails = () => {
     role_id: "",
   });
 
-  const loggedInUser = JSON.parse(localStorage.getItem("user")); // 본인 정보 수정을 위해 로그인한 유저의 정보 가져오기
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태
+  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const { getUserInfo, checkAuth, handleLogout } = useAuth();
 
-  // useEffect에서 userId를 디코딩 후 state에 저장
   useEffect(() => {
-    try {
-      console.log("loggedinUser : ", loggedInUser);
-      fetchFormData(loggedInUser.id); // 디코딩된 userId로 데이터 불러오기
-    } catch (error) {
-      console.error("잘못된 userId:", error);
-      alert("잘못된 사용자 ID입니다.");
-      navigate(`/user-details?user_id=${loggedInUser.id}`); // 잘못된 경우 목록 페이지로 이동
-    }
+    const fetchAllData = async () => {
+      try {
+        // 1. 사용자 정보 가져오기
+        const userInfo = await fetchUserInfo();
+
+        // 2. 모든 데이터 병렬로 가져오기
+        await Promise.all([
+          fetchFormData(userInfo.id), // 디코딩된 userId로 데이터 불러오기
+        ]);
+      } catch (error) {
+        console.error("데이터 로딩 오류:", error);
+      }
+      setLoading(false); // 로딩 완료
+    };
+    fetchAllData();
   }, []);
-  
+
+  // 로그인한 사용자 정보 가져오는 함수
+  const fetchUserInfo = async () => {
+    const userInfo = await getUserInfo();
+    setUser(userInfo);
+    return userInfo;
+  };
+
   // 전화번호 입력 시 자동으로 '-' 추가
   const formatPhoneNumber = (value) => {
     const onlyNumbers = value.replace(/\D/g, ""); // 숫자만 남기기
@@ -105,7 +121,7 @@ const ChangeMyDetails = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: loggedInUser.id,
+          id: user.id,
           username: formData.username,
           position: formData.position,
           department: formData.department,
@@ -120,32 +136,34 @@ const ChangeMyDetails = () => {
       }
 
       alert("✅ 유저 정보가 성공적으로 수정되었습니다!");
-      navigate(`/user-details?user_id=${loggedInUser.id}`);
+      navigate(`/user-details?user_id=${user.id}`);
     } catch (error) {
       console.error("유저 수정 오류:", error);
       alert(`❌ 유저 수정에 실패했습니다. 오류: ${error.message}`);
     }
   };
 
+  if (loading) return <div className="change-user-edit-body">로딩 중...</div>;
+
   return (
     <div className="change-user-edit-body">
-      <Sidebar />
+      <Sidebar user={user} />
       <div className="change-user-edit-container">
         <h2 className="change-user-edit-title">내 정보 변경</h2>
         <form onSubmit={handleSubmit}>
           <div className="change-user-edit-form-group">
             <label>이름</label>
-            <div className="change-user-info-text">{loggedInUser.name}</div>
+            <div className="change-user-info-text">{user?.name}</div>
           </div>
           <div className="change-user-edit-form-group">
             <label>부서</label>
             <div className="change-user-info-text">
-              {loggedInUser.department}
+              {user?.department}
             </div>
           </div>
           <div className="change-user-edit-form-group">
             <label>직급</label>
-            <div className="change-user-info-text">{loggedInUser.position}</div>
+            <div className="change-user-info-text">{user?.position}</div>
           </div>
           <div className="change-user-edit-form-group">
             <label>전화번호</label>

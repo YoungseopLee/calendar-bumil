@@ -1,8 +1,7 @@
 import Calendar from "./Calendar";
-import DepartmentView from "./Department_view";
 import AddSchedule from "./AddSchedule";
 import EditSchedule from "./EditSchedule";
 
-const CalendarModule = { Calendar, DepartmentView, AddSchedule, EditSchedule };
+const CalendarModule = { Calendar, AddSchedule, EditSchedule };
 
 export default CalendarModule;
