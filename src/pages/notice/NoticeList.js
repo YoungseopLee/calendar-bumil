@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import { IoSearchOutline } from "react-icons/io5";
 import { useAuth } from "../../utils/useAuth";
+import AddNoticeButton from "./AddNoticeButton";
 
 /**
  * 📌  NoticeList - 공지사항 목록을 보여주는 컴포넌트
@@ -52,7 +53,7 @@ const NoticeList = () => {
       try {
         // 1. 사용자 정보 가져오기
         const userInfo = await fetchUserInfo();
-        
+
         //2. 공지사항 가져오기
         await fetchNotices();
       } catch (error) {
@@ -156,20 +157,10 @@ const NoticeList = () => {
 
   return (
     <div className="notice-list-app">
-      <Sidebar user={user}/>
+      <Sidebar user={user} />
       <div className="notice-list-container">
         <div className="notice-header">
           <h1 className="notice-list-title">공지사항</h1>
-          <div className="notice-list-create-button-container">
-            {user?.role_id === "AD_ADMIN" && (
-              <button
-                className="notice-list-create-button"
-                onClick={() => navigate("/notice-create")}
-              >
-                <FaPlus />
-              </button>
-            )}
-          </div>
         </div>
 
         <div className="notice-search-icon-container">
@@ -230,6 +221,13 @@ const NoticeList = () => {
                 </div>
               </div>
             ))
+          )}
+        </div>
+
+        {/* 공지사항 추가 버튼 */}
+        <div className="notice-list-create-button-container">
+          {user?.role_id === "AD_ADMIN" && (
+            <AddNoticeButton />
           )}
         </div>
 
