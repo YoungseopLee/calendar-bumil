@@ -1,5 +1,5 @@
 .notice-list-app {
-  display: flex;
+  /* display: flex; */
   width: 100%;
   min-height: 100vh;
   background-color: #f5f7f9;
@@ -14,8 +14,8 @@
 
 .notice-list-create-button {
   position: fixed;
-  bottom: 20px; 
-  right: 20px; 
+  bottom: 20px;
+  right: 20px;
   width: 40px;
   height: 40px;
   background-color: #007bff;
@@ -30,7 +30,6 @@
   align-items: center;
   z-index: 1000;
   transition: background-color 0.3s ease;
-  
 }
 
 .notice-list-container {
@@ -60,8 +59,6 @@
   margin: 0;
   text-align: center;
 }
-
-
 
 .notice-list-item {
   display: flex;
@@ -117,16 +114,18 @@
 }
 
 .notice-search-icon-container {
+  width: 100%; /* 가로 너비를 꽉 채우도록 설정 */
   display: flex;
   flex-direction: row;
   gap: 1rem;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between; /* 좌우 끝으로 요소들을 배치 */
   border-bottom: 2px solid #f0f0f0;
   padding-bottom: 1rem;
 }
 
 .notice-search-container {
+  width: 100%;
   display: flex;
   flex-direction: row;
   gap: 1rem;
@@ -134,27 +133,30 @@
 }
 
 .notice-search-dropdown {
-  width: 30%;
   padding: 0.5rem;
   border-radius: 0.25rem;
   border: 1px solid #e0e0e0;
+  width: auto;
 }
 
 .notice-search-input {
-  width: 200px;
+  flex: 1;
   padding: 0.5rem;
   border-radius: 0.25rem;
   border: 1px solid #e0e0e0;
+  width: auto;
 }
-
-
 
 .notice-search-icon {
   font-size: 24px; /* 아이콘 크기 설정 */
   margin-right: 8px; /* 아이콘과 다른 요소 사이 여백 */
 }
 
-
+@media (max-width: 1200px) {
+  .notice-list-container {
+    max-width: 768px;
+  }
+}
 /* 반응형 디자인 */
 @media (max-width: 768px) {
   .notice-list-container {
@@ -174,16 +176,13 @@
   .notice-list-author {
     font-size: 0.8rem;
   }
-  .notice-search-input {
-    width: 100%;
-  }
-  .notice-search-dropdown {
-    width: 50%;
-  }
 }
-@media (min-width: 768px){
-  .notice-list-info{
+@media (min-width: 768px) and (max-width: 1200px) {
+  .notice-list-info {
     gap: 0.5rem;
+  }
+  .notice-list-container {
+    width: 600px;
   }
 }
 
