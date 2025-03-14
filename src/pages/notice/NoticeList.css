@@ -1,15 +1,16 @@
 .notice-list-app {
-  /* display: flex; */
+  display: flex;
   width: 100%;
-  min-height: 100vh;
-  background-color: #f5f7f9;
+  max-width: 768px;
+  background-color: none;
   justify-content: center;
+  margin: auto;
+  margin-top: 50px;
   padding: 0px; /* 좌우 여백을 추가해 화면 넘어가지 않도록 설정 */
   box-sizing: border-box; /* padding이 너비에 포함되도록 설정 */
 }
 
 .notice-list-container {
-  max-width: 768px;
   width: 100%;
   padding: 2rem;
   margin: 0 auto;
@@ -70,15 +71,14 @@
 }
 
 .notice-list-date {
+  min-width: 90px;
   color: #888;
   text-align: center;
-  flex: 1; /* 20% */
 }
 
 .notice-list-author {
-  min-width: 40px;
+  min-width: 60px;
   text-align: center;
-  flex: 1; /* 20% */
 }
 
 .notice-list-empty {
@@ -135,11 +135,6 @@
 }
 /* 반응형 디자인 */
 @media (max-width: 768px) {
-  .notice-list-container {
-    margin: 10px;
-    padding: 1rem;
-  }
-
   .notice-list-title {
     font-size: 1.5rem;
   }

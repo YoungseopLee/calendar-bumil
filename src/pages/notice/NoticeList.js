@@ -72,7 +72,6 @@ const NoticeList = () => {
     return userInfo;
   };
 
-
   // 공지사항 목록 조회 API 호출
   const fetchNotices = async () => {
     try {
@@ -226,9 +225,7 @@ const NoticeList = () => {
 
         {/* 공지사항 추가 버튼 */}
         <div className="notice-list-create-button-container">
-          {user?.role_id === "AD_ADMIN" && (
-            <AddNoticeButton />
-          )}
+          {user?.role_id === "AD_ADMIN" && <AddNoticeButton />}
         </div>
 
         {/* 페이지네이션 */}
