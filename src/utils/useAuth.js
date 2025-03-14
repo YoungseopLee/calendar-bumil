@@ -1,19 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export const useAuth = (requiredRole = null) => {
+export const useAuth = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL;
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     localStorage.removeItem("token");
     navigate("/");
-  };
+  }, [navigate]);
 
-  // 사용자 정보를 가져오는 함수 (다른 컴포넌트에서 사용)
-  const getUserInfo = async () => {
+  const getUserInfo = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
@@ -31,7 +30,6 @@ export const useAuth = (requiredRole = null) => {
       }
 
       const data = await response.json();
-      console.log("useAuth/로그인한 사용자 정보: ", data.user);
       return data.user;
 
     } catch (error) {
@@ -39,38 +37,27 @@ export const useAuth = (requiredRole = null) => {
       handleLogout();
       return null;
     }
-  };
+  }, [apiUrl, handleLogout]);
 
-  // 초기 인증 체크
-  const checkAuth = async () => {
+  const checkAuth = useCallback((userRole, requiredRoles) => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("로그인이 필요합니다.");
+      if (!userRole) {
+        throw new Error("사용자 정보가 없습니다.");
       }
 
-      const user = await getUserInfo();
-      if (!user) {
-        throw new Error("사용자 정보를 가져올 수 없습니다.");
-      }
-
-      // 권한 체크
-      if (requiredRole && user.role_id !== requiredRole) {
+      if (Array.isArray(requiredRoles) && !requiredRoles.includes(userRole)) {
         throw new Error("접근 권한이 없습니다.");
       }
 
-      setLoading(false);
+      return true;
 
     } catch (error) {
       setError(error.message);
       alert(error.message);
       handleLogout();
+      return false;
     }
-  };
+  }, [handleLogout]);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
-  return { loading, error, handleLogout, getUserInfo };
+  return { loading, error, handleLogout, getUserInfo, checkAuth };
 };
