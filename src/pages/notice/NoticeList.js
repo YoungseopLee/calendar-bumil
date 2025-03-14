@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
 import "./NoticeList.css";
 import { Link } from "react-router-dom";
 
@@ -140,7 +142,18 @@ const NoticeList = () => {
           ) : (
             notices.map((notice) => (
               <div key={notice.id} className="notice-list-item">
-                <Link to={`/notice-details/${notice.id}`}>{notice.title}</Link>
+                <Tippy
+                  content={notice.title}
+                  placement="top"
+                  followCursor={true}
+                  interactive={true}
+                  arrow={true}
+                  boundary="window"
+                >
+                  <Link to={`/notice-details/${notice.id}`}>
+                    {notice.title}
+                  </Link>
+                </Tippy>
                 <div className="notice-list-info">
                   <span className="notice-list-author">
                     {notice.created_by_name || "관리자"}

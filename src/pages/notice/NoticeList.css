@@ -53,7 +53,6 @@
   background-color: #0056b3;
 }
 
-
 .notice-list-item {
   display: flex;
   align-items: center;
@@ -88,7 +87,7 @@
   gap: 1rem;
   color: #666;
   font-size: 0.9rem;
-  flex: 1;  /* 제목과 분리된 작성자 + 날짜 영역 */
+  flex: 1; /* 제목과 분리된 작성자 + 날짜 영역 */
 }
 
 .notice-list-date {
