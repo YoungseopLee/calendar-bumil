@@ -177,6 +177,9 @@
   .notice-search-input {
     width: 100%;
   }
+  .notice-search-dropdown {
+    width: 50%;
+  }
 }
 @media (min-width: 768px){
   .notice-list-info{
