@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import "./EditSchedule.css";
+import Sidebar from "../components/Sidebar";
+import { useAuth } from "../../utils/useAuth";
 
 const EditSchedule = () => {
   const { scheduleId } = useParams();
@@ -12,6 +14,20 @@ const EditSchedule = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState("");
+
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중) 
+  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const { getUserInfo } = useAuth();
+
+  // 로그인한 사용자 정보 가져오기 및 권한 확인 후 권한 없으면 로그아웃 시키기
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userInfo = await getUserInfo();
+      setUser(userInfo);
+      setLoading(false); // 로딩 완료
+    };  
+    fetchUserInfo();
+  }, []);
 
   // 날짜에서 하루를 빼는 함수
   const subtractOneDay = (dateString) => {
@@ -80,8 +96,13 @@ const EditSchedule = () => {
     }
   };
 
+  if (loading) {
+    return <div>로딩 중...</div>;
+  }
+
   return (
     <div className="edit-body">
+      <Sidebar user={user} />
       <div className="edit-schedule">
         <h2 className="edit-schedule__title">일정 수정</h2>
         <form onSubmit={handleSubmit} className="edit-schedule__form">

@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "./AddSchedule.css";
 import { useAuth } from "../../utils/useAuth";
+import Sidebar from "../components/Sidebar";
 
 /**
  * 📌 AddSchedule - 새로운 일정을 추가하는 페이지
@@ -15,6 +16,7 @@ import { useAuth } from "../../utils/useAuth";
  *
  * ✅ UI(또는 Component) 구조:
  *  - AddSchedule (메인 페이지)
+ *    ├── 사이드바
  *    ├── 날짜 입력 필드 (시작일, 종료일)
  *    ├── 일정 입력 필드
  *    ├── 상태 선택 드롭다운
@@ -33,13 +35,13 @@ const AddSchedule = () => {
   const [newTask, setNewTask] = useState(""); // 새로운 할 일
   const [status, setStatus] = useState("준비 중"); // 상태 (준비 중, 진행 중, 완료)
   const [tasks, setTasks] = useState([]); // 추가된 일정 목록
-  const [loading, setLoading] = useState(false); // 로딩 상태
+  const [loading, setLoading] = useState(true); // 로딩 상태
   const [error, setError] = useState(""); // 오류 메시지
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
   const { getUserInfo } = useAuth();
 
   // 로그인한 사용자 정보 가져오기 (api로 가져오기)
@@ -168,8 +170,13 @@ const AddSchedule = () => {
     navigate("/calendar");
   };
 
+  if (loading) {
+    return <div>로딩 중...</div>;
+  }
+
   return (
     <div className="add-schedule-body">
+      <Sidebar user={user} />
       <div className="add-schedule-page">
         <div className="add-schedule">
           <h1></h1>
