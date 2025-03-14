@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./Manager.css";
 import Sidebar from "../components/Sidebar";
 import { useAuth } from "../../utils/useAuth";
+import ScrollToTopButton from "../components/ScrollToTopButton";
 
 const Manager = () => {
   const navigate = useNavigate();
@@ -106,6 +107,9 @@ const Manager = () => {
           </div>
         </div>
       </div>
+
+      {/* Scroll To Top 버튼 추가 */}
+      <ScrollToTopButton />
     </div>
   );
 };

@@ -256,10 +256,17 @@
 
 /* ✅ 타이틀 스타일 */
 .project-page-fixed-header .title {
+  align-items: center;
   margin: 0;
   padding: 10px 0;
   font-size: 20px;
   text-align: center;
+}
+
+/* 중앙 정렬 */
+.project-page-title{
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 /* ✅ 검색 필터 컨테이너 */
