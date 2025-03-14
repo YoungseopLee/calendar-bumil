@@ -19,7 +19,6 @@ const StatusManagement = () => {
     const fetchUserInfo = async () => {
       const userInfo = await getUserInfo();
       setUser(userInfo);
-      console.log("로그인한 사용자 정보: ", userInfo);
       
       const isAuthorized = checkAuth(userInfo?.role_id, ["AD_ADMIN"]); // 권한 확인하고 맞으면 true, 아니면 false 반환
       if (!isAuthorized) {
