@@ -75,7 +75,7 @@ const EmployeeList = () => {
           fetchStatusList(), // 상태 목록
         ]);
       } catch (error) {
-        console.error("데이터 로딩 오류:", error);
+        //console.error("데이터 로딩 오류:", error);
       }
       setLoading(false); // 로딩 완료
     };
@@ -99,7 +99,7 @@ const EmployeeList = () => {
       const data = await response.json();
       setStatusList(data.statuses);
     } catch (error) {
-      console.error("상태 목록 로딩 오류:", error);
+      //console.error("상태 목록 로딩 오류:", error);
     }
   };
 
