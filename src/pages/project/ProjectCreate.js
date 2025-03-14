@@ -262,7 +262,18 @@ const ProjectCreate = () => {
                   type="date"
                   name="business_start_date"
                   value={formData.business_start_date}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    const newStartDate = e.target.value;
+                    setFormData((prev) => ({
+                      ...prev,
+                      business_start_date: newStartDate,
+                      // 🚀 자동 조정: 시작 날짜가 종료 날짜보다 늦다면 종료 날짜도 변경
+                      business_end_date:
+                        prev.business_end_date && new Date(newStartDate) > new Date(prev.business_end_date)
+                          ? newStartDate
+                          : prev.business_end_date,
+                    }));
+                  }}
                   required
                 />
                 <span className="project-create-date-separator">~</span>
@@ -270,7 +281,18 @@ const ProjectCreate = () => {
                   type="date"
                   name="business_end_date"
                   value={formData.business_end_date}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    const newEndDate = e.target.value;
+                    setFormData((prev) => ({
+                      ...prev,
+                      business_end_date: newEndDate,
+                      // 🚀 자동 조정: 종료 날짜가 시작 날짜보다 빠르면 시작 날짜도 변경
+                      business_start_date:
+                        prev.business_start_date && new Date(prev.business_start_date) > new Date(newEndDate)
+                          ? newEndDate
+                          : prev.business_start_date,
+                    }));
+                  }}
                   required
                 />
               </div>
