@@ -44,15 +44,48 @@
 .participant-list li {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   background: white;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 5px;
   margin-bottom: 5px;
+  gap: 10px;
 }
 
-/* ✅ 참여자 삭제 버튼 */
+/* ✅ 왼쪽: 이름(부서) */
+.participant-info {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* 너무 길면 ... 처리 */
+  min-width: 150px;
+  /* 최소 너비 설정 */
+  max-width: 250px;
+  /* 최대 너비 제한 */
+}
+
+/* ✅ 오른쪽: 투입기간 + 삭제 버튼 */
+.participant-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 요소 간 일정한 간격 유지 */
+  min-width: 230px; /* ✅ 최소한의 공간 확보 (이전보다 증가) */
+  flex-shrink: 0; /* ✅ 줄어들지 않도록 고정 */
+  flex-basis: 230px; /* ✅ 최소 너비 확보 */
+  margin-left: auto; /* 왼쪽 요소와 최대한 거리 확보 */
+  gap: 15px; /* ✅ 투입기간과 삭제 버튼 사이 간격 증가 */
+  white-space: nowrap; /* ✅ 텍스트 줄바꿈 방지 */
+}
+
+/* ✅ 투입기간 */
+.participant-period {
+  white-space: nowrap;
+  text-align: center;
+  font-family: monospace; /* ✅ 날짜 간격이 일정하도록 설정 */
+  width: 150px; /* ✅ 투입기간의 크기를 고정 */
+}
+
+/* ✅ 삭제 버튼 */
 .remove-button {
   background: none;
   border: none;
@@ -79,16 +112,19 @@
 /* ✅ 반응형 */
 @media screen and (max-width: 500px) {
   .participant-selection-container {
-    flex-direction: column; /* 모바일에서는 세로 정렬 */
+    flex-direction: column;
+    /* 모바일에서는 세로 정렬 */
     align-items: flex-start;
   }
 
   .participant-dropdown {
-    width: 100%; /* 모바일에서는 전체 너비 사용 */
+    width: 100%;
+    /* 모바일에서는 전체 너비 사용 */
   }
 
   .participant-add-button {
-    width: 100%; /* 모바일에서는 버튼도 전체 너비 */
+    width: 100%;
+    /* 모바일에서는 버튼도 전체 너비 */
     margin-top: 5px;
   }
 }

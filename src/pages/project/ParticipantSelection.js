@@ -160,25 +160,48 @@ const ParticipantSelection = ({
                 type="date"
                 className="small-date-input"
                 value={user.participant_start_date}
-                onChange={(e) =>
-                  handleParticipantDateChange(
-                    user.id,
-                    "participant_start_date",
-                    e.target.value
-                  )
-                }
+                onChange={(e) => {
+                  const newStartDate = e.target.value;
+                  setSelectedParticipants((prevParticipants) =>
+                    prevParticipants.map((p) =>
+                      p.id === user.id
+                        ? {
+                          ...p,
+                          participant_start_date: newStartDate,
+                          // 🚀 자동 조정: 시작 날짜가 종료 날짜보다 늦다면 종료 날짜도 변경
+                          participant_end_date:
+                            p.participant_end_date && new Date(newStartDate) > new Date(p.participant_end_date)
+                              ? newStartDate
+                              : p.participant_end_date,
+                        }
+                        : p
+                    )
+                  );
+                }}
               />
+
               <input
                 type="date"
                 className="small-date-input"
                 value={user.participant_end_date}
-                onChange={(e) =>
-                  handleParticipantDateChange(
-                    user.id,
-                    "participant_end_date",
-                    e.target.value
-                  )
-                }
+                onChange={(e) => {
+                  const newEndDate = e.target.value;
+                  setSelectedParticipants((prevParticipants) =>
+                    prevParticipants.map((p) =>
+                      p.id === user.id
+                        ? {
+                          ...p,
+                          participant_end_date: newEndDate,
+                          // 🚀 자동 조정: 종료 날짜가 시작 날짜보다 빠르면 시작 날짜도 변경
+                          participant_start_date:
+                            p.participant_start_date && new Date(p.participant_start_date) > new Date(newEndDate)
+                              ? newEndDate
+                              : p.participant_start_date,
+                        }
+                        : p
+                    )
+                  );
+                }}
               />
               <button
                 type="button"
@@ -198,17 +221,24 @@ const ParticipantSelection = ({
         {participants.length > 0 ? (
           participants.map((user) => (
             <li key={user.id}>
-              {user.name} ({user.department})
-              <span>
-                📅 {user.participant_start_date} ~ {user.participant_end_date}
-              </span>
-              <button
-                type="button"
-                className="remove-button"
-                onClick={() => handleRemoveConfirmedParticipant(user.id)}
-              >
-                <FaTimes />
-              </button>
+              {/* ✅ 왼쪽: 이름(부서) */}
+              <div className="participant-info">
+                {user.name} ({user.department})
+              </div>
+
+              {/* ✅ 오른쪽: 투입기간 + 삭제 버튼 */}
+              <div className="participant-actions">
+                <span className="participant-period">
+                  📅 {user.participant_start_date} ~ {user.participant_end_date}
+                </span>
+                <button
+                  type="button"
+                  className="remove-button"
+                  onClick={() => handleRemoveConfirmedParticipant(user.id)}
+                >
+                  <FaTimes />
+                </button>
+              </div>
             </li>
           ))
         ) : (
