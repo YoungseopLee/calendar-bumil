@@ -176,7 +176,7 @@ const NoticeList = () => {
       <Sidebar />
       <div className="notice-list-container">
         <div className="notice-header">
-          <h2 className="notice-list-title">공지사항</h2>
+          <h1 className="notice-list-title">공지사항</h1>
           <div className="notice-list-create-button-container">
             {user?.role_id === "AD_ADMIN" && (
               <button

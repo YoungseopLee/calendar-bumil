@@ -54,10 +54,10 @@
 }
 
 .notice-list-title {
-  font-size: 1.8rem;
+  font-size: 1.8em;
+  margin-top: 50px;
+  margin-bottom: 15px;
   color: #333;
-  margin: 0;
-  text-align: center;
 }
 
 .notice-list-item {
