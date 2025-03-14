@@ -20,57 +20,67 @@ const Calendar = () => {
   const [users, setUsers] = useState([]); // 직원 목록
   const [statusList, setStatusList] = useState([]); // 상태 목록 (백엔드 CRUD 결과)
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
   const { getUserInfo } = useAuth();
 
-  // 로그인한 사용자 정보 가져오기 (api로 가져오기)
+  // 전체 데이터 가져오기
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      const userInfo = await getUserInfo();
-      setUser(userInfo);
-      setLoading(false);  // 로딩 완료
-    };  
-    fetchUserInfo();
-  }, []);
-
-  // 로그인 및 부서 데이터 가져오기
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!user) return; // 사용자 정보가 없으면 아무것도 안보여줌(로딩되면 보여줌)
-
-      // 오늘 날짜 선택
-      const today = new Date();
-      setSelectedDate(today);
-      handleDateClick(today.getDate());
-
-      setUserStatus(user.status); // 사용자의 현재 상태 설정
-
+    const fetchAllData = async () => {
       try {
-        // 1. 부서 및 사용자 정보 가져오기
-        const usersResponse = await fetch(
-          `${process.env.REACT_APP_API_URL}/user/get_users`
-        );
-        if (!usersResponse.ok)
-          throw new Error("직원 목록을 불러오지 못했습니다.");
-        const usersData = await usersResponse.json();
-        setUsers(usersData.users);
+        // 1. 사용자 정보 가져오기
+        const userInfo = await fetchUserInfo();
 
-        const uniqueDepartments = [
-          ...new Set(usersData.users.map((user) => user.department)),
-        ]
-          .filter(Boolean) // 빈 값 제거
-          .sort((a, b) => a.localeCompare(b, "ko-KR")); // 한글 정렬
-
-        setDepartments(uniqueDepartments);
+        // 2. 오늘 날짜 설정
+        const today = new Date();
+        setSelectedDate(today);
+        setUserStatus(userInfo.status);  // user.status 대신 userInfo.status 사용
+  
+        // 3. 모든 데이터 병렬로 가져오기
+        await Promise.all([
+          fetchUsersAndDepartments(),
+          fetchStatusList(),
+          fetchUserSchedule(userInfo.id)
+        ]);
+        
       } catch (error) {
         console.error("데이터 로딩 오류:", error);
       }
+      setLoading(false);  // 로딩 완료
     };
     
-    fetchData(); //부서 데이터 가져오기
-    fetchStatusList(); // 상태 목록 가져오기
-    fetchUserSchedule(); // 전체 일정 가져오기
-  }, [user]);
+    fetchAllData();
+  }, []);
+
+// 로그인한 사용자 정보 가져오는 함수
+const fetchUserInfo = async () => {
+  const userInfo = await getUserInfo();
+  setUser(userInfo);
+  return userInfo;
+};
+
+// 부서 및 사용자 정보 가져오는 함수
+const fetchUsersAndDepartments = async () => {
+  try {
+    const usersResponse = await fetch(
+      `${process.env.REACT_APP_API_URL}/user/get_users`
+    );
+    if (!usersResponse.ok)
+      throw new Error("직원 목록을 불러오지 못했습니다.");
+    const usersData = await usersResponse.json();
+    setUsers(usersData.users);
+
+    const uniqueDepartments = [
+      ...new Set(usersData.users.map((user) => user.department)),
+    ]
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b, "ko-KR"));
+
+    setDepartments(uniqueDepartments);
+
+    } catch (error) {
+      console.error("데이터 로딩 오류:", error);
+    }
+  };
 
   // 로그인한 사용자의 상태 가져오기
   const fetchStatusList = async () => {
@@ -87,27 +97,27 @@ const Calendar = () => {
   };
 
   // 로그인한 사용자의 일정 가져오기
-  const fetchUserSchedule = async () => {
+  const fetchUserSchedule = async (userId = user.id) => {
     try {
       const response = await fetch(
         `${process.env.REACT_APP_API_URL}/schedule/get_all_schedule`
       );
       if (!response.ok) throw new Error("전체 일정을 불러오지 못했습니다.");
       const data = await response.json();
-      console.log("전체일정: ", data.schedules);
+
       const filteredUsersSchedule = data.schedules.filter(
-        (schedule) => schedule.user_id === user.id
+        (schedule) => schedule.user_id === userId
       );
       setUserSchedule(filteredUsersSchedule);
-      console.log("내일정: ", filteredUsersSchedule);
+
       // 내 일정을 제외한 다른 사용자의 일정을 필터링
       const filteredOtherUsersSchedule = data.schedules.filter(
-        (schedule) => schedule.user_id !== user.id
+        (schedule) => schedule.user_id !== userId
       );
 
       // 다른 유저들의 일정 상태 업데이트
       setOtherUsersSchedule(filteredOtherUsersSchedule);
-      console.log("다른 유저들의 일정: ", filteredOtherUsersSchedule);
+
     } catch (error) {
       console.error("전체 일정 로딩 오류:", error);
     }
@@ -304,7 +314,7 @@ const Calendar = () => {
 
   return (
     <div>
-      <Sidebar />
+      <Sidebar user={user}/>
       <div className="calendar-parent">
         <div className="calendar">
           {/* 사용자 상태 변경 UI */}
@@ -568,8 +578,8 @@ const Calendar = () => {
                     }
 
                     return filtered.map((schedule) => {
-                      const user = users.find((u) => u.id === schedule.user_id);
-                      const userName = user ? user.name : "알 수 없음";
+                      const scheduleUser = users.find((u) => u.id === schedule.user_id);
+                      const userName = scheduleUser ? scheduleUser.name : "알 수 없음";
 
                       return (
                         <li
