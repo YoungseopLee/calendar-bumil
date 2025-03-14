@@ -10,8 +10,14 @@ const ResetUser = () => {
   const [searchField, setSearchField] = useState("name");
   const [activeRoleFilter, setActiveRoleFilter] = useState(null); // ✅ 선택된 역할 필터
 
-  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중) 
-  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중)
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    position: "",
+    department: "",
+    role_id: "",
+  }); //로그인한 사용자 정보
   const { getUserInfo, checkAuth, handleLogout } = useAuth();
 
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -21,7 +27,7 @@ const ResetUser = () => {
     const fetchUserInfo = async () => {
       const userInfo = await getUserInfo();
       setUser(userInfo);
-      
+
       const isAuthorized = checkAuth(userInfo?.role_id, ["AD_ADMIN"]); // 권한 확인하고 맞으면 true, 아니면 false 반환
       if (!isAuthorized) {
         console.error("관리자 권한이 없습니다.");
@@ -29,7 +35,7 @@ const ResetUser = () => {
         return;
       }
       setLoading(false); // 로딩 완료
-    };  
+    };
     fetchUserInfo();
   }, []);
 
@@ -46,7 +52,6 @@ const ResetUser = () => {
 
       const data = await response.json();
       setEmployees(data.users);
-      
     } catch (err) {
       console.error("데이터 불러오기 오류:", err);
     }

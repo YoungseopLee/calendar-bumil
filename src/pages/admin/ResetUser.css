@@ -1,21 +1,23 @@
 /* ✅ 전체 페이지 스타일 */
 .user-reset-page {
+  display: flex;
+  max-width: 768px;
   min-height: 100vh;
-  width: 100%;
-  max-width: 600px;
   margin: auto;
   margin-top: 50px;
+  justify-content: center;
   padding: 20px;
   background: #fff;
 }
 
 /* ✅ 콘텐츠 박스 스타일 */
 .user-reset-box {
+  display: flex;
+  justify-content: center;
+  width: 100%;
   box-sizing: border-box;
   background-color: white;
   border-radius: 10px;
-  width: 100%;
-  margin: 0 auto;
 }
 
 /* ✅ 타이틀 */
@@ -69,7 +71,8 @@
 }
 
 .user-reset-employee-container {
-  max-width: 600px;
+  width: 100%;
+  max-width: 768px;
   background: #fff;
   border-radius: 8px;
 }
