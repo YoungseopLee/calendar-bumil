@@ -316,7 +316,7 @@ def get_roles():
         cursor.close()
         conn.close()
 
-# 부서 목록 조회
+# 부서 목록 조회 -> department.py로 이동 (삭제 예정)
 @admin_bp.route('/get_department_list', methods=['GET'])
 def get_unique_departments():
     conn = get_db_connection()
