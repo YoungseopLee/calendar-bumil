@@ -68,7 +68,7 @@ const NoticeDetails = () => {
         throw new Error("공지사항을 불러오지 못했습니다.");
       }
       const data = await response.json();
-      console.log("data: ", data.notice);
+      //console.log("data: ", data.notice);
       setNotice(data.notice);
     } catch (err) {
       setError(err.message);

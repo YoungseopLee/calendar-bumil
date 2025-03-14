@@ -82,9 +82,9 @@ const AddUserPage = () => {
         // const posData = await posRes.json();
         const roleData = await roleRes.json();
 
-        console.log("부서 데이터:", deptData);
+        //console.log("부서 데이터:", deptData);
         // console.log("직급 데이터:", posData);
-        console.log("권한 데이터:", roleData);
+        //console.log("권한 데이터:", roleData);
 
         setDepartments(Array.isArray(deptData) ? deptData : []);
         // setPositions(Array.isArray(posData) ? posData : []);

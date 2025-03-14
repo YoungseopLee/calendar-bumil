@@ -112,7 +112,7 @@ const NoticeEdit = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError(null);
-    console.log("공지사항 제목, 내용:", formData.title, formData.content);
+    //console.log("공지사항 제목, 내용:", formData.title, formData.content);
     if (!formData.title || !formData.content) {
       setError("⚠️ 필수 입력값을 모두 입력해주세요.");
       return;

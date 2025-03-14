@@ -68,7 +68,7 @@ const UserRolesManagement = () => {
 
       if (!response.ok) throw new Error("역할 변경 실패");
 
-      console.log("역할 변경 성공:", employeeId, newRoleId);
+      //console.log("역할 변경 성공:", employeeId, newRoleId);
       alert("✅ 역할이 성공적으로 변경되었습니다!");
 
       // 🔥 즉시 상태 반영
@@ -79,14 +79,6 @@ const UserRolesManagement = () => {
       );
     } catch (error) {
       console.error("역할 변경 오류:", error);
-      console.log("Token:", localStorage.getItem("token"));
-      console.log(
-        "Sending request with ID:",
-        employeeId,
-        "New Role:",
-        newRoleId
-      );
-
       alert("❌ 역할 변경에 실패했습니다. 다시 시도해주세요.");
     }
   };

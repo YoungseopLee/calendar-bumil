@@ -46,7 +46,7 @@ const ResetUser = () => {
 
       const data = await response.json();
       setEmployees(data.users);
-      console.log("사용자 데이터:", data.users);
+      
     } catch (err) {
       console.error("데이터 불러오기 오류:", err);
     }
@@ -76,11 +76,9 @@ const ResetUser = () => {
 
       if (!response.ok) throw new Error("비밀번호 초기화 실패");
 
-      console.log("비밀번호 초기화 성공:", employeeId, newPassword);
       alert("✅ 비밀번호가 성공적으로 초기화되었습니다!");
     } catch (error) {
       console.error("비밀번호 초기화 오류:", error);
-      console.log("Token:", localStorage.getItem("token"));
 
       alert("❌ 비밀번호 초기화에 실패했습니다. 다시 시도해주세요.");
     }
