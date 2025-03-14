@@ -265,9 +265,11 @@
 
 /* 중앙 정렬 */
 .project-page-title{
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 40px;
   text-align: center;
-  font-size: 1.4em;
-  margin-bottom: 20px;
+  color: #333;
 }
 
 /* ✅ 검색 필터 컨테이너 */
