@@ -208,7 +208,6 @@
   .project-page-content,
   .project-page-box {
     max-width: 100%;
-    padding: 10px;
   }
 
   /* ✅ 390px 이하에서도 가로 배치 유지 */
@@ -264,7 +263,7 @@
 }
 
 /* 중앙 정렬 */
-.project-page-title{
+.project-page-title {
   font-size: 1.8rem;
   font-weight: bold;
   margin-bottom: 40px;

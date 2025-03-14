@@ -40,7 +40,13 @@ const ProjectPage = () => {
 
   // 환경 변수에서 API URL 가져오기
   const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
-  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    position: "",
+    department: "",
+    role_id: "",
+  }); //로그인한 사용자 정보
   const { getUserInfo, checkAuth, handleLogout } = useAuth();
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태
 
@@ -53,7 +59,6 @@ const ProjectPage = () => {
 
         // 2. 사용자 목록 가져오기
         await fetchUsers();
-
       } catch (error) {
         console.error("데이터 로딩 오류:", error);
       }
@@ -71,25 +76,24 @@ const ProjectPage = () => {
   };
 
   // 🔹 [2] 사용자 목록 조회
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch(`${apiUrl}/user/get_users`);
-        if (!response.ok)
-          throw new Error("사용자 데이터를 불러오지 못했습니다.");
-        const data = await response.json();
-        setUsers(data.users);
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/user/get_users`);
+      if (!response.ok) throw new Error("사용자 데이터를 불러오지 못했습니다.");
+      const data = await response.json();
+      setUsers(data.users);
 
-        // 사용자 ID-이름 매핑 생성
-        const idToNameMapping = {};
-        data.users.forEach((user) => {
-          idToNameMapping[user.id] = user.name;
-        });
+      // 사용자 ID-이름 매핑 생성
+      const idToNameMapping = {};
+      data.users.forEach((user) => {
+        idToNameMapping[user.id] = user.name;
+      });
 
-        setUserIdToNameMap(idToNameMapping);
-      } catch (err) {
-        //.error("사용자 목록 불러오기 오류:", err);
-      }
-    };
+      setUserIdToNameMap(idToNameMapping);
+    } catch (err) {
+      //.error("사용자 목록 불러오기 오류:", err);
+    }
+  };
 
   // 🔹 [3] 프로젝트 목록 조회
   useEffect(() => {
@@ -185,7 +189,7 @@ const ProjectPage = () => {
   return (
     <div className="project-page-app-body">
       <div className="project-page-sidebar">
-        <Sidebar user={user}/>
+        <Sidebar user={user} />
       </div>
       {/* ✅ ADMIN 권한만 프로젝트 추가 버튼 표시 */}
       {user?.role_id && ["AD_ADMIN", "PR_ADMIN"].includes(user?.role_id) && (
