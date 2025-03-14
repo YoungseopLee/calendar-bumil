@@ -30,7 +30,7 @@ const NoticeList = () => {
   const [searchText, setSearchText] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const noticesPerPage = 8;
+  const noticesPerPage = 10;
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
