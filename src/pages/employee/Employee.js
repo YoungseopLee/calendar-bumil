@@ -41,6 +41,8 @@ const EmployeeList = () => {
   const [searchText, setSearchText] = useState(""); // 검색 텍스트
   const [searchField, setSearchField] = useState("name"); // 검색 기준 필드 (이름, 직급 등)
   const [showFavorites, setShowFavorites] = useState(false); // 즐겨찾기 보기 여부 (true/false)
+  const [sortBy, setSortBy] = useState(null); // 정렬 기준 (이름, 직급 등)
+  const [sortOrder, setSortOrder] = useState("asc"); // 정렬 순서 (asc/desc)
 
   const navigate = useNavigate(); // 페이지 이동 훅
   const apiUrl = process.env.REACT_APP_API_URL; // API URL 환경 변수
@@ -204,12 +206,50 @@ const EmployeeList = () => {
     }
   };
 
+  const totalEmployees = employees.length;
+  const departmentCounts = employees.reduce((acc, emp) => {
+    const dept = emp.department || "기타";
+    acc[dept] = acc[dept] ? acc[dept] + 1 : 1; // 부서별 인원 수 계산
+    return acc;
+  }, {});
+
   // 🔍 **검색 필터링 로직**
   const filterEmployees = (emp) => {
     if (!searchText) return true;
     const mappedSearchText = statusMap[searchText] || searchText;
     const value = emp[searchField]?.toLowerCase() || "";
     return value.includes(mappedSearchText.toLowerCase());
+  };
+
+  // 📌 **직급 우선순위 매핑**
+  const positionOrder = {
+    "부사장": 1,
+    "전무": 2,
+    "상무": 3,
+    "이사": 4,
+    "부장": 5,
+    "차장": 6,
+    "과장": 7,
+    "대리": 8,
+    "주임": 9,
+    "사원": 10
+  };
+
+  const sortEmployees = (key) => {
+    if (key !== "position") return; // 🔽 직급 정렬만 허용
+
+    setSortBy(key);
+    setSortOrder((prevSortOrder) => (prevSortOrder === "asc" ? "desc" : "asc"));
+
+    setEmployees((prevEmployees) => {
+      const sortedEmployees = [...prevEmployees].sort((a, b) => {
+        // ✅ 직급 정렬: 위계 기반
+        const rankA = positionOrder[a.position] || 99; // 없는 직급은 가장 낮은 순위로
+        const rankB = positionOrder[b.position] || 99;
+        return sortOrder === "asc" ? rankA - rankB : rankB - rankA;
+      });
+      return sortedEmployees;
+    });
   };
 
   // 부서 목록을 클릭했을 때 해당 부서의 상태를 토글하는 함수
@@ -296,10 +336,23 @@ const EmployeeList = () => {
           {/* 🏷️ 인덱스 바 */}
           <div className="employee-index-bar sticky-header">
             <span className="index-item-1">즐겨찾기</span>
-            <span className="index-item">이름</span>
-            <span className="index-item">직급</span>
+
+            {/* 부서 */}
+            <span className="index-item">부서</span>
+
+            {/* 🔽 직급 정렬 버튼 */}
+            <span className="index-item">
+              직급
+              <button
+                className="sort-button"
+                onClick={() => sortEmployees("position")}
+              >
+                {sortBy === "position" ? (sortOrder === "asc" ? "▲" : "▼") : "▲"}
+              </button>
+            </span>
             <span className="index-item">상태</span>
           </div>
+
           {/* 부서 모두 열기/닫기 */}
           <div className="department-header" onClick={seeAllDepartments}>
             <span>
@@ -310,9 +363,13 @@ const EmployeeList = () => {
                   ? "▼"
                   : "▶"}
               </span>
-              범일정보
+              범일정보 
+              <div className="department-count">
+                ({totalEmployees}명) 
+              </div>
             </span>
           </div>
+
           {/* 👥 사원 목록 렌더링 */}
           <ul className="employee-list">
             {Object.keys(
@@ -342,7 +399,10 @@ const EmployeeList = () => {
                         <span className="arrow">
                           {openDepartments[department] ? "▼" : "▶"}
                         </span>
-                        {department}
+                        {department} 
+                        <div className="department-count">
+                          ({departmentEmployees.length}명)
+                        </div>
                       </span>
                     </div>
 
@@ -359,13 +419,12 @@ const EmployeeList = () => {
                           >
                             {/* ⭐ 즐겨찾기 토글 */}
                             <span
-                              className={`favorite-icon ${
-                                favoriteEmployees.some(
-                                  (fav) => fav.id === employee.id
-                                )
-                                  ? ""
-                                  : "not-favorite"
-                              }`}
+                              className={`favorite-icon ${favoriteEmployees.some(
+                                (fav) => fav.id === employee.id
+                              )
+                                ? ""
+                                : "not-favorite"
+                                }`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleFavorite(employee.id);
