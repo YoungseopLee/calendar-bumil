@@ -308,6 +308,14 @@
   cursor: pointer;
 }
 
+.department-count {
+  display: inline-block; /* ✅ 부서명 옆에 배치 */
+  font-size: 12px; /* 글씨 크기 줄이기 */
+  color: gray; /* 색상 변경 */
+  margin-left: 5px; /* 부서명과 간격 조정 */
+  vertical-align: middle; /* ✅ 정렬 문제 방지 */
+}
+
 /* 화살표 스타일 */
 .arrow {
   margin-right: 10px;
@@ -348,7 +356,11 @@
   background-color: #0056b3;
 }
 
-.sub-department {
-  margin-left: 8px;
-  padding: 5px 0;
+.sort-button {
+  border: none; /* ✅ 테두리 제거 */
+  background: none; /* ✅ 배경 제거 */
+  cursor: pointer;
+  font-size: 14px;
+  color: #333; /* 기본 색상 */
+  margin-left: 5px;
 }
