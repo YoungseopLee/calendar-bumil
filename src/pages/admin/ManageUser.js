@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../utils/useAuth";
 import Sidebar from "../components/Sidebar";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { followCursor } from "tippy.js";
 import "./ManageUser.css";
-import { useAuth } from "../../utils/useAuth";
 
 const ManageUser = () => {
   const [employees, setEmployees] = useState([]);
@@ -55,56 +55,64 @@ const ManageUser = () => {
 
       const data = await response.json();
 
-      // 직급 우선순위 배열
-      const positionOrder = [
-        "대표이사",
-        "부사장",
-        "본부장",
-        "상무",
-        "이사",
-        "팀장",
-        "부장",
-        "차장",
-        "과장",
-        "대리",
-        "주임",
-      ];
+      // ✅ users 배열이 존재하지 않는 경우 예외 처리
+      if (!data.users || !Array.isArray(data.users)) {
+        console.error("API 응답에 users 배열이 없습니다.");
+        setEmployees([]);
+        return;
+      }
 
-      // 직급 기준 정렬
-      const sortedEmployees = data.users
-        .map((user) => ({
-          ...user,
-          full_department: user.team_name
-            ? `${user.department_name} - ${user.team_name}`
-            : user.department_name,
-        }))
-        .sort((a, b) => {
-          return (
-            positionOrder.indexOf(a.position) -
-            positionOrder.indexOf(b.position)
-          );
-        });
+      // 부서별 최고 직급 찾는 맵
+      const departmentMaxRank = new Map();
+      const departmentEmployees = new Map();
 
-      // 부서를 기준으로 그룹화하여 정렬
-      const groupedEmployees = [];
-      const seenDepartments = new Set();
+      // 부서별 직원 그룹핑 및 최고 직급 찾기
+      data.users.forEach((user) => {
+        const department =
+          (user.team_name
+            ? `${user.department_name || "미지정"} - ${user.team_name}`
+            : user.department_name) || "미지정";
 
-      sortedEmployees.forEach((employee) => {
-        const { department, position } = employee;
+        const rank = positionOrder.indexOf(user.position);
 
-        // 만약 이 부서를 처음 보는 거라면, 해당 직급의 첫 번째 인원을 추가
-        if (!seenDepartments.has(department)) {
-          seenDepartments.add(department);
-
-          // 이 부서에 속한 모든 인원들을 추가
-          const sameDepartmentEmployees = sortedEmployees.filter(
-            (emp) => emp.department === department
-          );
-          groupedEmployees.push(...sameDepartmentEmployees);
+        if (
+          !departmentMaxRank.has(department) ||
+          departmentMaxRank.get(department) > rank
+        ) {
+          departmentMaxRank.set(department, rank);
         }
+
+        if (!departmentEmployees.has(department)) {
+          departmentEmployees.set(department, []);
+        }
+        departmentEmployees.get(department).push({
+          ...user,
+          full_department: department, // ✅ full_department 기본값 설정
+        });
       });
 
-      setEmployees(groupedEmployees);
+      const sortedEmployees = [];
+
+      // 정렬 순서 : 직급 → 부서 내 최고 직급 → 이름
+      [...departmentEmployees.entries()]
+        .sort(([deptA], [deptB]) => {
+          const highestRankA = departmentMaxRank.get(deptA);
+          const highestRankB = departmentMaxRank.get(deptB);
+          return highestRankA - highestRankB; // 최고 직급 기준 부서 정렬
+        })
+        .forEach(([department, employees]) => {
+          // 부서별 정렬된 직원 목록 추가
+          const sortedDeptEmployees = employees.sort((a, b) => {
+            const rankA = positionOrder.indexOf(a.position);
+            const rankB = positionOrder.indexOf(b.position);
+            if (rankA !== rankB) return rankA - rankB;
+            return a.name.localeCompare(b.name, "ko-KR"); // 같은 직급이면 이름순 정렬
+          });
+
+          sortedEmployees.push(...sortedDeptEmployees);
+        });
+
+      setEmployees(sortedEmployees);
     } catch (error) {
       console.error("데이터 불러오기 오류:", error);
     }
@@ -150,6 +158,22 @@ const ManageUser = () => {
       alert("❌ 유저 삭제에 실패했습니다.");
     }
   };
+
+  // 직급 우선순위 배열
+  const positionOrder = [
+    "대표이사",
+    "부사장",
+    "본부장",
+    "상무",
+    "이사",
+    "팀장",
+    "부장",
+    "차장",
+    "과장",
+    "대리",
+    "주임",
+    "어드민",
+  ];
 
   const filterEmployees = (emp) => {
     if (!searchText) return true;
