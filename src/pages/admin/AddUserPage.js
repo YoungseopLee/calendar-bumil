@@ -19,8 +19,14 @@ const AddUserPage = () => {
   const [signupStatus, setSignupStatus] = useState("");
   const [generatedPassword, setGeneratedPassword] = useState(""); // ✅ 초기 비밀번호 표시용
 
-  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중) 
-  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중)
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    position: "",
+    department: "",
+    role_id: "",
+  }); //로그인한 사용자 정보
   const { getUserInfo, checkAuth, handleLogout } = useAuth();
 
   // 로그인한 사용자 정보 가져오기 및 권한 확인 후 권한 없으면 로그아웃 시키기
@@ -28,7 +34,7 @@ const AddUserPage = () => {
     const fetchUserInfo = async () => {
       const userInfo = await getUserInfo();
       setUser(userInfo);
-      
+
       const isAuthorized = checkAuth(userInfo?.role_id, ["AD_ADMIN"]); // 권한 확인하고 맞으면 true, 아니면 false 반환
       if (!isAuthorized) {
         console.error("관리자 권한이 없습니다.");
@@ -36,7 +42,7 @@ const AddUserPage = () => {
         return;
       }
       setLoading(false); // 로딩 완료
-    };  
+    };
     fetchUserInfo();
   }, []);
 
@@ -68,7 +74,14 @@ const AddUserPage = () => {
     const fetchData = async () => {
       try {
         const deptRes = await fetch(
-          `${process.env.REACT_APP_API_URL}/admin/get_department_list`
+          `${process.env.REACT_APP_API_URL}/department/get_department_list`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "Content-Type": "application/json",
+            },
+          }
         );
         // 직급 관련 주석 처리(tb_user에 존재하지 않는 직급은 표시되지 않는 문제가 있음)
         // const posRes = await fetch(
@@ -78,6 +91,8 @@ const AddUserPage = () => {
           `${process.env.REACT_APP_API_URL}/admin/get_role_list`
         );
 
+        if (!deptRes.ok) throw new Error("부서 목록을 가져오지 못했습니다.");
+
         const deptData = await deptRes.json();
         // const posData = await posRes.json();
         const roleData = await roleRes.json();
@@ -86,7 +101,12 @@ const AddUserPage = () => {
         // console.log("직급 데이터:", posData);
         //console.log("권한 데이터:", roleData);
 
-        setDepartments(Array.isArray(deptData) ? deptData : []);
+        if (deptData.departments && Array.isArray(deptData.departments)) {
+          setDepartments(deptData.departments);
+        } else {
+          setDepartments([]);
+        }
+
         // setPositions(Array.isArray(posData) ? posData : []);
         setRoles(Array.isArray(roleData) ? roleData : []);
       } catch (error) {
@@ -162,8 +182,8 @@ const AddUserPage = () => {
     "대표이사",
     "부사장",
     "본부장",
-    "이사",
     "상무",
+    "이사",
     "팀장",
     "부장",
     "차장",
@@ -212,8 +232,10 @@ const AddUserPage = () => {
             >
               <option value="">부서를 선택하세요</option>
               {departments.map((dept, index) => (
-                <option key={index} value={dept}>
-                  {dept}
+                <option key={index} value={dept.dpr_id}>
+                  {dept.team_nm
+                    ? `${dept.dpr_nm} - ${dept.team_nm}`
+                    : dept.dpr_nm}
                 </option>
               ))}
             </select>

@@ -60,8 +60,8 @@ const ManageUser = () => {
         "대표이사",
         "부사장",
         "본부장",
-        "이사",
         "상무",
+        "이사",
         "팀장",
         "부장",
         "차장",
@@ -71,11 +71,19 @@ const ManageUser = () => {
       ];
 
       // 직급 기준 정렬
-      const sortedEmployees = data.users.sort((a, b) => {
-        return (
-          positionOrder.indexOf(a.position) - positionOrder.indexOf(b.position)
-        );
-      });
+      const sortedEmployees = data.users
+        .map((user) => ({
+          ...user,
+          full_department: user.team_name
+            ? `${user.department_name} - ${user.team_name}`
+            : user.department_name,
+        }))
+        .sort((a, b) => {
+          return (
+            positionOrder.indexOf(a.position) -
+            positionOrder.indexOf(b.position)
+          );
+        });
 
       // 부서를 기준으로 그룹화하여 정렬
       const groupedEmployees = [];
@@ -201,7 +209,7 @@ const ManageUser = () => {
                 <span className="manage-user-column">{employee.name}</span>
                 <span className="manage-user-column">{employee.position}</span>
                 <Tippy
-                  content={employee.department}
+                  content={employee.full_department}
                   placement="top"
                   plugins={[followCursor]}
                   followCursor="horizontal"
@@ -216,9 +224,9 @@ const ManageUser = () => {
                   }}
                 >
                   <span className="manage-user-column">
-                    {employee.department.length > 15
-                      ? `${employee.department.substring(0, 15)}...`
-                      : employee.department}
+                    {employee.full_department.length > 15
+                      ? `${employee.full_department.substring(0, 15)}...`
+                      : employee.full_department}
                   </span>
                 </Tippy>
                 <div className="manage-user-column manage-user-action-buttons">
