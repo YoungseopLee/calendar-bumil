@@ -155,7 +155,7 @@ const NoticeList = () => {
   if (error) return <p>오류 발생: {error}</p>;
 
   return (
-    <div className="notice-list-app">
+    <div className="notice-list-app-body">
       <Sidebar user={user} />
       <div className="notice-list-container">
         <div className="notice-header">

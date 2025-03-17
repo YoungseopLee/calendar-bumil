@@ -32,10 +32,9 @@ const NoticeDetails = () => {
       try {
         // 1. 사용자 정보 가져오기
         const userInfo = await fetchUserInfo();
-        
+
         //2. 공지사항 가져오기
         await fetchNotice();
-
       } catch (error) {
         console.error("데이터 로딩 오류:", error);
       }
@@ -108,7 +107,7 @@ const NoticeDetails = () => {
 
   return (
     <div>
-      <Sidebar user={user}/>
+      <Sidebar user={user} />
       <div className="notice-detail-container">
         <span
           className="notice-detail-notice"
@@ -118,6 +117,7 @@ const NoticeDetails = () => {
         </span>
         <h1 className="notice-detail-title">{notice.title}</h1>
         <div className="notice-detail-meta">
+          <span>{notice.created_by}</span>
           <div className="notice-detail-date">
             <span>
               {new Date(notice.created_at).toLocaleString("ko-KR", {
@@ -125,7 +125,6 @@ const NoticeDetails = () => {
               })}
             </span>
           </div>
-          <span>{notice.created_by}</span>
         </div>
 
         <div
@@ -160,13 +159,13 @@ const NoticeDetails = () => {
             <button
               className="notice-edit-button"
               onClick={() => navigate(`/notice-edit/${id}`)}
-          >
-            수정
-          </button>
-          <button
-            className="notice-delete-button"
-            onClick={() => handleDeleteNotice(id)}
-          >
+            >
+              수정
+            </button>
+            <button
+              className="notice-delete-button"
+              onClick={() => handleDeleteNotice(id)}
+            >
               삭제
             </button>
           </>

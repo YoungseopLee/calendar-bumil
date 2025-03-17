@@ -28,10 +28,9 @@ import Sidebar from "../components/Sidebar";
 const API_URL = process.env.REACT_APP_API_URL;
 
 const AddSchedule = () => {
-
   // ✅ 일정 관련 상태 관리
   const [startDate, setStartDate] = useState(""); // 시작 날짜
-  const [endDate, setEndDate] = useState(""); // 종료 날짜 
+  const [endDate, setEndDate] = useState(""); // 종료 날짜
   const [newTask, setNewTask] = useState(""); // 새로운 할 일
   const [status, setStatus] = useState("준비 중"); // 상태 (준비 중, 진행 중, 완료)
   const [tasks, setTasks] = useState([]); // 추가된 일정 목록
@@ -41,7 +40,13 @@ const AddSchedule = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    position: "",
+    department: "",
+    role_id: "",
+  }); //로그인한 사용자 정보
   const { getUserInfo } = useAuth();
 
   // 로그인한 사용자 정보 가져오기 (api로 가져오기)
@@ -49,8 +54,8 @@ const AddSchedule = () => {
     const fetchUserInfo = async () => {
       const userInfo = await getUserInfo();
       setUser(userInfo);
-      setLoading(false);  // 로딩 완료
-    };  
+      setLoading(false); // 로딩 완료
+    };
     fetchUserInfo();
   }, []);
 

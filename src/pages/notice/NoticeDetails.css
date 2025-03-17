@@ -1,18 +1,18 @@
 .notice-detail-container {
-  max-width: 600px;
+  max-width: 768px;
   width: 100%;
   background: #fff;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  margin: 0 auto;
-  margin-top: 15px;
-  overflow-x: hidden;  /* 추가: 가로 스크롤 방지 */
-  box-sizing: border-box;  /* 추가: padding이 width에 포함되도록 설정 */
+  margin: auto;
+  margin-top: 50px;
+  overflow-x: hidden; /* 추가: 가로 스크롤 방지 */
+  box-sizing: border-box; /* 추가: padding이 width에 포함되도록 설정 */
 }
 .notice-detail-notice {
+  text-align: center;
   font-weight: bold;
-  margin-left: 50px;
   cursor: pointer;
 }
 
@@ -25,6 +25,7 @@
 .notice-detail-meta {
   font-size: 14px;
   color: gray;
+  text-align: right;
   padding-bottom: 15px;
   border-bottom: 1px solid #ddd;
 }
@@ -112,7 +113,7 @@
   transition: background-color 0.3s ease; /* 부드러운 색상 전환 */
 }
 
-@media (min-width: 1000px) {
+@media (min-width: 1048px) {
   .notice-detail-container h1 {
     font-size: 30px;
   }
@@ -121,8 +122,8 @@
   }
 }
 
-@media (max-width: 770px) {
+@media (max-width: 768px) {
   .notice-detail-container {
-    padding-top: 12px;
+    margin-top: 50px;
   }
 }

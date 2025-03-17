@@ -1,6 +1,6 @@
 /* 전체 페이지 */
 .project-details-app-body {
-  display: flex; /* 🌟 사이드바와 컨텐츠를 나란히 배치 */
+  display: flex; /* 사이드바와 컨텐츠를 나란히 배치 */
   width: 100%;
   min-height: 100vh; /* 전체 화면 높이 차지 */
   background: white;

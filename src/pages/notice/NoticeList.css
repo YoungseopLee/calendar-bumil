@@ -1,12 +1,10 @@
-.notice-list-app {
-  display: flex;
+.notice-list-app-body {
   width: 100%;
   max-width: 768px;
   background-color: none;
   justify-content: center;
   margin: auto;
   margin-top: 50px;
-  padding: 0px; /* 좌우 여백을 추가해 화면 넘어가지 않도록 설정 */
   box-sizing: border-box; /* padding이 너비에 포함되도록 설정 */
 }
 
@@ -16,7 +14,6 @@
   margin: 0 auto;
   background-color: white;
   border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   overflow-x: hidden; /* 수평 스크롤 방지 */
   box-sizing: border-box; /* padding이 너비에 포함되도록 설정 */
 }
@@ -31,8 +28,7 @@
 }
 
 .notice-list-title {
-  font-size: 1.8em;
-  margin-top: 50px;
+  font-size: 1.5em;
   margin-bottom: 15px;
   color: #333;
 }
