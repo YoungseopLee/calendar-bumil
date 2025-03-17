@@ -141,3 +141,10 @@
 .checkbox-container .form-group:hover input[type="checkbox"] {
   border-color: #007bff; /* 테두리 색상 - 파란색 */
 }
+
+/* E-mail, Password 필수 표시 (*) */
+.required {
+  color: red;
+  font-weight: bold;
+  margin-left: 3px;
+}

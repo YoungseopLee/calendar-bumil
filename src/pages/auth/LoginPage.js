@@ -18,7 +18,7 @@ import "./LoginPage.css";
  *    ├── 로그인 버튼
  *    ├── 회원가입 링크
  */
-  
+
 const LoginPage = () => {
   const [id, setId] = useState(""); // 사용자 아이디(이메일)
   const [password, setPassword] = useState(""); // 사용자 비밀번호
@@ -158,7 +158,9 @@ const LoginPage = () => {
         {/* 🔑 로그인 폼 */}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="id">E-mail</label>
+            <label htmlFor="id">
+              E-mail<span className="required">*</span>
+            </label>
             <input
               type="text"
               id="id"
@@ -170,7 +172,9 @@ const LoginPage = () => {
           </div>
           {/* ✅ 비밀번호 입력 */}
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">
+              Password<span className="required">*</span>
+            </label>
             <input
               type="password"
               id="password"
@@ -203,16 +207,10 @@ const LoginPage = () => {
           </div>
           {/* ✅ 로그인 버튼 */}
           <button type="submit" className="login-button">
-            로그인
+            Sign in
           </button>
         </form>
-        {/* 회원가입 */}
         {message && <div className="message">{message}</div>}
-        <div className="footer">
-          <p>
-            Don't have an account? <Link to="/signup">회원가입</Link>
-          </p>
-        </div>
       </div>
     </div>
   );
