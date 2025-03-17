@@ -82,9 +82,25 @@ const Manager = () => {
         {/* 카드 컨테이너: 세로 정렬 */}
         <div className="card-container">
           <div className="manager-card">
-            <h2>상태 관리</h2>
-            <p>유저의 상태 리스트 항목을 관리할 수 있습니다.</p>
-            <button className="manage-button" onClick={goToStatusManagement}>
+            <h2>유저 추가</h2>
+            <p>유저를 추가할 수 있습니다.</p>
+            <button className="manage-button" onClick={goToAddUserPage}>
+              이동
+            </button>
+          </div>
+
+          <div className="manager-card">
+            <h2>유저 관리</h2>
+            <p>특정 유저의 정보를 수정 및 삭제를 할 수 있습니다.</p>
+            <button className="manage-button" onClick={goToUserManagePage}>
+              이동
+            </button>
+          </div>
+
+          <div className="manager-card">
+            <h2>유저 비밀번호 초기화</h2>
+            <p>특정 유저의 비밀번호를 초기화할 수 있습니다.</p>
+            <button className="manage-button" onClick={goToResetUserPage}>
               이동
             </button>
           </div>
@@ -109,25 +125,9 @@ const Manager = () => {
           </div>
 
           <div className="manager-card">
-            <h2>유저 추가</h2>
-            <p>유저를 추가할 수 있습니다.</p>
-            <button className="manage-button" onClick={goToAddUserPage}>
-              이동
-            </button>
-          </div>
-
-          <div className="manager-card">
-            <h2>유저 관리</h2>
-            <p>특정 유저의 정보를 수정 및 삭제를 할 수 있습니다.</p>
-            <button className="manage-button" onClick={goToUserManagePage}>
-              이동
-            </button>
-          </div>
-
-          <div className="manager-card">
-            <h2>유저 비밀번호 초기화</h2>
-            <p>특정 유저의 비밀번호를 초기화할 수 있습니다.</p>
-            <button className="manage-button" onClick={goToResetUserPage}>
+            <h2>상태 관리</h2>
+            <p>유저의 상태 리스트 항목을 관리할 수 있습니다.</p>
+            <button className="manage-button" onClick={goToStatusManagement}>
               이동
             </button>
           </div>
