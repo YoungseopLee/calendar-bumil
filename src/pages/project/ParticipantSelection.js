@@ -23,14 +23,18 @@ const ParticipantSelection = ({
           setUsers(
             data.users.map((user) => ({
               value: user.id,
-              label: `${user.name} - ${user.id} (${user.department})`,
+              label: user.team_name
+                ? `${user.name} - ${user.id} (${user.department_name} - ${user.team_name})`
+                : `${user.name} - ${user.id} (${user.department_name})`,
               name: user.name,
-              department: user.department,
+              department: user.team_name
+                ? `${user.department_name} - ${user.team_name}`
+                : user.department_name,
             }))
           );
         }
       } catch (error) {
-        //console.error("❌ 사용자 데이터를 불러오지 못했습니다.", error);
+        console.error("❌ 사용자 데이터를 불러오지 못했습니다.", error);
       }
     };
     fetchUsers();
@@ -166,20 +170,20 @@ const ParticipantSelection = ({
                     prevParticipants.map((p) =>
                       p.id === user.id
                         ? {
-                          ...p,
-                          participant_start_date: newStartDate,
-                          // 🚀 자동 조정: 시작 날짜가 종료 날짜보다 늦다면 종료 날짜도 변경
-                          participant_end_date:
-                            p.participant_end_date && new Date(newStartDate) > new Date(p.participant_end_date)
-                              ? newStartDate
-                              : p.participant_end_date,
-                        }
+                            ...p,
+                            participant_start_date: newStartDate,
+                            participant_end_date:
+                              p.participant_end_date &&
+                              new Date(newStartDate) >
+                                new Date(p.participant_end_date)
+                                ? newStartDate
+                                : p.participant_end_date,
+                          }
                         : p
                     )
                   );
                 }}
               />
-
               <input
                 type="date"
                 className="small-date-input"
@@ -190,14 +194,15 @@ const ParticipantSelection = ({
                     prevParticipants.map((p) =>
                       p.id === user.id
                         ? {
-                          ...p,
-                          participant_end_date: newEndDate,
-                          // 🚀 자동 조정: 종료 날짜가 시작 날짜보다 빠르면 시작 날짜도 변경
-                          participant_start_date:
-                            p.participant_start_date && new Date(p.participant_start_date) > new Date(newEndDate)
-                              ? newEndDate
-                              : p.participant_start_date,
-                        }
+                            ...p,
+                            participant_end_date: newEndDate,
+                            participant_start_date:
+                              p.participant_start_date &&
+                              new Date(p.participant_start_date) >
+                                new Date(newEndDate)
+                                ? newEndDate
+                                : p.participant_start_date,
+                          }
                         : p
                     )
                   );

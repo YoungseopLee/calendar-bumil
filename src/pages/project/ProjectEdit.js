@@ -38,7 +38,6 @@ const ProjectEdit = () => {
   const [selectedUser, setSelectedUser] = useState(null); // 새로 추가할 유저 선택
   const [users, setUsers] = useState([]); // 참여 가능한 유저 목록
 
-
   const apiUrl = process.env.REACT_APP_API_URL;
   const navigate = useNavigate();
   const location = useLocation();
@@ -63,9 +62,15 @@ const ProjectEdit = () => {
     changes: "비고",
   };
 
-  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    position: "",
+    department: "",
+    role_id: "",
+  }); //로그인한 사용자 정보
   const { getUserInfo, checkAuth, handleLogout } = useAuth();
-  
+
   // 전체 데이터 가져오기
   useEffect(() => {
     const fetchAllData = async () => {
@@ -74,10 +79,8 @@ const ProjectEdit = () => {
         const userInfo = await fetchUserInfo();
 
         // 2. 모든 데이터 병렬로 가져오기
-        await Promise.all([
-          fetchEmployees(),
-        ]);
-              
+        await Promise.all([fetchEmployees()]);
+
         const isAuthorized = checkAuth(userInfo?.role_id, ["AD_ADMIN"]); // 권한 확인하고 맞으면 true, 아니면 false 반환
         if (!isAuthorized) {
           console.error("관리자 권한이 없습니다.");
@@ -122,7 +125,9 @@ const ProjectEdit = () => {
       .filter((emp) => !assignedIds.has(emp.id))
       .map((emp) => ({
         value: emp.id,
-        label: `${emp.id} - ${emp.name} (${emp.department})`,
+        label: emp.team_name
+          ? `${emp.id} - ${emp.name} (${emp.department_name} - ${emp.team_name})`
+          : `${emp.id} - ${emp.name} (${emp.department_name})`,
       }));
     setUsers(availableUsers);
   }, [employees, Project?.assigned_user_ids]);
@@ -133,9 +138,7 @@ const ProjectEdit = () => {
   }, [users]);
 
   // 🔄 **5. 직원 목록 가져오기**
-  useEffect(() => {
-    
-  }, []);
+  useEffect(() => {}, []);
 
   // ✅ 프로젝트 상세정보 API 호출
   const fetchProjectDetails = async () => {
@@ -224,7 +227,11 @@ const ProjectEdit = () => {
         id: participant.id,
         user_id: participant.user_id,
         name: employee ? employee.name : "정보 없음",
-        department: employee ? employee.department : "정보 없음",
+        department: employee
+          ? employee.team_name
+            ? `${employee.department_name} - ${employee.team_name}`
+            : employee.department_name
+          : "정보 없음",
         phone: employee ? employee.phone_number : "정보 없음",
         status: employee ? employee.status : "정보 없음",
         comment: employee ? employee.comment : "정보 없음",
