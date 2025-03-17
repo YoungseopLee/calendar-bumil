@@ -316,29 +316,6 @@ def get_roles():
         cursor.close()
         conn.close()
 
-# 부서 목록 조회 -> department.py로 이동 (삭제 예정)
-@admin_bp.route('/get_department_list', methods=['GET'])
-def get_unique_departments():
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-    try:
-        sql = """
-            SELECT DISTINCT department 
-            FROM tb_user 
-            WHERE department IS NOT NULL AND department != '' 
-            ORDER BY department"""
-        cursor.execute(sql)
-        logger.info(f"[SQL/SELECT] tb_user /get_department_list{sql}")
-
-        departments = cursor.fetchall()
-        return jsonify([d['department'] for d in departments]), 200
-    except Exception as e:
-        print(f"부서 조회 오류: {e}")
-        return jsonify({'message': '부서 목록 조회 오류'}), 500
-    finally:
-        cursor.close()
-        conn.close()
-
 # 직급 목록 조회
 @admin_bp.route('/get_position_list', methods=['GET'])
 def get_unique_position():

@@ -2,9 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import BackButton from "../components/BackButton";
-import "./SituationControl.css";
 import { FaSearch } from "react-icons/fa";
 import { useAuth } from "../../utils/useAuth";
+
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
+import { followCursor } from "tippy.js";
+import "./SituationControl.css";
+
 /**
  * 📌 SituationControlPage
  * - 프로젝트와 사용자 목록을 불러오고,
@@ -90,7 +95,6 @@ const SituationControls = () => {
       try {
         // 1. 사용자 정보 가져오기
         const userInfo = await fetchUserInfo();
-        
       } catch (error) {
         console.error("데이터 로딩 오류:", error);
       }
@@ -655,7 +659,7 @@ const SituationControls = () => {
     <div className="SituationControl-page">
       <h1 className="title">프로젝트 현황관리</h1>
       <header className="SituationControl-header">
-        <Sidebar user={user}/>
+        <Sidebar user={user} />
         <BackButton />
       </header>
       <div className="SituationControl-search-container">
@@ -692,11 +696,27 @@ const SituationControls = () => {
         <div className="selected-projects">
           {selectedProjects.map((proj) => (
             <div key={proj.project_code} className="selected-project-box">
-              <span className="project-name">
-                {proj.project_name.length > 20
-                  ? proj.project_name.slice(0, 20) + "..."
-                  : proj.project_name}
-              </span>
+              <Tippy
+                content={proj.project_name}
+                placement="top"
+                plugins={[followCursor]}
+                followCursor="horizontal"
+                arrow={true}
+                popperOptions={{
+                  modifiers: [
+                    {
+                      name: "preventOverflow",
+                      options: { boundary: "window" },
+                    },
+                  ],
+                }}
+              >
+                <span className="project-name">
+                  {proj.project_name.length > 20
+                    ? proj.project_name.slice(0, 20) + "..."
+                    : proj.project_name}
+                </span>
+              </Tippy>
               <button
                 className="remove-project"
                 onClick={() => handleRemoveProject(proj.project_code)}
