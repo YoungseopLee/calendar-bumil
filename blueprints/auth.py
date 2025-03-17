@@ -149,7 +149,7 @@ def login():
 
         cursor = conn.cursor(dictionary=True)
         sql_tb_user_select = """
-        SELECT * FROM tb_user WHERE id = %s"""
+        SELECT * FROM tb_user WHERE id = %s AND is_delete_yn = 'N'"""
         cursor.execute(sql_tb_user_select, (id,))
         logger.info(f"[SQL/SELECT] tb_user /login{sql_tb_user_select}")
 

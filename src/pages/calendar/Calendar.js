@@ -36,7 +36,7 @@ const Calendar = () => {
       try {
         // 1. 사용자 정보 가져오기
         const userInfo = await fetchUserInfo();
-        
+
         // 2. 오늘 날짜 설정
         const today = new Date();
         setSelectedDate(today);
@@ -44,7 +44,7 @@ const Calendar = () => {
 
         // 3. 모든 데이터 병렬로 가져오기
         await Promise.all([
-          fetchUsersAndDepartments(),
+          fetchUsers(),
           fetchStatusList(),
           fetchUserSchedule(userInfo?.id),
         ]);
@@ -65,7 +65,7 @@ const Calendar = () => {
   };
 
   // 부서 및 사용자 정보 가져오는 함수
-  const fetchUsersAndDepartments = async () => {
+  const fetchUsers = async () => {
     try {
       const usersResponse = await fetch(
         `${process.env.REACT_APP_API_URL}/user/get_users`
@@ -76,12 +76,19 @@ const Calendar = () => {
       setUsers(usersData.users);
 
       const uniqueDepartments = [
-        ...new Set(usersData.users.map((user) => user.department)),
+        ...new Set(
+          usersData.users.map((user) =>
+            user.team_name
+              ? `${user.department_name} - ${user.team_name}`
+              : user.department_name
+          )
+        ),
       ]
         .filter(Boolean)
         .sort((a, b) => a.localeCompare(b, "ko-KR"));
-
+      // console.log(usersData.users);
       setDepartments(uniqueDepartments);
+      // console.log(uniqueDepartments);
     } catch (error) {
       console.error("데이터 로딩 오류:", error);
     }
@@ -560,7 +567,9 @@ const Calendar = () => {
                       .filter(
                         (user) =>
                           selectedDepartment === "" ||
-                          user.department === selectedDepartment
+                          (user.team_name
+                            ? `${user.department_name} - ${user.team_name}`
+                            : user.department_name) === selectedDepartment
                       )
                       .map((user) => user.id);
 

@@ -47,9 +47,20 @@ def get_users():
             return jsonify({'message': '데이터베이스 연결 실패!'}), 500
         cursor = conn.cursor(dictionary=True)
         sql = """
-            SELECT tu.id, tu.name, tu.position, tu.department, tu.phone_number, tu.role_id, tu.status, ts.comment, tu.first_login_yn 
-            FROM tb_user AS tu INNER JOIN tb_status AS ts
-            ON tu.status = ts.id
+            SELECT 
+                tu.id, 
+                tu.name, 
+                tu.position, 
+                td.dpr_nm AS department_name,  -- 부서명 가져오기
+                td.team_nm AS team_name,  -- 팀명 가져오기
+                tu.phone_number, 
+                tu.role_id, 
+                tu.status, 
+                ts.comment, 
+                tu.first_login_yn 
+            FROM tb_user AS tu 
+            LEFT JOIN tb_status AS ts ON tu.status = ts.id
+            LEFT JOIN tb_department AS td ON tu.department = td.dpr_id  -- 부서 매핑
             WHERE tu.is_delete_yn = 'N'
             ORDER BY tu.name ASC"""
         cursor.execute(sql)
