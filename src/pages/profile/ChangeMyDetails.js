@@ -11,13 +11,21 @@ const ChangeMyDetails = () => {
   const [formData, setFormData] = useState({
     username: "",
     position: "",
-    department: "",
+    department_name: "",
+    team_name: "",
     phone: "",
     role_id: "",
   });
 
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태
-  const [user, setUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    position: "",
+    department_name: "",
+    team_name: "",
+    role_id: "",
+  }); //로그인한 사용자 정보
   const { getUserInfo, checkAuth, handleLogout } = useAuth();
 
   useEffect(() => {
@@ -27,9 +35,7 @@ const ChangeMyDetails = () => {
         const userInfo = await fetchUserInfo();
 
         // 2. 모든 데이터 병렬로 가져오기
-        await Promise.all([
-          fetchFormData(userInfo.id), // 디코딩된 userId로 데이터 불러오기
-        ]);
+        await Promise.all([fetchFormData(userInfo.id)]);
       } catch (error) {
         console.error("데이터 로딩 오류:", error);
       }
@@ -62,13 +68,13 @@ const ChangeMyDetails = () => {
   };
 
   // 유저 데이터 불러오기 함수
-  const fetchFormData = async (decodedId) => {
-    if (!decodedId) return;
+  const fetchFormData = async (userId) => {
+    if (!userId) return;
 
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${apiUrl}/user/get_user?user_id=${decodedId}`,
+        `${apiUrl}/user/get_user?user_id=${userId}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
@@ -82,9 +88,16 @@ const ChangeMyDetails = () => {
       setFormData({
         username: data.user.name,
         position: data.user.position,
-        department: data.user.department,
+        department_name: data.user.department_name,
+        team_name: data.user.team_name,
         phone: data.user.phone_number,
         role_id: data.user.role_id,
+      });
+
+      setUser({
+        ...data.user,
+        department_name: data.user.department_name, 
+        team_name: data.user.team_name, 
       });
     } catch (error) {
       console.error("유저 데이터 불러오기 오류:", error);
@@ -124,7 +137,8 @@ const ChangeMyDetails = () => {
           id: user.id,
           username: formData.username,
           position: formData.position,
-          department: formData.department,
+          department_name: formData.department_name,
+          team_name: formData.team_name,
           phone: formData.phone,
           role_id: formData.role_id,
         }),
@@ -158,7 +172,9 @@ const ChangeMyDetails = () => {
           <div className="change-user-edit-form-group">
             <label>부서</label>
             <div className="change-user-info-text">
-              {user?.department}
+              {user?.team_name
+                ? `${user.department_name} - ${user.team_name}`
+                : user.department_name}
             </div>
           </div>
           <div className="change-user-edit-form-group">

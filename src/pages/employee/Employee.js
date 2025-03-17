@@ -43,6 +43,7 @@ const EmployeeList = () => {
   const [showFavorites, setShowFavorites] = useState(false); // 즐겨찾기 보기 여부 (true/false)
   const [sortBy, setSortBy] = useState(null); // 정렬 기준 (이름, 직급 등)
   const [sortOrder, setSortOrder] = useState("asc"); // 정렬 순서 (asc/desc)
+  const [allDepartmentsOpen, setAllDepartmentsOpen] = useState(false); // 전체 부서 열림 여부
 
   const navigate = useNavigate(); // 페이지 이동 훅
   const apiUrl = process.env.REACT_APP_API_URL; // API URL 환경 변수
@@ -128,7 +129,7 @@ const EmployeeList = () => {
     }
   };
 
-  // 👥 **사원 목록 가져오기**
+  // 👥 **사원 및 부서 목록 가져오기**
   const fetchEmployees = async () => {
     try {
       const response = await fetch(`${apiUrl}/user/get_users`);
@@ -138,10 +139,17 @@ const EmployeeList = () => {
       const data = await response.json();
       setEmployees(data.users);
 
-      const departments = Array.from(
-        new Set(data.users.map((user) => user.department || "기타"))
-      );
-      setDepartmentList(departments);
+      const uniqueDepartments = [
+        ...new Set(
+          data.users.map((user) =>
+            user.team_name
+              ? `${user.department_name} - ${user.team_name}`
+              : user.department_name || "기타"
+          )
+        ),
+      ].filter(Boolean);
+
+      setDepartmentList(uniqueDepartments);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -223,16 +231,16 @@ const EmployeeList = () => {
 
   // 📌 **직급 우선순위 매핑**
   const positionOrder = {
-    "부사장": 1,
-    "전무": 2,
-    "상무": 3,
-    "이사": 4,
-    "부장": 5,
-    "차장": 6,
-    "과장": 7,
-    "대리": 8,
-    "주임": 9,
-    "사원": 10
+    부사장: 1,
+    전무: 2,
+    상무: 3,
+    이사: 4,
+    부장: 5,
+    차장: 6,
+    과장: 7,
+    대리: 8,
+    주임: 9,
+    사원: 10,
   };
 
   const sortEmployees = (key) => {
@@ -261,9 +269,12 @@ const EmployeeList = () => {
   };
 
   const seeAllDepartments = () => {
-    setOpenDepartments((prev) => {
-      const allOpen = departmentList.every((department) => prev[department]); // 모든 부서가 열려 있는지 확인
+    const allOpen = departmentList.every(
+      (department) => openDepartments[department]
+    ); // 모든 부서가 열려 있는지 확인
+    setAllDepartmentsOpen(!allOpen); // 전체 열림 상태 반전
 
+    setOpenDepartments((prev) => {
       const updatedDepartments = {};
       departmentList.forEach((department) => {
         updatedDepartments[department] = !allOpen; // 모든 부서를 열거나 닫음
@@ -275,7 +286,10 @@ const EmployeeList = () => {
   // 직원들을 부서별로 그룹화하는 함수
   const groupByDepartment = (employees) => {
     return employees.reduce((acc, employee) => {
-      const department = employee.department || "기타"; // 부서 정보가 없으면 "기타"로 처리
+      const department = employee.team_name
+        ? `${employee.department_name} - ${employee.team_name}`
+        : employee.department_name || "기타";
+
       if (!acc[department]) {
         acc[department] = [];
       }
@@ -347,7 +361,11 @@ const EmployeeList = () => {
                 className="sort-button"
                 onClick={() => sortEmployees("position")}
               >
-                {sortBy === "position" ? (sortOrder === "asc" ? "▲" : "▼") : "▲"}
+                {sortBy === "position"
+                  ? sortOrder === "asc"
+                    ? "▲"
+                    : "▼"
+                  : "▲"}
               </button>
             </span>
             <span className="index-item">상태</span>
@@ -363,43 +381,43 @@ const EmployeeList = () => {
                   ? "▼"
                   : "▶"}
               </span>
-              범일정보 
-              <div className="department-count">
-                ({totalEmployees}명) 
-              </div>
+              범일정보
+              <div className="department-count">({totalEmployees}명)</div>
             </span>
           </div>
 
           {/* 👥 사원 목록 렌더링 */}
           <ul className="employee-list">
             {Object.keys(
-              groupByDepartment(
-                (showFavorites ? favoriteEmployees : employees).filter(
-                  filterEmployees
-                )
-              )
+              groupByDepartment(showFavorites ? favoriteEmployees : employees)
             )
-              .sort((a, b) => a.localeCompare(b)) // 부서명을 오름차순 정렬
+              .sort((a, b) => a.localeCompare(b, "ko-KR"))
               .map((department) => {
                 const departmentEmployees = groupByDepartment(
-                  (showFavorites ? favoriteEmployees : employees).filter(
-                    filterEmployees
-                  )
+                  showFavorites ? favoriteEmployees : employees
                 )[department];
 
                 return (
                   <div key={department}>
                     {/* 부서명 클릭 시 열고 닫을 수 있도록 토글 */}
                     <div
-                      className="department-header"
-                      onClick={() => toggleDepartment(department)}
+                      className={`department-header ${
+                        allDepartmentsOpen ? "open" : ""
+                      }`}
+                      onClick={seeAllDepartments}
+                      style={{
+                        backgroundColor: allDepartmentsOpen
+                          ? "#f5f5f5"
+                          : "white",
+                        transition: "background-color 0.3s",
+                      }}
                     >
                       <span className="sub-department">
                         {/* 화살표 표시 */}
                         <span className="arrow">
                           {openDepartments[department] ? "▼" : "▶"}
                         </span>
-                        {department} 
+                        {department}
                         <div className="department-count">
                           ({departmentEmployees.length}명)
                         </div>
@@ -419,12 +437,13 @@ const EmployeeList = () => {
                           >
                             {/* ⭐ 즐겨찾기 토글 */}
                             <span
-                              className={`favorite-icon ${favoriteEmployees.some(
-                                (fav) => fav.id === employee.id
-                              )
-                                ? ""
-                                : "not-favorite"
-                                }`}
+                              className={`favorite-icon ${
+                                favoriteEmployees.some(
+                                  (fav) => fav.id === employee.id
+                                )
+                                  ? ""
+                                  : "not-favorite"
+                              }`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleFavorite(employee.id);

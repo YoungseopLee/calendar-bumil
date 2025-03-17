@@ -30,7 +30,13 @@ const UserDetails = () => {
   const location = useLocation();
 
   const user_id = new URLSearchParams(location.search).get("user_id");
-  const [loggedInUser, setLoggedInUser] = useState({id: "", name: "", position: "", department: "", role_id: ""}); //로그인한 사용자 정보
+  const [loggedInUser, setLoggedInUser] = useState({
+    id: "",
+    name: "",
+    position: "",
+    department: "",
+    role_id: "",
+  }); //로그인한 사용자 정보
   const { getUserInfo, checkAuth, handleLogout } = useAuth();
 
   // 로그인한 사용자 정보 가져오기 및 권한 확인 후 권한 없으면 로그아웃 시키기
@@ -46,8 +52,7 @@ const UserDetails = () => {
         await Promise.all([
           fetchUserData(), // 사용자 정보
           fetchUserProjectData(), // 사용자 프로젝트 정보
-          fetchStatusList(), // 상태 목록   
-
+          fetchStatusList(), // 상태 목록
         ]);
       } catch (error) {
         //console.error("데이터 로딩 오류:", error);
@@ -140,14 +145,13 @@ const UserDetails = () => {
   const fetchStatusList = async () => {
     try {
       const response = await fetch(`${apiUrl}/status/get_status_list`);
-        if (!response.ok) throw new Error("상태 목록을 가져오지 못했습니다.");
-        const data = await response.json();
-        setStatusList(data.statuses); // [{ id: 1, comment: "HQ" }, ...]
-      } catch (err) {
-       //console.error("상태 목록 오류:", err);
-      } 
-    };
-
+      if (!response.ok) throw new Error("상태 목록을 가져오지 못했습니다.");
+      const data = await response.json();
+      setStatusList(data.statuses); // [{ id: 1, comment: "HQ" }, ...]
+    } catch (err) {
+      //console.error("상태 목록 오류:", err);
+    }
+  };
 
   const getStatusComment = (statusId) => {
     const statusObj = statusList.find((s) => s.id === statusId);
@@ -347,7 +351,9 @@ const UserDetails = () => {
             </p>
             <p>
               <FaBuilding className="icon" />
-              {user.department}
+              {user.team_name
+                ? `${user.department_name} - ${user.team_name}`
+                : user.department_name}
             </p>
             <p>
               <FaPhone className="icon" />

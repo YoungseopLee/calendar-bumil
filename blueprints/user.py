@@ -101,11 +101,22 @@ def get_user():
         cursor = conn.cursor(dictionary=True)
         
         sql = """
-            SELECT id, name, position, department, phone_number, role_id, status, is_delete_yn, first_login_yn
-            FROM tb_user
-            WHERE id = %s AND is_delete_yn = 'N'"""
+            SELECT 
+                tu.id, 
+                tu.name, 
+                tu.position, 
+                td.dpr_nm AS department_name,
+                td.team_nm AS team_name,
+                tu.phone_number, 
+                tu.role_id, 
+                tu.status, 
+                tu.is_delete_yn, 
+                tu.first_login_yn
+            FROM tb_user AS tu
+            LEFT JOIN tb_department AS td ON tu.department = td.dpr_id  -- 부서 매핑
+            WHERE tu.id = %s AND tu.is_delete_yn = 'N'"""
         cursor.execute(sql, (user_id,))
-        logger.info(f"[SQL/SELECT] tb_user /get_user{sql}")
+        logger.info(f"[SQL/SELECT] tb_user, tb_department /get_user {sql}")
 
         user_info = cursor.fetchone()
 
@@ -129,3 +140,4 @@ def get_user():
             conn.close()
         except Exception:
             pass
+
