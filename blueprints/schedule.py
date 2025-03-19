@@ -14,10 +14,9 @@ def get_schedule():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -36,7 +35,10 @@ def get_schedule():
         logger.info(f"[SQL/SELECT] tb_schedule /get_schedule{sql}")
 
         schedules = cursor.fetchall()
-        return jsonify({'schedules': schedules}), 200
+        response = jsonify({'schedules': schedules})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         print(f"일정 가져오기 오류: {e}")
         return jsonify({'message': '일정 가져오기 오류'}), 500
@@ -52,10 +54,9 @@ def get_other_users_schedule():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -83,7 +84,10 @@ def get_other_users_schedule():
         # 현재 사용자의 일정은 제외
         filtered_schedules = [sched for sched in schedules if sched['user_id'] != user_id]
 
-        return jsonify({'schedules': filtered_schedules}), 200
+        response = jsonify({'schedules': filtered_schedules})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         print(f"다른 사용자 일정 가져오기 오류: {e}")
         return jsonify({'message': '다른 사용자 일정 가져오기 오류'}), 500
@@ -99,10 +103,9 @@ def add_schedule():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -127,7 +130,10 @@ def add_schedule():
         logger.info(f"[SQL/INSERT] tb_schedule /add-schedule{sql}")
 
         conn.commit()
-        return jsonify({'message': '일정이 추가되었습니다.'}), 200
+        response = jsonify({'message': '일정이 추가되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         print(f"일정 추가 오류: {e}")
         return jsonify({'message': f'일정 추가 중 오류 발생: {e}'}), 500
@@ -143,10 +149,9 @@ def edit_schedule(schedule_id):
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -180,7 +185,10 @@ def edit_schedule(schedule_id):
         logger.info(f"[SQL/UPDATE] tb_schedule /edit-schedule{sql_schedule_update}")
 
         conn.commit()
-        return jsonify({'message': '일정이 수정되었습니다.'}), 200
+        response = jsonify({'message': '일정이 수정되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except jwt.ExpiredSignatureError:
         return jsonify({'message': '토큰이 만료되었습니다.'}), 401
     except jwt.InvalidTokenError:
@@ -201,10 +209,9 @@ def delete_schedule(schedule_id):
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -234,7 +241,10 @@ def delete_schedule(schedule_id):
         logger.info(f"[SQL/DELETE] tb_schedule /delete-schedule{sql_schedule_id_delete}")
 
         conn.commit()
-        return jsonify({'message': '일정이 삭제되었습니다.'}), 200
+        response = jsonify({'message': '일정이 삭제되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except jwt.ExpiredSignatureError:
         return jsonify({'message': '토큰이 만료되었습니다.'}), 401
     except jwt.InvalidTokenError:
@@ -254,10 +264,9 @@ def get_all_schedule():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -273,7 +282,10 @@ def get_all_schedule():
         logger.info(f"[SQL/SELECT] tb_schedule /get_all_schedule{sql}")
 
         schedules = cursor.fetchall()
-        return jsonify({'schedules': schedules}), 200
+        response = jsonify({'schedules': schedules})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         print(f"일정 가져오기 오류: {e}")
         return jsonify({'message': '일정 가져오기 오류'}), 500

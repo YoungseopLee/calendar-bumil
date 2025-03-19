@@ -15,10 +15,9 @@ def get_pending_users():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -54,10 +53,9 @@ def get_users():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -111,10 +109,9 @@ def get_user():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401

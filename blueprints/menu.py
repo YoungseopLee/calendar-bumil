@@ -15,9 +15,9 @@ def get_menu_list():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -29,7 +29,10 @@ def get_menu_list():
         cursor.execute(sql)
         menus = cursor.fetchall()
         logger.info(f"[SQL/SELECT] {sql}")
-        return jsonify({'menus': menus}), 200
+        response = jsonify({'menus': menus})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         return jsonify({'message': f'메뉴 조회 실패: {str(e)}'}), 500
     finally:
@@ -43,9 +46,9 @@ def create_menu():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -77,7 +80,10 @@ def create_menu():
         cursor.execute(sql, (menu_id, menu_nm, menu_order, created_by, created_by))
         conn.commit()
         logger.info(f"[SQL/INSERT] {sql} | PARAMS: ({menu_id}, {menu_nm}, {menu_order})")
-        return jsonify({'message': '메뉴가 추가되었습니다.'}), 201
+        response = jsonify({'message': '메뉴가 추가되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 201
     except Exception as e:
         return jsonify({'message': f'메뉴 추가 실패: {str(e)}'}), 500
     finally:
@@ -91,9 +97,9 @@ def update_menu(menu_id):
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -120,7 +126,10 @@ def update_menu(menu_id):
         if cursor.rowcount == 0:
             return jsonify({'message': '메뉴를 찾을 수 없습니다.'}), 404
 
-        return jsonify({'message': '메뉴가 성공적으로 수정되었습니다.'}), 200
+        response = jsonify({'message': '메뉴가 성공적으로 수정되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         return jsonify({'message': f'메뉴 수정 실패: {str(e)}'}), 500
     finally:
@@ -135,9 +144,9 @@ def delete_menu(menu_id):
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -153,7 +162,10 @@ def delete_menu(menu_id):
         if cursor.rowcount == 0:
             return jsonify({'message': '메뉴를 찾을 수 없습니다.'}), 404
 
-        return jsonify({'message': '메뉴가 성공적으로 삭제되었습니다.'}), 200
+        response = jsonify({'message': '메뉴가 성공적으로 삭제되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         return jsonify({'message': f'메뉴 삭제 실패: {str(e)}'}), 500
     finally:

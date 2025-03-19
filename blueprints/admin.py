@@ -18,9 +18,9 @@ def create_user():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -88,7 +88,10 @@ def create_user():
         logger.info(f"[SQL/INSERT] tb_user /add_user {sql_tb_user_insert}")
 
         conn.commit()
-        return jsonify({'message': '유저 생성 성공!'}), 201
+        response = jsonify({'message': '유저 생성 성공!'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 201
     except Exception as e:
         conn.rollback()
         print(f"유저 생성 오류: {e}")
@@ -104,9 +107,9 @@ def update_user():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -172,7 +175,10 @@ def update_user():
         logger.info(f"[SQL/UPDATE] tb_user /update_user{sql}")
 
         conn.commit()
-        return jsonify({'message': '유저 정보가 업데이트되었습니다.'}), 200
+        response = jsonify({'message': '유저 정보가 업데이트되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         conn.rollback()
         print(f"유저 정보 업데이트 오류: {e}")
@@ -183,15 +189,15 @@ def update_user():
 
 
 # 유저 삭제 API (논리 삭제)
-@admin_bp.route('/delete_user/<string:user_id>', methods=['PUT', 'OPTIONS'])
-def delete_user(user_id):
+@admin_bp.route('/delete_user/<string:target_user_id>', methods=['PUT', 'OPTIONS'])
+def delete_user(target_user_id):
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -205,11 +211,14 @@ def delete_user(user_id):
             UPDATE tb_user 
             SET is_delete_yn = 'Y' 
             WHERE id = %s"""
-        cursor.execute(sql, (user_id,))
+        cursor.execute(sql, (target_user_id,))
         logger.info(f"[SQL/UPDATE] tb_user /delete_user{sql}")
 
         conn.commit()
-        return jsonify({'message': '유저가 삭제되었습니다.'}), 200
+        response = jsonify({'message': '유저가 삭제되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         conn.rollback()
         print(f"유저 삭제 오류: {e}")
@@ -225,9 +234,9 @@ def update_role_id():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -270,7 +279,10 @@ def update_role_id():
         logger.info(f"[SQL/UPDATE] tb_user /update_role_id{sql}")
 
         conn.commit()
-        return jsonify({'message': '유저 정보가 업데이트되었습니다.'}), 200
+        response = jsonify({'message': '유저 정보가 업데이트되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         conn.rollback()
         print(f"유저 정보 업데이트 오류: {e}")
@@ -330,9 +342,9 @@ def update_status_admin():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -372,7 +384,10 @@ def update_status_admin():
 
 
         conn.commit()
-        return jsonify({'message': '상태가 업데이트되었습니다.'}), 200
+        response = jsonify({'message': '상태가 업데이트되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
 
     except jwt.ExpiredSignatureError:
         return jsonify({'message': '토큰이 만료되었습니다.'}), 401

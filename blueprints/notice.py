@@ -16,9 +16,9 @@ def get_notices():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -39,7 +39,10 @@ def get_notices():
         cursor.execute(sql)
 
         notices = cursor.fetchall()
-        return jsonify({'notices': notices}), 200
+        response = jsonify({'notices': notices})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         return jsonify({'message': f'공지사항 조회 실패: {str(e)}'}), 500
     finally:
@@ -53,9 +56,9 @@ def get_notice(notice_id):
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -74,7 +77,10 @@ def get_notice(notice_id):
         
         notice = cursor.fetchone()
         if notice:
-            return jsonify({'notice': notice}), 200
+            response = jsonify({'notice': notice})
+            if new_access_token:
+                response.headers["X-New-Access-Token"] = new_access_token
+            return response, 200
         return jsonify({'message': '공지사항을 찾을 수 없습니다.'}), 404
     except Exception as e:
         logger.error(f"공지사항 조회 오류: {e}")
@@ -90,9 +96,9 @@ def create_notice():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -125,9 +131,11 @@ def create_notice():
         VALUES (%s, %s, %s, %s, %s)"""
         cursor.execute(sql, (title, content, user_id, created_by, created_by))
         conn.commit()
-
-        return jsonify({'message': '공지사항이 성공적으로 등록되었습니다.'}), 201
-
+        
+        response = jsonify({'message': '공지사항이 성공적으로 등록되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 201
     except Exception as e:
         conn.rollback()
         return jsonify({'message': f'공지사항 등록 실패: {str(e)}'}), 500
@@ -143,9 +151,9 @@ def update_notice(notice_id):
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -175,7 +183,10 @@ def update_notice(notice_id):
         if cursor.rowcount == 0:
             return jsonify({'message': '공지사항을 찾을 수 없거나 삭제된 상태입니다.'}), 404
 
-        return jsonify({'message': '공지사항이 성공적으로 수정되었습니다.'}), 200
+        response = jsonify({'message': '공지사항이 성공적으로 수정되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         logger.error(f"공지사항 수정 오류: {e}")
         return jsonify({'message': '공지사항 수정 실패!'}), 500
@@ -190,9 +201,9 @@ def delete_notice(notice_id):
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -217,7 +228,10 @@ def delete_notice(notice_id):
         if cursor.rowcount == 0:
             return jsonify({'message': '공지사항을 찾을 수 없거나 이미 삭제되었습니다.'}), 404
 
-        return jsonify({'message': '공지사항이 성공적으로 삭제(비활성화)되었습니다.'}), 200
+        response = jsonify({'message': '공지사항이 성공적으로 삭제(비활성화)되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         logger.error(f"공지사항 삭제 오류: {e}")
         return jsonify({'message': '공지사항 삭제 실패!'}), 500
@@ -232,9 +246,9 @@ def restore_notice(notice_id):
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -259,7 +273,10 @@ def restore_notice(notice_id):
         if cursor.rowcount == 0:
             return jsonify({'message': '삭제된 공지사항을 찾을 수 없습니다.'}), 404
 
-        return jsonify({'message': '공지사항이 성공적으로 복구되었습니다.'}), 200
+        response = jsonify({'message': '공지사항이 성공적으로 복구되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         logger.error(f"공지사항 복구 오류: {e}")
         return jsonify({'message': '공지사항 복구 실패!'}), 500

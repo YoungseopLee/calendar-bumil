@@ -14,10 +14,9 @@ def get_all_status():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -49,10 +48,9 @@ def get_status_list():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -86,10 +84,9 @@ def get_users_status():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -130,10 +127,9 @@ def add_status():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -156,7 +152,10 @@ def add_status():
         logger.info(f"[SQL/INSERT] tb_status /add_status{sql}")
         
         conn.commit()
-        return jsonify({'message': '상태가 추가되었습니다.'}), 201
+        response = jsonify({'message': '상태가 추가되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 201
     except Exception as e:
         print(f"상태 추가 오류: {e}")
         return jsonify({'message': '상태 추가 오류'}), 500
@@ -173,10 +172,9 @@ def edit_status(status_id):
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -209,7 +207,10 @@ def edit_status(status_id):
 
         conn.commit()
 
-        return jsonify({'message': '상태가 성공적으로 수정되었습니다.'}), 200
+        response = jsonify({'message': '상태가 성공적으로 수정되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
 
     except Exception as e:
         print(f"상태 수정 오류: {e}")
@@ -228,10 +229,9 @@ def delete_status(status):
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -248,7 +248,10 @@ def delete_status(status):
         logger.info(f"[SQL/DELETE] tb_status /delete_status{sql}")
 
         conn.commit()
-        return jsonify({'message': '상태가 삭제되었습니다.'}), 200
+        response = jsonify({'message': '상태가 삭제되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         print(f"상태 삭제 오류: {e}")
         return jsonify({'message': '상태 삭제 오류'}), 500
@@ -265,10 +268,9 @@ def update_status():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
     
-    # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    requester_user_id, user_name, requester_role, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    requester_user_id, user_name, requester_role, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
     
     if requester_user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -321,7 +323,10 @@ def update_status():
         logger.info(f"[SQL/INSERT] tb_user_status_log /update_status{sql_status_log_insert}")
 
         conn.commit()
-        return jsonify({'message': '상태가 업데이트되었습니다.'}), 200
+        response = jsonify({'message': '상태가 업데이트되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
 
     except jwt.ExpiredSignatureError:
         return jsonify({'message': '토큰이 만료되었습니다.'}), 401
@@ -334,8 +339,5 @@ def update_status():
         try:
             cursor.close()
             conn.close()
-        except Exception:
-            pass
-
         except Exception:
             pass

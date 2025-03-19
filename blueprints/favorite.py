@@ -15,9 +15,9 @@ def toggle_favorite():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -57,7 +57,10 @@ def toggle_favorite():
             logger.info(f"[SQL/INSERT] tb_favorite /toggle_favorite{sql_tb_favorite_insert}")
             conn.commit()
             response_message = '즐겨찾기가 추가되었습니다.'
-        return jsonify({'message': response_message}), 200
+        response = jsonify({'message': response_message})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         print(f"즐겨찾기 오류: {e}")
         return jsonify({'message': f'오류: {e}'}), 500
@@ -74,9 +77,9 @@ def get_favorites():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -118,7 +121,10 @@ def get_favorites():
                 print(f"복호화 오류: {decryption_error}")
                 return jsonify({'message': '사용자 정보 복호화 실패'}), 500
 
-        return jsonify({'favorite': favorites}), 200
+        response = jsonify({'favorite': favorites})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         print(f"즐겨찾기 목록 조회 오류: {e}")
         return jsonify({'message': '즐겨찾기 목록 조회 오류'}), 500

@@ -32,9 +32,9 @@ def get_all_project():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -82,9 +82,9 @@ def get_search_project():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -146,9 +146,9 @@ def get_project_details():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -205,9 +205,9 @@ def add_project():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -296,7 +296,10 @@ def add_project():
             cursor.execute(sql_project_user, (project_code, participant_id, start_date, end_date, current_project_yn, created_by, created_by))
             logger.info(f"[SQL/INSERT] tb_project_user /add_project{sql_project_user}")
         conn.commit()
-        return jsonify({'message': '프로젝트가 추가되었습니다.'}), 201
+        response = jsonify({'message': '프로젝트가 추가되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 201
     except Exception as e:
         print(f"프로젝트 추가 오류: {e}")
         return jsonify({'message': f'프로젝트 추가 중 오류 발생: {e}'}), 500
@@ -314,9 +317,9 @@ def edit_project():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -439,7 +442,10 @@ def edit_project():
 
         conn.commit()
 
-        return jsonify({'message': '프로젝트가 수정되었습니다.'}), 200
+        response = jsonify({'message': '프로젝트가 수정되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
 
     except Exception as e:
         print(f"프로젝트 수정 오류: {e}")
@@ -458,9 +464,9 @@ def delete_project(project_code):
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -480,7 +486,10 @@ def delete_project(project_code):
         logger.info(f"[SQL/UPDATE] tb_project_user /delete_project{sql_project_user}")
 
         conn.commit()
-        return jsonify({'message': '프로젝트가 삭제되었습니다.'}), 200
+        response = jsonify({'message': '프로젝트가 삭제되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except jwt.ExpiredSignatureError:
         return jsonify({'message': '토큰이 만료되었습니다.'}), 401
     except jwt.InvalidTokenError:
@@ -502,9 +511,9 @@ def get_user_and_projects():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -570,9 +579,9 @@ def get_users_and_projects():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401

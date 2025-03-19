@@ -16,9 +16,9 @@ def get_department_list():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -34,7 +34,10 @@ def get_department_list():
         departments = cursor.fetchall()
         logger.info(f"[SQL/SELECT] {sql})")
         
-        return jsonify({'departments': departments}), 200
+        response = jsonify({'departments': departments})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         return jsonify({'message': f'부서 목록 조회 실패: {str(e)}'}), 500
     finally:
@@ -48,9 +51,9 @@ def get_department(dpr_id):
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -66,7 +69,10 @@ def get_department(dpr_id):
         department = cursor.fetchone()
         logger.info(f"[SQL/SELET] {sql} | PARAMS: ({dpr_id})")
         if department:
-            return jsonify({'department': department}), 200
+            response = jsonify({'department': department})
+            if new_access_token:
+                response.headers["X-New-Access-Token"] = new_access_token
+            return response, 200
         return jsonify({'message': '부서를 찾을 수 없습니다.'}), 404
     except Exception as e:
         return jsonify({'message': f'부서 조회 실패: {str(e)}'}), 500
@@ -81,9 +87,9 @@ def create_department():
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -109,7 +115,10 @@ def create_department():
         cursor.execute(sql, (dpr_id, dpr_nm, team_nm, created_by, created_by))
         conn.commit()
         logger.info(f"[SQL/INSERT] {sql} | PARAMS: ({dpr_id}, {dpr_nm}, {team_nm}, {created_by})")
-        return jsonify({'message': '부서가 성공적으로 추가되었습니다.'}), 201
+        response = jsonify({'message': '부서가 성공적으로 추가되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 201
     except Exception as e:
         return jsonify({'message': f'부서 추가 실패: {str(e)}'}), 500
     finally:
@@ -123,9 +132,9 @@ def update_department(dpr_id):
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -152,7 +161,10 @@ def update_department(dpr_id):
         if cursor.rowcount == 0:
             return jsonify({'message': '부서를 찾을 수 없습니다.'}), 404
 
-        return jsonify({'message': '부서가 성공적으로 수정되었습니다.'}), 200
+        response = jsonify({'message': '부서가 성공적으로 수정되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         return jsonify({'message': f'부서 수정 실패: {str(e)}'}), 500
     finally:
@@ -166,9 +178,9 @@ def delete_department(dpr_id):
         return jsonify({'message': 'CORS preflight request success'})
     
     # verify_and_refresh_token 사용하여 토큰 검증 및 자동 갱신
-    user_id, user_name, role_id, refresh_response, status_code = verify_and_refresh_token(request)
-    if refresh_response:
-        return refresh_response, status_code  # 자동 토큰 갱신 응답 반환
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code  # 자동 토큰 갱신 응답 반환
     
     if user_id is None:
         return jsonify({'message': '토큰 인증 실패'}), 401
@@ -187,7 +199,10 @@ def delete_department(dpr_id):
         if cursor.rowcount == 0:
             return jsonify({'message': '부서를 찾을 수 없습니다.'}), 404
 
-        return jsonify({'message': '부서가 성공적으로 삭제되었습니다.'}), 200
+        response = jsonify({'message': '부서가 성공적으로 삭제되었습니다.'})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
     except Exception as e:
         return jsonify({'message': f'부서 삭제 실패: {str(e)}'}), 500
     finally:

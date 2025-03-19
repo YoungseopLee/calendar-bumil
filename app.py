@@ -93,8 +93,8 @@ def after_request(response):
     response.headers["Access-Control-Allow-Credentials"] = "true"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Refresh-Token"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+    response.headers["Access-Control-Expose-Headers"] = "X-New-Access-Token"
     return response
-
 
 # 블루프린트 등록
 app.register_blueprint(auth_bp)
