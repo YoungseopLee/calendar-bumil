@@ -53,7 +53,7 @@ bcrypt = Bcrypt()
 bcrypt.init_app(app)
 
 # CORS 설정
-CORS(app, supports_credentials=True, origins=ALLOWED_ORIGINS)
+# CORS(app, supports_credentials=True, origins=ALLOWED_ORIGINS)
 
 access_handler = logging.FileHandler("logs/access.log")
 access_handler.setLevel(logging.INFO)
@@ -91,9 +91,10 @@ def after_request(response):
     else:
         response.headers["Access-Control-Allow-Origin"] = ALLOWED_ORIGINS[0]
     response.headers["Access-Control-Allow-Credentials"] = "true"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Refresh-Token"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     return response
+
 
 # 블루프린트 등록
 app.register_blueprint(auth_bp)
