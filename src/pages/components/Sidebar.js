@@ -138,7 +138,7 @@ const Sidebar = ({
         {/* 로그아웃 버튼 */}
         <div className="logout-section">
           <Link onClick={handleLogoutClick} className="logout-link">
-            <FaSignOutAlt className="menu-icon" /> {!isTablet && "로그아웃"}
+            <FaSignOutAlt className="logout-icon" /> {!isTablet && "로그아웃"}
           </Link>
         </div>
       </div>

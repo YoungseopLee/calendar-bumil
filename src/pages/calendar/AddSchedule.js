@@ -28,10 +28,6 @@ import "./AddSchedule.css";
  *    ├── 돌아가기 버튼
  */
 
-const API_URL = process.env.REACT_APP_API_URL;
-const accessToken = localStorage.getItem("access_token");
-const refreshToken = localStorage.getItem("refresh_token");
-
 const AddSchedule = () => {
   // ✅ 일정 관련 상태 관리
   const [startDate, setStartDate] = useState(""); // 시작 날짜
@@ -44,6 +40,10 @@ const AddSchedule = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  const API_URL = process.env.REACT_APP_API_URL;
+  const accessToken = localStorage.getItem("access_token");
+  const refreshToken = localStorage.getItem("refresh_token");
 
   const [user, setUser] = useState({
     id: "",

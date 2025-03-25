@@ -132,7 +132,7 @@
 }
 
 .menu li:hover {
-  background-color: #dee2e6;
+  background-color: #d5eaff;
   color: #212529;
 }
 
@@ -172,4 +172,8 @@
 
 .logout-link:hover {
   background-color: #b02a37;
+}
+
+.logout-icon {
+  font-size: 18px;
 }
