@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import "./ResetUser.css";
+import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
+import "./ResetUser.css";
 
 const ResetUser = () => {
   const [employees, setEmployees] = useState([]);
@@ -116,9 +117,7 @@ const ResetUser = () => {
     return value.includes(searchText.toLowerCase());
   };
 
-  if (loading) {
-    return <div>로딩 중...</div>;
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="user-reset-page">

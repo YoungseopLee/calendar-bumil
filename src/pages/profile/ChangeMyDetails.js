@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import "./ChangeMyDetails.css";
 import Sidebar from "../components/Sidebar";
+import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
+import "./ChangeMyDetails.css";
 
 const ChangeMyDetails = () => {
   const navigate = useNavigate();
@@ -161,7 +162,7 @@ const ChangeMyDetails = () => {
     }
   };
 
-  if (loading) return <div className="change-user-edit-body">로딩 중...</div>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="change-user-edit-body">

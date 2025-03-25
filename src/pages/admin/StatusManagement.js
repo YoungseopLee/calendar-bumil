@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import "./StatusManagement.css";
+import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 
+import "./StatusManagement.css";
 const StatusManagement = () => {
   const [statuses, setStatuses] = useState([]);
   const [newStatus, setNewStatus] = useState("");
@@ -115,9 +116,7 @@ const StatusManagement = () => {
     }
   };
 
-  if (loading) {
-    return <div>로딩 중...</div>;
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="status-management">

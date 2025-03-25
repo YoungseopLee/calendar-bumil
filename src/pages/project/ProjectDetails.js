@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import "./ProjectDetails.css";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
+import "./ProjectDetails.css";
 
 /**
  * 📌 ProjectDetails - 프로젝트 상세 정보를 조회하는 페이지
@@ -154,8 +156,8 @@ const ProjectDetails = () => {
   };
 
   // ✅ 데이터 로딩 중 또는 에러 발생 시 처리
-  if (loading) return <p>데이터를 불러오는 중...</p>;
-  if (error) return <p>오류 발생: {error}</p>;
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage />;
 
   // ✅ 프로젝트 수정 페이지로 이동
   const handleEditClick = () => {

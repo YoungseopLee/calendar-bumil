@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import BackButton from "../components/BackButton";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
 import { FaSearch } from "react-icons/fa";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
@@ -347,8 +349,8 @@ const SituationControls = () => {
   });
 
   // 로딩 및 에러 처리
-  if (loading) return <div className="userdetail-container">로딩 중...</div>;
-  if (error) return <div className="userdetail-container">{error}</div>;
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage />;
 
   const ChartView = ({ dateFilteredProjects }) => {
     // 프로젝트별로 참가자들을 그룹화 (project_code를 기준으로 데이터 그룹화)

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import "./EditSchedule.css";
 import Sidebar from "../components/Sidebar";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
+import LoadingSpinner from "../components/LoadingSpinner";
+import "./EditSchedule.css";
 
 const EditSchedule = () => {
   const { scheduleId } = useParams();
@@ -107,9 +108,7 @@ const EditSchedule = () => {
     }
   };
 
-  if (loading) {
-    return <div>로딩 중...</div>;
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="edit-body">

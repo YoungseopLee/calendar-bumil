@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
-import "./ManageDepartment.css";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
-
+import LoadingSpinner from "../components/LoadingSpinner";
+import Sidebar from "../components/Sidebar";
+import "./ManageDepartment.css";
 const ManageDepartment = () => {
   const [departmentList, setDepartmentList] = useState([]);
   const [newDepartmentId, setNewDepartmentId] = useState(""); // 부서 ID
@@ -186,9 +186,7 @@ const ManageDepartment = () => {
     setEditDepartment(null);
   };
 
-  if (loading) {
-    return <div>로딩 중...</div>;
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="department-management">

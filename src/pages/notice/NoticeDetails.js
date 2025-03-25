@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./NoticeDetails.css";
 import Sidebar from "../components/Sidebar";
 import { useParams } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
+
+import "./NoticeDetails.css";
 
 const NoticeDetails = () => {
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태
@@ -106,8 +109,8 @@ const NoticeDetails = () => {
   };
 
   // ✅ 로딩 중 또는 에러 시 화면에 표시할 메세지
-  if (loading) return <p>데이터를 불러오는 중...</p>;
-  if (error) return <p>오류 발생: {error}</p>;
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage />;
 
   return (
     <div>

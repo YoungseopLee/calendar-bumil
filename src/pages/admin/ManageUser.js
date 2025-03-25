@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import Sidebar from "../components/Sidebar";
+import LoadingSpinner from "../components/LoadingSpinner";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { followCursor } from "tippy.js";
@@ -206,9 +207,7 @@ const ManageUser = () => {
     department: "부서",
   };
 
-  if (loading) {
-    return <div>로딩 중...</div>;
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="manage-user-page">

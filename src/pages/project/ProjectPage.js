@@ -4,9 +4,10 @@ import ProjectList from "./ProjectList";
 import Sidebar from "../components/Sidebar";
 import AddProjectButton from "./AddProjectButton";
 import ScrollToTopButton from "../components/ScrollToTopButton";
-import "./ProjectPage.css";
+import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
+import "./ProjectPage.css";
 /**
  * 📌 ProjectPage - 프로젝트 목록을 조회하고 필터링하는 페이지
  *
@@ -29,6 +30,7 @@ const ProjectPage = () => {
   const [users, setUsers] = useState([]); // 사용자 목록
   const [userIdToNameMap, setUserIdToNameMap] = useState({}); // 사용자 ID-이름 매핑
   const [roleId, setRoleId] = useState(""); // 현재 로그인한 사용자의 권한
+  const [loading, setLoading] = useState(true); // 데이터 로딩 상태
 
   // 검색 및 필터링 관련 상태
   const [searchCategory, setSearchCategory] = useState("projectName"); // 검색 카테고리
@@ -52,7 +54,6 @@ const ProjectPage = () => {
     role_id: "",
   }); //로그인한 사용자 정보
   const { getUserInfo, checkAuth, handleLogout } = useAuth();
-  const [loading, setLoading] = useState(true); // 데이터 로딩 상태
 
   // 전체 데이터 가져오기
   useEffect(() => {
@@ -201,7 +202,7 @@ const ProjectPage = () => {
     );
   });
 
-  if (loading) return <p>데이터를 불러오는 중...</p>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="project-page-app-body">

@@ -1,0 +1,45 @@
+.spinner-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-size: 1.6rem;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.spinner-icon {
+  width: 60px;
+  height: 60px;
+  color: #4a90e2;
+  margin-bottom: 20px;
+  animation: rotate 1.2s linear infinite;
+}
+
+.error-icon {
+  width: 60px;
+  height: 60px;
+  color: #d9534f;
+  margin-bottom: 20px;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

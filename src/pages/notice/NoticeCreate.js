@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
+import { useAuth } from "../../utils/useAuth";
+import { authFetch } from "../../utils/authFetch";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "./NoticeCreate.css";
-import { useAuth } from "../../utils/useAuth";
-import { authFetch } from "../../utils/authFetch";
 
 /**
  * 📌  NoticeCreate - 공지사항 생성을 위한 컴포넌트
@@ -149,8 +151,8 @@ const NoticeCreate = () => {
   ];
 
   // ✅ 로딩 중 또는 에러 시 화면에 표시할 메세지
-  if (loading) return <p>데이터를 불러오는 중...</p>;
-  if (error) return <p>오류 발생: {error}</p>;
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage />;
 
   return (
     <div>

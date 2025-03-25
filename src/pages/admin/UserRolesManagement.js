@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import "./UserRolesManagement.css";
+import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
+import "./UserRolesManagement.css";
 
 const UserRolesManagement = () => {
   const [employees, setEmployees] = useState([]);
@@ -123,9 +124,7 @@ const UserRolesManagement = () => {
     department: "부서",
   };
 
-  if (loading) {
-    return <div>로딩 중...</div>;
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="user-roles-page">

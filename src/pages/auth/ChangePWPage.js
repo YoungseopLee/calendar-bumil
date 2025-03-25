@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./ChangePWPage.css";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
+import LoadingSpinner from "../components/LoadingSpinner";
+import "./ChangePWPage.css";
+
 const ChangePWPage = () => {
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중)
   const [formData, setFormData] = useState({
@@ -89,7 +91,7 @@ const ChangePWPage = () => {
     }
   };
 
-  if (loading) return <div className="userdetail-container">로딩 중...</div>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="changepw-body">

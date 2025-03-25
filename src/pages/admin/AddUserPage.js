@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
-import "./AddUserPage.css"; // 스타일 파일 추가
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
+import LoadingSpinner from "../components/LoadingSpinner";
+import "./AddUserPage.css"; // 스타일 파일 추가
 
 const AddUserPage = () => {
   const [formData, setFormData] = useState({
@@ -201,9 +202,7 @@ const AddUserPage = () => {
     "주임",
   ];
 
-  if (loading) {
-    return <div>로딩 중...</div>;
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="user-add-body">

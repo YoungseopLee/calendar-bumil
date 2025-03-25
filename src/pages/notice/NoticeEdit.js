@@ -1,11 +1,13 @@
 import Sidebar from "../components/Sidebar";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../../utils/useAuth";
+import { authFetch } from "../../utils/authFetch";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import "./NoticeEdit.css";
-import { useAuth } from "../../utils/useAuth";
-import { authFetch } from "../../utils/authFetch";
 
 const NoticeEdit = () => {
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태
@@ -196,8 +198,8 @@ const NoticeEdit = () => {
     "link",
   ];
 
-  if (loading) return <p>데이터를 불러오는 중...</p>;
-  if (error) return <p>오류 발생: {error}</p>;
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage />;
 
   return (
     <div>

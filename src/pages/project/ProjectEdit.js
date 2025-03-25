@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Sidebar from "../components/Sidebar";
 import Select from "react-select";
-import "./ProjectEdit.css";
+import Sidebar from "../components/Sidebar";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
+import "./ProjectEdit.css";
 
 /**
  * 📌 ProjectEdit - 프로젝트 수정 페이지
@@ -193,8 +195,8 @@ const ProjectEdit = () => {
   };
 
   // ✅ 로딩 중 또는 에러 시 화면에 표시할 메세지
-  if (loading) return <p>데이터를 불러오는 중...</p>;
-  if (error) return <p>오류 발생: {error}</p>;
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage />;
 
   // ✅ 입력 필드 값 변경 시 Project 상태 업데이트
   const handleChange = (key, value) => {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
 import Select from "react-select";
-import "./ParticipantSelection.css";
 import { authFetch } from "../../utils/authFetch";
+import "./ParticipantSelection.css";
 
 const ParticipantSelection = ({
   participants,

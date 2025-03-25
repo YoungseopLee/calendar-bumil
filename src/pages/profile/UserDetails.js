@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import BackButton from "../components/BackButton";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
+import { useAuth } from "../../utils/useAuth";
+import { authFetch } from "../../utils/authFetch";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { followCursor } from "tippy.js";
@@ -14,15 +18,13 @@ import {
   FaBuilding,
   FaUserCircle,
 } from "react-icons/fa"; // 아이콘 추가
-import { useAuth } from "../../utils/useAuth";
-import { authFetch } from "../../utils/authFetch";
 
 const UserDetails = () => {
   const [user, setUser] = useState(null); // 이 페이지에서만 프로필 유저 정보
   const [userprojects, setUserProjects] = useState([]); // 유저의 프로젝트 데이터 추가
   const [loading, setLoading] = useState(true);
-  const [statusList, setStatusList] = useState([]);
   const [error, setError] = useState(null);
+  const [statusList, setStatusList] = useState([]);
   const [year, setYear] = useState(new Date().getFullYear());
   const [isTableView, setIsTableView] = useState(false); // 추가: 표 형태 전환 상태
 
@@ -196,8 +198,8 @@ const UserDetails = () => {
     );
   });
 
-  if (loading) return <div className="userdetail-container">로딩 중...</div>;
-  if (error) return <div className="userdetail-container">{error}</div>;
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage />;
 
   const ChartView = ({ filteredProjects }) => {
     return (

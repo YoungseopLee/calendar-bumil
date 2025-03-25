@@ -10,6 +10,8 @@ import { FaPlus } from "react-icons/fa";
 import { IoSearchOutline } from "react-icons/io5";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
 import AddNoticeButton from "./AddNoticeButton";
 
 /**
@@ -155,8 +157,8 @@ const NoticeList = () => {
   };
 
   // 로딩 중 또는 에러 시 화면에 표시할 메세지
-  if (loading) return <p>데이터를 불러오는 중...</p>;
-  if (error) return <p>오류 발생: {error}</p>;
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage />;
 
   return (
     <div className="notice-list-app-body">

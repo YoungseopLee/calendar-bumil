@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import { useAuth } from "../../utils/useAuth";
+import { authFetch } from "../../utils/authFetch";
 import Tippy from "@tippyjs/react";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "tippy.js/dist/tippy.css";
 import { followCursor } from "tippy.js";
 import "./LoginLogPage.css";
-import { useAuth } from "../../utils/useAuth";
-import { authFetch } from "../../utils/authFetch";
 
 const LoginLogPage = () => {
   const [logs, setLogs] = useState([]); // 로그인 로그 데이터
@@ -120,9 +121,7 @@ const LoginLogPage = () => {
     }
   };
 
-  if (loading) {
-    return <div>로딩 중...</div>;
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="login-log-page">

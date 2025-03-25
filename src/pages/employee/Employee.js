@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import "./Employee.css";
 import Sidebar from "../components/Sidebar";
 import BackButton from "../components/BackButton";
-import { useNavigate } from "react-router-dom";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
+import { useNavigate } from "react-router-dom";
 
 /**
  * 📌 EmployeeList - 사원 목록을 조회하고 필터링하는 페이지
@@ -323,8 +325,8 @@ const EmployeeList = () => {
   const filteredEmployees = sourceEmployees.filter(filterEmployees);
 
   // ⏳ **로딩 및 에러 처리**
-  if (loading) return <p>데이터를 불러오는 중...</p>;
-  if (error) return <p>오류 발생: {error}</p>;
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage />;
 
   // 📋 **UI 구성 (사원 목록 렌더링)**
   return (

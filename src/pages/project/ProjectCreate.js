@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import "./ProjectCreate.css";
+import LoadingSpinner from "../components/LoadingSpinner";
 import ParticipantSelection from "./ParticipantSelection";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
+import "./ProjectCreate.css";
 
 /**
  * 📌 ProjectCreate - 프로젝트를 생성하는 페이지
@@ -177,7 +178,7 @@ const ProjectCreate = () => {
     }
   };
 
-  if (loading) return <p>데이터를 불러오는 중...</p>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="project-create-app-body">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import ProjectCard from "./ProjectCard";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "./ProjectList.css";
 
 /**
@@ -48,6 +49,8 @@ const ProjectList = ({ projects }) => {
     return () => observer.disconnect();
   }, [loadedCount, projects]);
 
+  if (loading) return <LoadingSpinner />;
+
   return (
     <div className="project-list">
       {/* 개별 프로젝트 카드 렌더링 (클릭 이벤트는 ProjectCard 내부에서 처리) */}
@@ -57,9 +60,6 @@ const ProjectList = ({ projects }) => {
 
       {/* 스크롤 감지를 위한 빈 div */}
       <div ref={observerRef} className="h-10"></div>
-
-      {/* 로딩 중 메시지 */}
-      {loading && <p className="loading-text">로딩 중...</p>}
     </div>
   );
 };

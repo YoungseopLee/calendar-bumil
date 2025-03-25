@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./Manager.css";
 import Sidebar from "../components/Sidebar";
 import { useAuth } from "../../utils/useAuth";
+import LoadingSpinner from "../components/LoadingSpinner";
 import ScrollToTopButton from "../components/ScrollToTopButton";
 
 const Manager = () => {
@@ -69,9 +70,7 @@ const Manager = () => {
     navigate("/manage-department");
   };
 
-  if (loading) {
-    return <div>로딩 중...</div>;
-  }
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="manager-page">

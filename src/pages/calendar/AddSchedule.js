@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import "./AddSchedule.css";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import Sidebar from "../components/Sidebar";
+import LoadingSpinner from "../components/LoadingSpinner";
+import ErrorMessage from "../components/ErrorMessage";
+import "./AddSchedule.css";
 
 /**
  * 📌 AddSchedule - 새로운 일정을 추가하는 페이지
@@ -177,9 +179,8 @@ const AddSchedule = () => {
     navigate("/calendar");
   };
 
-  if (loading) {
-    return <div>로딩 중...</div>;
-  }
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage />;
 
   return (
     <div className="add-schedule-body">
@@ -246,7 +247,7 @@ const AddSchedule = () => {
             {/* ✅ 추가 및 뒤로가기 버튼 */}
             <div className="add-schedule__button-container">
               <button onClick={handleAddTask} className="add-schedule__button">
-                {loading ? "로딩 중..." : "추가하기"}
+                추가하기{" "}
               </button>
               <button
                 onClick={handleBack}

@@ -8,6 +8,7 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { followCursor } from "tippy.js";
+import LoadingSpinner from "../components/LoadingSpinner";
 import "./Calendar.css";
 
 const Calendar = () => {
@@ -338,7 +339,7 @@ const Calendar = () => {
     }
   };
 
-  if (loading) return <div className="userdetail-container">로딩 중...</div>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div>
