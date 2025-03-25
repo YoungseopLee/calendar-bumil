@@ -31,7 +31,7 @@ export const useAuth = () => {
       const data = await response.json();
       return data.user;
     } catch (error) {
-      console.error("사용자 정보 조회 실패:", error);
+      // console.error("사용자 정보 조회 실패:", error);
       logoutFunc();
       return null;
     } finally {

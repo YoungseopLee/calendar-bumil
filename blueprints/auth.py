@@ -127,7 +127,8 @@ def get_user_from_refresh_token(refresh_token):
         logger.info(f"[SQL/SELECT] tb_refresh_token get_user_from_refresh_token() {sql_select_refresh_token}")
         token_data = cursor.fetchone()
 
-        if not token_data or datetime.now(timezone.utc) > token_data["expires_at"]:
+        expires_at = token_data["expires_at"].replace(tzinfo=timezone.utc)
+        if datetime.now(timezone.utc) > expires_at:
             return None, "Refresh Token이 만료되었거나 유효하지 않습니다."
 
         sql_select_tb_user = """
