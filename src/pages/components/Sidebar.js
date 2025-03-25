@@ -64,6 +64,11 @@ const Sidebar = ({
 
   const { handleLogout } = useAuth();
 
+  const handleLogoutClick = async (e) => {
+    e.preventDefault();
+    await handleLogout();
+  };
+
   const handleMyInfoClick = (e) => {
     e.preventDefault();
     navigate(`/user-details?user_id=${user?.id}`, { replace: true });
@@ -132,7 +137,7 @@ const Sidebar = ({
 
         {/* 로그아웃 버튼 */}
         <div className="logout-section">
-          <Link to="/" onClick={handleLogout} className="logout-link">
+          <Link onClick={handleLogoutClick} className="logout-link">
             <FaSignOutAlt className="menu-icon" /> {!isTablet && "로그아웃"}
           </Link>
         </div>

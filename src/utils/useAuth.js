@@ -8,8 +8,8 @@ export const useAuth = () => {
   const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL;
 
-  const handleLogout = useCallback(() => {
-    logoutFunc();
+  const handleLogout = useCallback(async () => {
+    await logoutFunc();
   }, []);
 
   const getUserInfo = useCallback(async () => {

@@ -85,9 +85,24 @@ export const refreshAccessTokenFunc = async () => {
 };
 
 // 강제 로그아웃 함수
-export const logoutFunc = () => {
-  // console.warn("로그아웃 실행됨: 토큰 삭제 및 리디렉트");
+export const logoutFunc = async () => {
+  const refreshToken = localStorage.getItem("refresh_token");
+
+  if (refreshToken) {
+    try {
+      await fetch(`${process.env.REACT_APP_API_URL}/auth/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refresh_token: refreshToken }),
+      });
+    } catch (error) {
+      console.error("로그아웃 API 호출 중 오류:", error);
+    }
+  }
+
   localStorage.removeItem("access_token");
   localStorage.removeItem("refresh_token");
-  window.location.href = "/"; // 강제 로그아웃
+  window.location.href = "/"; // 강제 로그아웃 및 리다이렉트
 };
