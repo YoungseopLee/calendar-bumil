@@ -236,10 +236,10 @@ def login():
         user = cursor.fetchone()
 
         if not user:
-            return jsonify({'message': '사용자를 찾을 수 없습니다!'}), 404
+            return jsonify({'message': '아이디 및 비밀번호를 확인하세요.'}), 404
 
         if not bcrypt.check_password_hash(user['password'], password):
-            return jsonify({'message': '잘못된 비밀번호!'}), 401
+            return jsonify({'message': '아이디 및 비밀번호를 확인하세요.'}), 401
 
         access_token = create_access_token(user)
         refresh_token = create_refresh_token()

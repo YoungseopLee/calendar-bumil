@@ -80,12 +80,14 @@ const LoginPage = () => {
   // 예제: "keepThisKey"는 유지하고 나머지는 삭제
   // clearLocalStorageExcept(["keepThisKey"]);
   function clearLocalStorageExcept(excludedKeys) {
-    const keysToRemove = Object.keys(localStorage).filter(key => !excludedKeys.includes(key));
-    
-    keysToRemove.forEach(key => {
-        localStorage.removeItem(key);
+    const keysToRemove = Object.keys(localStorage).filter(
+      (key) => !excludedKeys.includes(key)
+    );
+
+    keysToRemove.forEach((key) => {
+      localStorage.removeItem(key);
     });
-}
+  }
 
   const { refreshAccessToken } = useAuth();
   /**
@@ -100,7 +102,7 @@ const LoginPage = () => {
     setMessage("");
 
     try {
-      const response = await authFetch(`${apiUrl}/auth/login`, {
+      const response = await fetch(`${apiUrl}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -110,10 +112,10 @@ const LoginPage = () => {
 
       const data = await response.json();
 
-      if (!data.access_token) {
-        setMessage("Access Token 발급 실패. 관리자에게 문의하세요.");
-        return;
-      }
+      // if (!data.access_token) {
+      //   setMessage("Access Token 발급 실패. 관리자에게 문의하세요.");
+      //   return;
+      // }
 
       if (response.ok) {
         setMessage(data.message);
@@ -123,7 +125,12 @@ const LoginPage = () => {
         localStorage.setItem("refresh_token", data.refresh_token);
 
         //"access_token", "refresh_token", "savedId", "autoLogin"을 제외하고 로컬스토리지 전부 삭제
-        clearLocalStorageExcept(["access_token", "refresh_token", "savedId", "autoLogin"]);
+        clearLocalStorageExcept([
+          "access_token",
+          "refresh_token",
+          "savedId",
+          "autoLogin",
+        ]);
 
         // ✅ 로그인 사용자 정보 불러오기
         // LoginPage에서 get_logged_in_user를 왜 사용하는지 모르겠어서 주석 처리함.
