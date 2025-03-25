@@ -76,6 +76,17 @@ const LoginPage = () => {
     setAutoLogin(e.target.checked);
   };
 
+  // 이전에 사용하던 로컬스토리지(ex: user, ACCESSTOKEN 등)를 제거하는 함수
+  // 예제: "keepThisKey"는 유지하고 나머지는 삭제
+  // clearLocalStorageExcept(["keepThisKey"]);
+  function clearLocalStorageExcept(excludedKeys) {
+    const keysToRemove = Object.keys(localStorage).filter(key => !excludedKeys.includes(key));
+    
+    keysToRemove.forEach(key => {
+        localStorage.removeItem(key);
+    });
+}
+
   const { refreshAccessToken } = useAuth();
   /**
    * 🔑 **로그인 처리 함수**
@@ -110,6 +121,9 @@ const LoginPage = () => {
         // ✅ 로그인 성공 시 토큰 저장, refresh_token은 서버 DB에도 저장
         localStorage.setItem("access_token", data.access_token);
         localStorage.setItem("refresh_token", data.refresh_token);
+
+        //"access_token", "refresh_token", "savedId", "autoLogin"을 제외하고 로컬스토리지 전부 삭제
+        clearLocalStorageExcept(["access_token", "refresh_token", "savedId", "autoLogin"]);
 
         // ✅ 로그인 사용자 정보 불러오기
         // LoginPage에서 get_logged_in_user를 왜 사용하는지 모르겠어서 주석 처리함.
