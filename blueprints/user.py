@@ -134,6 +134,8 @@ def get_user():
                 td.dpr_nm AS department_name,
                 td.team_nm AS team_name,
                 tu.phone_number, 
+                tu.squid_test,
+                tu.mbti,
                 tu.role_id, 
                 tu.status, 
                 tu.is_delete_yn, 
