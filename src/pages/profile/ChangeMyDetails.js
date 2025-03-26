@@ -4,6 +4,7 @@ import Sidebar from "../components/Sidebar";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
+import Select from "react-select";
 import "./ChangeMyDetails.css";
 
 const ChangeMyDetails = () => {
@@ -19,6 +20,7 @@ const ChangeMyDetails = () => {
     team_name: "",
     phone: "",
     role_id: "",
+    squid_test: "",
   });
 
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태
@@ -29,6 +31,7 @@ const ChangeMyDetails = () => {
     department_name: "",
     team_name: "",
     role_id: "",
+    squid_test: "",
   }); //로그인한 사용자 정보
   const { getUserInfo, checkAuth, handleLogout } = useAuth();
 
@@ -97,6 +100,7 @@ const ChangeMyDetails = () => {
         team_name: data.user.team_name,
         phone: data.user.phone_number,
         role_id: data.user.role_id,
+        squid_test: data.user.squid_test,
       });
 
       setUser({
@@ -111,18 +115,18 @@ const ChangeMyDetails = () => {
   };
 
   // 입력 필드 변경 핸들러
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    // 전화번호 필드일 경우 자동 포맷 적용 및 비밀번호 자동 생성
-    if (name === "phone") {
-      const formattedPhone = formatPhoneNumber(value);
-      setFormData({
-        ...formData,
-        phone: formattedPhone,
-      });
+  const handleChange = (e, fieldName) => {
+    if (fieldName) {
+      // react-select에서 선택한 경우
+      setFormData((prev) => ({ ...prev, [fieldName]: e.value }));
     } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
+      // 일반 input 변경 처리
+      const { name, value } = e.target;
+      if (name === "phone") {
+        setFormData((prev) => ({ ...prev, phone: formatPhoneNumber(value) }));
+      } else {
+        setFormData((prev) => ({ ...prev, [name]: value }));
+      }
     }
   };
 
@@ -146,6 +150,7 @@ const ChangeMyDetails = () => {
           team_name: formData.team_name,
           phone: formData.phone,
           role_id: formData.role_id,
+          squid_test: formData.squid_test,
         }),
       });
 
@@ -161,6 +166,26 @@ const ChangeMyDetails = () => {
       alert(`❌ 유저 수정에 실패했습니다. 오류: ${error.message}`);
     }
   };
+
+  //존재하는 16개의 오징어 옵션들
+  const squidOptions = [
+    { value: "깐깐징어", label: "깐깐징어" },
+    { value: "쿨한징어", label: "쿨한징어" },
+    { value: "야망징어", label: "야망징어" },
+    { value: "솔플징어", label: "솔플징어" },
+    { value: "어쩔징어", label: "어쩔징어" },
+    { value: "돌격징어", label: "돌격징어" },
+    { value: "순둥징어", label: "순둥징어" },
+    { value: "눈치징어", label: "눈치징어" },
+    { value: "깐부징어", label: "깐부징어" },
+    { value: "몽글징어", label: "몽글징어" },
+    { value: "센스징어", label: "센스징어" },
+    { value: "팔랑징어", label: "팔랑징어" },
+    { value: "예민징어", label: "예민징어" },
+    { value: "꿀잼징어", label: "꿀잼징어" },
+    { value: "쌀쌀징어", label: "쌀쌀징어" },
+    { value: "대장징어", label: "대장징어" },
+  ];
 
   if (loading) return <LoadingSpinner />;
 
@@ -196,6 +221,22 @@ const ChangeMyDetails = () => {
               onChange={handleChange}
               required
             />
+          </div>
+          <div className="change-user-edit-form-group">
+            <label>당신의 징어</label>
+            <Select
+              name="squid_test"
+              options={squidOptions}
+              placeholder="징어를 선택하세요"
+              className="change-user-squid-input"
+              value={squidOptions.find(option => option.value === formData.squid_test)} // 현재 선택된 값 유지
+              onChange={(selectedOption) => handleChange(selectedOption, "squid_test")}
+            />
+          </div>
+          <div>
+            <a href="https://poomang.com/t/squid_test?from_detail=True" target="_blank" rel="noopener noreferrer">
+              당신의 징어가 궁금하다면?
+            </a>
           </div>
           <button
             type="button"
