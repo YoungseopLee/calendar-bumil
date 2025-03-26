@@ -9,6 +9,7 @@ import { authFetch } from "../../utils/authFetch";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { followCursor } from "tippy.js";
+import { MdSettings } from "react-icons/md";
 import "./UserDetails.css";
 import {
   FaOctopusDeploy,
@@ -334,12 +335,10 @@ const UserDetails = () => {
 
           {/* 본인 정보 수정 버튼(id가 같지 않으면 안뜸) */}
           {loggedInUser.id === user.id && (
-            <button
+            <MdSettings
               className="userdetail-edit-button"
               onClick={() => navigate("/change-my-details")}
-            >
-              내 정보 수정
-            </button>
+            ></MdSettings>
           )}
         </div>
 
