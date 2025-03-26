@@ -72,7 +72,9 @@ def get_users():
                 tu.position, 
                 td.dpr_nm AS department_name,  -- 부서명 가져오기
                 td.team_nm AS team_name,  -- 팀명 가져오기
-                tu.phone_number, 
+                tu.phone_number,
+                tu.squid_test,
+                tu.mbti,
                 tu.role_id, 
                 tu.status, 
                 ts.comment, 
