@@ -25,6 +25,10 @@ function App() {
           path="/manage-department"
           element={<Modules.Admin.ManageDepartment />}
         />
+        <Route
+          path="/last-login-log"
+          element={<Modules.Admin.LastLoginPage />}
+        />
 
         {/* ===== Auth ===== */}
         <Route path="/" element={<Modules.Auth.LoginPage />} />

@@ -95,6 +95,8 @@ def verify_and_refresh_token(request):
 
     try:
         payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
+        update_last_login(payload["user_id"])
+        
         # 정상 검증된 경우에는 새 토큰 발급 필요 없음
         return payload["user_id"], payload["name"], payload["role_id"], None, None, None
 
@@ -107,7 +109,9 @@ def verify_and_refresh_token(request):
         user, error = get_user_from_refresh_token(refresh_token)
         if error:
             return None, None, None, None, jsonify({"message": error}), 401
-
+        
+        update_last_login(payload["user_id"])
+        
         # 새 access token 발급
         new_access_token = create_access_token(user)
         return user["id"], user["name"], user["role_id"], new_access_token, None, None
@@ -157,6 +161,23 @@ def get_user_from_refresh_token(refresh_token):
     finally:
         cursor.close()
         conn.close()
+
+def update_last_login(user_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        sql = """
+            UPDATE tb_user
+            SET last_login_at = NOW()
+            WHERE id = %s"""
+        cursor.execute(sql, (user_id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        logger.info(f"[SQL/UPDATE] last_login_at 업데이트 완료 (user_id={user_id})")
+    except Exception as e:
+        logger.error(f"last_login_at 업데이트 오류: {e}")
+
 
 
 # 회원가입 (AES 암호화 적용)
@@ -428,7 +449,7 @@ def get_login_logs():
     
     try:
         sql_select_logs = """
-        SELECT log.login_at, log.user_id, log.ip_address, user.name, user.department
+        SELECT log.login_at, log.user_id, log.ip_address, user.name
         FROM tb_user_login_log log
         JOIN tb_user user ON log.user_id = user.id
         ORDER BY log.login_at DESC"""
@@ -449,6 +470,49 @@ def get_login_logs():
         cursor.close()
         conn.close()
 
+# 마지막 접속 시간 조회 API
+@auth_bp.route('/get_last_login_logs', methods=['GET', 'OPTIONS'])
+def get_last_login_logs():
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'CORS preflight request success'})
+    
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
+    
+    if user_id is None:
+        return jsonify({'message': '토큰 인증 실패'}), 401
+    
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({'message': '데이터베이스 연결 실패!'}), 500
+    
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        sql_select_last_login_all = """
+        SELECT id, name, position, last_login_at
+        FROM tb_user WHERE is_delete_yn = 'N'
+        ORDER BY last_login_at DESC
+        """
+        cursor.execute(sql_select_last_login_all)
+        users = cursor.fetchall()
+
+        logger.info(f"[SQL/SELECT] tb_user /get_last_login_logs {sql_select_last_login_all}")
+
+        response = jsonify({'message': '전체 마지막 접속 시간 조회 성공', 'users': users})
+        if new_access_token:
+            response.headers["X-New-Access-Token"] = new_access_token
+        return response, 200
+    except Exception as e:
+        logger.error(f"전체 마지막 접속 시간 조회 오류: {e}")
+        return jsonify({'message': '마지막 접속 시간 조회 실패!'}), 500
+    finally:
+        try:
+            cursor.close()
+            conn.close()
+        except Exception:
+            pass
 
 @auth_bp.route('/get_logged_in_user', methods=['GET', 'OPTIONS'])
 def get_logged_in_user():

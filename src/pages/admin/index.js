@@ -8,6 +8,7 @@ import UserRolesManagement from "./UserRolesManagement";
 import Unauthorized from "./Unauthorized";
 import LoginLogPage from "./LoginLogPage";
 import ManageDepartment from "./ManageDepartment";
+import LastLoginPage from "./LastLoginPage";
 
 const Admin = {
   Manager,
@@ -20,6 +21,7 @@ const Admin = {
   Unauthorized,
   LoginLogPage,
   ManageDepartment,
+  LastLoginPage,
 };
 
 export default Admin;

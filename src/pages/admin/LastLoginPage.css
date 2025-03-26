@@ -1,0 +1,91 @@
+.last-login-page {
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 700px;
+  margin: auto;
+  margin-top: 50px;
+}
+
+.last-login-box {
+  box-sizing: border-box;
+}
+
+.last-login-search-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.last-login-search-dropdown {
+  padding: 8px;
+  width: 120px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #eee;
+}
+
+.last-login-title {
+  text-align: center;
+}
+
+.last-login-search-input {
+  flex-grow: 1;
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.last-login-list-container {
+  max-width: 700px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 1vh 1vw;
+}
+
+.last-login-index-bar {
+  display: flex;
+  justify-content: space-between;
+  background: #f7f7f7;
+  padding: 12px;
+  font-weight: bold;
+  border-bottom: 2px solid #ddd;
+}
+
+.last-login-index-item {
+  flex-basis: 33%;
+  text-align: center;
+  font-size: 14px;
+}
+
+.last-login-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.last-login-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.last-login-item:hover {
+  background-color: #f0f0f0;
+}
+
+.last-login-column {
+  flex-basis: 33%;
+  text-align: center;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

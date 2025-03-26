@@ -60,14 +60,19 @@ const Manager = () => {
     navigate("/reset-user");
   };
 
-  // 유저 비밀번호 초기화 페이지 이동
+  // 유저 로그인 로그 페이지 이동
   const goToLoginLogPage = () => {
     navigate("/login-log");
   };
 
-  // 유저 비밀번호 초기화 페이지 이동
+  // 부서 관리 페이지 이동
   const goToDepartmentManagePage = () => {
     navigate("/manage-department");
+  };
+
+  // 유저 접속 로그 페이지 이동
+  const goToLastLoginLogPage = () => {
+    navigate("/last-login-log");
   };
 
   if (loading) return <LoadingSpinner />;
@@ -132,8 +137,16 @@ const Manager = () => {
           </div>
 
           <div className="manager-card">
-            <h2>로그인 로그 조회</h2>
-            <p>유저의 로그인 로그를 조회할 수 있는 페이지입니다.</p>
+            <h2>접속 기록 조회</h2>
+            <p>유저의 마지막 접속 기록을 조회할 수 있는 페이지입니다.</p>
+            <button className="manage-button" onClick={goToLastLoginLogPage}>
+              이동
+            </button>
+          </div>
+
+          <div className="manager-card">
+            <h2>로그인 기록 조회</h2>
+            <p>유저의 로그인 기록을 조회할 수 있는 페이지입니다.</p>
             <button className="manage-button" onClick={goToLoginLogPage}>
               이동
             </button>
