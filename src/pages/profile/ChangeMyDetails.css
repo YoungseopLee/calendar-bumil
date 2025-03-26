@@ -65,8 +65,14 @@
   padding: 10px;
 }
 
-.change-user-squid-input {
-  padding: 10px;
+.change-user-squid-test-link {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  color: #005ab9;
+  text-decoration: none;
+  font-size: 11px;
+  text-align: end;
 }
 
 /* 버튼 컨테이너 */
@@ -100,7 +106,6 @@
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin-top:15px
 }
 
 .change-user-change-pw-button {
@@ -126,4 +131,3 @@
 .change-user-edit-cancel-button:hover {
   background-color: #5a6268;
 }
-

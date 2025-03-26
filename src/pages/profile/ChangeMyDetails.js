@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../../utils/useAuth";
@@ -223,20 +223,29 @@ const ChangeMyDetails = () => {
             />
           </div>
           <div className="change-user-edit-form-group">
-            <label>당신의 징어</label>
+            <label>징어</label>
             <Select
               name="squid_test"
               options={squidOptions}
               placeholder="징어를 선택하세요"
               className="change-user-squid-input"
-              value={squidOptions.find(option => option.value === formData.squid_test)} // 현재 선택된 값 유지
-              onChange={(selectedOption) => handleChange(selectedOption, "squid_test")}
+              value={squidOptions.find(
+                (option) => option.value === formData.squid_test
+              )} // 현재 선택된 값 유지
+              onChange={(selectedOption) =>
+                handleChange(selectedOption, "squid_test")
+              }
             />
-          </div>
-          <div>
-            <a href="https://poomang.com/t/squid_test?from_detail=True" target="_blank" rel="noopener noreferrer">
-              당신의 징어가 궁금하다면?
-            </a>
+            <div>
+              <a
+                className="change-user-squid-test-link"
+                href="https://poomang.com/t/squid_test?from_detail=True"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                당신의 징어가 궁금하다면?
+              </a>
+            </div>
           </div>
           <button
             type="button"
