@@ -138,6 +138,12 @@ def update_user():
     if 'phone' in data:
         fields.append("phone_number = %s")
         values.append(encrypt_aes(data['phone']))
+    if 'squid_test' in data:
+        fields.append("squid_test = %s")
+        values.append(data['squid_test'])
+    if 'mbti' in data:
+        fields.append("mbti = %s")
+        values.append(data['mbti'])
     if 'password' in data:
         new_pass = data['password']
         hashed_password = bcrypt.generate_password_hash(new_pass).decode('utf-8')
