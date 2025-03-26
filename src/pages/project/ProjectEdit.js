@@ -445,19 +445,19 @@ const ProjectEdit = () => {
       </div>
       <div className="project-edit-main">
         <div className="project-edit-container">
-          <div className="project-edit-button-container">
+          <div className="project-edit-header-container">
             <h2 className="project-edit-title2">프로젝트 상세정보(품의서)</h2>
+          </div>
+          <h3 className="project-edit-section-title">🔹 사업개요</h3>
+          <div className="project-edit-button-container">
             <button
               onClick={() => navigate("/projects")}
+              type="button"
               className="project-edit-list-button"
             >
               목록
             </button>
           </div>
-          <div className="project-edit-button-container">
-            <h3 className="section-title">🔹 사업개요</h3>
-          </div>
-
           <table className="project-edit-table">
             <tbody>
               {Object.entries(fieldMappings).map(([key, label]) =>

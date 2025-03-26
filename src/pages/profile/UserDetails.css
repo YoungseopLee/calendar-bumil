@@ -96,19 +96,16 @@
 /* 본인 정보 수정 버튼 */
 .userdetail-edit-button {
   float: right;
-  padding: 8px 16px;
-  background-color: #007bff;
-  color: white;
+  color: #007bff;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
-  margin: 10px;
+  font-size: 2em;
+  transition: color 0.3s ease;
 }
 
 .userdetail-edit-button:hover {
-  background-color: #0056b3;
+  color: #111;
 }
 
 .userdetail-edit-button:active {
