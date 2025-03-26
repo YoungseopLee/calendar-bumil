@@ -21,6 +21,7 @@ const ChangeMyDetails = () => {
     phone: "",
     role_id: "",
     squid_test: "",
+    mbti: "",
   });
 
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태
@@ -32,6 +33,7 @@ const ChangeMyDetails = () => {
     team_name: "",
     role_id: "",
     squid_test: "",
+    mbti: "",
   }); //로그인한 사용자 정보
   const { getUserInfo, checkAuth, handleLogout } = useAuth();
 
@@ -101,6 +103,7 @@ const ChangeMyDetails = () => {
         phone: data.user.phone_number,
         role_id: data.user.role_id,
         squid_test: data.user.squid_test,
+        mbti: data.user.mbti,
       });
 
       setUser({
@@ -151,6 +154,7 @@ const ChangeMyDetails = () => {
           phone: formData.phone,
           role_id: formData.role_id,
           squid_test: formData.squid_test,
+          mbti: formData.mbti,
         }),
       });
 
@@ -185,6 +189,25 @@ const ChangeMyDetails = () => {
     { value: "꿀잼징어", label: "꿀잼징어" },
     { value: "쌀쌀징어", label: "쌀쌀징어" },
     { value: "대장징어", label: "대장징어" },
+  ];
+
+  const mbtiOptions = [
+    { value: "ISTJ", label: "ISTJ - 청렴결백한 관리자" },
+    { value: "ISFJ", label: "ISFJ - 용감한 수호자" },
+    { value: "INFJ", label: "INFJ - 선의의 옹호자" },
+    { value: "INTJ", label: "INTJ - 전략가" },
+    { value: "ISTP", label: "ISTP - 만능 재주꾼" },
+    { value: "ISFP", label: "ISFP - 호기심 많은 예술가" },
+    { value: "INFP", label: "INFP - 열정적인 중재자" },
+    { value: "INTP", label: "INTP - 사색하는 이론가" },
+    { value: "ESTP", label: "ESTP - 활동적인 모험가" },
+    { value: "ESFP", label: "ESFP - 사교적인 연예인" },
+    { value: "ENFP", label: "ENFP - 열정적인 사회 혁신가" },
+    { value: "ENTP", label: "ENTP - 창의적인 발명가" },
+    { value: "ESTJ", label: "ESTJ - 확고한 관리자" },
+    { value: "ESFJ", label: "ESFJ - 사교적인 돌봄자" },
+    { value: "ENFJ", label: "ENFJ - 인류애적인 리더" },
+    { value: "ENTJ", label: "ENTJ - 대담한 지도자" },
   ];
 
   if (loading) return <LoadingSpinner />;
@@ -246,6 +269,21 @@ const ChangeMyDetails = () => {
                 당신의 징어가 궁금하다면?
               </a>
             </div>
+          </div>
+          <div className="change-user-edit-form-group">
+            <label>MBTI</label>
+            <Select
+              name="mbti"
+              options={mbtiOptions}
+              placeholder="MBTI를 선택하세요"
+              className="change-user-squid-input"
+              value={mbtiOptions.find(
+                (option) => option.value === formData.mbti
+              )} // 현재 선택된 값 유지
+              onChange={(selectedOption) =>
+                handleChange(selectedOption, "mbti")
+              }
+            />
           </div>
           <button
             type="button"
