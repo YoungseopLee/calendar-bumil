@@ -17,6 +17,7 @@ import {
   FaUserTie,
   FaBuilding,
   FaUserCircle,
+  FaHeart,
 } from "react-icons/fa"; // 아이콘 추가
 
 const UserDetails = () => {
@@ -106,6 +107,8 @@ const UserDetails = () => {
 
       const userData = await userResponse.json();
       setUser(userData.user);
+
+      console.log("userdata : ", userData.user);
     } catch (err) {
       setError(err.message);
     }
@@ -376,6 +379,12 @@ const UserDetails = () => {
               <FaEnvelope className="icon" />
               {user.id}
             </p>
+            {user.squid_test !== null && (
+              <p>
+                <FaHeart className="icon" />
+                {user.squid_test}
+              </p>
+            )}
           </div>
         </div>
       </div>
