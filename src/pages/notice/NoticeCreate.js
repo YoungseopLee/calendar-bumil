@@ -7,6 +7,7 @@ import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import { BsPlusLg } from "react-icons/bs";
 import "./NoticeCreate.css";
 
 /**
@@ -175,18 +176,19 @@ const NoticeCreate = () => {
             modules={modules}
             formats={formats}
             theme="snow"
-            style={{ height: "250px" }}
+            style={{ height: "100%" }}
           />
-          <button className="notice-create-button" type="submit">
-            공지사항 생성
-          </button>
+          <div className="notice-create-button-group">
+            <BsPlusLg className="notice-create-button" type="submit"></BsPlusLg>
+            <button
+              className="notice-create-cancel-button"
+              type="button"
+              onClick={() => navigate("/notice-list")}
+            >
+              목록
+            </button>
+          </div>
         </form>
-        <button
-          className="notice-edit-cancel-button"
-          onClick={() => navigate("/notice-list")}
-        >
-          취소
-        </button>
       </div>
     </div>
   );

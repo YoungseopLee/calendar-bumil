@@ -7,7 +7,7 @@ import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
-
+import { BsPen, BsPencilSquare, BsTrash, BsTrash3 } from "react-icons/bs";
 import "./NoticeDetails.css";
 
 const NoticeDetails = () => {
@@ -113,12 +113,20 @@ const NoticeDetails = () => {
     <div>
       <Sidebar user={user} />
       <div className="notice-detail-container">
-        <span
-          className="notice-detail-notice"
-          onClick={() => navigate("/notice-list")}
-        >
-          공지사항
-        </span>
+        <div className="notice-detail-header">
+          <span
+            className="notice-detail-notice"
+            onClick={() => navigate("/notice-list")}
+          >
+            공지사항
+          </span>
+          <button
+            className="notice-detail-backspace-button"
+            onClick={() => navigate("/notice-list")}
+          >
+            목록
+          </button>
+        </div>
         <h1 className="notice-detail-title">{notice.title}</h1>
         <div className="notice-detail-meta">
           <span>{notice.created_by}</span>
@@ -142,36 +150,23 @@ const NoticeDetails = () => {
             gap: "3px",
             cursor: "pointer",
           }}
-        >
-          <FaArrowLeft
-            style={{ position: "relative", top: "0px" }}
-            onClick={() => navigate("/notice-list")}
-          />
-          <span
-            style={{
-              fontFamily: "Arial, sans-serif",
-              fontSize: "16px",
-              fontWeight: "bold",
-            }}
-            onClick={() => navigate("/notice-list")}
-          >
-            목록으로
-          </span>
-        </div>
+        ></div>
         {user?.role_id === "AD_ADMIN" && (
           <>
-            <button
-              className="notice-edit-button"
-              onClick={() => navigate(`/notice-edit/${id}`)}
-            >
-              수정
-            </button>
-            <button
-              className="notice-delete-button"
-              onClick={() => handleDeleteNotice(id)}
-            >
-              삭제
-            </button>
+            <div className="notice-details-button-group">
+              <BsPencilSquare
+                className="notice-details-edit-button"
+                onClick={() => navigate(`/notice-edit/${id}`)}
+              >
+                수정
+              </BsPencilSquare>
+              <BsTrash3
+                className="notice-details-delete-button"
+                onClick={() => handleDeleteNotice(id)}
+              >
+                삭제
+              </BsTrash3>
+            </div>
           </>
         )}
       </div>

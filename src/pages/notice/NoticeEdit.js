@@ -117,7 +117,7 @@ const NoticeEdit = () => {
     setError(null);
     //console.log("공지사항 제목, 내용:", formData.title, formData.content);
     if (!formData.title || !formData.content) {
-      setError("⚠️ 필수 입력값을 모두 입력해주세요.");
+      setError("필수 입력값을 모두 입력해주세요.");
       return;
     }
     updateNotice();
@@ -136,33 +136,7 @@ const NoticeEdit = () => {
       if (!response.ok) {
         throw new Error("공지사항 수정을 실패했습니다.");
       }
-      alert("✅ 공지사항이 성공적으로 수정되었습니다!");
-      navigate("/notice-list");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const createNotice = async () => {
-    try {
-      if (!accessToken) {
-        throw new Error("로그인이 필요합니다.");
-      }
-
-      const response = await authFetch(`${apiUrl}/notice/create_notice`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(formData),
-      });
-      if (!response.ok) {
-        throw new Error("공지사항 생성을 실패했습니다.");
-      }
-      alert("✅ 공지사항이 성공적으로 생성되었습니다!");
+      alert("공지사항이 수정되었습니다.");
       navigate("/notice-list");
     } catch (err) {
       setError(err.message);
@@ -200,11 +174,11 @@ const NoticeEdit = () => {
   return (
     <div>
       <Sidebar user={user} />
-      <div className="notice-create-container">
+      <div className="notice-edit-container">
         <h2>공지사항 수정</h2>
 
         <form onSubmit={handleSubmit}>
-          <div className="notice-create-form-group">
+          <div className="notice-edit-form-group">
             <label htmlFor="title">제목</label>
             <input
               type="text"
@@ -221,18 +195,21 @@ const NoticeEdit = () => {
             modules={modules}
             formats={formats}
             theme="snow"
-            style={{ height: "250px" }}
+            style={{ height: "100%" }}
           />
-          <button className="notice-create-button" type="submit">
-            공지사항 수정
-          </button>
+          <div className="notice-edit-button-group">
+            <button className="notice-edit-button" type="submit">
+              저장
+            </button>
+            <button
+              className="notice-edit-cancel-button"
+              type="button"
+              onClick={() => navigate("/notice-list")}
+            >
+              목록
+            </button>
+          </div>
         </form>
-        <button
-          className="notice-edit-cancel-button"
-          onClick={() => navigate("/notice-list")}
-        >
-          취소
-        </button>
       </div>
     </div>
   );
