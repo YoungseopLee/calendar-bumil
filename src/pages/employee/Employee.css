@@ -228,10 +228,12 @@
   /* background-color: white; */
   margin-right: 10px;
 }
+
 /* 토글 컨테이너 */
 .toggle-container {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
   margin-bottom: 10px;
 }
@@ -249,11 +251,27 @@
 
 .toggle-button {
   padding: 5px 10px;
+  margin-right: auto;
 }
 
 .toggle-button:hover,
 .department-tab:hover {
   background-color: #0056b3;
+}
+
+.squid-toggle {
+  margin-left: auto; /* 오른쪽 정렬 */
+}
+
+.good-squid, .bad-squid {
+  margin: 0 3px; /* Reduce margin */
+  padding: 3px 6px; /* Reduce padding */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: transparent; /* Remove background color */
+  font-size: 0.8em; /* Reduce font size */
+  color: #333; /* Set text color */
 }
 
 /* 부서 관련 스타일 */
@@ -366,3 +384,5 @@
   color: #333; /* 기본 색상 */
   margin-left: 5px;
 }
+
+
