@@ -58,13 +58,18 @@ const EditUser = () => {
     try {
       const decoded = atob(decodeURIComponent(userId)); // Base64 디코딩 + URL 디코딩
       setDecodedUserId(decoded);
-      fetchFormData(decoded); // 디코딩된 userId로 데이터 불러오기
     } catch (error) {
       console.error("잘못된 userId:", error);
       alert("잘못된 사용자 ID입니다.");
       navigate("/manage-user"); // 잘못된 경우 목록 페이지로 이동
     }
   }, [userId]); // userId가 변경될 때 실행
+
+  useEffect(() => {
+    if (decodedUserId && departments.length > 0) {
+      fetchFormData(decodedUserId, departments);
+    }
+  }, [decodedUserId, departments]);
 
   useEffect(() => {
     // API 호출
@@ -82,20 +87,11 @@ const EditUser = () => {
           }
         );
         if (!deptRes.ok) throw new Error("부서 목록을 가져오지 못했습니다.");
+        const deptData = await deptRes.json();
+        setDepartments(deptData.departments ?? []);
 
         const roleRes = await authFetch(`${apiUrl}/admin/get_role_list`);
-
-        const deptData = await deptRes.json();
         const roleData = await roleRes.json();
-
-        //console.log("부서 데이터:", deptData);
-        //console.log("권한 데이터:", roleData);
-
-        if (deptData.departments && Array.isArray(deptData.departments)) {
-          setDepartments(deptData.departments);
-        } else {
-          setDepartments([]);
-        }
         setRoles(Array.isArray(roleData) ? roleData : []);
       } catch (error) {
         console.error("데이터 불러오기 오류:", error);
@@ -137,7 +133,7 @@ const EditUser = () => {
   ];
 
   // 유저 데이터 불러오기 함수
-  const fetchFormData = async (decodedId) => {
+  const fetchFormData = async (decodedId, departmentsList) => {
     if (!decodedId) return;
 
     try {
@@ -157,10 +153,18 @@ const EditUser = () => {
         throw new Error("유저 데이터를 가져오는 데 실패했습니다.");
 
       const data = await response.json();
+
+      const matchedDepartment = departmentsList.find(
+        (dept) =>
+          dept.dpr_nm === data.user.department_name &&
+          (dept.team_nm === data.user.team_name ||
+            (!dept.team_nm && !data.user.team_name))
+      );
+
       setFormData({
         username: data.user.name,
         position: data.user.position,
-        department: data.user.department,
+        department: matchedDepartment ? matchedDepartment.dpr_id : "",
         phone: data.user.phone_number,
         role_id: data.user.role_id,
       });
