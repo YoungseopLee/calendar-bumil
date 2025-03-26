@@ -12,7 +12,6 @@ const ParticipantSelection = ({
 }) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const accessToken = localStorage.getItem("access_token");
-  const refreshToken = localStorage.getItem("refresh_token");
 
   const [users, setUsers] = useState([]); // 사용자 목록
   const [selectedParticipants, setSelectedParticipants] = useState([]); // ✅ 즉시 추가되는 리스트
@@ -25,7 +24,6 @@ const ParticipantSelection = ({
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
         });
         if (response.ok) {

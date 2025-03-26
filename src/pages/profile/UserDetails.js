@@ -32,7 +32,6 @@ const UserDetails = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const accessToken = localStorage.getItem("access_token");
-  const refreshToken = localStorage.getItem("refresh_token");
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -94,7 +93,6 @@ const UserDetails = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
         }
       );
@@ -130,7 +128,6 @@ const UserDetails = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
         }
       );
@@ -157,7 +154,6 @@ const UserDetails = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refreshToken,
         },
       });
       if (!response.ok) throw new Error("상태 목록을 가져오지 못했습니다.");

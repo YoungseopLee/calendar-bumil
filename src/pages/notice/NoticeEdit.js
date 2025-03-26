@@ -17,7 +17,6 @@ const NoticeEdit = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const accessToken = localStorage.getItem("access_token");
-  const refreshToken = localStorage.getItem("refresh_token");
 
   const navigate = useNavigate();
 
@@ -90,7 +89,6 @@ const NoticeEdit = () => {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
-          "X-Refresh-Token": refreshToken,
         },
       });
 
@@ -132,7 +130,6 @@ const NoticeEdit = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refreshToken,
         },
         body: JSON.stringify(formData),
       });
@@ -159,7 +156,6 @@ const NoticeEdit = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refreshToken,
         },
         body: JSON.stringify(formData),
       });

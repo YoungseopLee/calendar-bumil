@@ -33,7 +33,6 @@ const Calendar = () => {
   const { getUserInfo } = useAuth();
 
   const accessToken = localStorage.getItem("access_token");
-  const refreshToken = localStorage.getItem("refresh_token");
 
   // 전체 데이터 가져오기
   useEffect(() => {
@@ -77,7 +76,6 @@ const Calendar = () => {
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
         }
       );
@@ -113,7 +111,6 @@ const Calendar = () => {
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
         }
       );
@@ -133,7 +130,6 @@ const Calendar = () => {
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
         }
       );
@@ -246,7 +242,6 @@ const Calendar = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
         }
       );
@@ -283,7 +278,6 @@ const Calendar = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
           body: JSON.stringify({ status: newStatus }),
         }

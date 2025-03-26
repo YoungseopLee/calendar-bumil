@@ -95,29 +95,54 @@ def verify_and_refresh_token(request):
 
     try:
         payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
+        user_id = payload["user_id"]
         update_last_login(payload["user_id"])
         
         # 정상 검증된 경우에는 새 토큰 발급 필요 없음
-        return payload["user_id"], payload["name"], payload["role_id"], None, None, None
+        return user_id, payload["name"], payload["role_id"], None, None, None
 
     except jwt.ExpiredSignatureError:
-        # 만료된 경우에는 refresh token 검증
-        refresh_token = request.headers.get('X-Refresh-Token') or (request.get_json() or {}).get('refresh_token')
-        if not refresh_token:
-            return None, None, None, None, jsonify({"message": "Refresh Token이 없습니다. 다시 로그인해주세요."}), 401
+        # access token 만료 시, payload 강제 디코딩 (exp 검증 없이)
+        payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"], options={"verify_exp": False})
+        user_id = payload["user_id"]
 
-        user, error = get_user_from_refresh_token(refresh_token)
-        if error:
-            return None, None, None, None, jsonify({"message": error}), 401
-        
-        update_last_login(user["id"])
-        
-        # 새 access token 발급
+        # DB에서 refresh_token 검증
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        sql_tb_refresh_token = """
+        SELECT refresh_token, expires_at 
+        FROM tb_refresh_token 
+        WHERE user_id = %s"""
+        cursor.execute(sql_tb_refresh_token, (user_id,))
+        logger.info(f"[SQL/SELECT] tb_refresh_token, create_refresh_token() {sql_tb_refresh_token}")
+        token_data = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if not token_data:
+            return None, None, None, None, jsonify({"message": "Refresh Token이 존재하지 않습니다. 다시 로그인해주세요."}), 401
+
+        if datetime.utcnow() > token_data["expires_at"]:
+            return None, None, None, None, jsonify({"message": "Refresh Token이 만료되었습니다. 다시 로그인하세요."}), 401
+
+        # user_id로 새 access token 발급
+        user = get_user_from_db(user_id)
         new_access_token = create_access_token(user)
         return user["id"], user["name"], user["role_id"], new_access_token, None, None
-
+    
     except jwt.InvalidTokenError:
         return None, None, None, None, jsonify({"message": "유효하지 않은 Access Token입니다."}), 401
+
+def get_user_from_db(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM tb_user WHERE id = %s", (user_id,))
+    user = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return user
 
 # refresh_token 검증
 def get_user_from_refresh_token(refresh_token):
@@ -128,7 +153,7 @@ def get_user_from_refresh_token(refresh_token):
           SELECT * FROM tb_refresh_token 
           WHERE refresh_token = %s"""
         cursor.execute(sql_select_refresh_token, (refresh_token,))
-        logger.info(f"[SQL/SELECT] tb_refresh_token get_user_from_refresh_token() {sql_select_refresh_token}")
+        logger.info(f"[SQL/SELECT] tb_refresh_token, get_user_from_refresh_token() {sql_select_refresh_token}")
         token_data = cursor.fetchone()
 
         if not token_data:
@@ -149,7 +174,7 @@ def get_user_from_refresh_token(refresh_token):
         sql_select_tb_user = """
           SELECT * FROM tb_user WHERE id = %s"""
         cursor.execute(sql_select_tb_user, (token_data["user_id"],))
-        logger.info(f"[SQL/SELECT] tb_user get_user_from_refresh_token() {sql_select_tb_user}")
+        logger.info(f"[SQL/SELECT] tb_user, get_user_from_refresh_token() {sql_select_tb_user}")
         user = cursor.fetchone()
         if not user:
             return None, "사용자 정보를 찾을 수 없습니다."

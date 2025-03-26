@@ -27,7 +27,6 @@ const NoticeCreate = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const accessToken = localStorage.getItem("access_token");
-  const refresh_token = localStorage.getItem("refresh_token");
 
   const navigate = useNavigate();
 
@@ -111,7 +110,6 @@ const NoticeCreate = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refresh_token,
         },
         body: JSON.stringify(formData),
       });

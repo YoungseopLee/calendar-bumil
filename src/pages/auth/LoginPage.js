@@ -45,25 +45,12 @@ const LoginPage = () => {
       setRememberMe(true);
     }
 
-    const tryAutoLogin = async () => {
-      if (savedAutoLogin) {
-        const accessToken = localStorage.getItem("access_token");
-        if (accessToken) {
-          // access_token이 있으면 바로 이동 시도
-          navigate("/calendar", { replace: true });
-        } else {
-          // access_token이 없으면 refresh 시도
-          const refreshToken = localStorage.getItem("refresh_token");
-          if (savedAutoLogin && refreshToken) {
-            const newAccessToken = await refreshAccessToken();
-            if (newAccessToken) {
-              navigate("/calendar", { replace: true });
-            }
-          }
-        }
+    if (savedAutoLogin) {
+      const accessToken = localStorage.getItem("access_token");
+      if (accessToken) {
+        navigate("/calendar", { replace: true });
       }
-    };
-    tryAutoLogin();
+    }
   }, [navigate]);
 
   // 아이디 저장 체크박스 이벤트 핸들러
@@ -89,7 +76,6 @@ const LoginPage = () => {
     });
   }
 
-  const { refreshAccessToken } = useAuth();
   /**
    * 🔑 **로그인 처리 함수**
    * - 사용자가 입력한 아이디와 비밀번호를 백엔드로 전송
@@ -122,15 +108,9 @@ const LoginPage = () => {
 
         // ✅ 로그인 성공 시 토큰 저장, refresh_token은 서버 DB에도 저장
         localStorage.setItem("access_token", data.access_token);
-        localStorage.setItem("refresh_token", data.refresh_token);
 
         //"access_token", "refresh_token", "savedId", "autoLogin"을 제외하고 로컬스토리지 전부 삭제
-        clearLocalStorageExcept([
-          "access_token",
-          "refresh_token",
-          "savedId",
-          "autoLogin",
-        ]);
+        clearLocalStorageExcept(["access_token", "savedId", "autoLogin"]);
 
         // ✅ 로그인 사용자 정보 불러오기
         // LoginPage에서 get_logged_in_user를 왜 사용하는지 모르겠어서 주석 처리함.
@@ -167,7 +147,6 @@ const LoginPage = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${data.access_token}`,
-            "X-Refresh-Token": localStorage.getItem("refresh_token"),
           },
           body: JSON.stringify({ user_id: id }),
         });

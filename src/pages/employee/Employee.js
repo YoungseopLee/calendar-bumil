@@ -52,7 +52,6 @@ const EmployeeList = () => {
   const navigate = useNavigate(); // 페이지 이동 훅
   const apiUrl = process.env.REACT_APP_API_URL; // API URL 환경 변수
   const accessToken = localStorage.getItem("access_token"); // 로컬 스토리지에 저장된 토큰
-  const refreshToken = localStorage.getItem("refresh_token"); // 로컬 스토리지에 저장된 리프레시 토큰
 
   const statusMap = statusList.reduce((acc, { comment, id }) => {
     acc[comment] = id; // comment를 키로, id를 값으로 설정
@@ -105,7 +104,6 @@ const EmployeeList = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refreshToken,
         },
       });
       if (!response.ok) throw new Error("상태 목록을 불러오지 못했습니다.");
@@ -127,7 +125,6 @@ const EmployeeList = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
         }
       );
@@ -149,7 +146,6 @@ const EmployeeList = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refreshToken,
         },
       });
       if (!response.ok)
@@ -186,7 +182,6 @@ const EmployeeList = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refreshToken,
         },
         body: JSON.stringify({
           user_id: user.id,
@@ -210,7 +205,6 @@ const EmployeeList = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refreshToken,
         },
         body: JSON.stringify({
           user_id: employeeId,

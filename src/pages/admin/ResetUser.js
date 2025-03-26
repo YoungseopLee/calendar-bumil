@@ -24,7 +24,6 @@ const ResetUser = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const accessToken = localStorage.getItem("access_token");
-  const refreshToken = localStorage.getItem("refresh_token");
 
   // 로그인한 사용자 정보 가져오기 및 권한 확인 후 권한 없으면 로그아웃 시키기
   useEffect(() => {
@@ -55,7 +54,6 @@ const ResetUser = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refreshToken,
         },
       });
       if (!response.ok)
@@ -82,7 +80,6 @@ const ResetUser = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refreshToken,
         },
         body: JSON.stringify({
           id: employeeId,

@@ -44,7 +44,6 @@ const ProjectPage = () => {
   // 환경 변수에서 API URL 가져오기
   const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
   const accessToken = localStorage.getItem("access_token");
-  const refreshToken = localStorage.getItem("refresh_token");
 
   const [user, setUser] = useState({
     id: "",
@@ -87,7 +86,6 @@ const ProjectPage = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refreshToken,
         },
       });
       if (!response.ok) throw new Error("사용자 데이터를 불러오지 못했습니다.");
@@ -114,7 +112,6 @@ const ProjectPage = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
         });
 

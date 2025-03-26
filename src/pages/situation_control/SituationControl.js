@@ -80,7 +80,6 @@ const SituationControls = () => {
   // 환경변수에서 API URL 가져오기
   const apiUrl = process.env.REACT_APP_API_URL;
   const accessToken = localStorage.getItem("access_token");
-  const refreshToken = localStorage.getItem("refresh_token");
 
   const navigate = useNavigate(); // 페이지 이동을 위한 react-router-dom 훅
 
@@ -126,7 +125,6 @@ const SituationControls = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            "X-refresh-token": refreshToken,
           },
         });
         if (!response.ok)
@@ -145,7 +143,6 @@ const SituationControls = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            "X-refresh-token": refreshToken,
           },
         });
         if (!response.ok)
@@ -188,7 +185,6 @@ const SituationControls = () => {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${accessToken}`,
-              "X-refresh-token": refreshToken,
             },
             body: JSON.stringify({
               user_ids: effectiveUsers.map((user) => user.id), // ✅ 한 번에 여러 사용자 조회 요청

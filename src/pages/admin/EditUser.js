@@ -11,7 +11,6 @@ const EditUser = () => {
   const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL;
   const accessToken = localStorage.getItem("access_token");
-  const refreshToken = localStorage.getItem("refresh_token");
 
   // decodedUserId를 state로 저장
   const [decodedUserId, setDecodedUserId] = useState(null);
@@ -82,7 +81,6 @@ const EditUser = () => {
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${accessToken}`,
-              "X-Refresh-Token": refreshToken,
             },
           }
         );
@@ -144,7 +142,6 @@ const EditUser = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
         }
       );
@@ -200,7 +197,6 @@ const EditUser = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refreshToken,
         },
         body: JSON.stringify({
           id: decodedUserId,

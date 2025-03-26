@@ -91,7 +91,7 @@ def after_request(response):
     else:
         response.headers["Access-Control-Allow-Origin"] = ALLOWED_ORIGINS[0]
     response.headers["Access-Control-Allow-Credentials"] = "true"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Refresh-Token"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     response.headers["Access-Control-Expose-Headers"] = "X-New-Access-Token"
     return response

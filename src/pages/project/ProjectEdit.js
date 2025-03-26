@@ -43,7 +43,6 @@ const ProjectEdit = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const accessToken = localStorage.getItem("access_token");
-  const refreshToken = localStorage.getItem("refresh_token");
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -156,7 +155,6 @@ const ProjectEdit = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
         }
       );
@@ -180,7 +178,6 @@ const ProjectEdit = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refreshToken,
         },
       });
       if (!response.ok)
@@ -344,7 +341,6 @@ const ProjectEdit = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refreshToken,
         },
         body: JSON.stringify(projectToSave),
       });
@@ -424,7 +420,6 @@ const ProjectEdit = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken})}`,
-            "X-Refresh-Token": refreshToken,
           },
         }
       );

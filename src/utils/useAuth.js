@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { refreshAccessTokenFunc, logoutFunc } from "./authFetch";
+import { logoutFunc } from "./authFetch";
 
 export const useAuth = () => {
   const [loading, setLoading] = useState(true);
@@ -21,7 +21,6 @@ export const useAuth = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": localStorage.getItem("refresh_token"),
         },
       });
 

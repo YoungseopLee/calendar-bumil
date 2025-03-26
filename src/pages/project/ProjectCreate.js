@@ -28,7 +28,6 @@ const ProjectCreate = () => {
   const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL;
   const accessToken = localStorage.getItem("access_token");
-  const refreshToken = localStorage.getItem("refresh_token");
 
   const [user, setUser] = useState({
     id: "",
@@ -159,7 +158,6 @@ const ProjectCreate = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refreshToken,
         },
         body: JSON.stringify(payload),
       });

@@ -11,7 +11,6 @@ const ChangeMyDetails = () => {
   const navigate = useNavigate();
   const apiUrl = process.env.REACT_APP_API_URL;
   const accessToken = localStorage.getItem("access_token");
-  const refreshToken = localStorage.getItem("refresh_token");
 
   const [formData, setFormData] = useState({
     username: "",
@@ -87,7 +86,6 @@ const ChangeMyDetails = () => {
           method: "GET",
           "Content-Type": "application/json",
           headers: { Authorization: `Bearer ${accessToken}` },
-          "X-Refresh-Token": refreshToken,
         }
       );
 
@@ -143,7 +141,6 @@ const ChangeMyDetails = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "X-Refresh-Token": refreshToken,
         },
         body: JSON.stringify({
           id: user.id,

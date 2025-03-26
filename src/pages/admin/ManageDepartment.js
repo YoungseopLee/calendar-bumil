@@ -15,7 +15,6 @@ const ManageDepartment = () => {
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const accessToken = localStorage.getItem("access_token");
-  const refreshToken = localStorage.getItem("refresh_token");
 
   const navigate = useNavigate();
   const [user, setUser] = useState({
@@ -57,7 +56,6 @@ const ManageDepartment = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
         }
       );
@@ -87,7 +85,6 @@ const ManageDepartment = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
           body: JSON.stringify({
             dpr_id: newDepartmentId,
@@ -123,7 +120,6 @@ const ManageDepartment = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
         }
       );
@@ -154,7 +150,6 @@ const ManageDepartment = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${accessToken}`,
-            "X-Refresh-Token": refreshToken,
           },
           body: JSON.stringify({
             dpr_nm: editDepartment.dpr_nm,
