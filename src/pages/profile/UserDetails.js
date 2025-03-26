@@ -11,13 +11,14 @@ import "tippy.js/dist/tippy.css";
 import { followCursor } from "tippy.js";
 import "./UserDetails.css";
 import {
+  FaOctopusDeploy,
   FaPhone,
   FaEnvelope,
   FaCircle,
   FaUserTie,
   FaBuilding,
   FaUserCircle,
-  FaHeart,
+  FaRegComments,
 } from "react-icons/fa"; // 아이콘 추가
 
 const UserDetails = () => {
@@ -379,8 +380,14 @@ const UserDetails = () => {
             </p>
             {user.squid_test !== null && (
               <p>
-                <FaHeart className="icon" />
+                <FaOctopusDeploy className="icon" />
                 {user.squid_test}
+              </p>
+            )}
+            {user.mbti !== null && (
+              <p>
+                <FaRegComments className="icon" />
+                {user.mbti}
               </p>
             )}
           </div>
