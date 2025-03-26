@@ -107,8 +107,6 @@ const UserDetails = () => {
 
       const userData = await userResponse.json();
       setUser(userData.user);
-
-      console.log("userdata : ", userData.user);
     } catch (err) {
       setError(err.message);
     }
