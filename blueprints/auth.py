@@ -110,7 +110,7 @@ def verify_and_refresh_token(request):
         if error:
             return None, None, None, None, jsonify({"message": error}), 401
         
-        update_last_login(payload["user_id"])
+        update_last_login(user["id"])
         
         # 새 access token 발급
         new_access_token = create_access_token(user)
