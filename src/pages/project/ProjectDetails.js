@@ -5,6 +5,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
+import { BsPencilSquare } from "react-icons/bs";
 import "./ProjectDetails.css";
 
 /**
@@ -263,25 +264,23 @@ const ProjectDetails = () => {
         <Sidebar user={user} />
       </div>
       <div className="project-details-container">
-        <div className="project-details-edit-button-container">
+        <div className="project-details-edit-header-container">
           <h2 className="project-details-title2">프로젝트 상세정보(품의서)</h2>
+        </div>
+        <h3 className="project-details-section-title">🔹 사업개요</h3>
+        <div className="project-details-edit-button-container">
+          {user?.role_id != "USR_GENERAL" && ( //로그인 유저의 roleId를 보고 수정 버튼 표시 판정
+            <BsPencilSquare
+              onClick={handleEditClick}
+              className="project-details-edit-project-button"
+            ></BsPencilSquare>
+          )}
           <button
             onClick={() => navigate("/projects")}
             className="project-details-list-button"
           >
             목록
           </button>
-        </div>
-        <div className="project-details-edit-button-container">
-          <h3 className="project-details-section-title">🔹 사업개요</h3>
-          {user?.role_id != "USR_GENERAL" && ( //로그인 유저의 roleId를 보고 수정 버튼 표시 판정
-            <button
-              onClick={handleEditClick}
-              className="project-details-EditProjectButton"
-            >
-              프로젝트 수정
-            </button>
-          )}
         </div>
 
         {Project ? (
