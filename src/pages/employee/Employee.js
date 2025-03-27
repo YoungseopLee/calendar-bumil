@@ -389,13 +389,11 @@ const EmployeeList = () => {
               setShowSquids(false);
             }}
           >
-            {showTrigger && (
-              <GiSquidHead
-                size={24}
-                className="squid-toggle-trigger"
-                onClick={() => setShowSquids((prev) => !prev)}
-              />
-            )}
+            <GiSquidHead
+              size={24}
+              className={`squid-toggle-trigger ${showTrigger ? "visible" : ""}`}
+              onClick={() => setShowSquids((prev) => !prev)}
+            />
 
             <div className={`squid-toggle-options ${showSquids ? "open" : ""}`}>
               <GiSquidHead

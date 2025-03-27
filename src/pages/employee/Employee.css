@@ -265,6 +265,7 @@
   position: relative;
   display: flex;
   align-items: center;
+  cursor: pointer;
   justify-content: flex-end;
   width: 30px;
   height: 30px;
@@ -273,15 +274,23 @@
 /* 메인 오징어 (hover 시 보임) */
 .squid-toggle-trigger {
   opacity: 0;
+  transform: scale(0.8);
   pointer-events: none;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
   cursor: pointer;
   z-index: 2;
+}
+
+.squid-toggle-trigger.visible {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
 }
 
 .squid-toggle-wrapper:hover .squid-toggle-trigger {
   opacity: 1;
   pointer-events: auto;
+  transform: scale(1);
 }
 
 /* 펼쳐지는 오징어 아이콘들 (기본 숨김) */
