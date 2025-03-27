@@ -9,8 +9,8 @@ import "./ChooseSquidPage.css";
 const ChooseSquidPage = () => {
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태 관리 (true: 로딩 중)
   const [formData, setFormData] = useState({
-    mbti : "",
-    squid_test : "",
+    mbti: "",
+    squid_test: "",
   });
   const [choosesquidStatus, setchoosesquidStatus] = useState("");
   const [errors, setErrors] = useState({});
@@ -80,7 +80,6 @@ const ChooseSquidPage = () => {
       // 일반 input 변경 처리
       const { name, value } = e.target;
       setFormData((prev) => ({ ...prev, [name]: value }));
-
     }
   };
 
@@ -115,16 +114,18 @@ const ChooseSquidPage = () => {
     }
   };
 
+  const goToCalendarPage = () => {
+    navigate("/calendar");
+  };
+
   if (loading) return <LoadingSpinner />;
 
   return (
     <div className="choosesquid-body">
       <div className="choosesquid-container">
-        <h2>
-          당신의 징어를 선택해주세요
-        </h2>
+        <h2>당신의 징어를 선택해주세요</h2>
         <form onSubmit={handleSubmit}>
-        <div className="choosesquid-form-group">
+          <div className="choosesquid-form-group">
             <label>징어</label>
             <Select
               name="squid_test"
@@ -166,21 +167,21 @@ const ChooseSquidPage = () => {
           </div>
           <div className="choosesquid-button-container">
             <button type="submit" className="choosesquid-button">
-              징어 선택
+              저장
             </button>
             <button
               type="button"
               className="cancle-button"
-              onClick={() => window.history.back()}
+              onClick={goToCalendarPage}
             >
-              돌아가기
+              취소
             </button>
           </div>
         </form>
-        {choosesquidStatus && <div className="message">{choosesquidStatus}</div>}
-        <h4>
-          내 정보 페이지에서 다시 바꿀 수 있습니다.
-        </h4>
+        {choosesquidStatus && (
+          <div className="message">{choosesquidStatus}</div>
+        )}
+        <h4>내 정보 페이지에서 다시 바꿀 수 있습니다.</h4>
       </div>
     </div>
   );

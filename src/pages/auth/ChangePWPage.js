@@ -79,12 +79,11 @@ const ChangePWPage = () => {
       if (response.ok) {
         setchangepwStatus("비밀번호 변경이 완료되었습니다!");
         alert("비밀번호 변경 성공!");
-        
-        if(user.squid_test == null){
+
+        if (user.squid_test == null) {
           navigate("/choose-squid");
           return;
-        }
-        else {
+        } else {
           navigate("/calendar");
         }
       } else {

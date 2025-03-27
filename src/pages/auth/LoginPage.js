@@ -154,15 +154,14 @@ const LoginPage = () => {
         // ✅ 최초 로그인 여부 확인 후 페이지 이동
         if (data.user.first_login_yn === "Y") {
           // 오징어 있는지 확인 후 없으면 자신의 징어 선택 페이지로
-          if(data.user.squid_test == null){
-            navigate("/choose-squid",{ replace: true })
+          if (data.user.squid_test == null) {
+            navigate("/choose-squid", { replace: true });
             return;
           }
           navigate("/calendar", { replace: true });
         } else if (data.user.first_login_yn === "N") {
           navigate("/change-pw", { replace: true });
         }
-
       } else {
         // ❌ 로그인 실패 처리
         if (response.status === 403 && data.message === "승인 대기 중입니다!") {
