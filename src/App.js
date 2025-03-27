@@ -33,6 +33,7 @@ function App() {
         {/* ===== Auth ===== */}
         <Route path="/" element={<Modules.Auth.LoginPage />} />
         <Route path="/change-pw" element={<Modules.Auth.ChangePWPage />} />
+        <Route path="/choose-squid" element={<Modules.Auth.ChooseSquidPage />} />
 
         {/* ===== Calendar ===== */}
         <Route path="/calendar" element={<Modules.CalendarModule.Calendar />} />
