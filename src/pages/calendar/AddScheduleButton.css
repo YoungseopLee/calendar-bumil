@@ -1,0 +1,29 @@
+/* BackButton 컴포넌트 전용 스타일 */
+.add_schedule_button_container {
+  position: relative; /* 부모 요소 기준으로 컴포넌트 위치를 조정할 경우 */
+}
+
+/* 뒤로가기 버튼 & 프로젝트 추가 버튼 동일한 스타일 적용 */
+.add_schedule_button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 45px;
+  height: 45px;
+  background-color: #007bff9f;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: background-color 0.3s ease;
+}
+
+.add_schedule_button:hover {
+  background-color: #0056b3;
+}

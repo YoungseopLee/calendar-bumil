@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import AddScheduleButton from "./AddScheduleButton";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import { FaEdit, FaTrash } from "react-icons/fa";
@@ -453,6 +454,8 @@ const Calendar = () => {
               </div>
 
               <div className="add-schedule-container">
+                {/* 일정 추가 버튼을 오른쪽 하단 고정 컴포넌트로 만든 것 */}
+                {/* <AddScheduleButton selectedDate={selectedDate} /> */}
                 <button
                   className="button add-schedule-button"
                   onClick={handleAddScheduleClick}

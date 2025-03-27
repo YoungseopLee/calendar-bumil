@@ -49,7 +49,8 @@ const ProjectList = ({ projects }) => {
     return () => observer.disconnect();
   }, [loadedCount, projects]);
 
-  if (loading) return <LoadingSpinner />;
+  // 로딩 중일 때 로딩 스피너 표시가 필요하다면 아래 주석 해제
+  // if (loading) return <LoadingSpinner />;
 
   return (
     <div className="project-list">
