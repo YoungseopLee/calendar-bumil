@@ -316,6 +316,7 @@ def login():
 
         user_data = {
             'id': user['id'],
+            'squid_test': user['squid_test'],
             'first_login_yn': user.get('first_login_yn', 'Y')
         }
 
