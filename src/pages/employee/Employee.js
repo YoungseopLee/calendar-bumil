@@ -73,12 +73,12 @@ const EmployeeList = () => {
       try {
         // 1. 사용자 정보 가져오기
         const userInfo = await fetchUserInfo();
-
         // 2. 모든 데이터 병렬로 가져오기
         await Promise.all([
           fetchFavorites(userInfo.id), // 즐겨찾기 목록
           fetchEmployees(), // 사원 목록
           fetchStatusList(), // 상태 목록
+          // fetchSquidList(), // 오징어 목록
         ]);
       } catch (error) {
         //console.error("데이터 로딩 오류:", error);
@@ -93,6 +93,8 @@ const EmployeeList = () => {
   const fetchUserInfo = async () => {
     const userInfo = await getUserInfo();
     setUser(userInfo);
+    setMySquid(userInfo.squid_test); // 나의 오징어 타입 설정
+    console.log("사용자 오징어:", userInfo.squid_test);
     return userInfo;
   };
 
@@ -236,6 +238,7 @@ const EmployeeList = () => {
     return acc;
   }, {});
 
+
   // 🔍 **검색 필터링 로직**
   const filterEmployees = (emp) => {
     if (!searchText) return true;
@@ -318,6 +321,43 @@ const EmployeeList = () => {
   const sourceEmployees = showFavorites ? favoriteEmployees : employees;
   const filteredEmployees = sourceEmployees.filter(filterEmployees);
 
+  // ### 🦑 SQUID ZONE 
+  const [showSquids, setShowSquids] = useState(false); // 오징어 타입 보기 여부
+  const [mySquid, setMySquid] = useState(null);        // 나의 오징어 타입
+  const [squidFilterType, setSquidFilterType] = useState(null); // good, bad 필터 상태
+
+  const squidMatchMapping = {
+    "깐깐징어": { good: ["꿀잼징어"], bad: ["깐부징어"] },
+    "쿨한징어": { good: ["대장징어"], bad: ["꿀잼징어"] },
+    "야망징어": { good: ["예민징어"], bad: ["순둥징어"] },
+    "솔플징어": { good: ["센스징어"], bad: ["팔랑징어"] },
+    "어쩔징어": { good: ["순둥징어"], bad: ["예민징어"] },
+    "돌격징어": { good: ["눈치징어"], bad: ["몽글징어"] },
+    "순둥징어": { good: ["어쩔징어"], bad: ["야망징어"] },
+    "눈치징어": { good: ["돌격징어"], bad: ["쿨한징어"] },
+    "깐부징어": { good: ["몽글징어"], bad: ["깐깐징어"] },
+    "몽글징어": { good: ["깐부징어"], bad: ["돌격징어"] },
+    "센스징어": { good: ["솔플징어"], bad: ["쌀쌀징어"] },
+    "팔랑징어": { good: ["쌀쌀징어"], bad: ["솔플징어"] },
+    "예민징어": { good: ["야망징어"], bad: ["어쩔징어"] },
+    "꿀잼징어": { good: ["깐깐징어"], bad: ["쿨한징어"] },
+    "쌀쌀징어": { good: ["팔랑징어"], bad: ["센스징어"] },
+    "대장징어": { good: ["쿨한징어"], bad: ["눈치징어"] },
+  };
+
+  const applySquidFilter = (emps) => {
+    if (!squidFilterType || !mySquid || !squidMatchMapping[mySquid]) {
+      return emps; // 필터 미적용 상태
+    }
+
+    const targetSquids = squidMatchMapping[mySquid][squidFilterType];
+    if (!targetSquids || targetSquids.includes("???")) return []; // 미정이면 빈 배열 반환
+
+    return emps.filter((emp) => targetSquids.includes(emp.squid_test));
+  };
+
+  const finalFilteredEmployees = applySquidFilter(filteredEmployees);
+
   // ⏳ **로딩 및 에러 처리**
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage />;
@@ -331,7 +371,7 @@ const EmployeeList = () => {
       <div className="box">
         <h2 className="title">사원 목록</h2>
 
-        {/* 🔄 즐겨찾기 토글 */}
+        {/* 🔄 즐겨찾기 토글 동그라미 토글 */}
         <div className="toggle-container">
           <button
             className="toggle-button"
@@ -339,6 +379,37 @@ const EmployeeList = () => {
           >
             {showFavorites ? "전체 사원 보기" : "즐겨찾기 보기"}
           </button>
+
+          <button
+            className="squid-toggle"
+            onClick={() => setShowSquids((prev) => !prev)}
+          >
+            {showSquids ? (
+              <>
+                <button
+                  className={`good-squid ${squidFilterType === "good" ? "active" : ""}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSquidFilterType((prev) => (prev === "good" ? null : "good"));
+                  }}
+                >
+                  👍
+                </button>
+                <button
+                  className={`bad-squid ${squidFilterType === "bad" ? "active" : ""}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSquidFilterType((prev) => (prev === "bad" ? null : "bad"));
+                  }}
+                >
+                  👎
+                </button>
+              </>
+            ) : (
+              <span>🦑</span>
+            )}
+          </button>
+
         </div>
 
         {/* 🔍 검색 UI */}
@@ -408,18 +479,17 @@ const EmployeeList = () => {
 
           {/* 👥 사원 목록 렌더링 */}
           <ul className="employee-list">
-            {Object.keys(groupByDepartment(filteredEmployees))
+            {Object.keys(groupByDepartment(finalFilteredEmployees))
               .sort((a, b) => a.localeCompare(b, "ko-KR"))
               .map((department) => {
                 const departmentEmployees =
-                  groupByDepartment(filteredEmployees)[department];
+                  groupByDepartment(finalFilteredEmployees)[department];
                 return (
                   <div key={department}>
                     {/* 부서명 클릭 시 열고 닫을 수 있도록 토글 */}
                     <div
-                      className={`department-header ${
-                        openDepartments[department] ? "open" : ""
-                      }`}
+                      className={`department-header ${openDepartments[department] ? "open" : ""
+                        }`}
                       onClick={() => toggleDepartment(department)}
                       style={{
                         backgroundColor: openDepartments[department]
@@ -453,13 +523,12 @@ const EmployeeList = () => {
                           >
                             {/* ⭐ 즐겨찾기 토글 */}
                             <span
-                              className={`favorite-icon ${
-                                favoriteEmployees.some(
-                                  (fav) => fav.id === employee.id
-                                )
-                                  ? ""
-                                  : "not-favorite"
-                              }`}
+                              className={`favorite-icon ${favoriteEmployees.some(
+                                (fav) => fav.id === employee.id
+                              )
+                                ? ""
+                                : "not-favorite"
+                                }`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleFavorite(employee.id);
