@@ -160,11 +160,6 @@ const LoginPage = () => {
           }
           navigate("/calendar", { replace: true });
         } else if (data.user.first_login_yn === "N") {
-          // 오징어 있는지 확인 후 없으면 자신의 징어 선택 페이지로
-          if (data.user.squid_test == null){
-            navigate("/choose-squid",{ replace: true })
-            return;
-          }
           navigate("/change-pw", { replace: true });
         }
 
