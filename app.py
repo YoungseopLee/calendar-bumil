@@ -12,6 +12,7 @@ from blueprints.admin import admin_bp
 from blueprints.notice import notice_bp
 from blueprints.department import department_bp
 from blueprints.menu import menu_bp
+from blueprints.inquiry import inquiry_bp
 
 import os, logging
 
@@ -107,6 +108,7 @@ app.register_blueprint(admin_bp)
 app.register_blueprint(notice_bp)
 app.register_blueprint(department_bp)
 app.register_blueprint(menu_bp)
+app.register_blueprint(inquiry_bp)
 
 # gunicorn 사용 시 주석 처리
 if __name__ == "__main__":
