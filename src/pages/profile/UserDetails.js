@@ -19,8 +19,8 @@ import {
   FaUserTie,
   FaBuilding,
   FaUserCircle,
-  FaRegComments,
-} from "react-icons/fa"; // 아이콘 추가
+} from "react-icons/fa";
+import { AiFillHeart } from "react-icons/ai";
 
 const UserDetails = () => {
   const [user, setUser] = useState(null); // 이 페이지에서만 프로필 유저 정보
@@ -373,16 +373,16 @@ const UserDetails = () => {
               <FaEnvelope className="icon" />
               {user.id}
             </p>
+            {user.mbti !== null && (
+              <p>
+                <AiFillHeart className="icon" />
+                {user.mbti}
+              </p>
+            )}
             {user.squid_test !== null && (
               <p>
                 <FaOctopusDeploy className="icon" />
                 {user.squid_test}
-              </p>
-            )}
-            {user.mbti !== null && (
-              <p>
-                <FaRegComments className="icon" />
-                {user.mbti}
               </p>
             )}
           </div>
