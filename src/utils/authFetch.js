@@ -41,6 +41,12 @@ export const logoutFunc = async () => {
     }
   }
 
-  localStorage.removeItem("access_token");
-  window.location.href = "/"; // 강제 로그아웃 및 리다이렉트
+// accessToken만 제거
+localStorage.removeItem("access_token");
+
+// sessionStorage에서 필요한 항목만 제거 (예: 세션 만료 후 제거)
+sessionStorage.clear();
+
+// 리다이렉트
+window.location.replace("/");
 };
