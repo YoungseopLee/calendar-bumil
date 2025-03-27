@@ -383,6 +383,7 @@
 .department-header {
   display: flex;
   align-items: center;
+  border-bottom: 1px solid #ccc;
   font-size: 18px;
   font-weight: bold;
   color: #333;
