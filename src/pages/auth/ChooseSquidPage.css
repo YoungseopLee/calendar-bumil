@@ -53,7 +53,6 @@
   border-color: #007bff;
 }
 
-
 .choosesquid-form-group {
   margin-bottom: 15px;
   width: 100%;
@@ -140,8 +139,8 @@
   color: red;
 }
 
-.error {
+.error-text {
   color: red;
-  font-size: 12px;
-  margin-top: 5px;
+  font-size: 0.85em;
+  margin-top: 4px;
 }

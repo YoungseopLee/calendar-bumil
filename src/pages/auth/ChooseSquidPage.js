@@ -85,6 +85,16 @@ const ChooseSquidPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const newErrors = {};
+    if (!formData.squid_test) newErrors.squid_test = "징어를 선택해주세요.";
+    if (!formData.mbti) newErrors.mbti = "MBTI를 선택해주세요.";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     try {
       const response = await authFetch(`${apiUrl}/admin/update_user`, {
         method: "PUT",
@@ -139,6 +149,9 @@ const ChooseSquidPage = () => {
                 handleChange(selectedOption, "squid_test")
               }
             />
+            {errors.squid_test && (
+              <div className="error-text">{errors.squid_test}</div>
+            )}
             <div>
               <a
                 className="choosesquid-squid-test-link"
@@ -164,6 +177,7 @@ const ChooseSquidPage = () => {
                 handleChange(selectedOption, "mbti")
               }
             />
+            {errors.mbti && <div className="error-text">{errors.mbti}</div>}
           </div>
           <div className="choosesquid-button-container">
             <button type="submit" className="choosesquid-button">
