@@ -433,26 +433,33 @@ def log_login():
 def logout():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'}), 200
-    
-    data = request.get_json() or {}
-    refresh_token = data.get('refresh_token')
 
-    if not refresh_token:
-        return jsonify({"message": "Refresh Token이 필요합니다."}), 400
-    
+    # access_token 기반 인증
+    user_id, user_name, role_id, new_access_token, error_response, status_code = verify_and_refresh_token(request)
+    if error_response:
+        return error_response, status_code
+
+    if user_id is None:
+        return jsonify({"message": "토큰 인증 실패"}), 401
+
     conn = get_db_connection()
     cursor = conn.cursor()
-    # Refresh Token 삭제
-    sql_delete_refresh_token = """
-      DELETE FROM tb_refresh_token 
-      WHERE refresh_token = %s"""
-    cursor.execute(sql_delete_refresh_token, (refresh_token,))
-    logger.info(f"[SQL/DELETE] tb_refresh_token {sql_delete_refresh_token}")
-    
-    conn.commit()
+    try:
+        sql_delete_refresh_token = """
+            DELETE FROM tb_refresh_token 
+            WHERE user_id = %s"""
+        cursor.execute(sql_delete_refresh_token, (user_id,))
+        conn.commit()
 
-    response = make_response(jsonify({"message": "로그아웃 성공!"}), 200)
-    return response
+        logger.info(f"[SQL/DELETE] tb_refresh_token (user_id={user_id})")
+
+        return jsonify({"message": "로그아웃 성공!"}), 200
+    except Exception as e:
+        logger.error(f"로그아웃 중 오류: {e}")
+        return jsonify({"message": "로그아웃 실패"}), 500
+    finally:
+        cursor.close()
+        conn.close()
 
 # 로그인 기록 조회 API
 @auth_bp.route('/get_login_logs', methods=['GET', 'OPTIONS'])
@@ -570,8 +577,9 @@ def get_logged_in_user():
                 user['id'] = user['id']
                 user['name'] = user['name']
                 user['phone_number'] = decrypt_aes(user['phone_number'])
-            except Exception as decryption_error:
-                print(f"복호화 오류: {decryption_error}")
+            except Exception as e:
+                logger.warning(f"복호화 실패: {e}")
+                user['phone_number'] = '복호화 실패'
                 return jsonify({'message': '사용자 정보 복호화 실패'}), 500
 
             response = jsonify({'user': user})

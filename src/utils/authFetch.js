@@ -17,7 +17,23 @@ export const authFetch = async (url, options = {}) => {
 
   // 만약 401이 반환되면 => 이미 토큰 검증 실패거나 refresh 만료
   if (response.status === 401) {
-    logoutFunc(); // 바로 로그아웃 시키고 리다이렉트
+    try {
+      const data = await response.json();
+
+      // "refresh token" 관련 메시지일 경우에만 로그아웃
+      if (
+        data.message &&
+        (data.message.includes("Refresh Token") ||
+          data.message.includes("토큰") ||
+          data.message.includes("인증 실패"))
+      ) {
+        logoutFunc(); // 강제 로그아웃
+      }
+    } catch (err) {
+      // JSON 파싱 에러 등 예외 처리
+      console.error("401 응답 처리 중 오류:", err);
+      logoutFunc(); // 안전하게 로그아웃
+    }
   }
 
   return response;
@@ -41,12 +57,12 @@ export const logoutFunc = async () => {
     }
   }
 
-// accessToken만 제거
-localStorage.removeItem("access_token");
+  // accessToken만 제거
+  localStorage.removeItem("access_token");
 
-// sessionStorage에서 필요한 항목만 제거 (예: 세션 만료 후 제거)
-sessionStorage.clear();
+  // sessionStorage에서 필요한 항목만 제거 (예: 세션 만료 후 제거)
+  sessionStorage.clear();
 
-// 리다이렉트
-window.location.replace("/");
+  // 리다이렉트
+  window.location.replace("/");
 };
