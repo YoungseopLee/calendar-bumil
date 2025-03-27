@@ -59,11 +59,16 @@
   justify-content: space-between;
   padding: 5px;
   border-radius: 6px;
-  margin-bottom: 8px;
+  margin-top: 1px;
+  margin-bottom: 3px;
   font-weight: bold;
   transition: transform 0.2s ease-in-out, background-color 0.3s ease;
   cursor: pointer;
   grid-template-columns: 50px 1fr 1fr 1fr; /* 동일한 너비 설정 */
+}
+
+.employee-item2:hover {
+  background-color: #d3ddeb;
 }
 
 .favorite-item:hover,
@@ -83,7 +88,6 @@
   border-bottom: 2px solid #ccc;
   border-radius: 6px;
   margin-top: 0px;
-  margin-bottom: 10px;
   grid-template-columns: 50px 1fr 1fr 1fr; /* 첫 번째 열(즐겨찾기)만 작게 설정 */
 }
 
@@ -383,7 +387,7 @@
 .department-header {
   display: flex;
   align-items: center;
-  border-bottom: 1px solid #ccc;
+  border-top: 1px solid #ccc;
   font-size: 18px;
   font-weight: bold;
   color: #333;

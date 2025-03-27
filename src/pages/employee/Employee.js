@@ -479,8 +479,8 @@ const EmployeeList = () => {
           <div className="employee-index-bar sticky-header">
             <span className="index-item-1">즐겨찾기</span>
 
-            {/* 부서 */}
-            <span className="index-item">부서</span>
+            {/* 이름 */}
+            <span className="index-item">이름</span>
 
             {/* 🔽 직급 정렬 버튼 */}
             <span className="index-item">
