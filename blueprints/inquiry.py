@@ -50,14 +50,21 @@ def get_inquiry(inquiry_id):
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
+        # 먼저 해당 문의사항 가져오기
         sql = """
         SELECT * FROM tb_inquiry
-        WHERE id = %s AND user_id = %s AND is_delete_yn = 'N'"""
-        cursor.execute(sql, (inquiry_id, user_id))
+        WHERE id = %s AND is_delete_yn = 'N'"""
+        cursor.execute(sql, (inquiry_id,))
         inquiry = cursor.fetchone()
-        logger.info(f"[SQL/SELECT] {sql} | PARAMS: ({inquiry_id}, {user_id})")
+        logger.info(f"[SQL/SELECT] {sql} | PARAMS: ({inquiry_id})")
+
+        # 존재하지 않거나 삭제된 문의
         if not inquiry:
             return jsonify({'message': '해당 문의사항을 찾을 수 없습니다.'}), 404
+
+        # 비밀글인데 관리자가 아니고 작성자도 아니라면 차단
+        if inquiry['private_yn'] == 'Y' and inquiry['user_id'] != user_id and role_id != 'AD_ADMIN':
+            return jsonify({'message': '비밀글은 본인이나 관리자만 조회할 수 있습니다.'}), 403
 
         response = jsonify({'inquiry': inquiry})
         if new_access_token:
