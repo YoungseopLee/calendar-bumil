@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 import "./ChangePWPage.css";
 
 const ChangePWPage = () => {
@@ -21,6 +22,12 @@ const ChangePWPage = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const { getUserInfo } = useAuth();
+
+  const [showPasswords, setShowPasswords] = useState({
+    old: false,
+    new: false,
+    confirm: false,
+  });
 
   // 로그인한 사용자 정보 가져오기 (api로 가져오기)
   useEffect(() => {
@@ -108,36 +115,70 @@ const ChangePWPage = () => {
         <form onSubmit={handleSubmit}>
           <div className="form-group-changepw">
             <label htmlFor="old_password">현재 비밀번호</label>
-            <input
-              type="password"
-              id="old_password"
-              name="old_password"
-              onChange={handleChange}
-              required
-            />
+            <div className="input-icon-wrapper">
+              <input
+                type={showPasswords.old ? "text" : "password"}
+                id="old_password"
+                name="old_password"
+                onChange={handleChange}
+                required
+              />
+              <span
+                className="eye-icon"
+                onClick={() =>
+                  setShowPasswords((prev) => ({ ...prev, old: !prev.old }))
+                }
+              >
+                {showPasswords.old ? <FiEyeOff /> : <FiEye />}
+              </span>
+            </div>
           </div>
+
           <div className="form-group-changepw">
             <label htmlFor="new_password">변경 비밀번호</label>
-            <input
-              type="password"
-              id="new_password"
-              name="new_password"
-              onChange={handleChange}
-              required
-            />
+            <div className="input-icon-wrapper">
+              <input
+                type={showPasswords.new ? "text" : "password"}
+                id="new_password"
+                name="new_password"
+                onChange={handleChange}
+                required
+              />
+              <span
+                className="eye-icon"
+                onClick={() =>
+                  setShowPasswords((prev) => ({ ...prev, new: !prev.new }))
+                }
+              >
+                {showPasswords.old ? <FiEyeOff /> : <FiEye />}
+              </span>
+            </div>
             {errors.new_password && (
               <div className="error">{errors.new_password}</div>
             )}
           </div>
           <div className="form-group-changepw">
             <label htmlFor="confirm_password">변경 비밀번호 확인</label>
-            <input
-              type="password"
-              id="confirm_password"
-              name="confirm_password"
-              onChange={handleChange}
-              required
-            />
+            <div className="input-icon-wrapper">
+              <input
+                type={showPasswords.confirm ? "text" : "password"}
+                id="confirm_password"
+                name="confirm_password"
+                onChange={handleChange}
+                required
+              />
+              <span
+                className="eye-icon"
+                onClick={() =>
+                  setShowPasswords((prev) => ({
+                    ...prev,
+                    confirm: !prev.confirm,
+                  }))
+                }
+              >
+                {showPasswords.old ? <FiEyeOff /> : <FiEye />}
+              </span>
+            </div>
             {errors.confirm_password && (
               <div className="error">{errors.confirm_password}</div>
             )}
