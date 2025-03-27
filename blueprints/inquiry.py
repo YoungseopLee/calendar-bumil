@@ -150,7 +150,7 @@ def update_inquiry(inquiry_id):
         conn.close()
 
 # 문의사항 삭제 (논리 삭제)
-@inquiry_bp.route('/delete_inquiry/<int:inquiry_id>', methods=['DELETE', 'OPTIONS'])
+@inquiry_bp.route('/delete_inquiry/<int:inquiry_id>', methods=['PUT', 'OPTIONS'])
 def delete_inquiry(inquiry_id):
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
