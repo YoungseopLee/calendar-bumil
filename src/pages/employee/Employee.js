@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "./Employee.css";
 import Sidebar from "../components/Sidebar";
 import BackButton from "../components/BackButton";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -7,6 +6,8 @@ import ErrorMessage from "../components/ErrorMessage";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import { useNavigate } from "react-router-dom";
+import { GiSquidHead } from "react-icons/gi";
+import "./Employee.css";
 
 /**
  * 📌 EmployeeList - 사원 목록을 조회하고 필터링하는 페이지
@@ -94,7 +95,7 @@ const EmployeeList = () => {
     const userInfo = await getUserInfo();
     setUser(userInfo);
     setMySquid(userInfo.squid_test); // 나의 오징어 타입 설정
-    console.log("사용자 오징어:", userInfo.squid_test);
+    // console.log("사용자 오징어:", userInfo.squid_test);
     return userInfo;
   };
 
@@ -238,7 +239,6 @@ const EmployeeList = () => {
     return acc;
   }, {});
 
-
   // 🔍 **검색 필터링 로직**
   const filterEmployees = (emp) => {
     if (!searchText) return true;
@@ -321,28 +321,29 @@ const EmployeeList = () => {
   const sourceEmployees = showFavorites ? favoriteEmployees : employees;
   const filteredEmployees = sourceEmployees.filter(filterEmployees);
 
-  // ### 🦑 SQUID ZONE 
+  // ### 🦑 SQUID ZONE
   const [showSquids, setShowSquids] = useState(false); // 오징어 타입 보기 여부
-  const [mySquid, setMySquid] = useState(null);        // 나의 오징어 타입
+  const [showTrigger, setShowTrigger] = useState(false);
+  const [mySquid, setMySquid] = useState(null); // 나의 오징어 타입
   const [squidFilterType, setSquidFilterType] = useState(null); // good, bad 필터 상태
 
   const squidMatchMapping = {
-    "깐깐징어": { good: ["꿀잼징어"], bad: ["깐부징어"] },
-    "쿨한징어": { good: ["대장징어"], bad: ["꿀잼징어"] },
-    "야망징어": { good: ["예민징어"], bad: ["순둥징어"] },
-    "솔플징어": { good: ["센스징어"], bad: ["팔랑징어"] },
-    "어쩔징어": { good: ["순둥징어"], bad: ["예민징어"] },
-    "돌격징어": { good: ["눈치징어"], bad: ["몽글징어"] },
-    "순둥징어": { good: ["어쩔징어"], bad: ["야망징어"] },
-    "눈치징어": { good: ["돌격징어"], bad: ["쿨한징어"] },
-    "깐부징어": { good: ["몽글징어"], bad: ["깐깐징어"] },
-    "몽글징어": { good: ["깐부징어"], bad: ["돌격징어"] },
-    "센스징어": { good: ["솔플징어"], bad: ["쌀쌀징어"] },
-    "팔랑징어": { good: ["쌀쌀징어"], bad: ["솔플징어"] },
-    "예민징어": { good: ["야망징어"], bad: ["어쩔징어"] },
-    "꿀잼징어": { good: ["깐깐징어"], bad: ["쿨한징어"] },
-    "쌀쌀징어": { good: ["팔랑징어"], bad: ["센스징어"] },
-    "대장징어": { good: ["쿨한징어"], bad: ["눈치징어"] },
+    깐깐징어: { good: ["꿀잼징어"], bad: ["깐부징어"] },
+    쿨한징어: { good: ["대장징어"], bad: ["꿀잼징어"] },
+    야망징어: { good: ["예민징어"], bad: ["순둥징어"] },
+    솔플징어: { good: ["센스징어"], bad: ["팔랑징어"] },
+    어쩔징어: { good: ["순둥징어"], bad: ["예민징어"] },
+    돌격징어: { good: ["눈치징어"], bad: ["몽글징어"] },
+    순둥징어: { good: ["어쩔징어"], bad: ["야망징어"] },
+    눈치징어: { good: ["돌격징어"], bad: ["쿨한징어"] },
+    깐부징어: { good: ["몽글징어"], bad: ["깐깐징어"] },
+    몽글징어: { good: ["깐부징어"], bad: ["돌격징어"] },
+    센스징어: { good: ["솔플징어"], bad: ["쌀쌀징어"] },
+    팔랑징어: { good: ["쌀쌀징어"], bad: ["솔플징어"] },
+    예민징어: { good: ["야망징어"], bad: ["어쩔징어"] },
+    꿀잼징어: { good: ["깐깐징어"], bad: ["쿨한징어"] },
+    쌀쌀징어: { good: ["팔랑징어"], bad: ["센스징어"] },
+    대장징어: { good: ["쿨한징어"], bad: ["눈치징어"] },
   };
 
   const applySquidFilter = (emps) => {
@@ -380,36 +381,47 @@ const EmployeeList = () => {
             {showFavorites ? "전체 사원 보기" : "즐겨찾기 보기"}
           </button>
 
-          <button
-            className="squid-toggle"
-            onClick={() => setShowSquids((prev) => !prev)}
+          <div
+            className="squid-toggle-wrapper"
+            onMouseEnter={() => setShowTrigger(true)}
+            onMouseLeave={() => {
+              setShowTrigger(false);
+              setShowSquids(false);
+            }}
           >
-            {showSquids ? (
-              <>
-                <button
-                  className={`good-squid ${squidFilterType === "good" ? "active" : ""}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSquidFilterType((prev) => (prev === "good" ? null : "good"));
-                  }}
-                >
-                  👍
-                </button>
-                <button
-                  className={`bad-squid ${squidFilterType === "bad" ? "active" : ""}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSquidFilterType((prev) => (prev === "bad" ? null : "bad"));
-                  }}
-                >
-                  👎
-                </button>
-              </>
-            ) : (
-              <span>🦑</span>
+            {showTrigger && (
+              <GiSquidHead
+                size={24}
+                className="squid-toggle-trigger"
+                onClick={() => setShowSquids((prev) => !prev)}
+              />
             )}
-          </button>
 
+            <div className={`squid-toggle-options ${showSquids ? "open" : ""}`}>
+              <GiSquidHead
+                size={24}
+                className={`good-squid ${
+                  squidFilterType === "good" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSquidFilterType((prev) =>
+                    prev === "good" ? null : "good"
+                  );
+                }}
+              />
+              <GiSquidHead
+                size={24}
+                className={`bad-squid ${
+                  squidFilterType === "bad" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSquidFilterType((prev) => (prev === "bad" ? null : "bad"));
+                }}
+              />
+            </div>
+          </div>
         </div>
 
         {/* 🔍 검색 UI */}
@@ -482,14 +494,16 @@ const EmployeeList = () => {
             {Object.keys(groupByDepartment(finalFilteredEmployees))
               .sort((a, b) => a.localeCompare(b, "ko-KR"))
               .map((department) => {
-                const departmentEmployees =
-                  groupByDepartment(finalFilteredEmployees)[department];
+                const departmentEmployees = groupByDepartment(
+                  finalFilteredEmployees
+                )[department];
                 return (
                   <div key={department}>
                     {/* 부서명 클릭 시 열고 닫을 수 있도록 토글 */}
                     <div
-                      className={`department-header ${openDepartments[department] ? "open" : ""
-                        }`}
+                      className={`department-header ${
+                        openDepartments[department] ? "open" : ""
+                      }`}
                       onClick={() => toggleDepartment(department)}
                       style={{
                         backgroundColor: openDepartments[department]
@@ -523,12 +537,13 @@ const EmployeeList = () => {
                           >
                             {/* ⭐ 즐겨찾기 토글 */}
                             <span
-                              className={`favorite-icon ${favoriteEmployees.some(
-                                (fav) => fav.id === employee.id
-                              )
-                                ? ""
-                                : "not-favorite"
-                                }`}
+                              className={`favorite-icon ${
+                                favoriteEmployees.some(
+                                  (fav) => fav.id === employee.id
+                                )
+                                  ? ""
+                                  : "not-favorite"
+                              }`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleFavorite(employee.id);
