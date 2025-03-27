@@ -242,31 +242,7 @@ const ChangeMyDetails = () => {
               required
             />
           </div>
-          <div className="change-user-edit-form-group">
-            <label>징어</label>
-            <Select
-              name="squid_test"
-              options={squidOptions}
-              placeholder="징어를 선택하세요"
-              className="change-user-squid-input"
-              value={squidOptions.find(
-                (option) => option.value === formData.squid_test
-              )} // 현재 선택된 값 유지
-              onChange={(selectedOption) =>
-                handleChange(selectedOption, "squid_test")
-              }
-            />
-            <div>
-              <a
-                className="change-user-squid-test-link"
-                href="https://poomang.com/t/squid_test?from_detail=True"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                당신의 징어가 궁금하다면?
-              </a>
-            </div>
-          </div>
+          <div className="change-user-edit-form-group"></div>
           <div className="change-user-edit-form-group">
             <label>MBTI</label>
             <Select
@@ -281,6 +257,29 @@ const ChangeMyDetails = () => {
                 handleChange(selectedOption, "mbti")
               }
             />
+          </div>
+          <label>징어</label>
+          <Select
+            name="squid_test"
+            options={squidOptions}
+            placeholder="징어를 선택하세요"
+            className="change-user-squid-input"
+            value={squidOptions.find(
+              (option) => option.value === formData.squid_test
+            )} // 현재 선택된 값 유지
+            onChange={(selectedOption) =>
+              handleChange(selectedOption, "squid_test")
+            }
+          />
+          <div>
+            <a
+              className="change-user-squid-test-link"
+              href="https://poomang.com/t/squid_test?from_detail=True"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              당신의 징어가 궁금하다면?
+            </a>
           </div>
           <button
             type="button"

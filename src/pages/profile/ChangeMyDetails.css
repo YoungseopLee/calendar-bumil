@@ -99,6 +99,7 @@
 .change-user-change-pw-button {
   flex: 1;
   width: 100%;
+  margin-top: 15px;
   padding: 12px;
   font-size: 16px;
   color: #ffffff;
