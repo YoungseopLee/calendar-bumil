@@ -7,6 +7,9 @@ import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import { useNavigate } from "react-router-dom";
 import { GiSquidHead } from "react-icons/gi";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
+import { followCursor } from "tippy.js";
 import "./Employee.css";
 
 /**
@@ -389,35 +392,59 @@ const EmployeeList = () => {
               setShowSquids(false);
             }}
           >
-            <GiSquidHead
-              size={24}
-              className={`squid-toggle-trigger ${showTrigger ? "visible" : ""}`}
-              onClick={() => setShowSquids((prev) => !prev)}
-            />
+            <Tippy content="들켰다!" placement="top" arrow={true}>
+              <div>
+                <GiSquidHead
+                  size={24}
+                  className={`squid-toggle-trigger ${
+                    showTrigger ? "visible" : ""
+                  }`}
+                  onClick={() => setShowSquids((prev) => !prev)}
+                />
+              </div>
+            </Tippy>
 
             <div className={`squid-toggle-options ${showSquids ? "open" : ""}`}>
-              <GiSquidHead
-                size={24}
-                className={`good-squid ${
-                  squidFilterType === "good" ? "active" : ""
-                }`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSquidFilterType((prev) =>
-                    prev === "good" ? null : "good"
-                  );
-                }}
-              />
-              <GiSquidHead
-                size={24}
-                className={`bad-squid ${
-                  squidFilterType === "bad" ? "active" : ""
-                }`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSquidFilterType((prev) => (prev === "bad" ? null : "bad"));
-                }}
-              />
+              <Tippy
+                content="나와 잘 맞는 징어 표시하기"
+                placement="top"
+                arrow={true}
+              >
+                <div>
+                  <GiSquidHead
+                    size={24}
+                    className={`good-squid ${
+                      squidFilterType === "good" ? "active" : ""
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSquidFilterType((prev) =>
+                        prev === "good" ? null : "good"
+                      );
+                    }}
+                  />
+                </div>
+              </Tippy>
+              <Tippy
+                content="나와 안 맞는 징어 표시하기"
+                placement="top"
+                arrow={true}
+              >
+                <div>
+                  <GiSquidHead
+                    size={24}
+                    className={`bad-squid ${
+                      squidFilterType === "bad" ? "active" : ""
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSquidFilterType((prev) =>
+                        prev === "bad" ? null : "bad"
+                      );
+                    }}
+                  />
+                </div>
+              </Tippy>
             </div>
           </div>
         </div>
