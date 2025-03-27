@@ -333,11 +333,6 @@
 .department-header .arrow {
   transform: rotate(90deg);
 }
-/* 
-.department-employee-list {
-  margin-left: 20px;
-  padding-top: 10px;
-} */
 
 /* 뒤로가기 버튼 스타일 */
 .box > .back-button {

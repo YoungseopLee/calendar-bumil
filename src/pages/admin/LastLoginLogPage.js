@@ -4,12 +4,13 @@ import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import Sidebar from "../components/Sidebar";
 import Tippy from "@tippyjs/react";
+import ManagerBackButton from "./ManagerBackButton";
 import LoadingSpinner from "../components/LoadingSpinner";
 import "tippy.js/dist/tippy.css";
 import { followCursor } from "tippy.js";
-import "./LastLoginPage.css";
+import "./LastLoginLogPage.css";
 
-const LastLoginPage = () => {
+const LastLoginLogPage = () => {
   const [users, setUsers] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [searchField, setSearchField] = useState("name");
@@ -104,6 +105,7 @@ const LastLoginPage = () => {
   return (
     <div className="last-login-page">
       <Sidebar user={user} />
+      <ManagerBackButton />
       <div className="last-login-box">
         <div className="last-login-list-container">
           <h2 className="last-login-title">마지막 접속 기록</h2>
@@ -171,4 +173,4 @@ const LastLoginPage = () => {
   );
 };
 
-export default LastLoginPage;
+export default LastLoginLogPage;

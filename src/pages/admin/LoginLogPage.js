@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import ManagerBackButton from "./ManagerBackButton";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import Tippy from "@tippyjs/react";
@@ -124,6 +125,7 @@ const LoginLogPage = () => {
   return (
     <div className="login-log-page">
       <Sidebar user={user} />
+      <ManagerBackButton />
 
       <div className="login-log-box">
         <h2 className="title">로그인 기록</h2>

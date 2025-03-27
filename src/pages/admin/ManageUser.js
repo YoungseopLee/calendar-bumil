@@ -7,6 +7,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { followCursor } from "tippy.js";
+import ManagerBackButton from "./ManagerBackButton";
 import "./ManageUser.css";
 
 const ManageUser = () => {
@@ -209,6 +210,7 @@ const ManageUser = () => {
   return (
     <div className="manage-user-page">
       <Sidebar user={user} />
+      <ManagerBackButton />
       <div className="manage-user-box">
         <div className="manage-user-list-container">
           <h2 className="manage-user-title">유저 관리</h2>

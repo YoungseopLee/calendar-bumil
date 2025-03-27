@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import ManagerBackButton from "./ManagerBackButton";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
@@ -126,6 +127,7 @@ const UserRolesManagement = () => {
   return (
     <div className="user-roles-page">
       <Sidebar user={user} />
+      <ManagerBackButton />
 
       <div className="user-roles-box">
         <h2 className="title">사용자 역할 관리</h2>

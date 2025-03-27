@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Manager.css";
 import Sidebar from "../components/Sidebar";
+import ManagerBackButton from "../components/BackButton";
 import { useAuth } from "../../utils/useAuth";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ScrollToTopButton from "../components/ScrollToTopButton";
@@ -80,6 +81,7 @@ const Manager = () => {
   return (
     <div className="manager-page">
       <Sidebar user={user} />
+      <ManagerBackButton />
       <div className="manager-content">
         <h1 className="manager-title">관리자 페이지</h1>
 

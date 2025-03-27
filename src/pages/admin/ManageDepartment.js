@@ -4,6 +4,7 @@ import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Sidebar from "../components/Sidebar";
+import ManagerBackButton from "./ManagerBackButton";
 import "./ManageDepartment.css";
 const ManageDepartment = () => {
   const [departmentList, setDepartmentList] = useState([]);
@@ -186,6 +187,7 @@ const ManageDepartment = () => {
   return (
     <div className="department-management">
       <Sidebar user={user} />
+      <ManagerBackButton />
       <h2 className="department-title">부서 관리</h2>
       {/* 부서 목록 */}
       <div className="department-container">

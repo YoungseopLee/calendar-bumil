@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import ManagerBackButton from "./ManagerBackButton";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
@@ -117,6 +118,7 @@ const StatusManagement = () => {
   return (
     <div className="status-management">
       <Sidebar user={user} />
+      <ManagerBackButton />
       <h2 className="status-title">상태 관리</h2>
       <div className="status-list">
         {statuses.map((s) => (

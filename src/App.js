@@ -27,7 +27,7 @@ function App() {
         />
         <Route
           path="/last-login-log"
-          element={<Modules.Admin.LastLoginPage />}
+          element={<Modules.Admin.LastLoginLogPage />}
         />
 
         {/* ===== Auth ===== */}
