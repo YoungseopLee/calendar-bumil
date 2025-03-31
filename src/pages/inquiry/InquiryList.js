@@ -104,9 +104,15 @@ const InquiryList = () => {
     }
   };
 
-  // 검색 및 필터링 로직
   const filterInquirys = (inquiry) => {
+    if (searchField === "status") {
+      // 전체 선택 시 모든 항목 통과
+      if (!searchText || searchText === "전체") return true;
+      return inquiry.status === searchText;
+    }
+  
     if (!searchText) return true;
+  
     const value = inquiry[searchField]?.toLowerCase() || "";
     return value.includes(searchText.toLowerCase());
   };
@@ -129,6 +135,7 @@ const InquiryList = () => {
     title: "제목",
     content: "내용",
     created_by: "작성자",
+    status: "상태", 
   };
 
   // 페이지네이션 계산
@@ -168,24 +175,41 @@ const InquiryList = () => {
 
         <div className="inquiry-search-icon-container">
           <div className="inquiry-search-container">
-            <select
-              className="inquiry-search-dropdown"
-              value={searchField}
-              onChange={(e) => setSearchField(e.target.value)}
-            >
-              <option value="title">제목</option>
-              <option value="content">내용</option>
-              <option value="created_by">작성자</option>
-            </select>
+                    <select
+            className="inquiry-search-dropdown"
+            value={searchField}
+            onChange={(e) => {
+              setSearchField(e.target.value);
+              setSearchText(""); 
+            }}
+          >
+            <option value="title">제목</option>
+            <option value="content">내용</option>
+            <option value="created_by">작성자</option>
+            <option value="status">상태</option> 
+          </select>
 
-            <input
-              type="text"
-              className="inquiry-search-input"
-              placeholder={`${searchFieldLabelMap[searchField]}를 입력하세요.`}
-              onChange={(e) => setSearchText(e.target.value)}
-              value={searchText}
-            />
+          {searchField === "status" ? (
+  <select
+    className="inquiry-search-input"
+    onChange={(e) => setSearchText(e.target.value)}
+    value={searchText}
+  >
+    <option value="">전체</option>
+    <option value="대기중">대기중</option>
+    <option value="답변완료">답변완료</option>
+  </select>
+) : (
+  <input
+    type="text"
+    className="inquiry-search-input"
+    placeholder={`${searchFieldLabelMap[searchField]}를 입력하세요.`}
+    onChange={(e) => setSearchText(e.target.value)}
+    value={searchText}
+  />
+)}
           </div>
+          
           <IoSearchOutline className="inquiry-search-icon" />
         </div>
 
@@ -198,13 +222,13 @@ const InquiryList = () => {
               const canAccess = user.role_id === "AD_ADMIN";
 
               const statusDotClass =
-              inquiry.status === "답변완료" ? "status-complete" : "status-pending";          
+                inquiry.status === "답변완료" ? "status-complete" : "status-pending";
 
               return (
                 <div key={inquiry.id} className="inquiry-list-item">
                   <div className="inquiry-list-title-with-status">
                     <span className={`inquiry-status-dot ${statusDotClass}`}></span>
-            
+
                     {isPrivate && !canAccess ? (
                       <span className="inquiry-private-message">비공개글 입니다.</span>
                     ) : (
@@ -229,7 +253,7 @@ const InquiryList = () => {
                       </Tippy>
                     )}
                   </div>
-            
+
                   <div className="inquiry-list-info">
                     <span className="inquiry-list-author">
                       {inquiry.created_by || "관리자"}
