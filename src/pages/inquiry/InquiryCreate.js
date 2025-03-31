@@ -39,7 +39,7 @@ const InquiryCreate = () => {
     title: "",
     content: "",
     user_id: "",
-    private_yn: "N" // 비공개 여부
+    private_yn: "N", // 비공개 여부
   });
 
   //로그인한 사용자 정보
@@ -58,7 +58,6 @@ const InquiryCreate = () => {
       try {
         // 1. 사용자 정보 가져오기
         const userInfo = await fetchUserInfo();
-
       } catch (error) {
         console.error("데이터 로딩 오류:", error);
       }
@@ -188,7 +187,7 @@ const InquiryCreate = () => {
           </div>
           <div className="inquiry-create-button-group">
             <button className="inquiry-create-button" type="submit">
-              <BsPlusLg />
+              생성
             </button>
             <button
               className="inquiry-create-cancel-button"
