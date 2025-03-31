@@ -26,7 +26,7 @@ import AddInquiryButton from "./AddInquiryButton";
  */
 
 const InquiryList = () => {
-  const [inquirys, setInquirys] = useState([]); // 문의사항 목록
+  const [Inquiries, setInquirys] = useState([]); // 문의사항 목록
   const [filteredInquirys, setFilteredInquirys] = useState([]); // 필터링된 문의사항 목록
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태
   const [error, setError] = useState(null); // 에러 메세지
@@ -34,7 +34,7 @@ const InquiryList = () => {
   const [searchText, setSearchText] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const inquirysPerPage = 10;
+  const InquiriesPerPage = 10;
 
   const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -93,8 +93,8 @@ const InquiryList = () => {
       }
 
       const data = await response.json();
-      setInquirys(data.inquirys);
-      setFilteredInquirys(data.inquirys);
+      setInquirys(data.Inquiries);
+      setFilteredInquirys(data.Inquiries);
     } catch (err) {
       console.error("문의사항 목록 조회 오류:", err);
       setError("문의사항을 불러오는 중 오류가 발생했습니다.");
@@ -132,9 +132,9 @@ const InquiryList = () => {
 
   // 페이지네이션 계산
   const filteredInquirysList = filteredInquirys.filter(filterInquirys);
-  const totalPages = Math.ceil(filteredInquirysList.length / inquirysPerPage);
-  const indexOfLastInquiry = currentPage * inquirysPerPage;
-  const indexOfFirstInquiry = indexOfLastInquiry - inquirysPerPage;
+  const totalPages = Math.ceil(filteredInquirysList.length / InquiriesPerPage);
+  const indexOfLastInquiry = currentPage * InquiriesPerPage;
+  const indexOfFirstInquiry = indexOfLastInquiry - InquiriesPerPage;
   const currentInquirys = filteredInquirysList.slice(
     indexOfFirstInquiry,
     indexOfLastInquiry
