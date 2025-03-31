@@ -95,7 +95,7 @@ const InquiryList = () => {
       const data = await response.json();
       setInquirys(data.inquiries);
       setFilteredInquirys(data.inquiries);
-      console.log("문의사항 목록:", data.inquiries);
+      // console.log("문의사항 목록:", data.inquiries);
     } catch (err) {
       console.error("문의사항 목록 조회 오류:", err);
       setError("문의사항을 불러오는 중 오류가 발생했습니다.");
