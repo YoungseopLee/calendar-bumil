@@ -48,7 +48,7 @@ const InquiryEdit = () => {
         // console.log("userInfo: ", userInfo);
         // console.log("inquiry: ", inquiryData);
 
-        const isAuthor = userInfo.name === inquiryData.created_by; // 또는 userInfo.id === inquiryData.created_by_id
+        const isAuthor = userInfo.name === inquiryData.created_by; 
         const isAdmin = userInfo.role_id === "AD_ADMIN";
   
         // console.log("isAuthor: ", isAuthor);
