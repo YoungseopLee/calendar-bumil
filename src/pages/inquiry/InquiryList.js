@@ -158,7 +158,6 @@ const InquiryList = () => {
   if (error) return <ErrorMessage />;
 
   return (
-    console.log("문의사항 목록:", currentInquirys),
     <div className="inquiry-list-app-body">
       <Sidebar user={user} />
       <div className="inquiry-list-container">
