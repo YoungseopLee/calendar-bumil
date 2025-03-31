@@ -37,7 +37,7 @@ def get_notices():
         WHERE n.is_delete_yn = 'N'
         ORDER BY n.created_at DESC"""
         cursor.execute(sql)
-
+    
         notices = cursor.fetchall()
         response = jsonify({'notices': notices})
         if new_access_token:

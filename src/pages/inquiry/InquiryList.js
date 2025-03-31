@@ -80,7 +80,7 @@ const InquiryList = () => {
   const fetchInquirys = async () => {
     try {
       setLoading(true);
-      const response = await authFetch(`${apiUrl}/inquiry/get_all_inquiries`, {
+      const response = await authFetch(`${apiUrl}/inquiry/get_inquiry_list`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -193,6 +193,7 @@ const InquiryList = () => {
             <div className="inquiry-list-empty">등록된 문의사항이 없습니다.</div>
           ) : (
             currentInquirys.map((inquiry) => (
+              console.log("문의사항 데이터:", inquiry),
               <div key={inquiry.id} className="inquiry-list-item">
                 <Tippy
                   content={inquiry.title}
@@ -209,13 +210,14 @@ const InquiryList = () => {
                     ],
                   }}
                 >
+
                   <Link to={`/inquiry-details/${inquiry.id}`}>
                     {inquiry.title}
                   </Link>
                 </Tippy>
                 <div className="inquiry-list-info">
                   <span className="inquiry-list-author">
-                    {inquiry.created_by_name || "관리자"}
+                    {inquiry.created_by || "관리자"}
                   </span>
                   <span className="inquiry-list-date">
                     {formatDate(inquiry.created_at)}
