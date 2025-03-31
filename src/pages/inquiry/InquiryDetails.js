@@ -66,13 +66,6 @@ const InquiryDetails = () => {
       }
       const data = await response.json();
       setInquiry(data.inquiry);
-
-      if (data.inquiry.response_content) {
-        setResponseContent(data.inquiry.response_content);
-      }
-      if (data.inquiry.status) {
-        setStatus(data.inquiry.status);
-      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -101,6 +94,45 @@ const InquiryDetails = () => {
       navigate("/inquiry-list");
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  // 답변 등록 및 수정 함수
+  const handleSubmitResponse = async (e) => {
+    e.preventDefault();
+    if (!responseContent.trim()) {
+      alert("답변 내용을 입력해주세요.");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    try {
+      const response = await authFetch(
+        `${apiUrl}/inquiry/respond_inquiry/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ 
+            response_content: responseContent,
+            status: status 
+          }),
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error("답변을 등록하지 못했습니다.");
+      }
+      
+      alert("답변이 등록되었습니다.");
+      fetchInquiry(); // 답변 등록 후 데이터 새로고침
+    } catch (err) {
+      setError(err.message);
+      alert(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -176,25 +208,14 @@ const InquiryDetails = () => {
           className="inquiry-detail-content"
           dangerouslySetInnerHTML={{ __html: inquiry.content }}
         ></div>
-
-        {inquiry.response_content && (
-          <div className="inquiry-response-area">
-            <h3>관리자 답변</h3>
-            <div className="inquiry-response-meta">
-              <span>{inquiry.response_by}</span>
-              <span>
-                {new Date(inquiry.response_at).toLocaleString("ko-KR", {
-                  timeZone: "Asia/Seoul",
-                })}
-              </span>
-            </div>
-            <div
-              className="inquiry-response-content"
-              dangerouslySetInnerHTML={{ __html: inquiry.response_content }}
-            ></div>
-          </div>
-        )}
-
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "3px",
+            cursor: "pointer",
+          }}
+        ></div>
         {user?.role_id === "AD_ADMIN" && (
           <div className="inquiry-admin-response-form">
             <h3>관리자 답변 {inquiry.response_content ? "수정" : "등록"}</h3>

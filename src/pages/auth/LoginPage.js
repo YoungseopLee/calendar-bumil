@@ -9,7 +9,6 @@ import "./LoginPage.css";
  *
  * ✅ 주요 기능:
  *  - 사용자 로그인 처리 (POST /auth/login)
- *  - 로그인된 사용자 정보 불러오기 (GET /auth/get_logged_in_user)
  *  - 아이디 저장 & 자동 로그인 기능 지원
  *  - 최초 로그인 여부 확인 후 라우팅 처리
  *
@@ -111,21 +110,6 @@ const LoginPage = () => {
 
         //"access_token", "refresh_token", "savedId", "autoLogin"을 제외하고 로컬스토리지 전부 삭제
         clearLocalStorageExcept(["access_token", "savedId", "autoLogin"]);
-
-        // ✅ 로그인 사용자 정보 불러오기
-        // LoginPage에서 get_logged_in_user를 왜 사용하는지 모르겠어서 주석 처리함.
-        // const userResponse = await fetch(`${apiUrl}/auth/get_logged_in_user`, {
-        //   method: "GET",
-        //   headers: {
-        //     Authorization: `Bearer ${data.token}`,
-        //   },
-        // });
-
-        // if (userResponse.ok) {
-        //   const userData = await userResponse.json();
-        //   //localStorage.setItem("user", JSON.stringify(userData.user)); // ✅ 최신 사용자 정보 저장
-        //   localStorage.removeItem("user");
-        // }
 
         // ✅ 아이디 저장 여부 처리
         if (rememberMe) {
