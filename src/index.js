@@ -12,6 +12,7 @@ import ProfileModule from "./pages/profile";
 import ProjectModule from "./pages/project";
 import SituationControlModule from "./pages/situation_control";
 import NoticeModule from "./pages/notice";
+import InquiryModule from "./pages/inquiry";
 
 const Modules = {
   Admin,
@@ -23,6 +24,7 @@ const Modules = {
   ProjectModule,
   SituationControlModule,
   NoticeModule,
+  InquiryModule,
 };
 
 export default Modules;

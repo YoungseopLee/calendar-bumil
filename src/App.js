@@ -100,6 +100,24 @@ function App() {
           path="/notice-edit/:id"
           element={<Modules.NoticeModule.NoticeEdit />}
         />
+
+        {/* ===== Inquiry ===== */}
+        <Route
+          path="/inquiry-list"
+          element={<Modules.InquiryModule.InquiryList />}
+        />
+        <Route
+          path="/inquiry-details/:id"
+          element={<Modules.InquiryModule.InquiryDetails />}
+        />
+        <Route
+          path="/inquiry-create"
+          element={<Modules.InquiryModule.InquiryCreate />}
+        />
+        <Route
+          path="/inquiry-edit/:id"
+          element={<Modules.InquiryModule.InquiryEdit />}
+        />
       </Routes>
     </Router>
   );

@@ -106,6 +106,12 @@ const Sidebar = ({
             </Link>
           </li>
           <li>
+            <Link to="/inquiry-list">
+              <FaClipboardList className="menu-icon" />{" "}
+              {!isTablet && "문의사항"}
+            </Link>
+          </li>
+          <li>
             <Link to="/projects">
               <FaProjectDiagram className="menu-icon" />{" "}
               {!isTablet && "프로젝트"}

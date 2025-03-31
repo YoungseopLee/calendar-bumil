@@ -1,0 +1,159 @@
+.inquiry-detail-container {
+  max-width: 768px;
+  width: 100%;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin: auto;
+  margin-top: 50px;
+  overflow-x: hidden; /* 추가: 가로 스크롤 방지 */
+  box-sizing: border-box; /* 추가: padding이 width에 포함되도록 설정 */
+}
+.inquiry-detail-inquiry {
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.inquiry-detail-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.inquiry-detail-meta {
+  font-size: 14px;
+  color: gray;
+  text-align: right;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.inquiry-detail-date {
+  color: #777;
+  margin-bottom: 5px;
+}
+
+.inquiry-detail-content {
+  padding-top: 15px;
+  font-size: 16px;
+  line-height: 1.6;
+  white-space: pre-line;
+  margin-bottom: 20px;
+  padding-bottom: 50px;
+  border-bottom: 1px solid #ddd;
+
+  /* 긴 단어가 넘치지 않도록 처리 */
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.inquiry-detail-comments {
+  font-size: 14px;
+  color: gray;
+}
+
+.inquiry-detail-content {
+  font-family: sans-serif; /* 기본 폰트 설정 */
+}
+
+/* Quill 폰트 스타일 */
+.inquiry-detail-content .ql-font-serif {
+  font-family: serif;
+}
+.inquiry-detail-content .ql-font-monospace {
+  font-family: monospace;
+}
+
+/* 글씨 크기 */
+.inquiry-detail-content .ql-size-small {
+  font-size: 12px;
+}
+.inquiry-detail-content .ql-size-normal {
+  font-size: 16px;
+}
+.inquiry-detail-content .ql-size-large {
+  font-size: 24px;
+}
+.inquiry-detail-content .ql-size-huge {
+  font-size: 32px;
+}
+
+/* 정렬 */
+.inquiry-detail-content .ql-align-right {
+  text-align: right;
+}
+.inquiry-detail-content .ql-align-center {
+  text-align: center;
+}
+
+.inquiry-details-button-group {
+  display: flex;
+  justify-content: end;
+}
+
+.inquiry-details-edit-button {
+  margin-right: 10px;
+  background-color: #007bff; /* 배경색 (밝은 빨간색) */
+  color: white; /* 글자 색상 */
+  border: none; /* 테두리 없음 */
+  border-radius: 5px; /* 모서리 둥글게 */
+  padding: 10px 20px; /* 내부 여백 */
+  cursor: pointer; /* 마우스 커서 변경 */
+  font-size: 1em; /* 폰트 크기 */
+  transition: background-color 0.3s ease; /* 부드러운 색상 전환 */
+}
+
+.inquiry-details-edit-button:hover {
+  background-color: #0056b3; /* 마우스 호버 시 배경색 (진한 빨간색) */
+}
+
+.inquiry-details-delete-button {
+  background-color: #ff5a5a; /* 배경색 (밝은 빨간색) */
+  color: white; /* 글자 색상 */
+  border: none; /* 테두리 없음 */
+  border-radius: 5px; /* 모서리 둥글게 */
+  padding: 10px 20px; /* 내부 여백 */
+  cursor: pointer; /* 마우스 커서 변경 */
+  font-size: 1em; /* 폰트 크기 */
+  transition: background-color 0.3s ease; /* 부드러운 색상 전환 */
+}
+
+.inquiry-details-delete-button:hover {
+  background-color: #ff3737; /* 마우스 호버 시 배경색 (진한 빨간색) */
+}
+
+@media (min-width: 1048px) {
+  .inquiry-detail-container h1 {
+    font-size: 30px;
+  }
+  .inquiry-detail-inquiry {
+    margin-left: 0px;
+  }
+}
+
+@media (max-width: 768px) {
+  .inquiry-detail-container {
+    margin-top: 50px;
+  }
+}
+
+.inquiry-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.inquiry-detail-backspace-button {
+  background-color: #919497;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.inquiry-detail-backspace-button:hover {
+  background-color: #5a6268;
+}
