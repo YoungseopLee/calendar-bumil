@@ -179,7 +179,9 @@ const NoticeCreate = () => {
             style={{ height: "100%" }}
           />
           <div className="notice-create-button-group">
-            <BsPlusLg className="notice-create-button" type="submit"></BsPlusLg>
+            <button className="notice-create-button" type="submit">
+              생성
+            </button>
             <button
               className="notice-create-cancel-button"
               type="button"
