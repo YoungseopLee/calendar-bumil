@@ -371,14 +371,12 @@ const UserDetails = () => {
                 {user.mbti}
               </p>
             )}
-            <p
-              onMouseEnter={() => setShowSquidImage(true)}
-              style={{ cursor: "pointer" }}
-            >
-              <FaOctopusDeploy className="icon" />
-              {user.squid_test}
-            </p>
-
+            {user.squid_test && (
+              <p onMouseEnter={() => setShowSquidImage(true)}>
+                <FaOctopusDeploy className="icon" />
+                {user.squid_test}
+              </p>
+            )}
             {/* 이미지가 보일 때만 화면 중앙에 표시 */}
             {showSquidImage && (
               <>
