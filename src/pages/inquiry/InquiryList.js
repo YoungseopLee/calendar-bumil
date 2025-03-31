@@ -228,7 +228,7 @@ const InquiryList = () => {
 
         {/* 문의사항 추가 버튼 */}
         <div className="inquiry-list-create-button-container">
-          {user?.role_id === "AD_ADMIN" && <AddInquiryButton />}
+          <AddInquiryButton />
         </div>
 
         {/* 페이지네이션 */}
