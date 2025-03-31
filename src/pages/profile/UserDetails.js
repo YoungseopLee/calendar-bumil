@@ -30,6 +30,7 @@ const UserDetails = () => {
   const [statusList, setStatusList] = useState([]);
   const [year, setYear] = useState(new Date().getFullYear());
   const [isTableView, setIsTableView] = useState(false); // 추가: 표 형태 전환 상태
+  const [showSquidImage, setShowSquidImage] = useState(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const accessToken = localStorage.getItem("access_token");
@@ -170,18 +171,9 @@ const UserDetails = () => {
     return statusObj ? statusObj.comment : "알 수 없음";
   };
 
-  const getMonthStatus = (start, end) => {
-    const months = Array(12).fill(""); // 1월~12월 배열
-    const startDate = new Date(start);
-    const endDate = new Date(end);
-
-    for (let i = 0; i < 12; i++) {
-      const monthDate = new Date(startDate.getFullYear(), i, 1);
-      if (monthDate >= startDate && monthDate <= endDate) {
-        months[i] = "O";
-      }
-    }
-    return months;
+  const getSquidTestImage = (squidTest) => {
+    if (!squidTest) return null;
+    return require(`../../squid_img/${squidTest.replace("징어", "")}.png`);
   };
 
   const filteredProjects = userprojects.filter((project) => {
@@ -379,11 +371,32 @@ const UserDetails = () => {
                 {user.mbti}
               </p>
             )}
-            {user.squid_test !== null && (
-              <p>
-                <FaOctopusDeploy className="icon" />
-                {user.squid_test}
-              </p>
+            <p
+              onMouseEnter={() => setShowSquidImage(true)}
+              style={{ cursor: "pointer" }}
+            >
+              <FaOctopusDeploy className="icon" />
+              {user.squid_test}
+            </p>
+
+            {/* 이미지가 보일 때만 화면 중앙에 표시 */}
+            {showSquidImage && (
+              <>
+                <div
+                  className="squid-overlay"
+                  onMouseDown={() => setShowSquidImage(false)}
+                ></div>
+                <div
+                  className="squid-image-container"
+                  onMouseLeave={() => setShowSquidImage(false)}
+                >
+                  <img
+                    src={getSquidTestImage(user.squid_test)}
+                    alt={user.squid_test}
+                    className="squid-image"
+                  />
+                </div>
+              </>
             )}
           </div>
         </div>

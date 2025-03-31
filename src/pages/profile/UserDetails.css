@@ -287,6 +287,34 @@
   color: white;
   font-weight: bold;
 }
+.squid-image-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* 화면 정중앙 정렬 */
+  background: rgba(0, 0, 0, 0.8); /* 어두운 배경 추가 */
+  padding: 2px;
+  border-radius: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* 다른 요소 위에 표시 */
+}
+
+.squid-image {
+  width: 250px; /* 이미지 크기 */
+  height: auto;
+}
+
+.squid-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* 반투명 오버레이 */
+  z-index: 999;
+}
 
 /* 반응형 스타일 */
 @media (max-width: 768px) {

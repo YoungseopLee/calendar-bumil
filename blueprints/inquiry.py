@@ -48,7 +48,7 @@ def get_inquiry(inquiry_id):
         return error_response, status_code
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
     try:
         # 먼저 해당 문의사항 가져오기
         sql = """
@@ -97,7 +97,7 @@ def create_inquiry():
         return jsonify({'message': '제목과 내용을 입력해주세요.'}), 400
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
     try:
         sql = """
         INSERT INTO tb_inquiry (title, content, user_id, created_by, private_yn)
@@ -133,7 +133,7 @@ def update_inquiry(inquiry_id):
     private_yn = data.get('private_yn', 'N')
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
     try:
         sql_check = "SELECT user_id FROM tb_inquiry WHERE id = %s AND is_delete_yn = 'N'"
         cursor.execute(sql_check, (inquiry_id,))
@@ -167,7 +167,7 @@ def delete_inquiry(inquiry_id):
         return error_response, status_code
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
     try:
         sql_check = """
         SELECT user_id FROM tb_inquiry 
@@ -209,7 +209,7 @@ def respond_inquiry(inquiry_id):
     response_content = data.get('response_content')
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
     try:
         sql = """
         UPDATE tb_inquiry
