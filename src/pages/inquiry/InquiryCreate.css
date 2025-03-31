@@ -1,4 +1,4 @@
-.notice-create-container {
+.inquiry-create-container {
   max-width: 768px;
   width: 100%;
   background: #fff;
@@ -11,16 +11,16 @@
   box-sizing: border-box;
 }
 
-.notice-create-container h2 {
+.inquiry-create-container h2 {
   margin-top: 28px;
 }
 
-.notice-create-form-group {
+.inquiry-create-form-group {
   margin-bottom: 15px; /* 아래 여백 */
 }
 
 /* ✅ 입력 필드 라벨 스타일 */
-.notice-create-form-group label {
+.inquiry-create-form-group label {
   display: block; /* 블록 요소로 변경 (줄 바꿈) */
   margin-bottom: 5px; /* 아래 여백 */
   font-size: 14px; /* 폰트 크기 */
@@ -28,7 +28,7 @@
 }
 
 /* ✅ 입력 필드 스타일 */
-.notice-create-form-group input {
+.inquiry-create-form-group input {
   width: 94%; /* 입력 필드 너비 */
   padding: 10px; /* 내부 여백 */
   font-size: 14px; /* 폰트 크기 */
@@ -36,13 +36,13 @@
   border-radius: 4px; /* 모서리 둥글게 */
 }
 
-.notice-create-button-group {
+.inquiry-create-button-group {
   display: flex;
   justify-content: end;
   margin-top: 10px;
 }
 
-.notice-create-button {
+.inquiry-create-button {
   margin-right: 10px;
   background-color: #007bff; /* 배경색 (파란색) */
   color: #fff; /* 글자 색상 */
@@ -54,11 +54,11 @@
   transition: background-color 0.3s ease; /* 부드러운 색상 전환 */
 }
 
-.notice-create-button:hover {
+.inquiry-create-button:hover {
   background-color: #0056b3; /* 마우스 호버 시 배경색 변경 */
 }
 
-.notice-create-cancel-button {
+.inquiry-create-cancel-button {
   background-color: #919497;
   color: #fff;
   border: none;
@@ -68,6 +68,6 @@
   transition: background-color 0.3s ease;
 }
 
-.notice-create-cancel-button:hover {
+.inquiry-create-cancel-button:hover {
   background-color: #5a6268;
 }
