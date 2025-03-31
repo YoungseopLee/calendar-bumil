@@ -95,6 +95,7 @@ const InquiryList = () => {
       const data = await response.json();
       setInquirys(data.inquiries);
       setFilteredInquirys(data.inquiries);
+      console.log("문의사항 목록:", data.inquiries);
     } catch (err) {
       console.error("문의사항 목록 조회 오류:", err);
       setError("문의사항을 불러오는 중 오류가 발생했습니다.");
@@ -164,7 +165,7 @@ const InquiryList = () => {
         <div className="inquiry-header">
           <h1 className="inquiry-list-title">문의사항</h1>
         </div>
-  
+
         <div className="inquiry-search-icon-container">
           <div className="inquiry-search-container">
             <select
@@ -176,7 +177,7 @@ const InquiryList = () => {
               <option value="content">내용</option>
               <option value="created_by">작성자</option>
             </select>
-  
+
             <input
               type="text"
               className="inquiry-search-input"
@@ -187,7 +188,7 @@ const InquiryList = () => {
           </div>
           <IoSearchOutline className="inquiry-search-icon" />
         </div>
-  
+
         <div className="inquiry-list-list">
           {currentInquirys.length === 0 ? (
             <div className="inquiry-list-empty">등록된 문의사항이 없습니다.</div>
@@ -195,13 +196,18 @@ const InquiryList = () => {
             currentInquirys.map((inquiry) => {
               const isPrivate = inquiry.private_yn === "Y";
               const canAccess = user.role_id === "AD_ADMIN";
-  
+
+              const statusDotClass =
+              inquiry.status === "답변완료" ? "status-complete" : "status-pending";          
+
               return (
                 <div key={inquiry.id} className="inquiry-list-item">
-                  {isPrivate && !canAccess ? (
-                    <div className="inquiry-private-message">비공개글 입니다.</div>
-                  ) : (
-                    <>
+                  <div className="inquiry-list-title-with-status">
+                    <span className={`inquiry-status-dot ${statusDotClass}`}></span>
+            
+                    {isPrivate && !canAccess ? (
+                      <span className="inquiry-private-message">비공개글 입니다.</span>
+                    ) : (
                       <Tippy
                         content={inquiry.title}
                         placement="top"
@@ -221,27 +227,28 @@ const InquiryList = () => {
                           {inquiry.title}
                         </Link>
                       </Tippy>
-                      <div className="inquiry-list-info">
-                        <span className="inquiry-list-author">
-                          {inquiry.created_by || "관리자"}
-                        </span>
-                        <span className="inquiry-list-date">
-                          {formatDate(inquiry.created_at)}
-                        </span>
-                      </div>
-                    </>
-                  )}
+                    )}
+                  </div>
+            
+                  <div className="inquiry-list-info">
+                    <span className="inquiry-list-author">
+                      {inquiry.created_by || "관리자"}
+                    </span>
+                    <span className="inquiry-list-date">
+                      {formatDate(inquiry.created_at)}
+                    </span>
+                  </div>
                 </div>
               );
             })
           )}
         </div>
-  
+
         {/* 문의사항 추가 버튼 */}
         <div className="inquiry-list-create-button-container">
           <AddInquiryButton />
         </div>
-  
+
         {/* 페이지네이션 */}
         <div className="pagination">
           <button onClick={goToPreviousPage} disabled={currentPage === 1}>
