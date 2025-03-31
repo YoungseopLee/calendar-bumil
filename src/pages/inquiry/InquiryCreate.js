@@ -58,13 +58,6 @@ const InquiryCreate = () => {
         // 1. 사용자 정보 가져오기
         const userInfo = await fetchUserInfo();
 
-        //3. 권한 확인
-        const isAuthorized = checkAuth(userInfo?.role_id, ["USR_GENERAL"]); // 권한 확인하고 맞으면 true, 아니면 false 반환
-        if (!isAuthorized) {
-          console.error("권한이 없습니다.");
-          handleLogout();
-          return;
-        }
       } catch (error) {
         console.error("데이터 로딩 오류:", error);
       }
@@ -179,7 +172,9 @@ const InquiryCreate = () => {
             style={{ height: "100%" }}
           />
           <div className="inquiry-create-button-group">
-            <BsPlusLg className="inquiry-create-button" type="submit"></BsPlusLg>
+            <button className="inquiry-create-button" type="submit">
+              <BsPlusLg />
+            </button>
             <button
               className="inquiry-create-cancel-button"
               type="button"

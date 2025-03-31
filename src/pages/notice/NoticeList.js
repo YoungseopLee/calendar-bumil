@@ -94,6 +94,7 @@ const NoticeList = () => {
       }
 
       const data = await response.json();
+      console.log("API 응답:", data);
       setNotices(data.notices);
       setFilteredNotices(data.notices);
     } catch (err) {
