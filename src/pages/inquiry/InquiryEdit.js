@@ -42,25 +42,30 @@ const InquiryEdit = () => {
   useEffect(() => {
     const fetchAllData = async () => {
       try {
-        // 1. 사용자 정보 가져오기
         const userInfo = await fetchUserInfo();
+        const inquiryData = await fetchInquirys();
+  
+        // console.log("userInfo: ", userInfo);
+        // console.log("inquiry: ", inquiryData);
 
-        //2. 문의사항 가져오기
-        await fetchInquirys();
+        const isAuthor = userInfo.name === inquiryData.created_by; // 또는 userInfo.id === inquiryData.created_by_id
+        const isAdmin = userInfo.role_id === "AD_ADMIN";
+  
+        // console.log("isAuthor: ", isAuthor);
+        // console.log("isAdmin: ", isAdmin);
 
-        //3. 권한 확인
-        const isAuthorized = checkAuth(userInfo?.role_id, ["AD_ADMIN"]); // 권한 확인하고 맞으면 true, 아니면 false 반환
-        if (!isAuthorized) {
-          console.error("관리자 권한이 없습니다.");
-          handleLogout();
+        if (!isAuthor && !isAdmin) {
+          alert("수정 권한이 없습니다.");
+          navigate("/inquiry-list");
           return;
         }
+  
       } catch (error) {
         console.error("데이터 로딩 오류:", error);
       }
-      setLoading(false); // 로딩 완료
+      setLoading(false);
     };
-
+    
     fetchAllData();
   }, []);
 
@@ -96,8 +101,8 @@ const InquiryEdit = () => {
         throw new Error("문의사항을 불러오지 못했습니다.");
       }
       const data = await response.json();
-      console.log("data: ", data.inquiry);
       setInquiry(data.inquiry);
+      return data.inquiry; // ✅ 추가
     } catch (err) {
       setError(err.message);
     } finally {
@@ -115,7 +120,7 @@ const InquiryEdit = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError(null);
-    //console.log("문의사항 제목, 내용:", formData.title, formData.content);
+    // console.log("문의사항 제목, 내용:", formData.title, formData.content);
     if (!formData.title || !formData.content) {
       setError("필수 입력값을 모두 입력해주세요.");
       return;
