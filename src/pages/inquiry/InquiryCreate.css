@@ -71,3 +71,16 @@
 .inquiry-create-cancel-button:hover {
   background-color: #5a6268;
 }
+
+.private-checkbox-group {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.private-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}

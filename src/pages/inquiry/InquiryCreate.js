@@ -39,6 +39,7 @@ const InquiryCreate = () => {
     title: "",
     content: "",
     user_id: "",
+    private_yn: "N" // 비공개 여부
   });
 
   //로그인한 사용자 정보
@@ -171,6 +172,20 @@ const InquiryCreate = () => {
             theme="snow"
             style={{ height: "100%" }}
           />
+          <div className="private-checkbox-group">
+            <label className="private-checkbox" htmlFor="private_yn">
+              <input
+                type="checkbox"
+                id="private_yn"
+                name="private_yn"
+                checked={formData.private_yn === "Y"}
+                onChange={(e) =>
+                  handleChange(e.target.checked ? "Y" : "N", "private_yn")
+                }
+              />
+              비공개 여부
+            </label>
+          </div>
           <div className="inquiry-create-button-group">
             <button className="inquiry-create-button" type="submit">
               <BsPlusLg />

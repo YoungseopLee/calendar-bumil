@@ -127,7 +127,7 @@ const InquiryList = () => {
   const searchFieldLabelMap = {
     title: "제목",
     content: "내용",
-    created_by_name: "작성자",
+    created_by: "작성자",
   };
 
   // 페이지네이션 계산
@@ -158,13 +158,14 @@ const InquiryList = () => {
   if (error) return <ErrorMessage />;
 
   return (
+    console.log("문의사항 목록:", currentInquirys),
     <div className="inquiry-list-app-body">
       <Sidebar user={user} />
       <div className="inquiry-list-container">
         <div className="inquiry-header">
           <h1 className="inquiry-list-title">문의사항</h1>
         </div>
-
+  
         <div className="inquiry-search-icon-container">
           <div className="inquiry-search-container">
             <select
@@ -174,9 +175,9 @@ const InquiryList = () => {
             >
               <option value="title">제목</option>
               <option value="content">내용</option>
-              <option value="created_by_name">작성자</option>
+              <option value="created_by">작성자</option>
             </select>
-
+  
             <input
               type="text"
               className="inquiry-search-input"
@@ -187,52 +188,61 @@ const InquiryList = () => {
           </div>
           <IoSearchOutline className="inquiry-search-icon" />
         </div>
-
+  
         <div className="inquiry-list-list">
           {currentInquirys.length === 0 ? (
             <div className="inquiry-list-empty">등록된 문의사항이 없습니다.</div>
           ) : (
-            currentInquirys.map((inquiry) => (
-              console.log("문의사항 데이터:", inquiry),
-              <div key={inquiry.id} className="inquiry-list-item">
-                <Tippy
-                  content={inquiry.title}
-                  placement="top"
-                  plugins={[followCursor]}
-                  followCursor="horizontal"
-                  arrow={true}
-                  popperOptions={{
-                    modifiers: [
-                      {
-                        name: "preventOverflow",
-                        options: { boundary: "window" },
-                      },
-                    ],
-                  }}
-                >
-
-                  <Link to={`/inquiry-details/${inquiry.id}`}>
-                    {inquiry.title}
-                  </Link>
-                </Tippy>
-                <div className="inquiry-list-info">
-                  <span className="inquiry-list-author">
-                    {inquiry.created_by || "관리자"}
-                  </span>
-                  <span className="inquiry-list-date">
-                    {formatDate(inquiry.created_at)}
-                  </span>
+            currentInquirys.map((inquiry) => {
+              const isPrivate = inquiry.private_yn === "Y";
+              const canAccess = user.role_id === "AD_ADMIN";
+  
+              return (
+                <div key={inquiry.id} className="inquiry-list-item">
+                  {isPrivate && !canAccess ? (
+                    <div className="inquiry-private-message">비공개글 입니다.</div>
+                  ) : (
+                    <>
+                      <Tippy
+                        content={inquiry.title}
+                        placement="top"
+                        plugins={[followCursor]}
+                        followCursor="horizontal"
+                        arrow={true}
+                        popperOptions={{
+                          modifiers: [
+                            {
+                              name: "preventOverflow",
+                              options: { boundary: "window" },
+                            },
+                          ],
+                        }}
+                      >
+                        <Link to={`/inquiry-details/${inquiry.id}`}>
+                          {inquiry.title}
+                        </Link>
+                      </Tippy>
+                      <div className="inquiry-list-info">
+                        <span className="inquiry-list-author">
+                          {inquiry.created_by || "관리자"}
+                        </span>
+                        <span className="inquiry-list-date">
+                          {formatDate(inquiry.created_at)}
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
-
+  
         {/* 문의사항 추가 버튼 */}
         <div className="inquiry-list-create-button-container">
           <AddInquiryButton />
         </div>
-
+  
         {/* 페이지네이션 */}
         <div className="pagination">
           <button onClick={goToPreviousPage} disabled={currentPage === 1}>
