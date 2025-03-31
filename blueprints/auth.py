@@ -75,7 +75,7 @@ def create_access_token(user):
             "name": user["name"],
             "role_id": user["role_id"],
             "updated_by": user["updated_by"], 
-            "exp": datetime.now(timezone.utc) + timedelta(minutes=1)  # 30분 유효
+            "exp": datetime.now(timezone.utc) + timedelta(minutes=30)  # 30분 유효
         },
         SECRET_KEY,
         algorithm="HS256"
