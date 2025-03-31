@@ -24,11 +24,11 @@ def get_inquiries():
     try:
         sql = """
         SELECT * FROM tb_inquiry
-        WHERE user_id = %s AND is_delete_yn = 'N'
+        WHERE is_delete_yn = 'N'
         ORDER BY created_at DESC"""
-        cursor.execute(sql, (user_id,))
+        cursor.execute(sql)
         result = cursor.fetchall()
-        logger.info(f"[SQL/SELECT] {sql} | PARAMS: ({user_id})")
+        logger.info(f"[SQL/SELECT] {sql})")
         response = jsonify({'inquiries': result})
         if new_access_token:
             response.headers["X-New-Access-Token"] = new_access_token

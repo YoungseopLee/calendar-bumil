@@ -87,14 +87,17 @@ const InquiryDetails = () => {
     );
     if (!confirmDelete) return;
     try {
-      const response = await authFetch(`${apiUrl}/inquiry/delete_inquiry/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ updated_by: user.id }),
-      });
+      const response = await authFetch(
+        `${apiUrl}/inquiry/delete_inquiry/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ updated_by: user.id }),
+        }
+      );
       if (!response.ok) {
         throw new Error("문의사항을 삭제하지 못했습니다.");
       }
