@@ -59,9 +59,9 @@ const InquiryCreate = () => {
         const userInfo = await fetchUserInfo();
 
         //3. 권한 확인
-        const isAuthorized = checkAuth(userInfo?.role_id, ["AD_ADMIN"]); // 권한 확인하고 맞으면 true, 아니면 false 반환
+        const isAuthorized = checkAuth(userInfo?.role_id, ["USR_GENERAL"]); // 권한 확인하고 맞으면 true, 아니면 false 반환
         if (!isAuthorized) {
-          console.error("관리자 권한이 없습니다.");
+          console.error("권한이 없습니다.");
           handleLogout();
           return;
         }
@@ -106,7 +106,7 @@ const InquiryCreate = () => {
         throw new Error("로그인이 필요합니다.");
       }
 
-      const response = await authFetch(`${apiUrl}/inquiry/create_inquiry`, {
+      const response = await authFetch(`${apiUrl}/inquiry/add_inquiry`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

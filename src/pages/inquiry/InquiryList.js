@@ -80,7 +80,7 @@ const InquiryList = () => {
   const fetchInquirys = async () => {
     try {
       setLoading(true);
-      const response = await authFetch(`${apiUrl}/inquiry/get_inquiry_list`, {
+      const response = await authFetch(`${apiUrl}/inquiry/get_all_inquiries`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -93,8 +93,8 @@ const InquiryList = () => {
       }
 
       const data = await response.json();
-      setInquirys(data.Inquiries);
-      setFilteredInquirys(data.Inquiries);
+      setInquirys(data.inquiries);
+      setFilteredInquirys(data.inquiries);
     } catch (err) {
       console.error("문의사항 목록 조회 오류:", err);
       setError("문의사항을 불러오는 중 오류가 발생했습니다.");
@@ -228,7 +228,7 @@ const InquiryList = () => {
 
         {/* 문의사항 추가 버튼 */}
         <div className="inquiry-list-create-button-container">
-          {user?.role_id === "AD_ADMIN" && <AddInquiryButton />}
+          <AddInquiryButton />
         </div>
 
         {/* 페이지네이션 */}
