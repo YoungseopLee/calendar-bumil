@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # 문의사항 전체 조회
-@inquiry_bp.route('/get_all_inquiries', methods=['GET', 'OPTIONS'])
+@inquiry_bp.route('/get_inquiry_list', methods=['GET', 'OPTIONS'])
 def get_inquiries():
     if request.method == 'OPTIONS':
         return jsonify({'message': 'CORS preflight request success'})
