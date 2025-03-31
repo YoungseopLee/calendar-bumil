@@ -14,6 +14,9 @@ const InquiryDetails = () => {
   const [loading, setLoading] = useState(true); // 데이터 로딩 상태
   const [error, setError] = useState(null); // 에러 메세지
   const [inquiry, setInquiry] = useState(null);
+  const [responseContent, setResponseContent] = useState("");
+  const [status, setStatus] = useState("대기중");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const apiUrl = process.env.REACT_APP_API_URL;
   const accessToken = localStorage.getItem("access_token");
@@ -72,8 +75,15 @@ const InquiryDetails = () => {
         throw new Error("문의사항을 불러오지 못했습니다.");
       }
       const data = await response.json();
-      //console.log("data: ", data.inquiry);
       setInquiry(data.inquiry);
+      
+      // 기존 답변과 상태 설정
+      if (data.inquiry.response_content) {
+        setResponseContent(data.inquiry.response_content);
+      }
+      if (data.inquiry.status) {
+        setStatus(data.inquiry.status);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -108,6 +118,45 @@ const InquiryDetails = () => {
     }
   };
 
+  // 답변 등록 및 수정 함수
+  const handleSubmitResponse = async (e) => {
+    e.preventDefault();
+    if (!responseContent.trim()) {
+      alert("답변 내용을 입력해주세요.");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    try {
+      const response = await authFetch(
+        `${apiUrl}/inquiry/respond_inquiry/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ 
+            response_content: responseContent,
+            status: status 
+          }),
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error("답변을 등록하지 못했습니다.");
+      }
+      
+      alert("답변이 등록되었습니다.");
+      fetchInquiry(); // 답변 등록 후 데이터 새로고침
+    } catch (err) {
+      setError(err.message);
+      alert(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // ✅ 로딩 중 또는 에러 시 화면에 표시할 메세지
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage />;
@@ -139,6 +188,7 @@ const InquiryDetails = () => {
                 timeZone: "Asia/Seoul",
               })}
             </span>
+            <span className="inquiry-status">상태: {inquiry.status || "대기중"}</span>
           </div>
         </div>
 
@@ -146,6 +196,53 @@ const InquiryDetails = () => {
           className="inquiry-detail-content"
           dangerouslySetInnerHTML={{ __html: inquiry.content }}
         ></div>
+        
+        {/* 답변 내용 표시 영역 */}
+        {inquiry.response_content && (
+          <div className="inquiry-response-area">
+            <h3>관리자 답변</h3>
+            <div className="inquiry-response-meta">
+              <span>{inquiry.response_by}</span>
+              <span>
+                {new Date(inquiry.response_at).toLocaleString("ko-KR", {
+                  timeZone: "Asia/Seoul",
+                })}
+              </span>
+            </div>
+            <div
+              className="inquiry-response-content"
+              dangerouslySetInnerHTML={{ __html: inquiry.response_content }}
+            ></div>
+          </div>
+        )}
+        
+        {/* 관리자 답변 폼 */}
+        {user?.role_id === "AD_ADMIN" && (
+          <div className="inquiry-admin-response-form">
+            <h3>관리자 답변 {inquiry.response_content ? "수정" : "등록"}</h3>
+            <form onSubmit={handleSubmitResponse}>
+              <div className="form-group">
+                <label htmlFor="responseContent">답변 내용:</label>
+                <textarea
+                  id="responseContent"
+                  rows="5"
+                  value={responseContent}
+                  onChange={(e) => setResponseContent(e.target.value)}
+                  placeholder="답변 내용을 입력하세요"
+                  required
+                ></textarea>
+              </div>
+              <button 
+                type="submit" 
+                className="submit-response-button" 
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "처리 중..." : "답변 등록"}
+              </button>
+            </form>
+          </div>
+        )}
+        
         <div
           style={{
             display: "flex",
