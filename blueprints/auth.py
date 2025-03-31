@@ -75,7 +75,7 @@ def create_access_token(user):
             "name": user["name"],
             "role_id": user["role_id"],
             "updated_by": user["updated_by"], 
-            "exp": datetime.now(timezone.utc) + timedelta(minutes=30)  # 30분 유효
+            "exp": datetime.now(timezone.utc) + timedelta(minutes=1)  # 30분 유효
         },
         SECRET_KEY,
         algorithm="HS256"
@@ -103,9 +103,12 @@ def verify_and_refresh_token(request):
 
     except jwt.ExpiredSignatureError:
         # access token 만료 시, payload 강제 디코딩 (exp 검증 없이)
-        payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"], options={"verify_exp": False})
-        user_id = payload["user_id"]
-
+        try:
+            payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"], options={"verify_exp": False})
+            user_id = payload["user_id"]
+        except jwt.InvalidTokenError:
+            return None, None, None, None, jsonify({"message": "유효하지 않은 Access Token입니다."}), 401
+        
         # DB에서 refresh_token 검증
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
@@ -598,10 +601,12 @@ def get_logged_in_user():
         return jsonify({'message': '사용자 정보 조회 실패'}), 500
     finally:
         try:
-            cursor.close()
-            conn.close()
-        except Exception:
-            pass
+            if cursor:
+                cursor.close()
+            if conn:
+                conn.close()
+        except Exception as e:
+            logger.error(f"커서 또는 연결 종료 중 오류 발생: {e}")
 
 # 비밀번호 변경 API
 @auth_bp.route('/change_password', methods=['PUT', 'OPTIONS'])
