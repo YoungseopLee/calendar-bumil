@@ -20,7 +20,7 @@ def get_inquiries():
         return error_response, status_code
 
     conn = get_db_connection()
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
     try:
         sql = """
         SELECT * FROM tb_inquiry
@@ -229,6 +229,3 @@ def respond_inquiry(inquiry_id):
     finally:
         cursor.close()
         conn.close()
-
-
-
