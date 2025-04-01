@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import FloatingButton from "../components/FloatingButton";
+import AddNoticeButton from "./AddNoticeButton";
+import BackButton from "../components/BackButton";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { followCursor } from "tippy.js";
-import "./NoticeList.css";
 import { Link } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import { IoSearchOutline } from "react-icons/io5";
@@ -12,7 +14,7 @@ import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
-import AddNoticeButton from "./AddNoticeButton";
+import "./NoticeList.css";
 
 /**
  * 📌  NoticeList - 공지사항 목록을 보여주는 컴포넌트
@@ -161,6 +163,13 @@ const NoticeList = () => {
   return (
     <div className="notice-list-app-body">
       <Sidebar user={user} />
+      {/* 공지사항 추가 버튼 */}
+      <FloatingButton>
+        <BackButton />
+        <div className="notice-list-create-button-container">
+          {user?.role_id === "AD_ADMIN" && <AddNoticeButton />}
+        </div>
+      </FloatingButton>
       <div className="notice-list-container">
         <div className="notice-header">
           <h1 className="notice-list-title">공지사항</h1>
@@ -225,11 +234,6 @@ const NoticeList = () => {
               </div>
             ))
           )}
-        </div>
-
-        {/* 공지사항 추가 버튼 */}
-        <div className="notice-list-create-button-container">
-          {user?.role_id === "AD_ADMIN" && <AddNoticeButton />}
         </div>
 
         {/* 페이지네이션 */}

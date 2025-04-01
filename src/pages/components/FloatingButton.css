@@ -1,0 +1,78 @@
+/* 플로팅 버튼 전체 컨테이너 */
+.floating-button-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 999;
+  gap: 10px;
+}
+
+/* 메인 플로팅 버튼 (클릭하면 다른 버튼들이 열림) */
+.floating-main-button {
+  width: 45px;
+  height: 45px;
+  border-radius: 10px;
+  border: none;
+  background-color: #007bff81;
+  color: white;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+  transition: transform 0.3s ease;
+}
+
+/* 버튼이 열릴 때 회전 효과 */
+.floating-main-button:hover {
+  background-color: #0056b3;
+}
+
+.floating-main-button:active {
+  transform: rotate(45deg);
+}
+
+/* 펼쳐지는 버튼들 */
+.floating-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  position: absolute;
+  bottom: 55px; /* 기본적으로 숨김 */
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none; /* 클릭 방지 */
+}
+
+/* 펼쳐진 상태 */
+.floating-buttons.open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* 개별 버튼 스타일 */
+.floating-buttons button {
+  width: 45px;
+  height: 45px;
+  border-radius: 10px;
+  border: none;
+  background-color: #28a74680;
+  color: white;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+}
+
+.floating-buttons button:hover {
+  background-color: #218838;
+}

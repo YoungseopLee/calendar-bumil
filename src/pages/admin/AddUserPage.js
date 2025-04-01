@@ -3,7 +3,6 @@ import Sidebar from "../components/Sidebar";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import LoadingSpinner from "../components/LoadingSpinner";
-import ManagerBackButton from "./ManagerBackButton";
 import "./AddUserPage.css";
 
 const AddUserPage = () => {
@@ -204,7 +203,6 @@ const AddUserPage = () => {
   return (
     <div className="user-add-body">
       <Sidebar user={user} />
-      <ManagerBackButton />
       <div className="user-add-container">
         <h2>신규 사원 추가</h2>
         <form onSubmit={handleSubmit}>

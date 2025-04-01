@@ -5,9 +5,9 @@
 
 /* 뒤로가기 버튼 */
 .back-button {
-  position: fixed; /* 스크롤 시에도 고정 */
-  bottom: 20px; /* 화면 아래에서 20px */
-  right: 20px; /* 화면 오른쪽에서 20px */
+  /* position: fixed; 스크롤 시에도 고정 */
+  /* bottom: 20px; 화면 아래에서 20px */
+  /* right: 20px; 화면 오른쪽에서 20px */
   width: 45px; /* 버튼 크기 */
   height: 45px; /* 버튼 크기 */
   background-color: #007bff9f;

@@ -1,13 +1,12 @@
-/* BackButton 컴포넌트 전용 스타일 */
-.back-button-container {
-  position: relative; /* 부모 요소 기준으로 컴포넌트 위치를 조정할 경우 */
+.scroll-top-container {
+  position: sticky; /* 🔥 fixed-header 아래 따라오게 설정 */
+  top: 80px; /* 📌 fixed-header 아래 여백 설정 */
+  display: flex;
+  justify-content: flex-start;
+  padding: 10px;
 }
 
-/* 뒤로가기 버튼 */
-.back-button {
-  /* position: fixed; 스크롤 시에도 고정 */
-  /* bottom: 20px; 화면 아래에서 20px */
-  /* right: 20px; 화면 오른쪽에서 20px */
+.scroll-to-top-button2 {
   width: 45px; /* 버튼 크기 */
   height: 45px; /* 버튼 크기 */
   background-color: #007bff9f;
@@ -24,6 +23,6 @@
   transition: background-color 0.3s ease;
 }
 
-.back-button:hover {
-  background-color: #0056b3; /* 호버 시 어두운 파란색 */
+.scroll-to-top-button.show {
+  display: flex;
 }

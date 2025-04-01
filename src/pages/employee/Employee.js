@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
+import FloatingButton from "../components/FloatingButton";
 import BackButton from "../components/BackButton";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
@@ -370,7 +371,9 @@ const EmployeeList = () => {
   return (
     <div className="app">
       <Sidebar user={user} />
-      <BackButton />
+      <FloatingButton>
+        <BackButton />
+      </FloatingButton>
 
       <div className="box">
         <h2 className="title">사원 목록</h2>

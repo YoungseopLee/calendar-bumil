@@ -16,10 +16,7 @@ function App() {
           element={<Modules.Admin.UserRolesManagement />}
         />
         <Route path="/reset-user" element={<Modules.Admin.ResetUser />} />
-        <Route
-          path="/status-management"
-          element={<Modules.Admin.StatusManagement />}
-        />
+        <Route path="/manage-status" element={<Modules.Admin.ManageStatus />} />
         <Route path="/login-log" element={<Modules.Admin.LoginLogPage />} />
         <Route
           path="/manage-department"
@@ -33,7 +30,10 @@ function App() {
         {/* ===== Auth ===== */}
         <Route path="/" element={<Modules.Auth.LoginPage />} />
         <Route path="/change-pw" element={<Modules.Auth.ChangePWPage />} />
-        <Route path="/choose-squid" element={<Modules.Auth.ChooseSquidPage />} />
+        <Route
+          path="/choose-squid"
+          element={<Modules.Auth.ChooseSquidPage />}
+        />
 
         {/* ===== Calendar ===== */}
         <Route path="/calendar" element={<Modules.CalendarModule.Calendar />} />

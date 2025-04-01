@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Manager.css";
 import Sidebar from "../components/Sidebar";
+import FloatingButton from "../components/FloatingButton";
 import ManagerBackButton from "../components/BackButton";
+import ScrollToTopButton2 from "../components/ScrollToTopButton2";
 import { useAuth } from "../../utils/useAuth";
 import LoadingSpinner from "../components/LoadingSpinner";
-import ScrollToTopButton from "../components/ScrollToTopButton";
 
 const Manager = () => {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ const Manager = () => {
 
   // 상태 관리 페이지 이동
   const goToStatusManagement = () => {
-    navigate("/status-management");
+    navigate("/manage-status");
   };
 
   // 역할 관리 페이지 이동
@@ -51,7 +52,7 @@ const Manager = () => {
     navigate("/add-user");
   };
 
-  // 유저 추가 페이지 이동
+  // 유저 관리 페이지 이동
   const goToUserManagePage = () => {
     navigate("/manage-user");
   };
@@ -81,7 +82,10 @@ const Manager = () => {
   return (
     <div className="manager-page">
       <Sidebar user={user} />
-      <ManagerBackButton />
+      <FloatingButton>
+        <ScrollToTopButton2 />
+        <ManagerBackButton />
+      </FloatingButton>
       <div className="manager-content">
         <h1 className="manager-title">관리자 페이지</h1>
 
@@ -155,9 +159,6 @@ const Manager = () => {
           </div>
         </div>
       </div>
-
-      {/* Scroll To Top 버튼 추가 */}
-      <ScrollToTopButton />
     </div>
   );
 };

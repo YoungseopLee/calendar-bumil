@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import FloatingButton from "../components/FloatingButton";
 import ManagerBackButton from "./ManagerBackButton";
+import BackButton from "../components/BackButton";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
@@ -120,7 +122,10 @@ const ResetUser = () => {
   return (
     <div className="user-reset-page">
       <Sidebar user={user} />
-      <ManagerBackButton />
+      <FloatingButton>
+        <BackButton />
+        <ManagerBackButton />
+      </FloatingButton>
       <div className="user-reset-box">
         <div className="user-reset-employee-container">
           <h2 className="user-reset-title">사용자 비밀번호 초기화</h2>

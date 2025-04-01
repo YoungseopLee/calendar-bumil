@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import ManagerBackButton from "./ManagerBackButton";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import LoadingSpinner from "../components/LoadingSpinner";
@@ -227,7 +226,6 @@ const EditUser = () => {
   return (
     <div className="user-edit-body">
       <Sidebar user={user} />
-      <ManagerBackButton />
       <div className="user-edit-container">
         <h2 className="user-edit-title">유저 정보 변경</h2>
         <form onSubmit={handleSubmit}>

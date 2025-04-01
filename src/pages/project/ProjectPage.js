@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { FaSearch } from "react-icons/fa";
 import ProjectList from "./ProjectList";
 import Sidebar from "../components/Sidebar";
+import FloatingButton from "../components/FloatingButton";
+import BackButton from "../components/BackButton";
 import AddProjectButton from "./AddProjectButton";
-import ScrollToTopButton from "../components/ScrollToTopButton";
+import ScrollToTopButton2 from "../components/ScrollToTopButton2";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
@@ -207,9 +209,16 @@ const ProjectPage = () => {
         <Sidebar user={user} />
       </div>
       {/* ✅ ADMIN 권한만 프로젝트 추가 버튼 표시 */}
-      {user?.role_id && ["AD_ADMIN", "PR_ADMIN"].includes(user?.role_id) && (
-        <AddProjectButton />
-      )}
+      <FloatingButton>
+        <div className="project-page-scroll-top-container">
+          <ScrollToTopButton2 />
+        </div>
+        <BackButton />
+        {user?.role_id && ["AD_ADMIN", "PR_ADMIN"].includes(user?.role_id) && (
+          <AddProjectButton />
+        )}
+      </FloatingButton>
+
       <div className="project-page-content">
         <div className="project-page-box">
           <div className="project-page-fixed-header">
@@ -297,10 +306,6 @@ const ProjectPage = () => {
                 </button>
               ))}
             </div>
-          </div>
-
-          <div className="project-page-scroll-top-container">
-            <ScrollToTopButton />
           </div>
 
           {/* 필터링 된 프로젝트 목록 */}

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import FloatingButton from "../components/FloatingButton";
 import ManagerBackButton from "./ManagerBackButton";
+import BackButton from "../components/BackButton";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 
-import "./StatusManagement.css";
-const StatusManagement = () => {
+import "./ManageStatus.css";
+const ManageStatus = () => {
   const [statuses, setStatuses] = useState([]);
   const [newStatus, setNewStatus] = useState("");
   const [newComment, setNewComment] = useState("");
@@ -118,7 +120,11 @@ const StatusManagement = () => {
   return (
     <div className="status-management">
       <Sidebar user={user} />
-      <ManagerBackButton />
+      <FloatingButton>
+        <BackButton />
+        <ManagerBackButton />
+      </FloatingButton>
+
       <h2 className="status-title">상태 관리</h2>
       <div className="status-list">
         {statuses.map((s) => (
@@ -156,4 +162,4 @@ const StatusManagement = () => {
   );
 };
 
-export default StatusManagement;
+export default ManageStatus;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import FloatingButton from "../components/FloatingButton";
 import BackButton from "../components/BackButton";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
@@ -309,7 +310,9 @@ const UserDetails = () => {
     <div className="userdetail-page">
       <header className="userdetail-header">
         <Sidebar user={loggedInUser} />
-        <BackButton />
+        <FloatingButton>
+          <BackButton />
+        </FloatingButton>
       </header>
       <div className="userdetail-container">
         <div className="userdetail-icon-name-section">

@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import "./AddNoticeButton.css"; 
-import { FaPlus } from "react-icons/fa";
-import AddNoticeButton from "./AddNoticeButton";
+import { FaPencilAlt } from "react-icons/fa";
+import "./AddNoticeButton.css";
 /**
  * 📌 프로젝트 추가 버튼 컴포넌트
  *  - 프로젝트 추가 페이지로 이동하는 버튼
@@ -13,8 +12,11 @@ function AddProjectButton() {
 
   return (
     <div className="back-button-container">
-      <button className="back-button" onClick={() => navigate("/notice-create")}>
-        <FaPlus />
+      <button
+        className="back-button"
+        onClick={() => navigate("/notice-create")}
+      >
+        <FaPencilAlt />
       </button>{" "}
       {/* 공지 추가 페이지로 이동 */}
     </div>

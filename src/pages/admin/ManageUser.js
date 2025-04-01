@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import Sidebar from "../components/Sidebar";
+import FloatingButton from "../components/FloatingButton";
+import BackButton from "../components/BackButton";
+import ManagerBackButton from "./ManagerBackButton";
 import LoadingSpinner from "../components/LoadingSpinner";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { followCursor } from "tippy.js";
-import ManagerBackButton from "./ManagerBackButton";
 import "./ManageUser.css";
 
 const ManageUser = () => {
@@ -210,7 +212,10 @@ const ManageUser = () => {
   return (
     <div className="manage-user-page">
       <Sidebar user={user} />
-      <ManagerBackButton />
+      <FloatingButton>
+        <BackButton />
+        <ManagerBackButton />
+      </FloatingButton>
       <div className="manage-user-box">
         <div className="manage-user-list-container">
           <h2 className="manage-user-title">유저 관리</h2>

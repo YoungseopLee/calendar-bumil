@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import FloatingButton from "../components/FloatingButton";
 import BackButton from "../components/BackButton";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
@@ -676,7 +677,9 @@ const SituationControls = () => {
       <h1 className="title">프로젝트 현황관리</h1>
       <header className="SituationControl-header">
         <Sidebar user={user} />
-        <BackButton />
+        <FloatingButton>
+          <BackButton />
+        </FloatingButton>
       </header>
       <div className="SituationControl-search-container">
         <div className="search-project-container">

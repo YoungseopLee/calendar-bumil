@@ -5,9 +5,9 @@
 
 /* 뒤로가기 버튼 & 프로젝트 추가 버튼 동일한 스타일 적용 */
 .add_schedule_button {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
+  /* position: fixed; */
+  /* bottom: 20px; */
+  /* right: 20px; */
   width: 45px;
   height: 45px;
   background-color: #007bff9f;

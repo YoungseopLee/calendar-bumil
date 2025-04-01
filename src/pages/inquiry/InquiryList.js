@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
+import FloatingButton from "../components/FloatingButton";
+import BackButton from "../components/BackButton";
+import AddInquiryButton from "./AddInquiryButton";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { followCursor } from "tippy.js";
-import "./InquiryList.css";
 import { Link } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import { IoSearchOutline } from "react-icons/io5";
@@ -12,17 +14,17 @@ import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
-import AddInquiryButton from "./AddInquiryButton";
+import "./InquiryList.css";
 
 /**
  * 📌  InquiryList - 문의사항 목록을 보여주는 컴포넌트
- * 
+ *
  * ✅ 주요 기능:
  * - 문의사항 목록 조회 (GET /inquiry/get_all_inquiry)
- * 
+ *
  * ✅ UI (또는 Component) 구조:
  * - InquiryList (문의사항 목록)
- * 
+ *
  */
 
 const InquiryList = () => {
@@ -160,11 +162,17 @@ const InquiryList = () => {
   return (
     <div className="inquiry-list-app-body">
       <Sidebar user={user} />
+      <FloatingButton>
+        <BackButton />
+        <div className="inquiry-list-create-button-container">
+          <AddInquiryButton />
+        </div>
+      </FloatingButton>
       <div className="inquiry-list-container">
         <div className="inquiry-header">
           <h1 className="inquiry-list-title">문의사항</h1>
         </div>
-  
+
         <div className="inquiry-search-icon-container">
           <div className="inquiry-search-container">
             <select
@@ -176,7 +184,7 @@ const InquiryList = () => {
               <option value="content">내용</option>
               <option value="created_by">작성자</option>
             </select>
-  
+
             <input
               type="text"
               className="inquiry-search-input"
@@ -187,19 +195,23 @@ const InquiryList = () => {
           </div>
           <IoSearchOutline className="inquiry-search-icon" />
         </div>
-  
+
         <div className="inquiry-list-list">
           {currentInquirys.length === 0 ? (
-            <div className="inquiry-list-empty">등록된 문의사항이 없습니다.</div>
+            <div className="inquiry-list-empty">
+              등록된 문의사항이 없습니다.
+            </div>
           ) : (
             currentInquirys.map((inquiry) => {
               const isPrivate = inquiry.private_yn === "Y";
               const canAccess = user.role_id === "AD_ADMIN";
-  
+
               return (
                 <div key={inquiry.id} className="inquiry-list-item">
                   {isPrivate && !canAccess ? (
-                    <div className="inquiry-private-message">비공개글 입니다.</div>
+                    <div className="inquiry-private-message">
+                      비공개글 입니다.
+                    </div>
                   ) : (
                     <>
                       <Tippy
@@ -236,12 +248,7 @@ const InquiryList = () => {
             })
           )}
         </div>
-  
-        {/* 문의사항 추가 버튼 */}
-        <div className="inquiry-list-create-button-container">
-          <AddInquiryButton />
-        </div>
-  
+
         {/* 페이지네이션 */}
         <div className="pagination">
           <button onClick={goToPreviousPage} disabled={currentPage === 1}>
