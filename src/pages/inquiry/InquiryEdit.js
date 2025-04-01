@@ -26,6 +26,7 @@ const InquiryEdit = () => {
     title: "",
     content: "",
     user_id: "",
+    private_yn:"",
   });
 
   //로그인한 사용자 정보
@@ -82,6 +83,7 @@ const InquiryEdit = () => {
         title: inquiry.title,
         content: inquiry.content,
         user_id: user.id,
+        private_yn:inquiry.private_yn,
       });
     }
   }, [inquiry, user.id]);
@@ -202,6 +204,20 @@ const InquiryEdit = () => {
             theme="snow"
             style={{ height: "100%" }}
           />
+          <div className="private-checkbox-group">
+            <label className="private-checkbox" htmlFor="private_yn">
+              <input
+                type="checkbox"
+                id="private_yn"
+                name="private_yn"
+                checked={formData.private_yn === "Y"}
+                onChange={(e) =>
+                  handleChange(e.target.checked ? "Y" : "N", "private_yn")
+                }
+              />
+              비공개 여부
+            </label>
+          </div>
           <div className="inquiry-edit-button-group">
             <button className="inquiry-edit-button" type="submit">
               저장
