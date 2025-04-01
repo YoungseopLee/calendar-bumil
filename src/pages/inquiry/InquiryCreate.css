@@ -28,7 +28,8 @@
 }
 
 /*내용(content) 소제목*/
-label{
+.inquiry-create-title-label,
+.inquiry-create-content-label {
   display: block;
   margin-bottom: 5px;
   font-size: 14px;

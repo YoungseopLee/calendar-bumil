@@ -154,7 +154,9 @@ const InquiryCreate = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="inquiry-create-form-group">
-            <label htmlFor="title">제목</label>
+            <label className="inquiry-create-title-label" htmlFor="title">
+              제목
+            </label>
             <input
               type="text"
               id="title"
@@ -164,7 +166,9 @@ const InquiryCreate = () => {
               required
             />
           </div>
-          <label htmlFor="content">내용</label>
+          <label className="inquiry-create-content-label" htmlFor="content">
+            내용
+          </label>
           <ReactQuill
             value={formData.content}
             onChange={(value) => handleChange(value, "content")}

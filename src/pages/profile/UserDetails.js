@@ -418,7 +418,7 @@ const UserDetails = () => {
               checked={isTableView}
               onChange={() => setIsTableView(!isTableView)}
             />
-            <label htmlFor="project-checkbox">표로 보기</label>
+            <label className="user-details-checkbox-label" htmlFor="project-checkbox">표로 보기</label>
           </div>
         </div>
         <div className="year-selector">

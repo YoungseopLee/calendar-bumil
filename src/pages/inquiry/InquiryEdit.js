@@ -26,7 +26,7 @@ const InquiryEdit = () => {
     title: "",
     content: "",
     user_id: "",
-    private_yn:"",
+    private_yn: "",
   });
 
   //로그인한 사용자 정보
@@ -45,13 +45,13 @@ const InquiryEdit = () => {
       try {
         const userInfo = await fetchUserInfo();
         const inquiryData = await fetchInquirys();
-  
+
         // console.log("userInfo: ", userInfo);
         // console.log("inquiry: ", inquiryData);
 
-        const isAuthor = userInfo.name === inquiryData.created_by; 
+        const isAuthor = userInfo.name === inquiryData.created_by;
         const isAdmin = userInfo.role_id === "AD_ADMIN";
-  
+
         // console.log("isAuthor: ", isAuthor);
         // console.log("isAdmin: ", isAdmin);
 
@@ -60,13 +60,12 @@ const InquiryEdit = () => {
           navigate("/inquiry-list");
           return;
         }
-  
       } catch (error) {
         console.error("데이터 로딩 오류:", error);
       }
       setLoading(false);
     };
-    
+
     fetchAllData();
   }, []);
 
@@ -83,7 +82,7 @@ const InquiryEdit = () => {
         title: inquiry.title,
         content: inquiry.content,
         user_id: user.id,
-        private_yn:inquiry.private_yn,
+        private_yn: inquiry.private_yn,
       });
     }
   }, [inquiry, user.id]);
@@ -132,14 +131,17 @@ const InquiryEdit = () => {
 
   const updateInquiry = async () => {
     try {
-      const response = await authFetch(`${apiUrl}/inquiry/update_inquiry/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await authFetch(
+        `${apiUrl}/inquiry/update_inquiry/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(formData),
+        }
+      );
       if (!response.ok) {
         throw new Error("문의사항 수정을 실패했습니다.");
       }
@@ -186,7 +188,9 @@ const InquiryEdit = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="inquiry-edit-form-group">
-            <label htmlFor="title">제목</label>
+            <label className="inquiry-title-label" htmlFor="title">
+              제목
+            </label>
             <input
               type="text"
               id="title"
@@ -196,7 +200,9 @@ const InquiryEdit = () => {
               required
             />
           </div>
-          <label htmlFor="content">내용</label>
+          <label className="inquiry-content-label" htmlFor="content">
+            내용
+          </label>
           <ReactQuill
             value={formData.content}
             onChange={(value) => handleChange(value, "content")}
