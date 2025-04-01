@@ -27,6 +27,14 @@
   color: #555555; /* 글씨 색상 - 중간 회색 */
 }
 
+/*내용(content) 소제목*/
+label{
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #555555;
+}
+
 /* ✅ 입력 필드 스타일 */
 .inquiry-create-form-group input {
   width: 94%; /* 입력 필드 너비 */

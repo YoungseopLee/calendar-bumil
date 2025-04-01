@@ -66,3 +66,11 @@
 .inquiry-edit-button:hover {
   background-color: #0056b3;
 }
+
+/*내용(content) 소제목*/
+label{
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #555555;
+}
