@@ -196,6 +196,7 @@ const InquiryEdit = () => {
               required
             />
           </div>
+          <label htmlFor="content">내용</label>
           <ReactQuill
             value={formData.content}
             onChange={(value) => handleChange(value, "content")}

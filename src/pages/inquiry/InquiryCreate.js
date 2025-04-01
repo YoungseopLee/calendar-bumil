@@ -159,10 +159,12 @@ const InquiryCreate = () => {
               type="text"
               id="title"
               name="title"
+              placeholder="제목을 입력하세요"
               onChange={(e) => handleChange(e.target.value, e.target.name)}
               required
             />
           </div>
+          <label htmlFor="content">내용</label>
           <ReactQuill
             value={formData.content}
             onChange={(value) => handleChange(value, "content")}
