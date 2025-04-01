@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import FloatingButton from "../components/FloatingButton";
 import BackButton from "../components/BackButton";
+import EmployeeBackButton from "../employee/EmployeeBackButton";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
 import { useAuth } from "../../utils/useAuth";
@@ -11,6 +12,7 @@ import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import { followCursor } from "tippy.js";
 import { MdSettings } from "react-icons/md";
+import { FaUsers } from "react-icons/fa";
 import "./UserDetails.css";
 import {
   FaOctopusDeploy,
@@ -312,6 +314,7 @@ const UserDetails = () => {
         <Sidebar user={loggedInUser} />
         <FloatingButton>
           <BackButton />
+          <EmployeeBackButton />
         </FloatingButton>
       </header>
       <div className="userdetail-container">
