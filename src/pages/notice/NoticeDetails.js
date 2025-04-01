@@ -88,7 +88,7 @@ const NoticeDetails = () => {
     if (!confirmDelete) return;
     try {
       const response = await authFetch(`${apiUrl}/notice/delete_notice/${id}`, {
-        method: "DELETE",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
