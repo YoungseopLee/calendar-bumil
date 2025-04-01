@@ -4,9 +4,6 @@ import Sidebar from "../components/Sidebar";
 import FloatingButton from "../components/FloatingButton";
 import BackButton from "../components/BackButton";
 import AddInquiryButton from "./AddInquiryButton";
-import Tippy from "@tippyjs/react";
-import "tippy.js/dist/tippy.css";
-import { followCursor } from "tippy.js";
 import { Link } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 import { IoSearchOutline } from "react-icons/io5";
@@ -14,6 +11,9 @@ import { useAuth } from "../../utils/useAuth";
 import { authFetch } from "../../utils/authFetch";
 import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
+import { followCursor } from "tippy.js";
 import "./InquiryList.css";
 
 /**
@@ -112,9 +112,9 @@ const InquiryList = () => {
       if (!searchText || searchText === "전체") return true;
       return inquiry.status === searchText;
     }
-  
+
     if (!searchText) return true;
-  
+
     const value = inquiry[searchField]?.toLowerCase() || "";
     return value.includes(searchText.toLowerCase());
   };
@@ -137,7 +137,7 @@ const InquiryList = () => {
     title: "제목",
     content: "내용",
     created_by: "작성자",
-    status: "상태", 
+    status: "상태",
   };
 
   // 페이지네이션 계산
@@ -183,41 +183,41 @@ const InquiryList = () => {
 
         <div className="inquiry-search-icon-container">
           <div className="inquiry-search-container">
-                    <select
-            className="inquiry-search-dropdown"
-            value={searchField}
-            onChange={(e) => {
-              setSearchField(e.target.value);
-              setSearchText(""); 
-            }}
-          >
-            <option value="title">제목</option>
-            <option value="content">내용</option>
-            <option value="created_by">작성자</option>
-            <option value="status">상태</option> 
-          </select>
+            <select
+              className="inquiry-search-dropdown"
+              value={searchField}
+              onChange={(e) => {
+                setSearchField(e.target.value);
+                setSearchText("");
+              }}
+            >
+              <option value="title">제목</option>
+              <option value="content">내용</option>
+              <option value="created_by">작성자</option>
+              <option value="status">상태</option>
+            </select>
 
-          {searchField === "status" ? (
-  <select
-    className="inquiry-search-input"
-    onChange={(e) => setSearchText(e.target.value)}
-    value={searchText}
-  >
-    <option value="">전체</option>
-    <option value="대기중">대기중</option>
-    <option value="답변완료">답변완료</option>
-  </select>
-) : (
-  <input
-    type="text"
-    className="inquiry-search-input"
-    placeholder={`${searchFieldLabelMap[searchField]}를 입력하세요.`}
-    onChange={(e) => setSearchText(e.target.value)}
-    value={searchText}
-  />
-)}
+            {searchField === "status" ? (
+              <select
+                className="inquiry-search-input"
+                onChange={(e) => setSearchText(e.target.value)}
+                value={searchText}
+              >
+                <option value="">전체</option>
+                <option value="대기중">대기중</option>
+                <option value="답변완료">답변완료</option>
+              </select>
+            ) : (
+              <input
+                type="text"
+                className="inquiry-search-input"
+                placeholder={`${searchFieldLabelMap[searchField]}를 입력하세요.`}
+                onChange={(e) => setSearchText(e.target.value)}
+                value={searchText}
+              />
+            )}
           </div>
-          
+
           <IoSearchOutline className="inquiry-search-icon" />
         </div>
 
@@ -231,13 +231,22 @@ const InquiryList = () => {
               const isPrivate = inquiry.private_yn === "Y";
               const canAccess = user.role_id === "AD_ADMIN";
 
+              const statusDotClass =
+                inquiry.status === "답변완료"
+                  ? "status-complete"
+                  : "status-pending";
+
               return (
                 <div key={inquiry.id} className="inquiry-list-item">
                   <div className="inquiry-list-title-with-status">
-                    <span className={`inquiry-status-dot ${statusDotClass}`}></span>
+                    <span
+                      className={`inquiry-status-dot ${statusDotClass}`}
+                    ></span>
 
                     {isPrivate && !canAccess ? (
-                      <span className="inquiry-private-message">비공개글 입니다.</span>
+                      <span className="inquiry-private-message">
+                        비공개글 입니다.
+                      </span>
                     ) : (
                       <Tippy
                         content={inquiry.title}
@@ -274,12 +283,7 @@ const InquiryList = () => {
             })
           )}
         </div>
-  
-        {/* 문의사항 추가 버튼 */}
-        <div className="inquiry-list-create-button-container">
-          <AddInquiryButton />
-        </div>
-  
+
         {/* 페이지네이션 */}
         <div className="pagination">
           <button onClick={goToPreviousPage} disabled={currentPage === 1}>
