@@ -97,6 +97,7 @@ const InquiryList = () => {
       const data = await response.json();
       setInquirys(data.inquiries);
       setFilteredInquirys(data.inquiries);
+      // console.log("문의사항 목록:", data.inquiries);
     } catch (err) {
       console.error("문의사항 목록 조회 오류:", err);
       setError("문의사항을 불러오는 중 오류가 발생했습니다.");
@@ -105,9 +106,15 @@ const InquiryList = () => {
     }
   };
 
-  // 검색 및 필터링 로직
   const filterInquirys = (inquiry) => {
+    if (searchField === "status") {
+      // 전체 선택 시 모든 항목 통과
+      if (!searchText || searchText === "전체") return true;
+      return inquiry.status === searchText;
+    }
+  
     if (!searchText) return true;
+  
     const value = inquiry[searchField]?.toLowerCase() || "";
     return value.includes(searchText.toLowerCase());
   };
@@ -130,6 +137,7 @@ const InquiryList = () => {
     title: "제목",
     content: "내용",
     created_by: "작성자",
+    status: "상태", 
   };
 
   // 페이지네이션 계산
@@ -175,24 +183,41 @@ const InquiryList = () => {
 
         <div className="inquiry-search-icon-container">
           <div className="inquiry-search-container">
-            <select
-              className="inquiry-search-dropdown"
-              value={searchField}
-              onChange={(e) => setSearchField(e.target.value)}
-            >
-              <option value="title">제목</option>
-              <option value="content">내용</option>
-              <option value="created_by">작성자</option>
-            </select>
+                    <select
+            className="inquiry-search-dropdown"
+            value={searchField}
+            onChange={(e) => {
+              setSearchField(e.target.value);
+              setSearchText(""); 
+            }}
+          >
+            <option value="title">제목</option>
+            <option value="content">내용</option>
+            <option value="created_by">작성자</option>
+            <option value="status">상태</option> 
+          </select>
 
-            <input
-              type="text"
-              className="inquiry-search-input"
-              placeholder={`${searchFieldLabelMap[searchField]}를 입력하세요.`}
-              onChange={(e) => setSearchText(e.target.value)}
-              value={searchText}
-            />
+          {searchField === "status" ? (
+  <select
+    className="inquiry-search-input"
+    onChange={(e) => setSearchText(e.target.value)}
+    value={searchText}
+  >
+    <option value="">전체</option>
+    <option value="대기중">대기중</option>
+    <option value="답변완료">답변완료</option>
+  </select>
+) : (
+  <input
+    type="text"
+    className="inquiry-search-input"
+    placeholder={`${searchFieldLabelMap[searchField]}를 입력하세요.`}
+    onChange={(e) => setSearchText(e.target.value)}
+    value={searchText}
+  />
+)}
           </div>
+          
           <IoSearchOutline className="inquiry-search-icon" />
         </div>
 
@@ -208,12 +233,12 @@ const InquiryList = () => {
 
               return (
                 <div key={inquiry.id} className="inquiry-list-item">
-                  {isPrivate && !canAccess ? (
-                    <div className="inquiry-private-message">
-                      비공개글 입니다.
-                    </div>
-                  ) : (
-                    <>
+                  <div className="inquiry-list-title-with-status">
+                    <span className={`inquiry-status-dot ${statusDotClass}`}></span>
+
+                    {isPrivate && !canAccess ? (
+                      <span className="inquiry-private-message">비공개글 입니다.</span>
+                    ) : (
                       <Tippy
                         content={inquiry.title}
                         placement="top"
@@ -233,22 +258,28 @@ const InquiryList = () => {
                           {inquiry.title}
                         </Link>
                       </Tippy>
-                      <div className="inquiry-list-info">
-                        <span className="inquiry-list-author">
-                          {inquiry.created_by || "관리자"}
-                        </span>
-                        <span className="inquiry-list-date">
-                          {formatDate(inquiry.created_at)}
-                        </span>
-                      </div>
-                    </>
-                  )}
+                    )}
+                  </div>
+
+                  <div className="inquiry-list-info">
+                    <span className="inquiry-list-author">
+                      {inquiry.created_by || "관리자"}
+                    </span>
+                    <span className="inquiry-list-date">
+                      {formatDate(inquiry.created_at)}
+                    </span>
+                  </div>
                 </div>
               );
             })
           )}
         </div>
-
+  
+        {/* 문의사항 추가 버튼 */}
+        <div className="inquiry-list-create-button-container">
+          <AddInquiryButton />
+        </div>
+  
         {/* 페이지네이션 */}
         <div className="pagination">
           <button onClick={goToPreviousPage} disabled={currentPage === 1}>
