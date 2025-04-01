@@ -229,7 +229,9 @@ const InquiryList = () => {
           ) : (
             currentInquirys.map((inquiry) => {
               const isPrivate = inquiry.private_yn === "Y";
-              const canAccess = user.role_id === "AD_ADMIN";
+              const canAccess = 
+                user.role_id === "AD_ADMIN" || 
+                user.name === inquiry.created_by;
 
               const statusDotClass =
                 inquiry.status === "답변완료"
