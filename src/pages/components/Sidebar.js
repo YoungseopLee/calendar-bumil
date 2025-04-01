@@ -10,7 +10,9 @@ import {
   FaTools,
   FaUserShield,
   FaSignOutAlt,
+  FaQuestion,
 } from "react-icons/fa";
+
 import "./Sidebar.css";
 
 import "../../utils/useAuth";
@@ -105,12 +107,7 @@ const Sidebar = ({
               {!isTablet && "공지사항"}
             </Link>
           </li>
-          <li>
-            <Link to="/inquiry-list">
-              <FaClipboardList className="menu-icon" />{" "}
-              {!isTablet && "문의사항"}
-            </Link>
-          </li>
+
           <li>
             <Link to="/projects">
               <FaProjectDiagram className="menu-icon" />{" "}
@@ -130,6 +127,11 @@ const Sidebar = ({
           <li>
             <Link to="/situation_control">
               <FaTools className="menu-icon" /> {!isTablet && "현황 관리"}
+            </Link>
+          </li>
+          <li>
+            <Link to="/inquiry-list">
+              <FaQuestion className="menu-icon" /> {!isTablet && "문의사항"}
             </Link>
           </li>
           {user?.role_id === "AD_ADMIN" && (
