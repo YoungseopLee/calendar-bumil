@@ -174,14 +174,14 @@ def delete_inquiry(inquiry_id):
         WHERE id = %s AND is_delete_yn = 'N'"""
         cursor.execute(sql_check, (inquiry_id,))
         row = cursor.fetchone()
-        if not row or row['user_id'] != user_id:
+        if not row or (row['user_id'] != user_id and role_id != 'AD_ADMIN'):
             return jsonify({'message': '삭제 권한이 없습니다.'}), 403
 
         sql = """
         UPDATE tb_inquiry
         SET is_delete_yn = 'Y', updated_by = %s
         WHERE id = %s"""
-        cursor.execute(sql, (user_name, inquiry_id))
+        cursor.execute(sql, (user_name, inquiry_id,))
         conn.commit()
         logger.info(f"[SQL/DELETE] {sql} | PARAMS: ({user_name}, {inquiry_id})")
         response = jsonify({'message': '문의사항이 삭제되었습니다.'})
