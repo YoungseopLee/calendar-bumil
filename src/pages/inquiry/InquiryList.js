@@ -229,9 +229,8 @@ const InquiryList = () => {
           ) : (
             currentInquirys.map((inquiry) => {
               const isPrivate = inquiry.private_yn === "Y";
-              const canAccess = 
-                user.role_id === "AD_ADMIN" || 
-                user.name === inquiry.created_by;
+              const canAccess =
+                user.role_id === "AD_ADMIN" || user.name === inquiry.created_by;
 
               const statusDotClass =
                 inquiry.status === "답변완료"
@@ -240,37 +239,35 @@ const InquiryList = () => {
 
               return (
                 <div key={inquiry.id} className="inquiry-list-item">
-                  <div className="inquiry-list-title-with-status">
-                    <span
-                      className={`inquiry-status-dot ${statusDotClass}`}
-                    ></span>
+                  <span
+                    className={`inquiry-status-dot ${statusDotClass}`}
+                  ></span>
 
-                    {isPrivate && !canAccess ? (
-                      <span className="inquiry-private-message">
-                        비공개글 입니다.
-                      </span>
-                    ) : (
-                      <Tippy
-                        content={inquiry.title}
-                        placement="top"
-                        plugins={[followCursor]}
-                        followCursor="horizontal"
-                        arrow={true}
-                        popperOptions={{
-                          modifiers: [
-                            {
-                              name: "preventOverflow",
-                              options: { boundary: "window" },
-                            },
-                          ],
-                        }}
-                      >
-                        <Link to={`/inquiry-details/${inquiry.id}`}>
-                          {inquiry.title}
-                        </Link>
-                      </Tippy>
-                    )}
-                  </div>
+                  {isPrivate && !canAccess ? (
+                    <span className="inquiry-private-message">
+                      비공개글 입니다.
+                    </span>
+                  ) : (
+                    <Tippy
+                      content={inquiry.title}
+                      placement="top"
+                      plugins={[followCursor]}
+                      followCursor="horizontal"
+                      arrow={true}
+                      popperOptions={{
+                        modifiers: [
+                          {
+                            name: "preventOverflow",
+                            options: { boundary: "window" },
+                          },
+                        ],
+                      }}
+                    >
+                      <Link to={`/inquiry-details/${inquiry.id}`}>
+                        {inquiry.title}
+                      </Link>
+                    </Tippy>
+                  )}
 
                   <div className="inquiry-list-info">
                     <span className="inquiry-list-author">
