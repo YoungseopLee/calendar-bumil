@@ -157,6 +157,12 @@ const InquiryDetails = () => {
     }
   };
 
+  //권한 확인 함수(수정/삭제 버튼)
+  const canModifyInquiry = () => {
+    if (!inquiry || !user) return false;
+    return user.name === inquiry.created_by || user.role_id === "AD_ADMIN";
+  };
+
   // ✅ 로딩 중 또는 에러 시 화면에 표시할 메세지
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage />;
@@ -251,7 +257,7 @@ const InquiryDetails = () => {
             cursor: "pointer",
           }}
         ></div>
-        {user?.role_id === "AD_ADMIN" && (
+        {canModifyInquiry() && (
           <>
             <div className="inquiry-details-button-group">
               <BsPencilSquare
